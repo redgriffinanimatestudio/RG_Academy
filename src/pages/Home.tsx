@@ -1,12 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { GraduationCap, Briefcase, Play, Check, Globe, Users } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { signInWithGoogle } from '../firebase';
+import OAuthConsent from '../components/OAuthConsent';
 
 const Home: React.FC = () => {
   const { t } = useTranslation();
   const { lang } = useParams();
+  const [showConsent, setShowConsent] = useState(false);
+
+  const handleSocialLogin = () => {
+    setShowConsent(true);
+  };
+
+  const handleAcceptConsent = async () => {
+    setShowConsent(false);
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
 
   return (
     <div className="space-y-32 pb-24">
@@ -53,7 +69,7 @@ const Home: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="flex items-center gap-8 pt-4"
+            className="flex flex-wrap items-center gap-6 pt-4"
           >
             <Link to={`/aca/${lang}`} className="flex items-center gap-4 group">
               <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center transition-transform group-hover:scale-110">
@@ -64,6 +80,14 @@ const Home: React.FC = () => {
                 <div className="text-sm font-black uppercase tracking-widest text-white group-hover:text-primary transition-colors">{t('promotion_studio')}</div>
               </div>
             </Link>
+
+            <button 
+              onClick={handleSocialLogin}
+              className="flex items-center gap-3 bg-white text-bg-dark px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-neutral-100 transition-all shadow-xl active:scale-95"
+            >
+              <img src="https://www.google.com/favicon.ico" alt="" className="w-4 h-4" />
+              {t('continue_google')}
+            </button>
           </motion.div>
         </div>
       </section>
@@ -128,7 +152,7 @@ const Home: React.FC = () => {
           <div className="grid grid-cols-2 gap-8">
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-primary">
-                <Check size={20} />
+                <div className="font-black text-xs">01</div>
               </div>
               <div>
                 <div className="font-black uppercase tracking-tight text-sm">{t('clean_code')}</div>
@@ -137,7 +161,7 @@ const Home: React.FC = () => {
             </div>
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-primary">
-                <Check size={20} />
+                <div className="font-black text-xs">02</div>
               </div>
               <div>
                 <div className="font-black uppercase tracking-tight text-sm">{t('modern_design')}</div>
@@ -173,15 +197,33 @@ const Home: React.FC = () => {
         <p className="text-xl text-white/40 font-medium max-w-2xl mx-auto">
           {t('join_artists')}
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-          <Link to={`/signup/${lang}`} className="criativo-btn w-full sm:w-auto">
-            {t('get_started_free')}
-          </Link>
-          <Link to={`/community/${lang}`} className="px-12 py-5 border-2 border-white/10 text-white font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all w-full sm:w-auto">
-            {t('view_community')}
-          </Link>
+        <div className="flex flex-col items-center justify-center gap-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full">
+            <button 
+              onClick={handleSocialLogin}
+              className="bg-white text-bg-dark px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-neutral-100 transition-all w-full sm:w-auto flex items-center justify-center gap-4 shadow-2xl shadow-white/5"
+            >
+              <img src="https://www.google.com/favicon.ico" alt="" className="w-5 h-5" />
+              {t('continue_google')}
+            </button>
+            <Link to={`/community/${lang}`} className="px-12 py-5 border-2 border-white/10 text-white font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all w-full sm:w-auto">
+              {t('view_community')}
+            </Link>
+          </div>
+          
+          <div className="flex items-center gap-6 opacity-20 group">
+            <div className="h-[1px] w-12 bg-white" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em]">{t('secure_auth')}</span>
+            <div className="h-[1px] w-12 bg-white" />
+          </div>
         </div>
       </section>
+
+      <OAuthConsent 
+        isOpen={showConsent} 
+        onClose={() => setShowConsent(false)} 
+        onAccept={handleAcceptConsent}
+      />
     </div>
   );
 };

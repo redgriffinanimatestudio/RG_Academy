@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { GraduationCap, Search, Filter, PlayCircle, Star, Users, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useParams } from 'react-router-dom';
+import { 
+  Search, 
+  Filter, 
+  PlayCircle, 
+  Star, 
+  Users, 
+  ChevronRight, 
+  BookOpen,
+  ArrowLeft,
+  GraduationCap
+} from 'lucide-react';
 
 const MOCK_COURSES = [
   {
@@ -18,22 +28,8 @@ const MOCK_COURSES = [
     duration: '24h 15m',
     levelKey: 'advanced',
     thumbnail: 'https://picsum.photos/seed/rigging/800/600',
-    category: 'Animation'
-  },
-  {
-    id: '2',
-    slug: 'cinematic-vfx-houdini-destruction',
-    title: 'Cinematic VFX: Houdini Destruction',
-    lecturer: 'Sarah Chen',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-2.png',
-    rating: 4.8,
-    reviews: 850,
-    price: 129.99,
-    students: 8200,
-    duration: '32h 40m',
-    levelKey: 'expert',
-    thumbnail: 'https://picsum.photos/seed/houdini/800/600',
-    category: 'VFX & Compositing'
+    category: 'Animation',
+    topics: ['Character Modeling', 'Retopology']
   },
   {
     id: '3',
@@ -48,69 +44,14 @@ const MOCK_COURSES = [
     duration: '45h 20m',
     levelKey: 'intermediate',
     thumbnail: 'https://picsum.photos/seed/envart/800/600',
-    category: '3D Modeling'
-  },
-  {
-    id: '4',
-    slug: 'unreal-engine-5-real-time-lighting',
-    title: 'Unreal Engine 5: Real-time Lighting',
-    lecturer: 'Elena Vance',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-4.png',
-    rating: 4.9,
-    reviews: 3400,
-    price: 79.99,
-    students: 45000,
-    duration: '18h 30m',
-    levelKey: 'intermediate',
-    thumbnail: 'https://picsum.photos/seed/ue5/800/600',
-    category: 'Game Development'
-  },
-  {
-    id: '5',
-    slug: 'digital-sculpting-zbrush',
-    title: 'Digital Sculpting with ZBrush',
-    lecturer: 'David Miller',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-5.png',
-    rating: 4.8,
-    reviews: 1500,
-    price: 69.99,
-    students: 12000,
-    duration: '28h 10m',
-    levelKey: 'beginner',
-    thumbnail: 'https://picsum.photos/seed/zbrush/800/600',
-    category: '3D Modeling'
-  },
-  {
-    id: '6',
-    slug: '2d-animation-principles-cg',
-    title: '2D Animation Principles for CG',
-    lecturer: 'Yuki Tanaka',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-6.png',
-    rating: 4.9,
-    reviews: 980,
-    price: 54.99,
-    students: 7500,
-    duration: '12h 45m',
-    levelKey: 'beginner',
-    thumbnail: 'https://picsum.photos/seed/2danim/800/600',
-    category: 'Animation'
+    category: '3D Modeling',
+    topics: ['Modular Environments', 'World Building']
   }
 ];
 
-const CATEGORIES = [
-  'all_workshops',
-  'modeling_3d',
-  'animation',
-  'vfx_compositing',
-  'game_dev',
-  'digital_art',
-  'software_masterclass'
-];
-
-export default function Academy() {
+export default function TopicPage() {
   const { t } = useTranslation();
-  const { lang } = useParams();
-  const [selectedCategory, setSelectedCategory] = useState('all_workshops');
+  const { lang, topicSlug } = useParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   
@@ -121,43 +62,40 @@ export default function Academy() {
     duration: 'all'
   });
 
-  const filteredCourses = MOCK_COURSES.filter(course => {
-    const categoryKey = course.category === '3D Modeling' ? 'modeling_3d' :
-                       course.category === 'Animation' ? 'animation' :
-                       course.category === 'VFX & Compositing' ? 'vfx_compositing' :
-                       course.category === 'Game Development' ? 'game_dev' :
-                       course.category === 'Digital Art' ? 'digital_art' :
-                       course.category === 'Software Masterclass' ? 'software_masterclass' : '';
+  const topicName = topicSlug?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Topic';
 
-    const matchesCategory = selectedCategory === 'all_workshops' || categoryKey === selectedCategory;
-    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         course.lecturer.toLowerCase().includes(searchQuery.toLowerCase());
-    
+  const filteredCourses = MOCK_COURSES.filter(course => {
+    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesLevel = filters.level === 'all' || course.levelKey === filters.level;
     const matchesPrice = course.price <= filters.priceRange[1];
     const matchesDuration = filters.duration === 'all' || 
-      (filters.duration === 'short' && parseInt(course.duration) < 20) ||
-      (filters.duration === 'long' && parseInt(course.duration) >= 20);
-
-    return matchesCategory && matchesSearch && matchesLevel && matchesPrice && matchesDuration;
+      (filters.duration === 'short' && parseInt(course.duration) < 10) ||
+      (filters.duration === 'long' && parseInt(course.duration) >= 10);
+      
+    return matchesSearch && matchesLevel && matchesPrice && matchesDuration;
   });
 
   return (
     <div className="space-y-12 py-8">
       <header className="space-y-8">
+        <Link 
+          to={`/aca/${lang}`} 
+          className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/40 hover:text-primary transition-colors"
+        >
+          <ArrowLeft size={14} />
+          {t('all_workshops')}
+        </Link>
+
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-primary font-black uppercase tracking-[0.3em] text-[10px]">
               <GraduationCap size={14} />
-              {t('academy_workshops')}
+              {t('learning_paths')}
             </div>
             <h1 className="text-6xl font-black tracking-tighter text-white leading-none uppercase">
-              {t('master_craft').split('.')[0]} <br />
-              <span className="text-primary italic">{t('master_craft').split('.')[1] || 'CRAFT.'}</span>
+              {topicName.split(' ')[0]} <br />
+              <span className="text-primary italic">{topicName.split(' ').slice(1).join(' ')}</span>
             </h1>
-            <p className="text-lg text-white/40 max-w-xl font-medium">
-              {t('academy_desc')}
-            </p>
           </div>
           
           <div className="flex flex-col gap-4 w-full md:w-auto">
@@ -196,7 +134,7 @@ export default function Academy() {
                 <div className="space-y-4">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">Skill Level</h4>
                   <div className="flex flex-wrap gap-2">
-                    {['all', 'beginner', 'intermediate', 'advanced', 'expert'].map((lvl) => (
+                    {['all', 'beginner', 'intermediate', 'advanced'].map((lvl) => (
                       <button
                         key={lvl}
                         onClick={() => setFilters({ ...filters, level: lvl })}
@@ -233,8 +171,8 @@ export default function Academy() {
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/60 focus:outline-none focus:border-primary cursor-pointer appearance-none"
                   >
                     <option value="all" className="bg-bg-card text-white">Any Duration</option>
-                    <option value="short" className="bg-bg-card text-white">Short (&lt; 20 hours)</option>
-                    <option value="long" className="bg-bg-card text-white">Long (20+ hours)</option>
+                    <option value="short" className="bg-bg-card text-white">Short (&lt; 10 hours)</option>
+                    <option value="long" className="bg-bg-card text-white">Long (10+ hours)</option>
                   </select>
                 </div>
               </div>
@@ -242,24 +180,16 @@ export default function Academy() {
           )}
         </AnimatePresence>
 
-        <div className="flex items-center gap-3 overflow-x-auto pb-4 no-scrollbar">
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 text-white/40 rounded-xl text-xs font-black uppercase tracking-widest mr-2 border border-white/5">
-            <Filter size={14} />
-            {t('category')}
+        <div className="flex items-center gap-4 p-8 rounded-[2.5rem] bg-white/5 border border-white/5">
+          <div className="size-12 rounded-2xl bg-primary flex items-center justify-center text-bg-dark shadow-lg shadow-primary/20">
+            <BookOpen size={24} />
           </div>
-          {CATEGORIES.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all border ${
-                selectedCategory === category
-                  ? 'bg-primary text-bg-dark border-primary shadow-lg shadow-primary/20'
-                  : 'bg-white/5 text-white/40 border-white/5 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              {t(category)}
-            </button>
-          ))}
+          <div>
+            <h3 className="text-sm font-black uppercase tracking-tight text-white">Curated Path: {topicName}</h3>
+            <p className="text-xs font-bold text-white/40 uppercase tracking-widest mt-1">
+              {filteredCourses.length} Workshops • Industry Standard Curriculum
+            </p>
+          </div>
         </div>
       </header>
 
@@ -286,14 +216,6 @@ export default function Academy() {
                     <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-bg-dark shadow-xl shadow-primary/40 transform scale-75 group-hover:scale-100 transition-transform duration-500">
                       <PlayCircle size={32} fill="currentColor" />
                     </div>
-                  </div>
-                  <div className="absolute top-4 left-4 px-3 py-1 bg-black/80 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest rounded-lg">
-                    {t(course.category === '3D Modeling' ? 'modeling_3d' :
-                       course.category === 'Animation' ? 'animation' :
-                       course.category === 'VFX & Compositing' ? 'vfx_compositing' :
-                       course.category === 'Game Development' ? 'game_dev' :
-                       course.category === 'Digital Art' ? 'digital_art' :
-                       course.category === 'Software Masterclass' ? 'software_masterclass' : course.category)}
                   </div>
                 </div>
                 
@@ -341,16 +263,27 @@ export default function Academy() {
         </AnimatePresence>
       </div>
 
-      <section className="bg-primary rounded-[2.5rem] p-12 text-bg-dark flex flex-col md:flex-row items-center justify-between gap-8">
-        <div className="space-y-4 text-center md:text-left">
-          <h2 className="text-4xl font-black tracking-tighter uppercase">{t('become_mentor')}</h2>
-          <p className="text-bg-dark/60 font-medium max-w-md">
-            {t('mentor_desc')}
+      <section className="bg-white/5 border border-white/5 rounded-[2.5rem] p-12 flex flex-col items-center text-center space-y-8">
+        <div className="size-20 rounded-[2rem] bg-primary/10 flex items-center justify-center text-primary">
+          <GraduationCap size={40} />
+        </div>
+        <div className="space-y-4 max-w-2xl">
+          <h2 className="text-4xl font-black tracking-tighter uppercase">Don't see what you're looking for?</h2>
+          <p className="text-lg text-white/40 font-medium leading-relaxed">
+            Our academy is constantly expanding. Subscribe to get notified about new workshops in {topicName} 
+            and exclusive mentorship opportunities.
           </p>
         </div>
-        <button className="bg-bg-dark text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-black transition-all hover:scale-105 shadow-xl shadow-black/10">
-          {t('start_teaching')}
-        </button>
+        <div className="flex w-full max-w-md gap-4">
+          <input 
+            type="email" 
+            placeholder="Enter your email" 
+            className="flex-1 bg-white/5 border-none rounded-2xl p-4 text-white placeholder:text-white/20 font-medium focus:ring-2 focus:ring-primary/20 transition-all"
+          />
+          <button className="bg-primary text-bg-dark px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-xl shadow-primary/20">
+            Notify Me
+          </button>
+        </div>
       </section>
     </div>
   );

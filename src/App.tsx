@@ -13,6 +13,7 @@ import Login from './pages/Login';
 import Messages from './pages/Messages';
 import Dashboard from './pages/Dashboard';
 import CreateCourse from './pages/CreateCourse';
+import TopicPage from './pages/TopicPage';
 import SpecialistProfile from './pages/SpecialistProfile';
 import Contracts from './pages/Contracts';
 import InfoPage from './pages/InfoPage';
@@ -75,6 +76,7 @@ export default function App() {
           <Route path="/:lang" element={<LanguageWrapper><Layout><Home /></Layout></LanguageWrapper>} />
           <Route path="/dev/:lang" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
           <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />
+          <Route path="/aca/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><TopicPage /></Layout></LanguageWrapper>} />
           <Route path="/aca/:lang/course/:slug" element={<LanguageWrapper><Layout><CourseDetail /></Layout></LanguageWrapper>} />
           <Route path="/learn/:lang/:slug" element={<LanguageWrapper><Learn /></LanguageWrapper>} />
           <Route path="/studio/:lang" element={<LanguageWrapper><Layout><Studio /></Layout></LanguageWrapper>} />
