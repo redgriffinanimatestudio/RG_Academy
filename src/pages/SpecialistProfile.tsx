@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { 
   MapPin, 
   Link as LinkIcon, 
@@ -12,11 +12,13 @@ import {
   Star,
   Clock,
   Briefcase,
-  UserCheck
+  UserCheck,
+  ArrowLeft
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const MOCK_PROFILE = {
+  // ... existing mock data
   name: 'Alex Rivera',
   role: 'Senior Character Technical Artist',
   avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png',
@@ -39,10 +41,21 @@ const MOCK_PROFILE = {
 
 export default function SpecialistProfile() {
   const { id } = useParams();
+  const location = useLocation();
+  const isStudio = location.pathname.includes('/studio/');
+  const backLink = isStudio ? `/studio` : `/aca`;
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-12">
+        <Link 
+          to={backLink}
+          className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/20 hover:text-primary transition-colors"
+        >
+          <ArrowLeft size={14} />
+          {isStudio ? 'Back to Studio' : 'Back to Academy'}
+        </Link>
+
         {/* Profile Header Card */}
         <div className="relative p-12 rounded-[3rem] bg-zinc-900 border border-white/5 overflow-hidden">
           <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/10 to-transparent pointer-events-none" />

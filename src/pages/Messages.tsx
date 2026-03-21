@@ -21,6 +21,7 @@ export default function Messages() {
 
   const [showNewChat, setShowNewChat] = useState(false);
   const [searchUserQuery, setSearchUserQuery] = useState('');
+  const [roomSearchQuery, setRoomSearchQuery] = useState('');
   const [searchResults, setSearchUserResults] = useState<UserProfile[]>([]);
 
   useEffect(() => {
@@ -37,6 +38,13 @@ export default function Messages() {
 
     return () => unsubscribe();
   }, [user]);
+
+  const filteredRooms = rooms.filter(room => {
+    const partnerId = room.participants.find(p => p !== user?.uid);
+    const partner = partnerId ? participants[partnerId] : null;
+    return partner?.displayName?.toLowerCase().includes(roomSearchQuery.toLowerCase()) || 
+           room.lastMessage?.toLowerCase().includes(roomSearchQuery.toLowerCase());
+  });
 
   useEffect(() => {
     if (!activeRoomId) return;
@@ -116,14 +124,16 @@ export default function Messages() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" size={16} />
             <input 
               type="text" 
-              placeholder={t('search_workshops')} 
+              value={roomSearchQuery}
+              onChange={(e) => setRoomSearchQuery(e.target.value)}
+              placeholder="Search conversations..." 
               className="w-full pl-10 pr-4 py-3 bg-white/5 border-none rounded-xl text-[11px] font-medium text-white placeholder:text-white/20 focus:ring-1 focus:ring-primary/20 transition-all"
             />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto no-scrollbar">
-          {rooms.map((room) => {
+          {filteredRooms.map((room) => {
             const partnerId = room.participants.find(p => p !== user.uid);
             const partner = partnerId ? participants[partnerId] : null;
             

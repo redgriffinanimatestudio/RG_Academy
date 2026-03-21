@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import { 
   Users, 
   MessageSquare, 
@@ -36,8 +37,18 @@ interface Alert {
 
 export default function Community() {
   const { t } = useTranslation();
+  const { lang } = useParams();
+  const location = useLocation();
+  const isStudio = location.pathname.includes('/studio/');
+  const modePrefix = isStudio ? '/studio' : '/aca';
+
   const [activeTab, setActiveTab] = useState<'discussions' | 'feed' | 'discovery'>('discussions');
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [showDiscussionFilters, setShowDiscussionFilters] = useState(false);
+  const [discussionFilters, setDiscussionFilters] = useState({
+    category: 'all',
+    sortBy: 'recent'
+  });
   
   // Networking States
   const [feed, setFeed] = useState<FeedEvent[]>([]);
@@ -137,6 +148,14 @@ export default function Community() {
     }
   };
 
+  const filteredDiscussions = discussions.filter(d => {
+    const matchesCategory = discussionFilters.category === 'all' || d.category === discussionFilters.category;
+    return matchesCategory;
+  }).sort((a, b) => {
+    if (discussionFilters.sortBy === 'replies') return b.replies - a.replies;
+    return 0; // Default recent
+  });
+
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -190,24 +209,88 @@ export default function Community() {
                   exit={{ opacity: 0, x: 20 }}
                   className="space-y-8"
                 >
-                  {/* Discussions Content (Existing) */}
-                  <div className="p-8 rounded-3xl bg-zinc-900/50 border border-white/5">
-                    <div className="flex items-center justify-between mb-8">
-                      <div className="flex items-center gap-3">
-                        <MessageSquare className="w-6 h-6 text-emerald-500" />
-                        <h2 className="text-2xl font-bold uppercase tracking-tight">{t('recent_discussions')}</h2>
-                      </div>
+                  {/* Discussions Header & Search/Filter */}
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
+                      <input 
+                        type="text" 
+                        placeholder="Search discussions..." 
+                        className="w-full pl-12 pr-4 py-4 bg-white/5 border-none rounded-2xl text-sm font-medium text-white placeholder:text-white/20 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                      />
+                    </div>
+                    <div className="flex gap-4">
+                      <button 
+                        onClick={() => setShowDiscussionFilters(!showDiscussionFilters)}
+                        className={`px-6 py-4 rounded-2xl flex items-center gap-3 font-black uppercase tracking-widest text-[10px] transition-all border ${showDiscussionFilters ? 'bg-emerald-500 text-bg-dark border-emerald-500' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
+                      >
+                        <Filter size={18} />
+                        Filters
+                      </button>
                       <button 
                         onClick={() => setShowCreatePost(true)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-full bg-white text-black text-sm font-bold hover:bg-zinc-200 transition-colors"
+                        className="px-6 py-4 rounded-2xl bg-white text-bg-dark font-black uppercase tracking-widest text-[10px] flex items-center gap-2 hover:bg-zinc-200 transition-all"
                       >
-                        <Plus className="w-4 h-4" />
-                        {t('start_topic')}
+                        <Plus size={18} />
+                        Start Topic
                       </button>
+                    </div>
+                  </div>
+
+                  {/* Discussion Filters Panel */}
+                  <AnimatePresence>
+                    {showDiscussionFilters && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="space-y-4">
+                            <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Category</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {['all', 'design', 'technical', 'showcase'].map((cat) => (
+                                <button
+                                  key={cat}
+                                  onClick={() => setDiscussionFilters({ ...discussionFilters, category: cat })}
+                                  className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${discussionFilters.category === cat ? 'bg-emerald-500 text-bg-dark' : 'bg-white/5 text-white/40 hover:text-white'}`}
+                                >
+                                  {cat}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="space-y-4">
+                            <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Sort By</h4>
+                            <div className="flex gap-2">
+                              {[
+                                { id: 'recent', label: 'Most Recent' },
+                                { id: 'replies', label: 'Most Active' }
+                              ].map((sort) => (
+                                <button
+                                  key={sort.id}
+                                  onClick={() => setDiscussionFilters({ ...discussionFilters, sortBy: sort.id })}
+                                  className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${discussionFilters.sortBy === sort.id ? 'bg-emerald-500 text-bg-dark' : 'bg-white/5 text-white/40 hover:text-white'}`}
+                                >
+                                  {sort.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <div className="p-8 rounded-3xl bg-zinc-900/50 border border-white/5">
+                    <div className="flex items-center gap-3 mb-8">
+                      <MessageSquare className="w-6 h-6 text-emerald-500" />
+                      <h2 className="text-2xl font-bold uppercase tracking-tight">{t('recent_discussions')}</h2>
                     </div>
 
                     <div className="space-y-4">
-                      {discussions.map((discussion) => (
+                      {filteredDiscussions.map((discussion) => (
                         <div key={discussion.id} className="p-6 rounded-2xl bg-black/40 border border-white/5 hover:border-emerald-500/40 transition-colors cursor-pointer group">
                           {/* ... discussion item content ... */}
                           <div className="flex items-start justify-between gap-4">
@@ -287,17 +370,21 @@ export default function Community() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {recommendations.map((spec) => (
-                      <div key={spec.userId} className="p-6 rounded-[2rem] bg-zinc-900 border border-white/5 hover:border-emerald-500/30 transition-all group">
+                      <Link 
+                        key={spec.userId} 
+                        to={`${modePrefix}/${lang || 'eng'}/profile/${spec.userId}`}
+                        className="p-6 rounded-[2rem] bg-zinc-900 border border-white/5 hover:border-emerald-500/30 transition-all group block"
+                      >
                         <div className="flex items-center gap-4 mb-6">
                           <div className="size-16 rounded-2xl overflow-hidden bg-white/5 border border-white/5">
                             <img src={`https://picsum.photos/seed/${spec.userId}/200/200`} alt="" referrerPolicy="no-referrer" />
                           </div>
-                          <div className="flex-1">
-                            <h4 className="text-lg font-black uppercase tracking-tight text-white">{spec.userId}</h4>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-lg font-black uppercase tracking-tight text-white truncate">{spec.userId}</h4>
                             <p className="text-xs text-emerald-500 font-bold uppercase tracking-widest">{spec.role}</p>
                           </div>
                           <button 
-                            onClick={() => handleFollow(spec.userId)}
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFollow(spec.userId); }}
                             className={`size-12 rounded-xl flex items-center justify-center transition-all ${following.includes(spec.userId) ? 'bg-white/5 text-white/40' : 'bg-emerald-500 text-bg-dark hover:scale-105'}`}
                           >
                             {following.includes(spec.userId) ? <UserMinus size={20} /> : <UserPlus size={20} />}
@@ -312,7 +399,7 @@ export default function Community() {
                           <div className="flex items-center gap-2"><MapPin size={12} /> {spec.location}</div>
                           <div className="flex items-center gap-2 text-emerald-500">Available</div>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </motion.div>

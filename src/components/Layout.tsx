@@ -17,11 +17,14 @@ import {
   ChevronDown, 
   MessageSquare, 
   LogIn,
-  LayoutDashboard
+  LayoutDashboard,
+  Shield,
+  Filter
 } from 'lucide-react';
 import { auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { userService, UserProfile } from '../services/userService';
+import { adminService } from '../services/adminService';
 import { notificationService, Notification } from '../services/notificationService';
 import { useAlert } from './Alert';
 import AIAssistant from './AIAssistant';
@@ -111,8 +114,12 @@ const STUDIO_CATEGORIES = [
   }
 ];
 
+import { useAuth } from '../context/AuthContext';
+
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const { profile, activeRole, setActiveRole } = useAuth();
   const [user] = useAuthState(auth);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const { showAlert } = useAlert();
   const location = useLocation();
   const navigate = useNavigate();
@@ -139,10 +146,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (user) {
+      userService.getProfile(user.uid).then(setUserProfile);
       const unsubscribe = notificationService.subscribeToNotifications(user.uid, (newNotifications) => {
         setNotifications(newNotifications);
       });
       return () => unsubscribe();
+    } else {
+      setUserProfile(null);
     }
   }, [user]);
 
@@ -152,6 +162,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isCommunity = location.pathname.includes('/community/');
   const currentLang = LANGUAGES.find(l => l.code === (lang || 'eng')) || LANGUAGES[0];
   const modePrefix = isStudio ? '/studio' : '/aca';
+  const logoLink = (isAcademy || isStudio) ? `${modePrefix}/${lang || 'eng'}` : `/${lang || 'eng'}`;
   const modeColor = isAcademy || isStudio ? 'text-primary' : 'text-white';
   const modeBg = isAcademy || isStudio ? 'bg-primary' : 'bg-white/10';
   const modeShadow = isAcademy || isStudio ? 'shadow-primary/20' : 'shadow-white/10';
@@ -178,6 +189,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { icon: MessageSquare, label: t('messages'), path: `${modePrefix}/${lang || 'eng'}/messages` },
     { icon: Settings, label: t('contracts'), path: `${modePrefix}/${lang || 'eng'}/contracts` },
   ];
+
+  if (userProfile && adminService.isAdmin(userProfile.roles)) {
+    navItems.push({ icon: Shield, label: 'Admin Console', path: `/admin/${lang || 'eng'}` });
+  }
 
   return (
     <div className="min-h-screen bg-bg-dark font-sans text-white">
@@ -367,6 +382,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                           <p className="text-xs font-black text-white truncate">{user.displayName}</p>
                           <p className="text-[9px] text-white/40 truncate font-bold uppercase mt-1">{user.email}</p>
                         </div>
+                        {profile && profile.roles.length > 1 && (
+                          <div className="px-6 py-4 border-b border-white/5 bg-white/[0.02]">
+                            <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em] mb-3">Switch Role</p>
+                            <div className="space-y-2">
+                              {profile.roles.map(role => (
+                                <button 
+                                  key={role}
+                                  onClick={() => setActiveRole(role)}
+                                  className={`w-full text-left px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${activeRole === role ? 'bg-primary text-bg-dark shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                                >
+                                  {role.replace('_', ' ')}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                         <div className="py-2">
                           <Link to={`/aca/${lang || 'eng'}/dashboard`} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all">{t('my_learning')}</Link>
                           <button onClick={() => auth.signOut()} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase text-primary hover:bg-primary/10 transition-all flex items-center gap-2"><LogOut size={14} /> {t('logout')}</button>
@@ -572,11 +603,34 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="space-y-4 pt-4 border-t border-white/5">
             {user ? (
               <div className="space-y-3">
-                <Link to={`/aca/${lang || 'eng'}/dashboard`} onClick={() => setIsMobileMenuOpen(false)} className="p-4 bg-white/5 rounded-3xl flex items-center gap-4 border border-white/5">
-                  <div className="size-12 rounded-2xl bg-primary flex items-center justify-center text-bg-dark shadow-lg"><User size={24} /></div>
-                  <div className="flex-1 min-w-0"><p className="text-xs font-black text-white truncate uppercase">{user.displayName}</p><p className="text-[9px] text-white/40 truncate font-bold uppercase mt-0.5">{user.email}</p></div>
+                <Link to={`/aca/${lang || 'eng'}/dashboard`} onClick={() => setIsMobileMenuOpen(false)} className="p-4 bg-white/5 rounded-3xl flex items-center gap-4 border border-white/5 relative overflow-hidden group">
+                  <div className="size-12 rounded-2xl bg-primary flex items-center justify-center text-bg-dark shadow-lg shrink-0"><User size={24} /></div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-black text-white truncate uppercase">{user.displayName}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[8px] font-black text-primary uppercase tracking-widest bg-primary/10 px-1.5 py-0.5 rounded">Active: {activeRole?.replace('_', ' ')}</span>
+                    </div>
+                  </div>
                 </Link>
-                <button onClick={() => { auth.signOut(); setIsMobileMenuOpen(false); }} className="w-full p-4 text-primary font-black uppercase text-[10px] bg-primary/5 rounded-2xl hover:bg-primary/10 flex items-center justify-center gap-3 border border-primary/10"><LogOut size={16} />{t('logout')}</button>
+
+                {profile && profile.roles.length > 1 && (
+                  <div className="p-4 bg-white/[0.02] rounded-3xl border border-white/5 space-y-3">
+                    <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em] px-2">Switch Account Role</p>
+                    <div className="grid grid-cols-1 gap-2">
+                      {profile.roles.map(role => (
+                        <button 
+                          key={role}
+                          onClick={() => { setActiveRole(role); setIsMobileMenuOpen(false); }}
+                          className={`w-full text-left px-4 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${activeRole === role ? 'bg-primary text-bg-dark' : 'bg-white/5 text-white/40'}`}
+                        >
+                          {role.replace('_', ' ')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <button onClick={() => { auth.signOut(); setIsMobileMenuOpen(false); }} className="w-full p-4 text-primary font-black uppercase text-[10px] bg-primary/5 rounded-2xl hover:bg-primary/10 flex items-center justify-center gap-3 border border-primary/10 transition-all"><LogOut size={16} />{t('logout')}</button>
               </div>
             ) : (
               <Link to={`${modePrefix}/${lang || 'eng'}/login`} onClick={() => setIsMobileMenuOpen(false)} className="criativo-btn !w-full !py-4 !flex !items-center !justify-center !rounded-2xl !text-[10px] uppercase font-black"><LogIn size={16} className="mr-2" />{t('login')}</Link>
@@ -591,12 +645,61 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         )}
       </AnimatePresence>
 
-      <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <ErrorBoundary>
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-            {children}
-          </motion.div>
-        </ErrorBoundary>
+      <main className="mx-auto max-w-[1600px] px-4 py-12 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Desktop Left Sidebar */}
+          {(isAcademy || isStudio) && (
+            <aside className="hidden lg:block w-64 shrink-0 space-y-10 sticky top-32 h-fit">
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 text-primary">
+                  <div className="size-8 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <Filter size={16} />
+                  </div>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em]">{t('categories')}</h3>
+                </div>
+                
+                <div className="space-y-2">
+                  {(isAcademy ? ACADEMY_CATEGORIES : STUDIO_CATEGORIES).map((cat) => (
+                    <div key={cat.name} className="space-y-1">
+                      <button 
+                        className="w-full text-left px-4 py-3 rounded-2xl bg-white/5 border border-white/5 text-[11px] font-black uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center justify-between group"
+                      >
+                        {t(cat.name)}
+                        <ChevronRight size={12} className="opacity-0 group-hover:opacity-100 transition-all" />
+                      </button>
+                      <div className="pl-4 py-2 space-y-2">
+                        {cat.subcategories.map(sub => (
+                          <Link 
+                            key={sub.name}
+                            to={`${modePrefix}/${lang || 'eng'}/${isAcademy ? 'topic' : 'service'}/${sub.topics[0].toLowerCase().replace(/ /g, '-')}`}
+                            className="block text-[10px] font-bold text-white/20 hover:text-primary transition-colors uppercase tracking-widest"
+                          >
+                            • {t(sub.name)}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-6 rounded-[2rem] bg-gradient-to-br from-primary/20 to-transparent border border-primary/10 space-y-4">
+                <h4 className="text-xs font-black uppercase tracking-widest text-white">{t('newsletter')}</h4>
+                <p className="text-[10px] text-white/40 font-medium leading-relaxed">Get the latest CG trends and workshop updates.</p>
+                <input type="email" placeholder="Email" className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-[10px] text-white focus:border-primary outline-none" />
+                <button className="w-full py-3 bg-primary text-bg-dark rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all">Join</button>
+              </div>
+            </aside>
+          )}
+
+          <div className="flex-1 min-w-0">
+            <ErrorBoundary>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+                {children}
+              </motion.div>
+            </ErrorBoundary>
+          </div>
+        </div>
       </main>
 
       <footer className="bg-black border-t border-white/5 pt-24 pb-12">

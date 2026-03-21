@@ -139,7 +139,7 @@ export default function Contracts() {
                     <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-primary transition-all duration-1000" 
-                        style={{ width: `${(contract.milestones.filter(m => m.status === 'paid').length / contract.milestones.length) * 100}%` }}
+                        style={{ width: `${(contract.milestones.filter(m => m.status === 'released').length / contract.milestones.length) * 100}%` }}
                       />
                     </div>
                   </div>
@@ -206,21 +206,20 @@ export default function Contracts() {
                       <div key={idx} className="p-6 bg-black/20 rounded-3xl border border-white/5 flex items-center justify-between group hover:border-white/10 transition-all">
                         <div className="flex items-center gap-4">
                           <div className={`size-10 rounded-xl flex items-center justify-center ${
-                            m.status === 'paid' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-white/5 text-white/20'
+                            m.status === 'released' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-white/5 text-white/20'
                           }`}>
-                            {m.status === 'paid' ? <CheckCircle size={20} /> : <Clock size={20} />}
+                            {m.status === 'released' ? <CheckCircle size={20} /> : <Clock size={20} />}
                           </div>
                           <div>
                             <h5 className="text-[11px] font-black uppercase tracking-widest text-white">{m.title}</h5>
-                            <p className="text-[10px] text-white/40 font-medium mt-0.5">{m.description}</p>
                           </div>
                         </div>
                         <div className="text-right space-y-1">
                           <p className="text-sm font-black text-white">${m.amount.toLocaleString()}</p>
                           <span className={`text-[8px] font-black uppercase tracking-widest ${
-                            m.status === 'paid' ? 'text-emerald-500' : 'text-white/20'
+                            m.status === 'released' ? 'text-emerald-500' : 'text-white/20'
                           }`}>
-                            {m.status === 'paid' ? t('paid') : t('pending')}
+                            {m.status === 'released' ? t('paid') : t('pending')}
                           </span>
                         </div>
                       </div>

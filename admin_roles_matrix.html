@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RGA API — Матрица прав административных ролей</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f8f7f4;
+    color: #1a1a18;
+    padding: 32px 24px;
+    min-height: 100vh;
+  }
+  h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #73726c; margin-bottom: 28px; }
+  .card { background: #fff; border: 0.5px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 24px; max-width: 900px; margin: 0 auto; }
+  .fr { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .fb { padding:5px 14px; font-size:12px; border-radius:20px; border:0.5px solid rgba(0,0,0,0.15); background:transparent; color:#73726c; cursor:pointer; font-family:inherit; transition:all 0.15s; }
+  .fb.active { background:#FAEEDA; color:#633806; border-color:#854F0B; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th, td { padding:8px 10px; text-align:center; border-bottom:0.5px solid rgba(0,0,0,0.08); }
+  th { font-size:11px; font-weight:500; color:#888780; text-transform:uppercase; letter-spacing:0.04em; }
+  td:first-child { text-align:left; font-size:12px; color:#1a1a18; padding-left:4px; }
+  .sub { font-size:11px; color:#888780; font-family:monospace; margin-top:2px; }
+  .y  { color:#1D9E75; font-size:15px; }
+  .n  { color:#D3D1C7; font-size:15px; }
+  .p  { color:#BA7517; font-size:13px; font-weight:500; }
+  .sr td { background:#f8f7f4; font-size:11px; font-weight:500; color:#888780; text-transform:uppercase; letter-spacing:0.05em; text-align:left; padding:8px 4px; }
+  .cr { cursor:pointer; }
+  .cr:hover td { background:#f8f7f4; }
+  .hm { color:#633806; }
+  .hg { color:#085041; }
+  .hr { color:#444441; }
+  .leg { display:flex; gap:16px; margin-bottom:14px; font-size:12px; color:#73726c; flex-wrap:wrap; }
+  .li { display:flex; align-items:center; gap:5px; }
+  .count { font-size:12px; color:#888780; margin-top:10px; }
+  .hint { text-align:center; font-size:12px; color:#888780; margin-top:16px; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background:#1a1a18; color:#e0ded6; }
+    .card { background:#242422; border-color:rgba(255,255,255,0.08); }
+    h1 { color:#e0ded6; }
+    .subtitle { color:#888780; }
+    .fb { border-color:rgba(255,255,255,0.15); color:#888780; }
+    .fb.active { background:#633806; color:#FAEEDA; border-color:#854F0B; }
+    th, td { border-bottom-color:rgba(255,255,255,0.06); }
+    th { color:#5F5E5A; }
+    td:first-child { color:#e0ded6; }
+    .sub { color:#5F5E5A; }
+    .sr td { background:#1a1a18; color:#5F5E5A; }
+    .cr:hover td { background:#1a1a18; }
+    .n { color:#444441; }
+    .leg { color:#5F5E5A; }
+    .count { color:#5F5E5A; }
+    .hint { color:#5F5E5A; }
+  }
+</style>
+</head>
+<body>
+<div style="max-width:900px;margin:0 auto;">
+  <h1>RGA API Platform</h1>
+  <div class="subtitle">Матрица прав · Chief Manager · Manager · Moderator</div>
+  <div class="card">
+
+    <div class="fr" id="filters">
+      <button class="fb active" data-g="all">Все модули</button>
+      <button class="fb" data-g="users">Пользователи</button>
+      <button class="fb" data-g="content">Контент</button>
+      <button class="fb" data-g="finance">Финансы</button>
+      <button class="fb" data-g="analytics">Аналитика</button>
+      <button class="fb" data-g="team">Команда</button>
+      <button class="fb" data-g="system">Система</button>
+    </div>
+
+    <div class="leg">
+      <div class="li"><span class="y">●</span> Полный доступ</div>
+      <div class="li"><span class="p">◑</span> Частичный / только чтение</div>
+      <div class="li"><span class="n">○</span> Нет доступа</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="text-align:left;min-width:220px;">Действие</th>
+          <th class="hm">Chief<br>Manager</th>
+          <th class="hg">Manager</th>
+          <th class="hr">Moderator</th>
+        </tr>
+      </thead>
+      <tbody id="tb"></tbody>
+    </table>
+
+    <div class="count">Показано: <span id="cnt">0</span> действий</div>
+  </div>
+  <div class="hint">RGA_API · D:\RGA_API · Admin Roles Matrix v1.0</div>
+</div>
+
+<script>
+const rows = [
+  {g:'users', section:'Управление пользователями'},
+  {g:'users', label:'Просматривать всех пользователей',     sub:'GET /admin/users',                   cm:1, mg:1, mo:2},
+  {g:'users', label:'Полный профиль пользователя',           sub:'GET /admin/users/:id',               cm:1, mg:1, mo:1},
+  {g:'users', label:'Назначать / снимать роли',              sub:'PATCH /admin/users/:id/roles',       cm:1, mg:0, mo:0},
+  {g:'users', label:'Временно блокировать аккаунт',          sub:'PATCH /admin/users/:id/suspend',     cm:1, mg:1, mo:1},
+  {g:'users', label:'Удалять аккаунт навсегда',              sub:'DELETE /admin/users/:id',            cm:1, mg:0, mo:0},
+  {g:'users', label:'Выдавать предупреждения',               sub:'POST /admin/users/:id/warn',         cm:1, mg:1, mo:1},
+  {g:'users', label:'Экспортировать данные пользователя',    sub:'GET /admin/users/:id/export',        cm:1, mg:0, mo:0},
+
+  {g:'content', section:'Модерация контента'},
+  {g:'content', label:'Просматривать все курсы (draft)',     sub:'GET /admin/courses?status=all',      cm:1, mg:1, mo:1},
+  {g:'content', label:'Снять курс с публикации',             sub:'PATCH /courses/:id/publish',         cm:1, mg:1, mo:1},
+  {g:'content', label:'Удалить курс',                        sub:'DELETE /admin/courses/:id',          cm:1, mg:1, mo:1},
+  {g:'content', label:'Просматривать флагнутый контент',     sub:'GET /admin/content/flagged',         cm:1, mg:1, mo:1},
+  {g:'content', label:'Обрабатывать жалобы пользователей',   sub:'PATCH /admin/reports/:id',           cm:1, mg:1, mo:1},
+  {g:'content', label:'Одобрять публикацию услуг Studio',    sub:'PATCH /services/:id/approve',        cm:1, mg:1, mo:1},
+  {g:'content', label:'Управлять витриной курсов',           sub:'PATCH /admin/featured/courses',      cm:1, mg:1, mo:0},
+  {g:'content', label:'Обновить правила платформы',          sub:'PATCH /admin/content/policy',        cm:1, mg:0, mo:0},
+
+  {g:'finance', section:'Финансы и транзакции'},
+  {g:'finance', label:'Просматривать выручку платформы',     sub:'GET /admin/finance/revenue',         cm:1, mg:0, mo:0},
+  {g:'finance', label:'Все транзакции Stripe',               sub:'GET /admin/finance/transactions',    cm:1, mg:0, mo:0},
+  {g:'finance', label:'Выплаты исполнителям',                sub:'GET /admin/finance/payouts',         cm:1, mg:0, mo:0},
+  {g:'finance', label:'Инициировать возврат',                sub:'POST /admin/finance/refund/:id',     cm:1, mg:0, mo:2},
+  {g:'finance', label:'Баланс Stripe аккаунта',              sub:'GET /admin/finance/stripe/balance',  cm:1, mg:0, mo:0},
+  {g:'finance', label:'Управлять комиссией платформы',       sub:'PATCH /admin/finance/commission',    cm:2, mg:0, mo:0},
+  {g:'finance', label:'Просматривать все возвраты',          sub:'GET /admin/finance/refunds',         cm:1, mg:0, mo:0},
+
+  {g:'analytics', section:'Аналитика платформы'},
+  {g:'analytics', label:'Метрики пользователей (DAU/MAU)',   sub:'GET /admin/analytics/users',         cm:1, mg:1, mo:0},
+  {g:'analytics', label:'Аналитика Academy Mode',            sub:'GET /admin/analytics/courses',       cm:1, mg:1, mo:0},
+  {g:'analytics', label:'Аналитика Studio Mode',             sub:'GET /admin/analytics/studio',        cm:1, mg:1, mo:0},
+  {g:'analytics', label:'Нагрузка на модерацию',             sub:'GET /admin/analytics/moderation',    cm:1, mg:1, mo:0},
+  {g:'analytics', label:'Когортный анализ',                  sub:'GET /admin/analytics/cohorts',       cm:1, mg:1, mo:0},
+  {g:'analytics', label:'Сформировать отчёт',                sub:'POST /admin/analytics/report',       cm:1, mg:1, mo:0},
+
+  {g:'team', section:'Управление командой'},
+  {g:'team', label:'Просматривать список модераторов',        sub:'GET /admin/moderators',              cm:1, mg:2, mo:0},
+  {g:'team', label:'Назначать нового модератора',             sub:'POST /admin/moderators',             cm:1, mg:0, mo:0},
+  {g:'team', label:'Снимать модератора с должности',          sub:'DELETE /admin/moderators/:id',       cm:1, mg:0, mo:0},
+  {g:'team', label:'Управлять менеджерами',                   sub:'POST/DELETE /admin/managers',        cm:1, mg:0, mo:0},
+  {g:'team', label:'Настраивать права стаффа',                sub:'PATCH /admin/staff/:id/perms',       cm:1, mg:0, mo:0},
+  {g:'team', label:'Просматривать audit log',                 sub:'GET /admin/audit-log',               cm:1, mg:2, mo:0},
+
+  {g:'system', section:'Системные настройки'},
+  {g:'system', label:'Управлять промо-кодами',                sub:'POST /admin/promo-codes',            cm:1, mg:1, mo:0},
+  {g:'system', label:'Массовые уведомления',                  sub:'POST /admin/notifications/broadcast',cm:1, mg:1, mo:0},
+  {g:'system', label:'Email кампании',                        sub:'GET /admin/email/campaigns',         cm:1, mg:1, mo:0},
+  {g:'system', label:'Системные настройки платформы',         sub:'PATCH /admin/system/settings',       cm:2, mg:0, mo:0},
+  {g:'system', label:'Управлять SEO и метаданными',           sub:'PATCH /admin/seo',                   cm:1, mg:1, mo:0},
+  {g:'system', label:'Экспорт audit log в CSV/PDF',           sub:'POST /admin/audit-log/export',       cm:1, mg:0, mo:0},
+];
+
+const sym = v => v===1?'<span class="y">●</span>':v===2?'<span class="p">◑</span>':'<span class="n">○</span>';
+let active = 'all';
+
+function render() {
+  let html = '';
+  let count = 0;
+  rows.forEach(r => {
+    if (r.section) {
+      if (active !== 'all' && r.g !== active) return;
+      html += `<tr class="sr"><td colspan="4">${r.section}</td></tr>`;
+      return;
+    }
+    if (active !== 'all' && r.g !== active) return;
+    count++;
+    html += `<tr class="cr">
+      <td><div>${r.label}</div><div class="sub">${r.sub}</div></td>
+      <td>${sym(r.cm)}</td>
+      <td>${sym(r.mg)}</td>
+      <td>${sym(r.mo)}</td>
+    </tr>`;
+  });
+  document.getElementById('tb').innerHTML = html;
+  document.getElementById('cnt').textContent = count;
+}
+
+document.getElementById('filters').addEventListener('click', e => {
+  const b = e.target.closest('.fb');
+  if (!b) return;
+  document.querySelectorAll('.fb').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  active = b.dataset.g;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

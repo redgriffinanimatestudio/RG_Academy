@@ -79,7 +79,7 @@ export default function TopicPage() {
     <div className="space-y-12 py-8">
       <header className="space-y-8">
         <Link 
-          to={`/aca/${lang}`} 
+          to={`/aca/${lang || 'eng'}`} 
           className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/40 hover:text-primary transition-colors"
         >
           <ArrowLeft size={14} />

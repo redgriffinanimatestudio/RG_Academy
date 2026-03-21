@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { 
   Users, 
   MessageSquare, 
@@ -26,31 +26,37 @@ const MOCK_PROJECTS = [
     id: '1',
     title: 'Character Rigging for Indie RPG',
     client: 'Nebula Games',
-    budget: '$500 - $1,000',
+    clientId: 'client_1',
+    budget: 800,
     tags: ['Maya', 'Rigging', 'Game Dev'],
-    statusKey: 'open',
-    urgencyKey: 'urgent_status',
-    description: 'We need a senior rigger to help us with our main character. 12+ joints, facial setup, and IK/FK switching required.'
+    status: 'open',
+    urgency: 'urgent',
+    description: 'We need a senior rigger to help us with our main character. 12+ joints, facial setup, and IK/FK switching required.',
+    participants: []
   },
   {
     id: '2',
     title: 'Environment Concept Art - Sci-Fi City',
     client: 'Starlight Studios',
-    budget: '$2,000 - $3,500',
+    clientId: 'client_2',
+    budget: 2500,
     tags: ['Concept Art', 'Environment', '2D'],
-    statusKey: 'in_progress',
-    urgencyKey: 'normal_status',
-    description: 'Creating a high-end sci-fi city environment concept art.'
+    status: 'in_progress',
+    urgency: 'normal',
+    description: 'Creating a high-end sci-fi city environment concept art.',
+    participants: []
   },
   {
     id: '3',
     title: 'VFX for Short Film Sequence',
     client: 'Independent Creator',
-    budget: '$1,500 - $2,000',
+    clientId: 'client_3',
+    budget: 1800,
     tags: ['Houdini', 'VFX', 'Simulation'],
-    statusKey: 'open',
-    urgencyKey: 'urgent_status',
-    description: 'Looking for a VFX artist to create magical fire and destruction effects.'
+    status: 'open',
+    urgency: 'urgent',
+    description: 'Looking for a VFX artist to create magical fire and destruction effects.',
+    participants: []
   }
 ];
 
@@ -100,9 +106,9 @@ export default function Studio() {
   const filteredProjects = MOCK_PROJECTS.filter(project => {
     const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          project.client.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = filters.status === 'all' || project.statusKey === filters.status;
-    const matchesUrgency = filters.urgency === 'all' || project.urgencyKey === filters.urgency;
-    const matchesBudget = parseInt(project.budget.replace(/[^0-9]/g, '')) >= filters.budgetMin;
+    const matchesStatus = filters.status === 'all' || project.status === filters.status;
+    const matchesUrgency = filters.urgency === 'all' || project.urgency === filters.urgency;
+    const matchesBudget = project.budget >= filters.budgetMin;
 
     return matchesSearch && matchesStatus && matchesUrgency && matchesBudget;
   });
@@ -222,8 +228,8 @@ export default function Studio() {
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/60 focus:outline-none focus:border-primary cursor-pointer appearance-none"
                 >
                   <option value="all" className="bg-bg-card text-white">Any Urgency</option>
-                  <option value="urgent_status" className="bg-bg-card text-white">Urgent Only</option>
-                  <option value="normal_status" className="bg-bg-card text-white">Normal Only</option>
+                  <option value="urgent" className="bg-bg-card text-white">Urgent Only</option>
+                  <option value="normal" className="bg-bg-card text-white">Normal Only</option>
                 </select>
               </div>
             </div>
@@ -267,7 +273,7 @@ export default function Studio() {
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <h3 className="font-black text-2xl tracking-tight text-white uppercase">{project.title}</h3>
-                          {project.urgencyKey === 'urgent_status' && (
+                          {project.urgency === 'urgent' && (
                             <span className="px-2 py-0.5 bg-primary text-bg-dark text-[8px] font-black uppercase tracking-widest rounded-md flex items-center gap-1">
                               <Zap size={8} fill="currentColor" /> {t('urgent')}
                             </span>
@@ -276,9 +282,9 @@ export default function Studio() {
                         <p className="text-sm text-white/40 font-medium">{t('posted_by')} <span className="text-white">{project.client}</span></p>
                       </div>
                       <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                        project.statusKey === 'open' ? 'bg-primary/10 text-primary' : 'bg-white/5 text-white/40'
+                        project.status === 'open' ? 'bg-primary/10 text-primary' : 'bg-white/5 text-white/40'
                       }`}>
-                        {t(project.statusKey)}
+                        {t(project.status)}
                       </span>
                     </div>
                     
@@ -293,7 +299,7 @@ export default function Studio() {
                     <div className="flex items-center justify-between pt-6 border-t border-white/5">
                       <div className="flex flex-col">
                         <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{t('budget_range')}</span>
-                        <span className="text-lg font-black text-white">{project.budget}</span>
+                        <span className="text-lg font-black text-white">${project.budget.toLocaleString()}</span>
                       </div>
                       <button 
                         onClick={() => {
@@ -316,7 +322,11 @@ export default function Studio() {
               <h2 className="text-2xl font-black tracking-tight text-white uppercase">{t('top_talent')}</h2>
               <div className="space-y-4">
                 {MOCK_TALENT.map((talent) => (
-                  <div key={talent.id} className="group flex items-center gap-4 p-5 rounded-[1.5rem] border border-white/5 bg-white/5 hover:border-primary/20 transition-all cursor-pointer">
+                  <Link 
+                    key={talent.id} 
+                    to={`/studio/${lang || 'eng'}/profile/${talent.id}`}
+                    className="group flex items-center gap-4 p-5 rounded-[1.5rem] border border-white/5 bg-white/5 hover:border-primary/20 transition-all cursor-pointer"
+                  >
                     <div className={`avatar ${talent.online ? 'avatar-online-bottom' : 'avatar-offline-bottom'}`}>
                       <div className="size-14 rounded-2xl shadow-lg shadow-black/20 border border-white/5">
                         <img src={talent.avatar} alt={talent.name} referrerPolicy="no-referrer" />
@@ -330,10 +340,10 @@ export default function Studio() {
                         <span>{talent.location}</span>
                       </div>
                     </div>
-                    <button className="p-3 bg-white/5 text-white/20 rounded-xl group-hover:bg-primary group-hover:text-bg-dark transition-all">
+                    <div className="p-3 bg-white/5 text-white/20 rounded-xl group-hover:bg-primary group-hover:text-bg-dark transition-all">
                       <MessageSquare size={18} />
-                    </button>
-                  </div>
+                    </div>
+                  </Link>
                 ))}
               </div>
               <button className="w-full py-4 rounded-2xl border-2 border-white/5 text-xs font-black uppercase tracking-widest text-white/40 hover:bg-white/5 hover:border-white/10 transition-all">

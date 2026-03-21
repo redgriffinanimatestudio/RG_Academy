@@ -118,7 +118,8 @@ export default function Academy() {
   const [filters, setFilters] = useState({
     level: 'all',
     priceRange: [0, 200],
-    duration: 'all'
+    duration: 'all',
+    sortBy: 'popular'
   });
 
   const filteredCourses = MOCK_COURSES.filter(course => {
@@ -140,6 +141,11 @@ export default function Academy() {
       (filters.duration === 'long' && parseInt(course.duration) >= 20);
 
     return matchesCategory && matchesSearch && matchesLevel && matchesPrice && matchesDuration;
+  }).sort((a, b) => {
+    if (filters.sortBy === 'price_low') return a.price - b.price;
+    if (filters.sortBy === 'price_high') return b.price - a.price;
+    if (filters.sortBy === 'rating') return b.rating - a.rating;
+    return b.students - a.students; // popular
   });
 
   return (
@@ -226,15 +232,16 @@ export default function Academy() {
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">Duration</h4>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">Sort By</h4>
                   <select 
-                    value={filters.duration}
-                    onChange={(e) => setFilters({ ...filters, duration: e.target.value })}
+                    value={filters.sortBy}
+                    onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/60 focus:outline-none focus:border-primary cursor-pointer appearance-none"
                   >
-                    <option value="all" className="bg-bg-card text-white">Any Duration</option>
-                    <option value="short" className="bg-bg-card text-white">Short (&lt; 20 hours)</option>
-                    <option value="long" className="bg-bg-card text-white">Long (20+ hours)</option>
+                    <option value="popular" className="bg-bg-card text-white">Most Popular</option>
+                    <option value="rating" className="bg-bg-card text-white">Highest Rated</option>
+                    <option value="price_low" className="bg-bg-card text-white">Price: Low to High</option>
+                    <option value="price_high" className="bg-bg-card text-white">Price: High to Low</option>
                   </select>
                 </div>
               </div>

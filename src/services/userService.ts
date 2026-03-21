@@ -1,7 +1,15 @@
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 
-export type UserRole = 'student' | 'lecturer' | 'client' | 'executor' | 'admin' | 'manager' | 'moderator';
+export type UserRole = 
+  | 'student' 
+  | 'lecturer' 
+  | 'client' 
+  | 'executor' 
+  | 'admin' 
+  | 'manager' 
+  | 'moderator' 
+  | 'chief_manager';
 
 export interface UserProfile {
   uid: string;
