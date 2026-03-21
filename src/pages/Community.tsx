@@ -60,6 +60,47 @@ export default function Community() {
     }
   };
 
+  const [discussions, setDiscussions] = useState([
+    { id: '1', category: 'design', title: 'realistic_skin_shaders', author: 'artist_x', replies: 12, time: '2 hours_ago', type: 'design' },
+    { id: '2', category: 'technical', title: 'optimizing_ue5', author: 'artist_x', replies: 8, time: '5 hours_ago', type: 'technical' },
+    { id: '3', category: 'showcase', title: 'latest_env_project', author: 'artist_x', replies: 15, time: '1 day_ago', type: 'showcase' },
+  ]);
+  const [showCreatePost, setShowCreatePost] = useState(false);
+  const [newPost, setNewPost] = useState({ title: '', category: 'design' });
+
+  const handleCreatePost = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPost.title.trim()) return;
+
+    const post = {
+      id: Math.random().toString(36).substr(2, 9),
+      category: newPost.category,
+      title: newPost.title,
+      author: 'You',
+      replies: 0,
+      time: 'just_now',
+      type: newPost.category
+    };
+
+    setDiscussions([post, ...discussions]);
+    setNewPost({ title: '', category: 'design' });
+    setShowCreatePost(false);
+    triggerAlert('success', 'action_complete', 'Post created successfully!');
+  };
+
+  const stats = [
+    { id: 'members', label: t('active_members'), value: '42k+', icon: Users },
+    { id: 'teams', label: t('project_teams'), value: '1.2k', icon: Zap },
+    { id: 'mentors', label: t('verified_mentors'), value: '850', icon: Shield },
+    { id: 'tiers', label: t('artist_tiers'), value: '4', icon: Award },
+  ];
+
+  const notifications = [
+    { id: 'notif-1', type: 'info', msg: t('new_course_added') },
+    { id: 'notif-2', type: 'success', msg: t('project_completed') },
+    { id: 'notif-3', type: 'warning', msg: t('maintenance_scheduled') },
+  ];
+
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -93,14 +134,9 @@ export default function Community() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
-          {[
-            { label: t('active_members'), value: '42k+', icon: Users },
-            { label: t('project_teams'), value: '1.2k', icon: Zap },
-            { label: t('verified_mentors'), value: '850', icon: Shield },
-            { label: t('artist_tiers'), value: '4', icon: Award },
-          ].map((stat, idx) => (
+          {stats.map((stat, idx) => (
             <motion.div
-              key={idx}
+              key={stat.id}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: idx * 0.1 }}
@@ -116,6 +152,52 @@ export default function Community() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content Area */}
           <div className="lg:col-span-2 space-y-8">
+            {/* Create Post Form */}
+            <AnimatePresence>
+              {showCreatePost && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="p-8 rounded-3xl bg-zinc-900 border border-emerald-500/30 mb-8"
+                >
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold uppercase tracking-tight">{t('start_topic')}</h3>
+                    <button onClick={() => setShowCreatePost(false)} className="text-zinc-500 hover:text-white">
+                      <XCircle size={20} />
+                    </button>
+                  </div>
+                  <form onSubmit={handleCreatePost} className="space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Category</label>
+                      <select 
+                        value={newPost.category}
+                        onChange={(e) => setNewPost({ ...newPost, category: e.target.value })}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-emerald-500 outline-none"
+                      >
+                        <option value="design">Design</option>
+                        <option value="technical">Technical</option>
+                        <option value="showcase">Showcase</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Topic Title</label>
+                      <input 
+                        type="text"
+                        value={newPost.title}
+                        onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                        placeholder="What's on your mind?"
+                        className="w-full bg-black/40 border border-white/10 rounded-xl p-3 text-sm focus:border-emerald-500 outline-none"
+                      />
+                    </div>
+                    <button type="submit" className="w-full py-4 bg-emerald-500 text-black font-black uppercase tracking-widest text-xs rounded-xl hover:bg-emerald-400 transition-colors">
+                      Post Topic
+                    </button>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Alerts Demo Section */}
             <div className="p-8 rounded-3xl bg-zinc-900/50 border border-white/5">
               <div className="flex items-center justify-between mb-8">
@@ -177,39 +259,40 @@ export default function Community() {
                   <MessageSquare className="w-6 h-6 text-emerald-500" />
                   <h2 className="text-2xl font-bold uppercase tracking-tight">{t('recent_discussions')}</h2>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-white text-black text-sm font-bold hover:bg-zinc-200 transition-colors">
+                <button 
+                  onClick={() => setShowCreatePost(true)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white text-black text-sm font-bold hover:bg-zinc-200 transition-colors"
+                >
                   <Plus className="w-4 h-4" />
                   {t('start_topic')}
                 </button>
               </div>
 
               <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="p-6 rounded-2xl bg-black/40 border border-white/5 hover:border-emerald-500/40 transition-colors cursor-pointer group">
+                {discussions.map((discussion) => (
+                  <div key={discussion.id} className="p-6 rounded-2xl bg-black/40 border border-white/5 hover:border-emerald-500/40 transition-colors cursor-pointer group">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400">
-                            {i === 1 ? t('design') : i === 2 ? t('technical') : t('showcase')}
+                            {t(discussion.category)}
                           </span>
-                          <span className="text-xs text-zinc-500">2 {t('hours_ago')}</span>
+                          <span className="text-xs text-zinc-500">{discussion.time.includes('_') ? t(discussion.time) : discussion.time}</span>
                         </div>
                         <h4 className="text-lg font-bold group-hover:text-emerald-400 transition-colors mb-2">
-                          {i === 1 ? t('realistic_skin_shaders') : 
-                           i === 2 ? t('optimizing_ue5') : 
-                           t('latest_env_project')}
+                          {t(discussion.title)}
                         </h4>
                         <div className="flex items-center gap-4 text-sm text-zinc-500">
                           <span className="flex items-center gap-1.5">
-                            {t('started_by')} {t('artist_x')}
+                            {t('started_by')} {discussion.author.includes('artist') ? t(discussion.author) : discussion.author}
                           </span>
                           <span className="flex items-center gap-1.5">
-                            12 {t('replies')}
+                            {discussion.replies} {t('replies')}
                           </span>
                         </div>
                       </div>
                       <div className="w-12 h-12 rounded-xl bg-zinc-800 overflow-hidden shrink-0">
-                        <img src={`https://picsum.photos/seed/user${i}/100/100`} alt="User" referrerPolicy="no-referrer" />
+                        <img src={`https://picsum.photos/seed/${discussion.id}/100/100`} alt="User" referrerPolicy="no-referrer" />
                       </div>
                     </div>
                   </div>
@@ -254,12 +337,8 @@ export default function Community() {
                 
                 {alerts.length === 0 && (
                   <div className="space-y-6">
-                    {[
-                      { type: 'info', msg: t('new_course_added') },
-                      { type: 'success', msg: t('project_completed') },
-                      { type: 'warning', msg: t('maintenance_scheduled') },
-                    ].map((notif, idx) => (
-                      <div key={idx} className="flex gap-3">
+                    {notifications.map((notif) => (
+                      <div key={notif.id} className="flex gap-3">
                         <div className={`w-1 h-auto rounded-full ${
                           notif.type === 'info' ? 'bg-sky-500' : 
                           notif.type === 'success' ? 'bg-emerald-500' : 'bg-amber-500'

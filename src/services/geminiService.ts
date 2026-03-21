@@ -1,6 +1,6 @@
 import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 
-const API_KEY = process.env.GEMINI_API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY || "";
 
 export const getGeminiResponse = async (prompt: string) => {
   if (!API_KEY) {
@@ -9,8 +9,8 @@ export const getGeminiResponse = async (prompt: string) => {
 
   const ai = new GoogleGenAI({ apiKey: API_KEY });
   const response = await ai.models.generateContent({
-    model: "gemini-3.1-pro-preview",
-    contents: prompt,
+    model: "gemini-2.0-flash",
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
     config: {
       thinkingConfig: {
         thinkingLevel: ThinkingLevel.HIGH,

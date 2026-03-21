@@ -4,7 +4,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase';
 import { chatService, ChatRoom, ChatMessage } from '../services/chatService';
 import { userService, UserProfile } from '../services/userService';
-import { Send, Search, User, MoreVertical, Phone, Video, Info, Hash, MessageSquare } from 'lucide-react';
+import { Send, Search, User, MoreVertical, Phone, Video, Info, Hash, MessageSquare, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
@@ -19,13 +19,16 @@ export default function Messages() {
   const [participants, setParticipants] = useState<Record<string, UserProfile>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const [showNewChat, setShowNewChat] = useState(false);
+  const [searchUserQuery, setSearchUserQuery] = useState('');
+  const [searchResults, setSearchUserResults] = useState<UserProfile[]>([]);
+
   useEffect(() => {
     if (!user) return;
 
     const unsubscribe = chatService.subscribeToChatRooms(user.uid, async (updatedRooms) => {
       setRooms(updatedRooms);
       
-      // Fetch participant profiles for all rooms
       const allParticipantIds = Array.from(new Set(updatedRooms.flatMap(r => r.participants)));
       const profiles = await userService.getUsers(allParticipantIds);
       const profileMap = profiles.reduce((acc, p) => ({ ...acc, [p.uid]: p }), {});
@@ -48,6 +51,28 @@ export default function Messages() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (searchUserQuery.length > 2) {
+      userService.getUsers(['1', '2', '3']).then(results => {
+        setSearchUserResults(results.filter(u => u.displayName?.toLowerCase().includes(searchUserQuery.toLowerCase())));
+      });
+    } else {
+      setSearchUserResults([]);
+    }
+  }, [searchUserQuery]);
+
+  const handleCreateRoom = async (partnerId: string) => {
+    if (!user) return;
+    try {
+      const roomId = await chatService.createChatRoom([user.uid, partnerId], 'direct');
+      setActiveRoomId(roomId);
+      setShowNewChat(false);
+      setSearchUserQuery('');
+    } catch (error) {
+      console.error('Error creating room:', error);
+    }
+  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,14 +99,17 @@ export default function Messages() {
   const activeChatPartner = otherParticipant ? participants[otherParticipant] : null;
 
   return (
-    <div className="h-[calc(100vh-12rem)] flex bg-bg-card rounded-[2.5rem] border border-white/5 overflow-hidden">
+    <div className="h-[calc(100vh-12rem)] flex bg-bg-card rounded-[2.5rem] border border-white/5 overflow-hidden relative">
       {/* Sidebar */}
       <div className="w-80 border-r border-white/5 flex flex-col bg-black/20">
         <div className="p-6 border-b border-white/5">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-black uppercase tracking-tighter text-white">{t('messages_title')}</h2>
-            <button className="p-2 bg-white/5 rounded-xl text-white/40 hover:text-white transition-colors">
-              <MessageSquare size={18} />
+            <button 
+              onClick={() => setShowNewChat(true)}
+              className="p-2 bg-white/5 rounded-xl text-white/40 hover:text-white transition-colors"
+            >
+              <Plus size={18} />
             </button>
           </div>
           <div className="relative">
@@ -240,6 +268,62 @@ export default function Messages() {
           </div>
         )}
       </div>
+
+      {/* New Chat Modal */}
+      <AnimatePresence>
+        {showNewChat && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="w-full max-w-md bg-zinc-900 rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl"
+            >
+              <div className="p-8 space-y-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-black uppercase tracking-tighter text-white">New Message</h3>
+                  <button onClick={() => setShowNewChat(false)} className="text-white/20 hover:text-white">
+                    <Plus className="rotate-45" size={24} />
+                  </button>
+                </div>
+                
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
+                  <input 
+                    autoFocus
+                    type="text" 
+                    value={searchUserQuery}
+                    onChange={(e) => setSearchUserQuery(e.target.value)}
+                    placeholder="Search users by name..."
+                    className="w-full pl-12 pr-4 py-4 bg-white/5 border-none rounded-2xl text-sm font-medium text-white focus:ring-2 focus:ring-primary/20 transition-all"
+                  />
+                </div>
+
+                <div className="space-y-2 max-h-60 overflow-y-auto no-scrollbar">
+                  {searchResults.map((u) => (
+                    <button 
+                      key={u.uid}
+                      onClick={() => handleCreateRoom(u.uid)}
+                      className="w-full p-4 flex items-center gap-4 rounded-2xl bg-white/5 hover:bg-primary hover:text-bg-dark transition-all group"
+                    >
+                      <div className="size-10 rounded-xl bg-white/10 overflow-hidden">
+                        <img src={u.photoURL || ''} alt="" className="w-full h-full object-cover" />
+                      </div>
+                      <div className="text-left">
+                        <div className="text-sm font-black uppercase tracking-tight">{u.displayName}</div>
+                        <div className="text-[10px] font-bold opacity-40 uppercase tracking-widest group-hover:opacity-100 transition-opacity">Start Conversation</div>
+                      </div>
+                    </button>
+                  ))}
+                  {searchUserQuery.length > 2 && searchResults.length === 0 && (
+                    <p className="text-center py-8 text-sm text-white/20 font-medium">No users found.</p>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

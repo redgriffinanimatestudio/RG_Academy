@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GraduationCap, Search, Filter, PlayCircle, Star, Users, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useParams } from 'react-router-dom';
 
 const MOCK_COURSES = [
   {
     id: '1',
+    slug: 'mastering-character-rigging-maya',
     title: 'Mastering Character Rigging in Maya',
     lecturer: 'Alex Rivera',
     lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png',
@@ -20,6 +22,7 @@ const MOCK_COURSES = [
   },
   {
     id: '2',
+    slug: 'cinematic-vfx-houdini-destruction',
     title: 'Cinematic VFX: Houdini Destruction',
     lecturer: 'Sarah Chen',
     lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-2.png',
@@ -34,6 +37,7 @@ const MOCK_COURSES = [
   },
   {
     id: '3',
+    slug: 'environment-art-aaa-games',
     title: 'Environment Art for AAA Games',
     lecturer: 'Marcus Thorne',
     lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-3.png',
@@ -48,6 +52,7 @@ const MOCK_COURSES = [
   },
   {
     id: '4',
+    slug: 'unreal-engine-5-real-time-lighting',
     title: 'Unreal Engine 5: Real-time Lighting',
     lecturer: 'Elena Vance',
     lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-4.png',
@@ -62,6 +67,7 @@ const MOCK_COURSES = [
   },
   {
     id: '5',
+    slug: 'digital-sculpting-zbrush',
     title: 'Digital Sculpting with ZBrush',
     lecturer: 'David Miller',
     lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-5.png',
@@ -76,6 +82,7 @@ const MOCK_COURSES = [
   },
   {
     id: '6',
+    slug: '2d-animation-principles-cg',
     title: '2D Animation Principles for CG',
     lecturer: 'Yuki Tanaka',
     lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-6.png',
@@ -102,11 +109,11 @@ const CATEGORIES = [
 
 export default function Academy() {
   const { t } = useTranslation();
+  const { lang } = useParams();
   const [selectedCategory, setSelectedCategory] = useState('all_workshops');
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredCourses = MOCK_COURSES.filter(course => {
-    // Map course category to key for comparison
     const categoryKey = course.category === '3D Modeling' ? 'modeling_3d' :
                        course.category === 'Animation' ? 'animation' :
                        course.category === 'VFX & Compositing' ? 'vfx_compositing' :
@@ -182,66 +189,68 @@ export default function Academy() {
               key={course.id}
               className="group criativo-card"
             >
-              <div className="relative aspect-video overflow-hidden rounded-2xl">
-                <img 
-                  src={course.thumbnail} 
-                  alt={course.title} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-bg-dark shadow-xl shadow-primary/40 transform scale-75 group-hover:scale-100 transition-transform duration-500">
-                    <PlayCircle size={32} fill="currentColor" />
-                  </div>
-                </div>
-                <div className="absolute top-4 left-4 px-3 py-1 bg-black/80 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest rounded-lg">
-                  {t(course.category === '3D Modeling' ? 'modeling_3d' :
-                     course.category === 'Animation' ? 'animation' :
-                     course.category === 'VFX & Compositing' ? 'vfx_compositing' :
-                     course.category === 'Game Development' ? 'game_dev' :
-                     course.category === 'Digital Art' ? 'digital_art' :
-                     course.category === 'Software Masterclass' ? 'software_masterclass' : course.category)}
-                </div>
-              </div>
-              
-              <div className="pt-6 space-y-4">
-                <h3 className="text-xl font-black tracking-tight text-white group-hover:text-primary transition-colors line-clamp-2 uppercase">
-                  {course.title}
-                </h3>
-                <div className="flex items-center gap-3">
-                  <div className="avatar">
-                    <div className="size-10 rounded-full border border-white/5">
-                      <img src={course.lecturerAvatar} alt={course.lecturer} referrerPolicy="no-referrer" />
+              <Link to={`/aca/${lang}/course/${course.slug}`}>
+                <div className="relative aspect-video overflow-hidden rounded-2xl">
+                  <img 
+                    src={course.thumbnail} 
+                    alt={course.title} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-bg-dark shadow-xl shadow-primary/40 transform scale-75 group-hover:scale-100 transition-transform duration-500">
+                      <PlayCircle size={32} fill="currentColor" />
                     </div>
                   </div>
-                  <p className="text-sm text-white/40 font-medium">{t('by')} {course.lecturer}</p>
+                  <div className="absolute top-4 left-4 px-3 py-1 bg-black/80 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest rounded-lg">
+                    {t(course.category === '3D Modeling' ? 'modeling_3d' :
+                       course.category === 'Animation' ? 'animation' :
+                       course.category === 'VFX & Compositing' ? 'vfx_compositing' :
+                       course.category === 'Game Development' ? 'game_dev' :
+                       course.category === 'Digital Art' ? 'digital_art' :
+                       course.category === 'Software Masterclass' ? 'software_masterclass' : course.category)}
+                  </div>
                 </div>
+                
+                <div className="pt-6 space-y-4 text-left">
+                  <h3 className="text-xl font-black tracking-tight text-white group-hover:text-primary transition-colors line-clamp-2 uppercase">
+                    {course.title}
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <div className="avatar">
+                      <div className="size-10 rounded-full border border-white/5">
+                        <img src={course.lecturerAvatar} alt={course.lecturer} referrerPolicy="no-referrer" />
+                      </div>
+                    </div>
+                    <p className="text-sm text-white/40 font-medium">{t('by')} {course.lecturer}</p>
+                  </div>
 
-                <div className="flex items-center gap-4 text-xs font-bold text-white/20">
-                  <div className="flex items-center gap-1.5">
-                    <Star size={14} className="text-primary" fill="currentColor" />
-                    <span className="text-white">{course.rating}</span>
-                    <span>({course.reviews})</span>
+                  <div className="flex items-center gap-4 text-xs font-bold text-white/20">
+                    <div className="flex items-center gap-1.5">
+                      <Star size={14} className="text-primary" fill="currentColor" />
+                      <span className="text-white">{course.rating}</span>
+                      <span>({course.reviews})</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Users size={14} />
+                      <span>{course.students.toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-white/5 rounded-md">
+                      <span className="text-white">{t(course.levelKey)}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <Users size={14} />
-                    <span>{course.students.toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 px-2 py-0.5 bg-white/5 rounded-md">
-                    <span className="text-white">{t(course.levelKey)}</span>
-                  </div>
-                </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{t('price')}</span>
-                    <span className="text-2xl font-black text-white">${course.price}</span>
+                  <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{t('price')}</span>
+                      <span className="text-2xl font-black text-white">${course.price}</span>
+                    </div>
+                    <div className="bg-white/5 text-white p-3 rounded-xl group-hover:bg-primary group-hover:text-bg-dark transition-colors border border-white/5">
+                      <ChevronRight size={20} />
+                    </div>
                   </div>
-                  <button className="bg-white/5 text-white p-3 rounded-xl hover:bg-primary hover:text-bg-dark transition-colors border border-white/5">
-                    <ChevronRight size={20} />
-                  </button>
                 </div>
-              </div>
+              </Link>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -261,4 +270,3 @@ export default function Academy() {
     </div>
   );
 }
-
