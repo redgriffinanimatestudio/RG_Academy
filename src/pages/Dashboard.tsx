@@ -14,16 +14,17 @@ import {
   MessageSquare, Layers, Box, Video, Shield, Cpu, MoreVertical, LayoutDashboard, FileText, 
   CreditCard, History, Target, UserCheck, LifeBuoy, Settings, Mail, Heart, ExternalLink, 
   ShieldCheck, CheckCircle2, AlertCircle, CalendarDays, FileSearch, ClipboardList, Wallet, 
-  Globe, Rocket, SearchCode, Bell, Eye 
+  Globe, Rocket, SearchCode, Bell, Eye, User, GraduationCap, UserPlus, LogOut 
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useParams, useSearchParams, useLocation, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 export default function Dashboard() {
-  const { activeRole, setActiveRole, user, profile } = useAuth();
+  const { activeRole, setActiveRole, user, profile, logout } = useAuth();
   const [searchParams] = useSearchParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { lang } = useParams();
   
   // Sync activeRole with URL path or profile
@@ -38,7 +39,11 @@ export default function Dashboard() {
       'moderator': 'moderator',
       'hr': 'hr',
       'finance': 'finance',
-      'support': 'support'
+      'support': 'support',
+      'student': 'student',
+      'lecturer': 'lecturer',
+      'executor': 'executor',
+      'client': 'client'
     };
     
     const targetRoleFromPath = roleMap[firstSegment];
@@ -48,15 +53,12 @@ export default function Dashboard() {
         setActiveRole(targetRoleFromPath as any);
       }
     } else if (location.pathname.includes('/dashboard') && profile && profile.roles.length > 0) {
-      // On general dashboard, ensure a high-priority role is selected if available.
-      // If current role is 'student' or null, and the user has better roles, upgrade them.
+      // On general dashboard, ensure a role is selected if none is active.
       const priorities: string[] = ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'lecturer', 'executor', 'client', 'student'];
       const bestRole = priorities.find(r => profile.roles.includes(r as any));
       
-      if (bestRole && (!activeRole || activeRole === 'student')) {
-        if (activeRole !== bestRole) {
-          setActiveRole(bestRole as any);
-        }
+      if (bestRole && !activeRole) {
+        setActiveRole(bestRole as any);
       }
     }
   }, [location.pathname, profile, activeRole, setActiveRole]);
@@ -79,87 +81,215 @@ export default function Dashboard() {
 
   const theme = roleThemes[activeRole || 'student'] || { accent: '#00f5d4', label: 'Member' };
 
-  return (
-    <div className="space-y-8 max-w-[1600px] mx-auto py-4">
-      {/* HEADER */}
-      <section className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-8 border-b border-white/5">
-        <div className="flex flex-col">
-          <div className="flex items-center gap-3">
-            <div className="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] bg-white/5 border border-white/10" style={{ color: theme.accent }}>
-              {theme.label} Hub
-            </div>
-            <span className="text-white/10">/</span>
-            <span className="text-[11px] font-black uppercase tracking-widest text-white/40">{currentView.replace(/_/g, ' ')}</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white mt-4 uppercase leading-none">
-            {currentView === 'overview' || currentView === 'dashboard' ? `Welcome, ${user?.displayName?.split(' ')[0] || 'User'}` : currentView.replace(/_/g, ' ')}
-          </h1>
-        </div>
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Quick Access for Admins/Managers */}
-          {profile?.roles.includes('admin') && activeRole !== 'admin' && (
-            <Link to={`/admin/${lang || 'eng'}`} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-[9px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500/20 transition-all">
-              <Shield size={14} /> Full Admin
-            </Link>
-          )}
-          {profile?.roles.includes('chief_manager') && activeRole !== 'chief_manager' && (
-            <Link to={`/chief-manager/${lang || 'eng'}`} className="flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl text-[9px] font-black uppercase tracking-widest text-purple-500 hover:bg-purple-500/20 transition-all">
-              <Target size={14} /> Strategy
-            </Link>
-          )}
+  const getSidebarItems = (role: string) => {
+    const commonTop = [
+      { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+      { id: 'profile', label: 'My Profile', icon: User },
+    ];
+    
+    const commonBottom = [
+      { id: 'messages', label: 'Messages', icon: MessageSquare },
+      { id: 'wallet', label: 'Wallet', icon: Wallet },
+      { id: 'settings', label: 'Settings', icon: Settings },
+    ];
 
-          {/* Role Switcher */}
+    const roleSpecific: Record<string, any[]> = {
+      admin: [
+        { id: 'users', label: 'User Control', icon: Users },
+        { id: 'content', label: 'CMS Engine', icon: Box },
+        { id: 'system', label: 'Infrastructure', icon: Cpu },
+        { id: 'logs', label: 'Audit Logs', icon: FileText },
+      ],
+      chief_manager: [
+        { id: 'strategy', label: 'Strategic Hub', icon: Target },
+        { id: 'performance', label: 'KPI Analytics', icon: TrendingUp },
+        { id: 'team', label: 'Team Leads', icon: Users },
+        { id: 'global_ops', label: 'Global Ops', icon: Globe },
+      ],
+      manager: [
+        { id: 'academy_ops', label: 'Academy Ops', icon: GraduationCap },
+        { id: 'studio_ops', label: 'Studio Board', icon: Briefcase },
+        { id: 'contracts', label: 'Contracts', icon: FileSearch },
+        { id: 'reviews', label: 'Review Queue', icon: ClipboardList },
+      ],
+      lecturer: [
+        { id: 'instructor_hub', label: 'Teaching Hub', icon: Video },
+        { id: 'my_courses', label: 'Course Builder', icon: Layers },
+        { id: 'students', label: 'My Students', icon: UserCheck },
+        { id: 'analytics', label: 'Class Stats', icon: TrendingUp },
+      ],
+      executor: [
+        { id: 'pro_workspace', label: 'Production', icon: Zap },
+        { id: 'my_progress', label: 'Skill Path', icon: BookOpen },
+        { id: 'job_pipeline', label: 'Job Pipeline', icon: Briefcase },
+        { id: 'portfolio', label: 'Portfolio CMS', icon: Layers },
+      ],
+      client: [
+        { id: 'projects', label: 'My Productions', icon: Box },
+        { id: 'talent_search', label: 'Talent Scout', icon: SearchCode },
+        { id: 'billing', label: 'Finance Hub', icon: CreditCard },
+        { id: 'briefs', label: 'Project Briefs', icon: FileText },
+      ],
+      student: [
+        { id: 'my_progress', label: 'My Workshops', icon: BookOpen },
+        { id: 'projects', label: 'Studio Projects', icon: Briefcase },
+        { id: 'certificates', label: 'Certificates', icon: Award },
+        { id: 'calendar', label: 'Live Sessions', icon: CalendarDays },
+      ],
+      moderator: [
+        { id: 'moderation', label: 'Safety Hub', icon: Shield },
+        { id: 'reports', label: 'Report Queue', icon: AlertCircle },
+        { id: 'community', label: 'Forum Mgmt', icon: Users },
+      ],
+      hr: [
+        { id: 'talent_mgmt', label: 'Hiring Board', icon: UserPlus },
+        { id: 'interviews', label: 'Schedule', icon: Calendar },
+        { id: 'applications', label: 'Review Hub', icon: ClipboardList },
+      ],
+      finance: [
+        { id: 'payouts', label: 'Payout Queue', icon: DollarSign },
+        { id: 'revenue', label: 'Revenue Share', icon: TrendingUp },
+        { id: 'escrow', label: 'Escrow Control', icon: ShieldCheck },
+      ],
+      support: [
+        { id: 'tickets', label: 'Help Desk', icon: LifeBuoy },
+        { id: 'user_search', label: 'Deep Search', icon: SearchCode },
+        { id: 'kb', label: 'Base Mgmt', icon: BookOpen },
+      ]
+    };
+
+    return [...commonTop, ...(roleSpecific[role] || roleSpecific.student), ...commonBottom];
+  };
+
+  const sidebarItems = getSidebarItems(activeRole || 'student');
+
+  return (
+    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 max-w-[1600px] mx-auto py-4 lg:py-8 px-4 lg:px-8 min-h-screen">
+      {/* SIDEBAR / MOBILE NAVIGATION */}
+      <aside className="lg:w-72 shrink-0">
+        <div className="lg:p-8 lg:rounded-[2.5rem] lg:bg-[#0a0a0a] lg:border lg:border-white/5 lg:shadow-2xl space-y-6 lg:space-y-10 lg:sticky lg:top-24">
+          
+          {/* Profile Section - Hidden on very small mobile if needed, but here kept compact */}
+          <div className="flex items-center justify-between lg:flex-col lg:items-start gap-4 bg-[#0a0a0a] lg:bg-transparent p-4 lg:p-0 rounded-2xl border border-white/5 lg:border-0">
+            <div className="flex items-center gap-4">
+              <div className="size-10 lg:size-12 rounded-xl lg:rounded-2xl overflow-hidden border-2 border-white/5">
+                <img src={profile?.photoURL || `https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png`} alt="" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-xs lg:text-sm font-black text-white truncate uppercase tracking-tight">{user?.displayName?.split(' ')[0]}</h3>
+                <p className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest" style={{ color: theme.accent }}>{theme.label}</p>
+              </div>
+            </div>
+            
+            {/* Quick logout for mobile */}
+            <button onClick={() => logout()} className="lg:hidden p-2 text-red-500/40 hover:text-red-500">
+              <LogOut size={18} />
+            </button>
+          </div>
+
+          {/* Role Switcher - Optimized for mobile (Horizontal scroll) */}
           {profile && profile.roles.length > 1 && (
-            <div className="flex items-center bg-white/5 rounded-2xl p-1 border border-white/5 overflow-hidden">
-              {['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'lecturer', 'executor', 'client', 'student']
+            <div className="flex lg:grid lg:grid-cols-2 gap-2 overflow-x-auto no-scrollbar pb-2 lg:pb-0">
+              {['admin', 'chief_manager', 'student', 'lecturer', 'executor', 'client']
                 .filter(r => profile.roles.includes(r as any))
                 .map(r => (
                   <button
                     key={r}
                     onClick={() => setActiveRole(r as any)}
-                    className={`px-3 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all ${
+                    className={`whitespace-nowrap px-4 lg:px-2 py-2 rounded-xl text-[8px] lg:text-[7px] font-black uppercase tracking-widest transition-all border shrink-0 ${
                       activeRole === r 
-                      ? 'bg-white text-black shadow-lg scale-105' 
-                      : 'text-white/40 hover:text-white hover:bg-white/5'
+                      ? 'bg-white text-black border-white shadow-lg' 
+                      : 'text-white/40 border-white/5 hover:text-white hover:bg-white/5'
                     }`}
                   >
-                    {r.split('_')[0]}
+                    {r.replace('_', ' ')}
                   </button>
                 ))}
             </div>
           )}
 
-          <button className="p-3 bg-white/5 rounded-2xl border border-white/5 text-white/40 hover:text-white transition-all relative">
-            <Bell size={20} />
-            <div className="absolute top-3 right-3 size-2 rounded-full border-2 border-[#0a0a0a]" style={{ background: theme.accent }} />
-          </button>
-        </div>
-      </section>
+          {/* Navigation - Horizontal scroll on mobile, vertical on desktop */}
+          <nav className="flex lg:flex-col gap-1 overflow-x-auto no-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0">
+            {sidebarItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  if (item.id === 'profile' && user?.uid) {
+                    const mode = location.pathname.split('/')[1] || 'aca';
+                    navigate(`/${mode}/${lang || 'eng'}/profile/${user.uid}`);
+                  } else {
+                    navigate(`?view=${item.id}`);
+                  }
+                }}
+                className={`flex items-center gap-3 lg:gap-4 px-5 lg:px-6 py-3 lg:py-4 rounded-xl lg:rounded-2xl transition-all group shrink-0 ${
+                  currentView === item.id 
+                    ? 'bg-white text-black font-black shadow-xl scale-[1.02]' 
+                    : 'text-white/40 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <item.icon size={16} className={currentView === item.id ? 'text-black' : 'group-hover:text-primary transition-colors'} />
+                <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest whitespace-nowrap">{item.label}</span>
+              </button>
+            ))}
+          </nav>
 
-      {/* CONTENT DISPATCHER */}
-      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="min-h-[600px]">
-        {activeRole === 'admin' && <AdminDashboardContent activeModule={currentView} theme={{ ...theme, bg: '#0a0a0a', border: '#2a2a2a' }} user={user} />}
-        {activeRole === 'chief_manager' && <ChiefManagerDashboardContent activeModule={currentView} theme={{ ...theme, bg: '#0a0a0a', border: '#2a2a2a' }} />}
-        {activeRole === 'manager' && <ManagerDashboardContent activeModule={currentView} theme={{ ...theme, bg: '#0a0a0a', border: '#2a2a2a' }} />}
-        {['moderator', 'hr', 'finance', 'support'].includes(activeRole || '') && <StaffDashboardContent activeRole={activeRole} activeModule={currentView} accentColor={theme.accent} />}
-        
-        {['student', 'lecturer', 'client', 'executor'].includes(activeRole || '') && <CoreDashboardView activeRole={activeRole} currentView={currentView} accent={theme.accent} />}
-        
-        {!activeRole && (
-          <div className="flex flex-col items-center justify-center py-40 opacity-20 text-center">
-            <LayoutDashboard size={80} className="mb-8" />
-            <h2 className="text-2xl font-black uppercase tracking-[0.5em]">Module Initializing...</h2>
+          {/* Desktop Footer */}
+          <div className="hidden lg:block pt-6 border-t border-white/5">
+            <button 
+              onClick={() => logout()}
+              className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-red-500/40 hover:text-red-500 hover:bg-red-500/5 transition-all group"
+            >
+              <LogOut size={18} />
+              <span className="text-[10px] font-black uppercase tracking-widest">Secure Logout</span>
+            </button>
           </div>
-        )}
-      </motion.div>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT AREA */}
+      <main className="flex-1 space-y-8 lg:space-y-12">
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2 lg:space-y-4">
+            <div className="flex items-center gap-2 text-primary font-black uppercase tracking-[0.3em] text-[9px] lg:text-[10px]">
+              <LayoutDashboard size={14} />
+              Dashboard Hub
+            </div>
+            <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-white leading-tight uppercase">
+              {currentView === 'overview' ? `Welcome,` : currentView.replace(/_/g, ' ')} <br className="hidden lg:block" />
+              <span className="text-primary italic">{currentView === 'overview' ? user?.displayName?.split(' ')[0] : 'HUB'}.</span>
+            </h1>
+          </div>
+          <div className="flex items-center gap-3 lg:gap-4">
+            <button className="p-3 lg:p-4 bg-white/5 rounded-xl lg:rounded-2xl border border-white/5 text-white/40 hover:text-white transition-all relative">
+              <Bell size={20} lg:size={24} />
+              <div className="absolute top-3 right-3 lg:top-4 lg:right-4 size-2 rounded-full border-2 border-[#0a0a0a]" style={{ background: theme.accent }} />
+            </button>
+            <Link 
+              to={`/aca/${lang || 'eng'}`}
+              className="flex-1 lg:flex-none px-6 lg:px-8 py-3 lg:py-4 bg-primary text-bg-dark rounded-xl lg:rounded-2xl text-[9px] lg:text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 lg:gap-3"
+            >
+              <Rocket size={16} lg:size={18} /> <span className="whitespace-nowrap">Explore Workshops</span>
+            </Link>
+          </div>
+        </header>
+
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+          {activeRole === 'admin' && <AdminDashboardContent activeModule={currentView} theme={{ ...theme, bg: '#0a0a0a', border: '#2a2a2a' }} user={user} />}
+          {activeRole === 'chief_manager' && <ChiefManagerDashboardContent activeModule={currentView} theme={{ ...theme, bg: '#0a0a0a', border: '#2a2a2a' }} />}
+          {activeRole === 'manager' && <ManagerDashboardContent activeModule={currentView} theme={{ ...theme, bg: '#0a0a0a', border: '#2a2a2a' }} />}
+          {['moderator', 'hr', 'finance', 'support'].includes(activeRole || '') && <StaffDashboardContent activeRole={activeRole} activeModule={currentView} accentColor={theme.accent} />}
+          
+          {['student', 'lecturer', 'client', 'executor'].includes(activeRole || '') && <CoreDashboardView activeRole={activeRole} currentView={currentView} accent={theme.accent} user={user} lang={lang} />}
+        </motion.div>
+      </main>
     </div>
   );
 }
 
-function CoreDashboardView({ activeRole, currentView, accent }: any) {
+function CoreDashboardView({ activeRole, currentView, accent, user, lang }: any) {
   return (
     <>
-      {activeRole === 'student' && <StudentDashboard view={currentView} accent={accent} />}
+      {activeRole === 'student' && <StudentDashboard view={currentView} accent={accent} user={user} lang={lang} />}
       {activeRole === 'lecturer' && <LecturerDashboard view={currentView} accent={accent} />}
       {activeRole === 'client' && <ClientDashboard view={currentView} accent={accent} />}
       {activeRole === 'executor' && <ExecutorDashboard view={currentView} accent={accent} />}
@@ -167,124 +297,139 @@ function CoreDashboardView({ activeRole, currentView, accent }: any) {
   );
 }
 
-function StudentDashboard({ view, accent }: any) {
+function StudentDashboard({ view, accent, user, lang }: any) {
+  const [enrollments, setEnrollments] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    async function fetchEnrollments() {
+      if (!user?.uid) return;
+      try {
+        setLoading(true);
+        const { academyService } = await import('../services/academyService');
+        const data = await academyService.getUserEnrollments(user.uid);
+        setEnrollments(data);
+      } catch (error) {
+        console.error("Failed to fetch enrollments:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchEnrollments();
+  }, [user?.uid]);
+
   if (view === 'overview' || view === 'my_progress') {
     return (
-      <div className="space-y-8">
+      <div className="space-y-12">
         {/* Top Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard label="Current Courses" value="3" sub="2 nearing completion" icon={BookOpen} accent={accent} />
+          <StatCard label="My Workshops" value={enrollments.length} sub={`${enrollments.filter(e => e.progress > 90).length} completed`} icon={BookOpen} accent={accent} />
           <StatCard label="Mastery Points" value="12,450" sub="Top 12% globally" icon={Zap} accent={accent} />
           <StatCard label="Certificates" value="7" sub="Latest: Unreal Lighting" icon={Award} accent={accent} />
           <StatCard label="Study Time" value="142h" sub="+12h this week" icon={Clock} accent={accent} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
-          <div className="space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12">
+          <div className="space-y-12">
             {/* Active Pipeline */}
-            <div className="bg-[#111] border border-white/5 rounded-[2.5rem] p-8 space-y-8 shadow-2xl">
+            <div className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] p-10 space-y-10 shadow-2xl">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
-                  <Play size={20} style={{ color: accent }} /> Active Learning Pipeline
+                <h3 className="text-2xl font-black uppercase tracking-tight flex items-center gap-3 text-white">
+                  <Play size={24} style={{ color: accent }} /> {view === 'overview' ? 'Active Pipeline' : 'All My Workshops'}
                 </h3>
-                <button className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors">View All</button>
               </div>
-              <div className="grid gap-4">
-                {[
-                  { title: "CGI Production Vol.1", progress: 68, instructor: "Alex R.", img: "edu1" },
-                  { title: "Mastering Houdini FX", progress: 34, instructor: "Sarah L.", img: "edu2" }
-                ].map((course, i) => (
-                  <div key={i} className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl flex items-center justify-between group hover:border-white/10 transition-all">
-                    <div className="flex items-center gap-6">
-                      <div className="size-16 rounded-2xl overflow-hidden border border-white/10 group-hover:border-primary/20 transition-all">
-                        <img src={`https://picsum.photos/seed/${course.img}/200`} className="w-full h-full object-cover" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-black text-white uppercase tracking-tight">{course.title}</h4>
-                        <p className="text-[10px] text-white/40 font-bold uppercase mt-1">Instructor: {course.instructor}</p>
-                        <div className="flex items-center gap-4 mt-3">
-                          <div className="w-48 h-1 bg-white/5 rounded-full overflow-hidden">
-                            <motion.div 
-                              initial={{ width: 0 }} 
-                              animate={{ width: `${course.progress}%` }} 
-                              transition={{ duration: 1, delay: i * 0.2 }}
-                              className="h-full" 
-                              style={{ background: accent }} 
-                            />
+              
+              {loading ? (
+                <div className="flex justify-center py-20">
+                  <span className="loading loading-spinner loading-lg text-primary"></span>
+                </div>
+              ) : (
+                <div className="grid gap-6">
+                  {enrollments.length > 0 ? enrollments.map((enr, i) => (
+                    <div key={i} className="p-8 bg-white/[0.02] border border-white/5 rounded-[2.5rem] flex flex-col md:flex-row md:items-center justify-between gap-8 group hover:border-white/10 transition-all">
+                      <div className="flex items-center gap-8">
+                        <div className="size-24 rounded-3xl overflow-hidden border-2 border-white/5 group-hover:border-primary/20 transition-all shadow-2xl">
+                          <img src={enr.course.thumbnail} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="text-xl font-black text-white uppercase tracking-tight group-hover:text-primary transition-colors">{enr.course.title}</h4>
+                          <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Instructor: {enr.course.lecturerName}</p>
+                          <div className="flex items-center gap-6 mt-4">
+                            <div className="w-64 h-2 bg-white/5 rounded-full overflow-hidden">
+                              <motion.div 
+                                initial={{ width: 0 }} 
+                                animate={{ width: `${enr.progress}%` }} 
+                                transition={{ duration: 1, delay: i * 0.2 }}
+                                className="h-full" 
+                                style={{ background: accent }} 
+                              />
+                            </div>
+                            <span className="text-xs font-black" style={{ color: accent }}>{enr.progress}%</span>
                           </div>
-                          <span className="text-[10px] font-black" style={{ color: accent }}>{course.progress}%</span>
                         </div>
                       </div>
+                      <Link 
+                        to={`/learn/${lang}/${enr.course.slug}`}
+                        className="px-10 py-4 bg-white text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all text-center"
+                      >
+                        Continue Learning
+                      </Link>
                     </div>
-                    <button className="px-6 py-3 bg-white/5 border border-white/5 rounded-xl text-[10px] font-black uppercase hover:bg-white/10 transition-all">Resume</button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Upcoming Lessons */}
-            <div className="bg-[#111] border border-white/5 rounded-[2.5rem] p-8 space-y-8 shadow-2xl">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
-                  <Calendar size={20} style={{ color: accent }} /> Upcoming Sessions
-                </h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  { title: "Advanced Rigging Q&A", date: "Today, 18:00", type: "Live Workshop" },
-                  { title: "Portfolio Review", date: "Tomorrow, 14:00", type: "Group Critique" }
-                ].map((session, i) => (
-                  <div key={i} className="p-6 bg-white/[0.01] border border-white/5 rounded-3xl space-y-4 hover:border-white/10 transition-all">
-                    <div className="flex justify-between items-start">
-                      <span className="px-2 py-1 bg-white/5 text-white/60 text-[8px] font-black uppercase rounded border border-white/10" style={{ color: accent, borderColor: `${accent}20` }}>{session.type}</span>
-                      <Clock size={14} className="text-white/20" />
+                  )) : (
+                    <div className="text-center py-20 bg-white/[0.01] border border-dashed border-white/5 rounded-[3rem] space-y-6">
+                      <BookOpen size={48} className="mx-auto text-white/10" />
+                      <p className="text-white/20 font-black uppercase tracking-widest text-xs">No active workshops found</p>
+                      <Link to={`/aca/${lang}`} className="text-primary text-[10px] font-black uppercase tracking-widest hover:underline">Browse Catalog</Link>
                     </div>
-                    <h4 className="text-xs font-black text-white uppercase tracking-tight">{session.title}</h4>
-                    <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{session.date}</div>
-                    <button className="w-full py-2 bg-white/5 rounded-lg text-[9px] font-black uppercase hover:bg-white/10 transition-all">Join Waiting Room</button>
-                  </div>
-                ))}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="space-y-6">
-            {/* Certification Card */}
-            <div className="p-8 rounded-[2.5rem] relative overflow-hidden group shadow-2xl flex flex-col justify-between aspect-square" style={{ background: accent }}>
-              <div className="relative z-10 text-bg-dark">
-                <Rocket size={48} className="mb-6" />
-                <h3 className="text-2xl font-black uppercase tracking-tighter leading-tight">Elite <br /> CG Certification</h3>
-                <p className="text-[10px] font-bold uppercase tracking-widest mt-4 opacity-60">Validate your industry skills</p>
+          <aside className="space-y-8">
+            {/* Certification Widget */}
+            <div className="p-10 rounded-[3rem] relative overflow-hidden group shadow-2xl flex flex-col justify-between aspect-square" style={{ background: accent }}>
+              <div className="relative z-10 text-bg-dark space-y-4">
+                <Rocket size={56} className="mb-4" />
+                <h3 className="text-3xl font-black uppercase tracking-tighter leading-none">Elite <br /> CG Pro <br /> Exam</h3>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Validate your industry skills</p>
               </div>
-              <button className="w-full py-4 bg-bg-dark text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all relative z-10 shadow-xl">Apply for Exam</button>
-              {/* Background Glow */}
-              <div className="absolute -bottom-20 -right-20 size-64 bg-white/20 blur-[80px] rounded-full group-hover:scale-110 transition-transform" />
+              <button className="w-full py-5 bg-bg-dark text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all relative z-10 shadow-xl">Apply for Exam</button>
+              <div className="absolute -bottom-20 -right-20 size-80 bg-white/20 blur-[100px] rounded-full group-hover:scale-110 transition-transform" />
             </div>
 
-            {/* Progress Summary */}
-            <div className="bg-[#111] border border-white/5 rounded-[2.5rem] p-8 space-y-6">
-              <h3 className="text-xs font-black uppercase tracking-widest text-white/40">Weekly Goal</h3>
-              <div className="flex items-end justify-between">
-                <span className="text-3xl font-black text-white tracking-tighter">85%</span>
-                <span className="text-[10px] font-bold uppercase" style={{ color: accent }}>12/15 hours</span>
+            {/* Daily Challenge */}
+            <div className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] p-10 space-y-6 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 text-primary/20"><Target size={40} /></div>
+              <h3 className="text-xs font-black uppercase tracking-widest text-white/40">Daily Challenge</h3>
+              <p className="text-lg font-black text-white uppercase leading-tight">Sculpt a human ear <br /> in under 20 mins.</p>
+              <div className="flex items-center gap-4 pt-4">
+                <div className="flex -space-x-3">
+                  {[1,2,3].map(i => <div key={i} className="size-8 rounded-xl border-2 border-[#0a0a0a] bg-white/10 overflow-hidden"><img src={`https://picsum.photos/seed/${i+10}/50`} /></div>)}
+                </div>
+                <span className="text-[9px] font-black text-white/20 uppercase">+42 others joined</span>
               </div>
-              <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }} 
-                  animate={{ width: '85%' }} 
-                  transition={{ duration: 1.5 }}
-                  className="h-full" 
-                  style={{ background: accent }} 
-                />
-              </div>
-              <p className="text-[9px] text-white/20 font-black uppercase leading-relaxed tracking-widest">You're doing better than 82% of students this week. Keep it up!</p>
+              <button className="w-full py-4 border-2 border-white/5 rounded-2xl text-[10px] font-black uppercase text-white/40 hover:text-white hover:border-white/10 transition-all">Accept Challenge</button>
             </div>
-          </div>
+          </aside>
         </div>
       </div>
     );
   }
-  return <div className="p-20 text-center opacity-20 uppercase font-black tracking-widest">{view} module is coming soon</div>;
+
+  // Handle other views
+  return (
+    <div className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] p-20 text-center space-y-8">
+      <div className="flex justify-center"><Target size={64} className="text-white/10 animate-pulse" /></div>
+      <div className="space-y-2">
+        <h2 className="text-2xl font-black uppercase tracking-tighter text-white">{view.replace(/_/g, ' ')} Module</h2>
+        <p className="text-xs font-bold text-white/20 uppercase tracking-widest">Section initializing with real-time data streaming...</p>
+      </div>
+      <button onClick={() => navigate('?view=overview')} className="px-8 py-4 bg-white/5 text-white/40 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-white transition-all border border-white/5">Back to Overview</button>
+    </div>
+  );
 }
 
 function LecturerDashboard({ view, accent }: any) {
