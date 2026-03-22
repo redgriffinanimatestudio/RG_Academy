@@ -55,6 +55,23 @@ import { auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useAuth } from '../context/AuthContext';
 
+export function StaffDashboardContent({ activeRole, activeModule, accentColor }: any) {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div key={`${activeRole}-${activeModule}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6 max-w-[1400px] mx-auto">
+        {activeModule === 'dashboard' && <GenericDashboard activeRole={activeRole} accent={accentColor} />}
+        {activeModule !== 'dashboard' && (
+          <div className="p-20 text-center opacity-20 flex flex-col items-center">
+            <Shield size={64} className="mb-6" style={{ color: accentColor }} />
+            <div className="text-xl font-black uppercase tracking-[0.5em]">{activeModule.replace(/_/g, ' ')} Module</div>
+            <div className="text-sm mt-2">Active Node Control Operational...</div>
+          </div>
+        )}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 export default function StaffDashboard() {
   const { lang } = useParams();
   const { user, profile, activeRole, loading } = useAuth();

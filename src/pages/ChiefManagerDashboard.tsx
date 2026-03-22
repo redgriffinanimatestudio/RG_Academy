@@ -52,6 +52,21 @@ import { userService, UserProfile } from '../services/userService';
 import { auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
+export function ChiefManagerDashboardContent({ activeModule, theme }: any) {
+  return (
+    <AnimatePresence mode="wait">
+      {activeModule === 'dashboard' && <StrategyView theme={theme} />}
+      {activeModule === 'all_contracts' && <ContractsView theme={theme} />}
+      {activeModule !== 'dashboard' && activeModule !== 'all_contracts' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full py-20 opacity-20 text-center">
+          <Target size={64} className="mb-6" />
+          <div className="text-[12px] font-black uppercase tracking-[0.5em]">{activeModule} View Initializing...</div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export default function ChiefManagerDashboard() {
   const { lang } = useParams();
   const [user, loading] = useAuthState(auth);

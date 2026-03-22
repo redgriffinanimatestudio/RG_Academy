@@ -25,19 +25,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [devUser, setDevUser] = useState<any>(null);
 
   useEffect(() => {
-    // Initial load and listen for storage changes
-    const loadDevUser = () => {
-      const stored = localStorage.getItem('rg_dev_user');
-      if (stored) {
+    const stored = localStorage.getItem('rg_dev_user');
+    if (stored) {
+      try {
         setDevUser(JSON.parse(stored));
-      } else {
-        setDevUser(null);
+      } catch (e) {
+        localStorage.removeItem('rg_dev_user');
       }
-    };
-
-    loadDevUser();
-    window.addEventListener('storage', loadDevUser);
-    return () => window.removeEventListener('storage', loadDevUser);
+    }
   }, []);
 
   useEffect(() => {
@@ -48,48 +43,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: devUser.displayName,
         photoURL: devUser.photoURL || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png',
         roles: ['student', 'lecturer', 'client', 'executor', 'chief_manager', 'admin'],
-        createdAt: new Date(devUser.createdAt) as any,
-        updatedAt: new Date(devUser.updatedAt) as any
+        createdAt: new Date() as any,
+        updatedAt: new Date() as any
       };
       setProfile(devProfile);
       if (!activeRole) setActiveRoleState('admin');
-      return;
-    }
-
-    if (user) {
+    } else if (user) {
       setProfileLoading(true);
-      userService.getProfile(user.uid).then(async p => {
-        let currentProfile = p;
-        
-        if (!currentProfile) {
-          // Create a new profile if it doesn't exist
-          await userService.createProfile(
-            user.uid,
-            user.email || '',
-            user.displayName,
-            user.photoURL
-          );
-          currentProfile = await userService.getProfile(user.uid);
-        }
-
-        if (currentProfile) {
-          // For development purposes, we grant all roles to the user
-          const allRoles: UserRole[] = ['student', 'lecturer', 'client', 'executor', 'chief_manager', 'admin'];
-          const enhancedProfile = { 
-            ...currentProfile, 
-            roles: Array.from(new Set([...(currentProfile.roles || []), ...allRoles])) 
-          };
-          setProfile(enhancedProfile);
-          
-          if (!activeRole && enhancedProfile.roles.length > 0) {
-            setActiveRoleState(enhancedProfile.roles[0]);
-          }
+      userService.getProfile(user.uid).then(p => {
+        if (p) {
+          setProfile(p);
+          if (!activeRole && p.roles.length > 0) setActiveRoleState(p.roles[0]);
         }
         setProfileLoading(false);
-      }).catch(err => {
-        console.error("Error fetching/creating profile:", err);
-        setProfileLoading(false);
-      });
+      }).catch(() => setProfileLoading(false));
     } else {
       setProfile(null);
       setActiveRoleState(null);
@@ -97,21 +64,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, devUser]);
 
   const loginAsGuest = async () => {
-    try {
-      const response = await fetch('/api/dev/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'dev@redgriffin.academy',
-          displayName: 'Dev Administrator'
-        })
-      });
-      const data = await response.json();
-      localStorage.setItem('rg_dev_user', JSON.stringify(data));
-      setDevUser(data);
-    } catch (error) {
-      console.error("Dev login failed:", error);
-    }
+    localStorage.setItem('rg_dev_user', JSON.stringify({
+      id: 'admin_dev',
+      email: 'admin@redgriffin.academy',
+      displayName: 'System Admin'
+    }));
+    window.location.reload();
   };
 
   const logout = async () => {
@@ -136,15 +94,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     uid: devUser.id,
     email: devUser.email,
     displayName: devUser.displayName,
-    photoURL: devUser.photoURL,
     isDev: true
   } : null);
+
+  // Loading state: only true if we don't have a devUser AND firebase is loading
+  const isLoading = devUser ? false : (loading || profileLoading);
 
   return (
     <AuthContext.Provider value={{ 
       user: effectiveUser, 
       profile, 
-      loading: loading || profileLoading, 
+      loading: isLoading, 
       activeRole, 
       setActiveRole,
       hasRole,

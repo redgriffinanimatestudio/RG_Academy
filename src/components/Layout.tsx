@@ -127,37 +127,42 @@ const COMMUNITY_CATEGORIES = [
 
 const DASHBOARD_MENUS: Record<string, any[]> = {
   student: [
-    { name: 'learning_dashboard', icon: GraduationCap, subcategories: [{ name: 'my_progress', topics: ['Current Courses', 'Study Plan', 'Certificates', 'Wishlist'] }, { name: 'academy_calendar', topics: ['Upcoming Lessons', 'Deadlines', 'Reminders'] }] },
-    { name: 'student_finance', icon: Zap, subcategories: [{ name: 'purchases', topics: ['Order History', 'Payment Methods', 'Subscriptions'] }] }
+    { name: 'learning_dashboard', icon: GraduationCap, subcategories: [{ name: 'my_progress' }, { name: 'academy_calendar' }] },
+    { name: 'student_finance', icon: Zap, subcategories: [{ name: 'purchases' }] }
   ],
   lecturer: [
-    { name: 'instructor_hub', icon: Video, subcategories: [{ name: 'content_mgmt', topics: ['Published Workshops', 'Drafts', 'Reviews', 'Recordings'] }, { name: 'student_engagement', topics: ['Enrollment Stats', 'Assignments', 'Student Q&A'] }] },
-    { name: 'lecturer_wallet', icon: Zap, subcategories: [{ name: 'financials', topics: ['Earnings Report', 'Payout History', 'Tax Documents'] }] }
+    { name: 'instructor_hub', icon: Video, subcategories: [{ name: 'content_mgmt' }, { name: 'student_engagement' }] },
+    { name: 'lecturer_wallet', icon: Zap, subcategories: [{ name: 'financials' }] }
   ],
   executor: [
-    { name: 'pro_workspace', icon: Briefcase, subcategories: [{ name: 'job_pipeline', topics: ['Active Contracts', 'Invitations', 'Project Board'] }, { name: 'pro_profile', topics: ['Portfolio Showcase', 'Skills Matrix', 'Profile Settings'] }] },
-    { name: 'business_ops', icon: Users, subcategories: [{ name: 'networking', topics: ['My Connections', 'Recommendations', 'Colleagues'] }, { name: 'finances', topics: ['Earnings & Payouts', 'Invoices', 'Tax Info'] }] }
+    { name: 'pro_workspace', icon: Briefcase, subcategories: [{ name: 'job_pipeline' }, { name: 'pro_profile' }] },
+    { name: 'business_ops', icon: Users, subcategories: [{ name: 'networking' }, { name: 'finances' }] }
   ],
   client: [
-    { name: 'client_workspace', icon: Box, subcategories: [{ name: 'project_mgmt', topics: ['My active Projects', 'Post a Project', 'Drafts'] }, { name: 'talent_acquisition', topics: ['Saved Experts', 'Interviews', 'Messages'] }] },
-    { name: 'client_billing', icon: Settings, subcategories: [{ name: 'finances', topics: ['Deposits', 'Payments History', 'Billing Info'] }] }
+    { name: 'client_workspace', icon: Box, subcategories: [{ name: 'project_mgmt' }, { name: 'talent_acquisition' }] },
+    { name: 'client_billing', icon: Settings, subcategories: [{ name: 'finances' }] }
   ],
   admin: [
-    { name: 'core_management', icon: Shield, subcategories: [{ name: 'user_operations', topics: ['Users Directory', 'Roles & RBAC', 'Access Logs'] }, { name: 'platform_content', topics: ['Course Moderation', 'Studio Review', 'Reports'] }] },
-    { name: 'system_health', icon: Cpu, subcategories: [{ name: 'infrastructure', topics: ['Server Status', 'API Logs', 'Backups'] }] }
+    { name: 'core_management', icon: Shield, subcategories: [{ name: 'dashboard' }] },
+    { name: 'user_operations', icon: Users, subcategories: [{ name: 'users_directory' }, { name: 'roles_rbac' }, { name: 'access_logs' }] },
+    { name: 'platform_content', icon: Box, subcategories: [{ name: 'course_moderation' }, { name: 'studio_review' }, { name: 'reports' }] },
+    { name: 'system_health', icon: Cpu, subcategories: [{ name: 'server_status' }, { name: 'api_logs' }, { name: 'settings' }] }
   ],
   chief_manager: [
-    { name: 'strategic_hub', icon: Target, subcategories: [{ name: 'overview', topics: ['Strategy', 'KPI Metrics', 'Growth'] }, { name: 'team_mgmt', topics: ['Staff List', 'Performance', 'HR Ops'] }] },
-    { name: 'ops_mgmt', icon: Briefcase, subcategories: [{ name: 'contracts', topics: ['All Contracts', 'Escrows', 'Legal'] }] }
+    { name: 'strategic_hub', icon: Target, subcategories: [{ name: 'dashboard' }, { name: 'kpi_metrics' }, { name: 'growth' }] },
+    { name: 'team_mgmt', icon: Users, subcategories: [{ name: 'staff_list' }, { name: 'performance' }] },
+    { name: 'ops_mgmt', icon: Briefcase, subcategories: [{ name: 'all_contracts' }, { name: 'legal' }] }
   ],
   manager: [
-    { name: 'operational_overview', icon: LayoutDashboard, subcategories: [{ name: 'academy_ops', topics: ['Courses Review', 'Student Feedback', 'Lecturer Support'] }, { name: 'studio_ops', topics: ['Project Board', 'Contract Status', 'Escrow Alerts'] }] },
-    { name: 'user_management', icon: Users, subcategories: [{ name: 'directory', topics: ['User List', 'Role Requests', 'Verifications'] }] }
+    { name: 'operational_overview', icon: LayoutDashboard, subcategories: [{ name: 'overview' }] },
+    { name: 'academy_ops', icon: GraduationCap, subcategories: [{ name: 'courses_review' }, { name: 'student_feedback' }] },
+    { name: 'studio_ops', icon: Box, subcategories: [{ name: 'project_board' }, { name: 'contract_status' }, { name: 'escrow_alerts' }] },
+    { name: 'user_management', icon: Users, subcategories: [{ name: 'user_list' }, { name: 'role_requests' }] }
   ],
-  moderator: [{ name: 'content_moderation', icon: Shield, subcategories: [{ name: 'reviews', topics: ['Recent Feedback', 'Reported Reviews', 'Archive'] }, { name: 'community', topics: ['Flagged Posts', 'Banned Keywords', 'Spam Filter'] }] }],
-  hr: [{ name: 'talent_mgmt', icon: Users, subcategories: [{ name: 'team', topics: ['Employee List', 'Onboarding', 'Attendance'] }, { name: 'recruiting', topics: ['Job Openings', 'Applications', 'Interview Schedule'] }] }],
-  finance: [{ name: 'financial_ops', icon: DollarSign, subcategories: [{ name: 'payouts', topics: ['Payment Queue', 'Completed Transactions', 'Payout Rules'] }, { name: 'contracts', topics: ['Milestone Alerts', 'Revenue Share', 'Tax Compliance'] }] }],
-  support: [{ name: 'help_desk', icon: LifeBuoy, subcategories: [{ name: 'tickets', topics: ['Open Tickets', 'Assigned to me', 'Resolved'] }, { name: 'kb', topics: ['Articles', 'FAQs', 'Internal Docs'] }] }]
+  moderator: [{ name: 'content_moderation', icon: Shield, subcategories: [{ name: 'dashboard' }, { name: 'reported_reviews' }, { name: 'flagged_posts' }, { name: 'banned_keywords' }] }],
+  hr: [{ name: 'talent_mgmt', icon: Users, subcategories: [{ name: 'dashboard' }, { name: 'job_openings' }, { name: 'applications' }, { name: 'interview_schedule' }] }],
+  finance: [{ name: 'financial_ops', icon: DollarSign, subcategories: [{ name: 'dashboard' }, { name: 'payment_queue' }, { name: 'revenue_share' }, { name: 'tax_compliance' }] }],
+  support: [{ name: 'help_desk', icon: LifeBuoy, subcategories: [{ name: 'dashboard' }, { name: 'open_tickets' }, { name: 'base_knowledge' }, { name: 'user_search' }] }]
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {

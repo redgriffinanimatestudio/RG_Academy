@@ -1,109 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { 
-  BookOpen, 
-  Clock, 
-  Award, 
-  TrendingUp, 
-  Play, 
-  ChevronRight,
-  Calendar,
-  Star,
-  Zap,
-  CheckCircle,
-  Search,
-  Filter,
-  Users,
-  DollarSign,
-  Briefcase,
-  PieChart,
-  Plus,
-  Layout,
-  ArrowUpRight,
-  ArrowDownRight,
-  MessageSquare,
-  Layers,
-  Box,
-  Video,
-  Shield,
-  Cpu,
-  MoreVertical,
-  LayoutDashboard,
-  FileText,
-  CreditCard,
-  History,
-  Target,
-  UserCheck,
-  LifeBuoy,
-  Settings,
-  Mail,
-  Heart,
-  ExternalLink,
-  ShieldCheck,
-  CheckCircle2,
-  AlertCircle,
-  Eye
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
 
-export default function Dashboard() {
-  const { t } = useTranslation();
-  const { lang } = useParams();
-  const { user, profile, activeRole } = useAuth();
-  const [searchParams] = useSearchParams();
-  const currentView = searchParams.get('view') || 'overview';
+// Import Full Original Dashboards
+import AdminDashboard, { AdminDashboardContent } from './AdminDashboard';
+import ChiefManagerDashboard, { ChiefManagerDashboardContent } from './ChiefManagerDashboard';
+import ManagerDashboard, { ManagerDashboardContent } from './ManagerDashboard';
+import StaffDashboard, { StaffDashboardContent } from './StaffDashboard';
 
-  // Role-based accent colors
-  const roleColors: Record<string, string> = {
-    student: '#378add',
-    lecturer: '#1d9e75',
-    client: '#ef9f27',
-    executor: '#e24b4a',
-    admin: '#ef4444'
+// Import Generic Modules for Core Roles
+import { 
+  BookOpen, Clock, Award, TrendingUp, Play, ChevronRight, Calendar, Star, Zap, CheckCircle, 
+  Search, Filter, Users, DollarSign, Briefcase, Plus, Layout as LayoutIcon, ArrowUpRight, ArrowDownRight, 
+  MessageSquare, Layers, Box, Video, Shield, Cpu, MoreVertical, LayoutDashboard, FileText, 
+  CreditCard, History, Target, UserCheck, LifeBuoy, Settings, Mail, Heart, ExternalLink, 
+  ShieldCheck, CheckCircle2, AlertCircle, CalendarDays, FileSearch, ClipboardList, Wallet, 
+  Globe, Rocket, SearchCode, Bell, Eye 
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
+export default function Dashboard() {
+  const { activeRole, user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const currentView = searchParams.get('view') || (['admin', 'chief_manager', 'manager'].includes(activeRole || '') ? 'dashboard' : 'overview');
+
+  const roleThemes: Record<string, any> = {
+    admin: { accent: '#ef4444', label: 'Administrator' },
+    chief_manager: { accent: '#7f77dd', label: 'Chief Manager' },
+    manager: { accent: '#1d9e75', label: 'Operations Manager' },
+    moderator: { accent: '#ef9f27', label: 'Moderator' },
+    hr: { accent: '#378add', label: 'HR Lead' },
+    finance: { accent: '#1d9e75', label: 'Finance' },
+    support: { accent: '#7f77dd', label: 'Support' },
+    student: { accent: '#378add', label: 'Student' },
+    lecturer: { accent: '#1d9e75', label: 'Instructor' },
+    client: { accent: '#ef9f27', label: 'Client' },
+    executor: { accent: '#e24b4a', label: 'Executor' }
   };
 
-  const accentColor = roleColors[activeRole || 'student'] || '#00f5d4';
+  const theme = roleThemes[activeRole || 'student'] || { accent: '#00f5d4', label: 'Member' };
 
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto py-2">
-      {/* HEADER SECTION */}
-      <section className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-white/5">
+    <div className="space-y-8 max-w-[1600px] mx-auto py-4">
+      {/* HEADER */}
+      <section className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-8 border-b border-white/5">
         <div className="flex flex-col">
-          <div className="text-[14px] font-medium uppercase tracking-tight text-white/80 flex items-center gap-2">
-            <span style={{ color: accentColor }}>{activeRole?.replace('_', ' ')}</span>
-            <span className="opacity-20">/</span>
-            <span>{currentView.replace(/_/g, ' ')}</span>
+          <div className="flex items-center gap-3">
+            <div className="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] bg-white/5 border border-white/10" style={{ color: theme.accent }}>
+              {theme.label} Hub
+            </div>
+            <span className="text-white/10">/</span>
+            <span className="text-[11px] font-black uppercase tracking-widest text-white/40">{currentView.replace(/_/g, ' ')}</span>
           </div>
-          <div className="text-[11px] font-medium text-white/40 uppercase tracking-widest mt-1">
-            {user?.displayName || 'User'} · {new Date().toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'en-US', { month: 'long', year: 'numeric' })}
-          </div>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white mt-4 uppercase leading-none">
+            {currentView === 'overview' || currentView === 'dashboard' ? `Welcome, ${user?.displayName?.split(' ')[0] || 'User'}` : currentView.replace(/_/g, ' ')}
+          </h1>
         </div>
-        <div className="flex items-center gap-4 text-[11px] font-black uppercase tracking-widest text-white/20">
-          <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/5">
-            <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-emerald-500/80">System Live</span>
-          </div>
+        <div className="flex items-center gap-4">
+          <button className="p-3 bg-white/5 rounded-2xl border border-white/5 text-white/40 hover:text-white transition-all relative">
+            <Bell size={20} />
+            <div className="absolute top-3 right-3 size-2 rounded-full border-2 border-[#0a0a0a]" style={{ background: theme.accent }} />
+          </button>
         </div>
       </section>
 
-      {/* DASHBOARD MODULES */}
-      <motion.div
-        key={`${activeRole}-${currentView}`}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
-      >
-        {activeRole === 'student' && <StudentViews view={currentView} accent={accentColor} lang={lang} />}
-        {activeRole === 'lecturer' && <LecturerViews view={currentView} accent={accentColor} lang={lang} />}
-        {activeRole === 'client' && <ClientViews view={currentView} accent={accentColor} lang={lang} />}
-        {activeRole === 'executor' && <ExecutorViews view={currentView} accent={accentColor} lang={lang} />}
+      {/* CONTENT DISPATCHER */}
+      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="min-h-[600px]">
+        {activeRole === 'admin' && <AdminDashboardContent activeModule={currentView} theme={{ ...theme, bg: '#0a0a0a', border: '#2a2a2a' }} user={user} />}
+        {activeRole === 'chief_manager' && <ChiefManagerDashboardContent activeModule={currentView} theme={{ ...theme, bg: '#0a0a0a', border: '#2a2a2a' }} />}
+        {activeRole === 'manager' && <ManagerDashboardContent activeModule={currentView} theme={{ ...theme, bg: '#0a0a0a', border: '#2a2a2a' }} />}
+        {['moderator', 'hr', 'finance', 'support'].includes(activeRole || '') && <StaffDashboardContent activeRole={activeRole} activeModule={currentView} accentColor={theme.accent} />}
         
-        {(!activeRole || !['student', 'lecturer', 'client', 'executor'].includes(activeRole)) && (
-          <div className="p-20 text-center opacity-20">
-            <LayoutDashboard size={64} className="mx-auto mb-6" />
-            <div className="text-xl font-black uppercase tracking-[0.5em]">Workspace Ready</div>
+        {['student', 'lecturer', 'client', 'executor'].includes(activeRole || '') && <CoreDashboardView activeRole={activeRole} currentView={currentView} accent={theme.accent} />}
+        
+        {!activeRole && (
+          <div className="flex flex-col items-center justify-center py-40 opacity-20 text-center">
+            <LayoutDashboard size={80} className="mb-8" />
+            <h2 className="text-2xl font-black uppercase tracking-[0.5em]">Module Initializing...</h2>
           </div>
         )}
       </motion.div>
@@ -111,329 +85,110 @@ export default function Dashboard() {
   );
 }
 
-// --- STUDENT VIEWS ---
-
-function StudentViews({ view, accent, lang }: any) {
-  if (view === 'overview' || view === 'my_progress' || view === 'current_courses') {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[{l:'Активных курсов',v:'3',s:'в процессе'},{l:'Завершено',v:'7',s:'сертификатов'},{l:'Часов обучения',v:'142',s:'+8 на этой неделе'}].map((m, i) => (
-            <div key={i} className="bg-[#111] border border-white/5 rounded-xl p-5 space-y-3 shadow-xl">
-              <div className="text-[11px] text-white/40 font-medium uppercase tracking-wider">{m.l}</div>
-              <div className="text-3xl font-bold text-white tracking-tighter">{m.v}</div>
-              <div className="text-[11px] font-medium" style={{ color: accent }}>{m.s}</div>
-            </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-[#111] border border-white/5 rounded-2xl p-6 shadow-2xl">
-            <div className="text-[13px] font-bold mb-6 text-white uppercase tracking-tight">Текущий прогресс</div>
-            <div className="space-y-6">
-              {[{n:'Maya Character Rigging',p:68,c:accent},{n:'Houdini Dynamics FX',p:34,c:'#ef9f27'},{n:'ZBrush Creature Sculpting',p:12,c:'#555'}].map((p, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="flex justify-between text-[12px] font-medium"><span className="text-white/80">{p.n}</span><span className="text-white/40">{p.p}%</span></div>
-                  <div className="h-1.5 bg-white/5 rounded-full overflow-hidden"><div className="h-full rounded-full transition-all duration-1000" style={{ width: `${p.p}%`, background: p.c }} /></div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="bg-[#111] border border-white/5 rounded-2xl p-6 shadow-2xl">
-            <div className="text-[13px] font-bold mb-6 text-white uppercase tracking-tight">Последние сертификаты</div>
-            <div className="space-y-3">
-              {[{n:'UE5 Lighting Masterclass',s:'получен',c:'text-emerald-500 bg-emerald-500/10'},{n:'Traditional 2D Animation',s:'получен',c:'text-emerald-500 bg-emerald-500/10'}].map((cert, i) => (
-                <div key={i} className="flex justify-between items-center p-4 border border-white/5 rounded-xl bg-white/[0.01]">
-                  <span className="text-[12px] font-medium text-white/80">{cert.n}</span>
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${cert.c}`}>{cert.s}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  if (view === 'certificates') {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1,2,3,4,5].map(i => (
-          <div key={i} className="bg-[#111] border border-white/5 rounded-[2rem] p-8 space-y-6 group hover:border-primary/20 transition-all shadow-2xl">
-            <div className="aspect-[1.414/1] bg-white/5 rounded-xl flex items-center justify-center border border-white/5 relative overflow-hidden">
-              <Award size={64} className="text-white/10 group-hover:text-primary/20 transition-colors" />
-              <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 bg-black/60 backdrop-blur-sm transition-all">
-                <button className="px-6 py-2 bg-primary text-bg-dark text-[10px] font-black uppercase rounded-lg">Download PDF</button>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Certificate of Completion</div>
-              <h3 className="text-lg font-black text-white uppercase tracking-tight leading-tight">Professional CGI Course Vol.{i}</h3>
-              <div className="flex justify-between items-center pt-2 text-[10px] font-bold text-white/20 uppercase tracking-widest">
-                <span>Issued March 202{i+2}</span>
-                <span>ID: RG-{Math.random().toString(36).substr(2, 6).toUpperCase()}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (view === 'purchases' || view === 'order_history') {
-    return (
-      <div className="bg-[#111] border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl">
-        <div className="p-8 border-b border-white/5 bg-white/[0.01] flex items-center justify-between">
-          <div className="text-[11px] font-black uppercase tracking-widest">Order History & Invoices</div>
-          <button className="text-[9px] font-black text-primary uppercase tracking-widest border-b border-primary/20">Export All</button>
-        </div>
-        <table className="w-full text-left">
-          <thead>
-            <tr className="bg-black/40 text-[9px] font-black text-white/20 uppercase tracking-widest"><th className="px-8 py-5">Order ID</th><th className="px-8 py-5">Course / Service</th><th className="px-8 py-5">Date</th><th className="px-8 py-5">Amount</th><th className="px-8 py-5 text-right">Status</th></tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {[1,2,3].map(i => (
-              <tr key={i} className="hover:bg-white/[0.01]">
-                <td className="px-8 py-6 text-xs font-bold text-white/40">#ORD-992{i}</td>
-                <td className="px-8 py-6 text-xs font-bold text-white">Maya Character Rigging Level {i}</td>
-                <td className="px-8 py-6 text-xs text-white/40 font-medium">12 March 2026</td>
-                <td className="px-8 py-6 text-xs font-black text-primary">$89.00</td>
-                <td className="px-8 py-6 text-right"><span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase rounded">Completed</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  }
-
-  return <PlaceholderView name={view} />;
-}
-
-// --- LECTURER VIEWS ---
-
-function LecturerViews({ view, accent, lang }: any) {
-  if (view === 'overview' || view === 'instructor_hub' || view === 'published_workshops') {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[{l:'Опубликованных',v:'4',s:'активных курса'},{l:'Студентов',v:'1 240',s:'+86 за месяц'},{l:'Доход (мес.)',v:'$3 180',s:'+22%'}].map((m, i) => (
-            <div key={i} className="bg-[#111] border border-white/5 rounded-xl p-5 space-y-3 shadow-xl">
-              <div className="text-[11px] text-white/40 font-medium uppercase tracking-wider">{m.l}</div>
-              <div className="text-3xl font-bold text-white tracking-tighter">{m.v}</div>
-              <div className="text-[11px] font-medium" style={{ color: accent }}>{m.s}</div>
-            </div>
-          ))}
-        </div>
-        <div className="bg-[#111] border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
-          <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
-            <div className="text-[11px] font-black uppercase tracking-widest">Active Workshops Management</div>
-            <Link to={`/aca/${lang}/create-course`} className="h-10 px-6 bg-primary text-bg-dark rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center gap-2">
-              <Plus size={14} /> New Content
-            </Link>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-black/40 text-[9px] font-black text-white/20 uppercase tracking-widest">
-                  <th className="px-8 py-5">Workshop Title</th><th className="px-8 py-5">Enrollment</th><th className="px-8 py-5">Revenue</th><th className="px-8 py-5">Status</th><th className="px-8 py-5 text-right"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {[1, 2, 3].map((_, i) => (
-                  <tr key={i} className="hover:bg-white/[0.02] transition-colors group">
-                    <td className="px-8 py-6 flex items-center gap-4">
-                      <div className="size-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-[10px] font-black text-primary">W{i+1}</div>
-                      <div className="text-xs font-bold text-white">Maya Character Rigging Masterclass {i+1}</div>
-                    </td>
-                    <td className="px-8 py-6 text-xs text-white/40 font-bold">1,420 Students</td>
-                    <td className="px-8 py-6 text-xs font-black text-emerald-500">$4,280</td>
-                    <td className="px-8 py-6"><span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[8px] font-black uppercase rounded-md border border-emerald-500/20">Published</span></td>
-                    <td className="px-8 py-6 text-right"><button className="size-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center text-white/20 hover:text-white transition-all"><MoreVertical size={14} /></button></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (view === 'financials' || view === 'earnings_report') {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[{l:'Available for Withdrawal',v:'$1,240',c:accent},{l:'Pending Clearance',v:'$840',c:'#ef9f27'},{l:'Lifetime Earnings',v:'$42,180',c:'#378add'},{l:'Monthly Growth',v:'+18%',c:'#1d9e75'}].map((m, i) => (
-            <div key={i} className="bg-[#111] border border-white/5 rounded-xl p-5 space-y-2">
-              <div className="text-[10px] font-black text-white/20 uppercase tracking-widest">{m.l}</div>
-              <div className="text-2xl font-black text-white">{m.v}</div>
-              <div className="text-[10px] font-bold" style={{ color: m.c }}>Active Tracker</div>
-            </div>
-          ))}
-        </div>
-        <div className="bg-[#111] border border-white/5 rounded-[2.5rem] p-8">
-          <div className="text-[11px] font-black uppercase tracking-widest mb-8">Monthly Earnings Breakdown</div>
-          <div className="h-64 flex items-end gap-2 px-2">
-            {[40, 70, 45, 90, 65, 80, 50, 85, 60, 95, 75, 55].map((h, i) => (
-              <motion.div key={i} initial={{ height: 0 }} animate={{ height: `${h}%` }} className="flex-1 rounded-t-lg bg-white/5 border-t border-primary/20 hover:bg-primary/20 transition-all cursor-pointer group relative">
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 text-[10px] font-black text-primary transition-all">${h*10}</div>
-              </motion.div>
-            ))}
-          </div>
-          <div className="flex justify-between pt-4 px-2 text-[9px] font-black text-white/10 uppercase tracking-widest">
-            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return <PlaceholderView name={view} />;
-}
-
-// --- CLIENT VIEWS ---
-
-function ClientViews({ view, accent, lang }: any) {
-  if (view === 'overview' || view === 'client_workspace' || view === 'my_active_projects') {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[{l:'Активных проектов',v:'3',s:'в работе'},{l:'Заявок получено',v:'14',s:'5 новых',c:'#e24b4a'},{l:'Потрачено (мес.)',v:'$6 200',s:'2 контракта'}].map((m, i) => (
-            <div key={i} className="bg-[#111] border border-white/5 rounded-xl p-5 space-y-3 shadow-xl">
-              <div className="text-[11px] text-white/40 font-medium uppercase tracking-wider">{m.l}</div>
-              <div className="text-3xl font-bold text-white tracking-tighter">{m.v}</div>
-              <div className="text-[11px] font-medium" style={{ color: m.c || accent }}>{m.s}</div>
-            </div>
-          ))}
-        </div>
-        <div className="bg-[#111] border border-white/5 rounded-2xl p-6 shadow-2xl">
-          <div className="text-[13px] font-bold mb-6 text-white uppercase tracking-tight">Active Project Pipeline</div>
-          <div className="space-y-4">
-            {[{n:'Character Rigging for RPG',b:'$1,000',s:'open',c:'emerald'},{n:'Creature FX Simulation',b:'$3,500',s:'in_progress',c:'amber'},{n:'Cinematic Intro Animation',b:'$2,000',s:'open',c:'emerald'}].map((p, i) => (
-              <div key={i} className="p-6 bg-white/[0.02] border border-white/5 rounded-[2rem] flex items-center justify-between group hover:border-white/10 transition-all">
-                <div className="flex items-center gap-6">
-                  <div className={`size-12 rounded-2xl bg-${p.c}-500/10 flex items-center justify-center text-${p.c}-500`}><Briefcase size={20} /></div>
-                  <div><h4 className="text-sm font-black text-white uppercase tracking-tight">{p.n}</h4><p className="text-[10px] text-white/20 font-bold uppercase tracking-widest mt-1">Budget: {p.b} · 12 Applications</p></div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className={`px-3 py-1 bg-${p.c}-500/10 text-${p.c}-500 text-[9px] font-black uppercase rounded-lg border border-${p.c}-500/20`}>{p.s.replace('_', ' ')}</span>
-                  <button className="size-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/20 hover:text-white"><ChevronRight size={18} /></button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (view === 'talent_acquisition' || view === 'saved_experts') {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1,2,3].map(i => (
-          <div key={i} className="bg-[#111] border border-white/5 rounded-[2.5rem] p-8 space-y-6 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl group-hover:bg-primary/10 transition-all" />
-            <div className="flex items-center gap-4 relative z-10">
-              <div className="size-16 rounded-[1.5rem] overflow-hidden border-2 border-white/5"><img src={`https://picsum.photos/seed/user${i}/200`} className="w-full h-full object-cover" /></div>
-              <div><h3 className="text-lg font-black text-white uppercase tracking-tight">Alex Rivera {i}</h3><p className="text-[10px] font-black text-primary uppercase tracking-widest">Senior Technical Artist</p></div>
-            </div>
-            <div className="flex gap-2 relative z-10">{['Maya', 'Python', 'UE5'].map(s => <span key={s} className="px-2 py-1 bg-white/5 rounded-md text-[8px] font-black uppercase text-white/40 tracking-widest border border-white/5">{s}</span>)}</div>
-            <div className="pt-4 border-t border-white/5 flex justify-between items-center relative z-10">
-              <div className="flex items-center gap-1 text-amber-500"><Star size={12} fill="currentColor" /><span className="text-[11px] font-black">4.9</span><span className="text-[10px] text-white/20 ml-1">(142)</span></div>
-              <button className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/5 transition-all">View Profile</button>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  return <PlaceholderView name={view} />;
-}
-
-// --- EXECUTOR VIEWS ---
-
-function ExecutorViews({ view, accent, lang }: any) {
-  if (view === 'overview' || view === 'pro_workspace' || view === 'active_contracts') {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[{l:'Активных контрактов',v:'2',s:'в работе'},{l:'Заработано (мес.)',v:'$2 800',s:'+$800 pending'},{l:'Рейтинг',v:'4.9',s:'24 проекта'}].map((m, i) => (
-            <div key={i} className="bg-[#111] border border-white/5 rounded-xl p-5 space-y-3 shadow-xl">
-              <div className="text-[11px] text-white/40 font-medium uppercase tracking-wider">{m.l}</div>
-              <div className="text-3xl font-bold text-white tracking-tighter">{m.v}</div>
-              <div className="text-[11px] font-medium" style={{ color: accent }}>{m.s}</div>
-            </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-[#111] border border-white/5 rounded-2xl p-6 shadow-2xl">
-            <div className="text-[13px] font-bold mb-6 text-white uppercase tracking-tight">Active Contracts & Milestones</div>
-            <div className="space-y-6">
-              {[{n:'Creature FX Simulation · Nebula',s:'Milestone 2/4',p:50,c:'#ef9f27'},{n:'Sci-Fi Environment Design',s:'Milestone 3/4',p:75,c:accent}].map((ctr, i) => (
-                <div key={i} className="space-y-3 pb-4 border-b border-white/5 last:border-0 last:pb-0">
-                  <div className="flex justify-between items-center">
-                    <div><div className="text-[12px] font-bold text-white/80">{ctr.n}</div><div className="text-[10px] text-white/20 uppercase font-black mt-0.5">{ctr.s}</div></div>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase text-emerald-500 bg-emerald-500/10">In Progress</span>
-                  </div>
-                  <div className="h-1.5 bg-white/5 rounded-full overflow-hidden"><div className="h-full rounded-full transition-all duration-1000" style={{ width: `${ctr.p}%`, background: ctr.c }} /></div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="bg-[#111] border border-white/5 rounded-2xl p-6 shadow-2xl">
-            <div className="text-[13px] font-bold mb-6 text-white uppercase tracking-tight">Recommended Projects</div>
-            <div className="space-y-4">
-              {[{n:'Char Rigging RPG',b:'$1,000',sk:'Maya'},{n:'Cinematic Intro Animation',b:'$2,500',sk:'UE5'}].map((p, i) => (
-                <div key={i} className="flex justify-between items-center py-3 border-b border-white/5 last:border-0">
-                  <div><div className="text-[12px] font-bold text-white/80">{p.n}</div><div className="text-[10px] text-white/40 uppercase tracking-tight">{p.b} · {p.sk}</div></div>
-                  <button className="px-3 py-1.5 border border-white/10 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-bg-dark transition-all">Quick Apply</button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (view === 'pro_profile' || view === 'portfolio_showcase') {
-    return (
-      <div className="space-y-10">
-        <div className="p-10 rounded-[3rem] bg-[#111] border border-white/5 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] group-hover:bg-primary/10 transition-all" />
-          <div className="flex flex-col md:flex-row gap-10 items-center">
-            <div className="size-40 rounded-[2.5rem] overflow-hidden border-4 border-white/5 shadow-2xl shrink-0"><img src="https://picsum.photos/seed/profile/400" className="w-full h-full object-cover" /></div>
-            <div className="space-y-4 text-center md:text-left flex-1">
-              <div><h2 className="text-4xl font-black text-white uppercase tracking-tighter leading-none">Your Professional <br /> <span className="text-primary italic">Identity.</span></h2><p className="text-white/40 text-sm mt-4 max-w-xl font-medium leading-relaxed">Showcase your skills, experience and portfolio to attract high-tier studio contracts. Keep your profile updated for better recommendation rankings.</p></div>
-              <div className="flex flex-wrap justify-center md:justify-start gap-3"><button className="px-8 py-3 bg-primary text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 transition-all shadow-xl">Edit Showcase</button><button className="px-8 py-3 bg-white/5 text-white border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">Preview Profile</button></div>
-            </div>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[{l:'Profile Views',v:'1,420',i:Eye},{l:'Search Appearances',v:'342',i:Search},{l:'Invite Rate',v:'12%',i:Mail},{l:'Skill Match',v:'98%',i:ShieldCheck}].map((s, i) => (
-            <div key={i} className="p-6 rounded-[2rem] bg-[#111] border border-white/5 text-center space-y-2 group hover:border-primary/20 transition-all">
-              <s.i size={20} className="text-primary mx-auto mb-2 opacity-40 group-hover:opacity-100 transition-opacity" />
-              <div className="text-2xl font-black text-white">{s.v}</div>
-              <div className="text-[9px] font-black uppercase tracking-widest text-white/20">{s.l}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  return <PlaceholderView name={view} />;
-}
-
-// --- HELPER COMPONENTS ---
-
-function PlaceholderView({ name }: { name: string }) {
+function CoreDashboardView({ activeRole, currentView, accent }: any) {
   return (
-    <div className="flex flex-col items-center justify-center py-40 opacity-20 text-center">
-      <Cpu size={64} className="mb-6 animate-pulse" />
-      <h2 className="text-2xl font-black uppercase tracking-[0.5em]">{name.replace(/_/g, ' ')}</h2>
-      <p className="text-sm mt-2 font-bold uppercase tracking-widest">Interface Module Initializing...</p>
+    <>
+      {activeRole === 'student' && <StudentDashboard view={currentView} accent={accent} />}
+      {activeRole === 'lecturer' && <LecturerDashboard view={currentView} accent={accent} />}
+      {activeRole === 'client' && <ClientDashboard view={currentView} accent={accent} />}
+      {activeRole === 'executor' && <ExecutorDashboard view={currentView} accent={accent} />}
+    </>
+  );
+}
+
+function StudentDashboard({ view, accent }: any) {
+  if (view === 'overview' || view === 'my_progress') {
+    return (
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <StatCard label="Current Courses" value="3" sub="2 nearing completion" icon={BookOpen} accent={accent} />
+          <StatCard label="Mastery Points" value="12,450" sub="Top 12% globally" icon={Zap} accent={accent} />
+          <StatCard label="Certificates" value="7" sub="Latest: Unreal Lighting" icon={Award} accent={accent} />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
+          <div className="bg-[#111] border border-white/5 rounded-[2.5rem] p-8 space-y-8 shadow-2xl">
+            <div className="flex items-center justify-between"><h3 className="text-xl font-black uppercase tracking-tight">Active Learning Pipeline</h3></div>
+            <div className="grid gap-4">
+              {[1, 2].map(i => (
+                <div key={i} className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl flex items-center justify-between group hover:border-white/10 transition-all">
+                  <div className="flex items-center gap-6">
+                    <div className="size-16 rounded-2xl overflow-hidden"><img src={`https://picsum.photos/seed/edu${i}/200`} className="w-full h-full object-cover" /></div>
+                    <div><h4 className="text-sm font-black text-white uppercase tracking-tight">CGI Production Vol.{i}</h4><div className="flex items-center gap-4 mt-2"><div className="w-32 h-1 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-primary" style={{ width: i === 1 ? '68%' : '34%' }} /></div></div></div>
+                  </div>
+                  <button className="px-6 py-3 bg-white/5 border border-white/5 rounded-xl text-[10px] font-black uppercase hover:bg-primary hover:text-bg-dark transition-all">Resume</button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="p-8 rounded-[2rem] bg-primary text-bg-dark relative overflow-hidden group shadow-2xl shadow-primary/10 flex flex-col justify-between">
+            <Rocket size={40} className="mb-4 relative z-10" />
+            <h3 className="text-xl font-black uppercase tracking-tighter leading-tight relative z-10">Get RG <br /> Certification</h3>
+            <button className="w-full mt-6 py-3 bg-bg-dark text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-black transition-all relative z-10">Start Exam</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return <div className="p-20 text-center opacity-20 uppercase font-black tracking-widest">{view} module is coming soon</div>;
+}
+
+function LecturerDashboard({ view, accent }: any) {
+  return (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard label="Live Workshops" value="4" sub="1,420 total students" icon={Video} accent={accent} />
+        <StatCard label="Monthly Revenue" value="$12,450" sub="↑ 18% vs last month" icon={DollarSign} accent={accent} />
+        <StatCard label="Average Rating" value="4.95" sub="Based on 342 reviews" icon={Star} accent={accent} />
+      </div>
+      <div className="bg-[#111] border border-white/5 rounded-[2.5rem] p-10 text-center opacity-20">
+        <TrendingUp size={64} className="mx-auto mb-6" />
+        <div className="text-xl font-black uppercase tracking-[0.5em]">Instructor Analytics Initializing...</div>
+      </div>
+    </div>
+  );
+}
+
+function ClientDashboard({ view, accent }: any) {
+  return (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard label="Active Projects" value="3" sub="2 in final stage" icon={Box} accent={accent} />
+        <StatCard label="Talent Pipeline" value="14" sub="5 new applicants" icon={Users} accent={accent} />
+        <StatCard label="Quarterly Spend" value="$12,400" sub="Within budget" icon={CreditCard} accent={accent} />
+      </div>
+      <div className="bg-[#111] border border-white/5 rounded-[2.5rem] p-10 text-center opacity-20">
+        <Briefcase size={64} className="mx-auto mb-6" />
+        <div className="text-xl font-black uppercase tracking-[0.5em]">Studio Workspace Initializing...</div>
+      </div>
+    </div>
+  );
+}
+
+function ExecutorDashboard({ view, accent }: any) {
+  return (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard label="Contracts Active" value="2" sub="+$1,400 pending" icon={Briefcase} accent={accent} />
+        <StatCard label="Invitation Rate" value="12%" sub="High profile studios" icon={Mail} accent={accent} />
+        <StatCard label="Network Rank" value="Elite" sub="Top 5% Expert" icon={Award} accent={accent} />
+      </div>
+      <div className="bg-[#111] border border-white/5 rounded-[2.5rem] p-10 text-center opacity-20">
+        <Zap size={64} className="mx-auto mb-6" />
+        <div className="text-xl font-black uppercase tracking-[0.5em]">Expert Portal Initializing...</div>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value, sub, icon: Icon, accent }: any) {
+  return (
+    <div className="bg-[#111] border border-white/5 rounded-[2rem] p-6 space-y-4 hover:border-white/10 transition-all shadow-xl group">
+      <div className="flex justify-between items-start">
+        <div className="text-[10px] font-black text-white/20 uppercase tracking-widest group-hover:text-white/40 transition-colors">{label}</div>
+        <Icon size={18} style={{ color: accent }} className="opacity-40 group-hover:opacity-100 transition-opacity" />
+      </div>
+      <div className="text-4xl font-black text-white tracking-tighter">{value}</div>
+      <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: accent }}>{sub}</div>
     </div>
   );
 }

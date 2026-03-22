@@ -55,6 +55,22 @@ import { userService, UserProfile } from '../services/userService';
 import { auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
+export function ManagerDashboardContent({ activeModule, theme }: any) {
+  return (
+    <AnimatePresence mode="wait">
+      {activeModule === 'overview' && <ManagerOverview theme={theme} />}
+      {activeModule === 'courses_review' && <CoursesReview theme={theme} />}
+      {activeModule !== 'overview' && activeModule !== 'courses_review' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full py-20 opacity-20 text-center">
+          <Box size={64} className="mb-6" />
+          <div className="text-xl font-black uppercase tracking-[0.5em]">{activeModule} Module</div>
+          <div className="text-sm mt-2">Section content coming soon...</div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export default function ManagerDashboard() {
   const { lang } = useParams();
   const [user, loading] = useAuthState(auth);
