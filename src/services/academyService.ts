@@ -84,33 +84,46 @@ export const academyService = {
   },
 
   async getLessons(courseId: string): Promise<Lesson[]> {
-    const response = await fetch(`${API_URL}/courses`);
-    const courses = await response.json();
-    const course = courses.find((c: any) => c.id === courseId);
-    return course?.lessons || [];
+    // We can use getCourseBySlug if we have the slug, or just fetch course detail
+    // For now, let's assume we need to fetch by ID if possible, but our API uses slug
+    // If courseId is actually a slug in some contexts, this works:
+    const response = await fetch(`${API_URL}/courses/${courseId}`);
+    if (!response.ok) return [];
+    const data = await response.json();
+    return data.lessons || [];
   },
 
   async enrollInCourse(userId: string, courseId: string): Promise<void> {
-    console.log(`Enrolling user ${userId} in course ${courseId}`);
+    const response = await fetch(`${API_URL}/enroll`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, courseId })
+    });
+    if (!response.ok) throw new Error('Failed to enroll');
   },
 
   async getEnrollment(userId: string, courseId: string): Promise<Enrollment | null> {
-    return null;
+    const response = await fetch(`${API_URL}/users/${userId}/enrollments`);
+    if (!response.ok) return null;
+    const enrollments: Enrollment[] = await response.json();
+    return enrollments.find(e => e.courseId === courseId) || null;
   },
 
   async updateLessonProgress(userId: string, courseId: string, lessonId: string, isCompleted: boolean): Promise<void> {
-    console.log(`Updating progress for ${lessonId}`);
+    // This would need a PUT /api/enrollments/:id or similar
+    console.log(`Updating progress for ${lessonId} (stub)`);
   },
 
   async getReviews(courseId: string): Promise<Review[]> {
-    const response = await fetch(`${API_URL}/courses`);
-    const courses = await response.json();
-    const course = courses.find((c: any) => c.id === courseId);
-    return course?.reviews || [];
+    const response = await fetch(`${API_URL}/courses/${courseId}`);
+    if (!response.ok) return [];
+    const data = await response.json();
+    return data.reviews || [];
   },
 
   async addReview(review: Omit<Review, 'id' | 'createdAt' | 'isApproved'>): Promise<string> {
-    return "new_review_id";
+    // Need POST /api/reviews
+    return "new_review_id_stub";
   },
 
   async getCategories(): Promise<any[]> {
@@ -120,20 +133,8 @@ export const academyService = {
   },
 
   async getUserEnrollments(userId: string): Promise<any[]> {
-    // This would typically be a backend call like /api/users/:id/enrollments
-    // For now, we fetch all courses and mock the enrollment status
-    const response = await fetch(`${API_URL}/courses`);
+    const response = await fetch(`${API_URL}/users/${userId}/enrollments`);
     if (!response.ok) throw new Error('Failed to fetch enrollments');
-    const courses = await response.json();
-    
-    // Simulate enrollments for the current user
-    return courses.slice(0, 2).map((course: any, index: number) => ({
-      id: `enr_${course.id}`,
-      courseId: course.id,
-      course: course,
-      progress: index === 0 ? 68 : 34,
-      status: 'active',
-      enrolledAt: new Date().toISOString()
-    }));
+    return response.json();
   }
 };

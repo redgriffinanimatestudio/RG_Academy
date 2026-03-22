@@ -107,6 +107,52 @@ async function startServer() {
     }
   });
 
+  // GET User enrollments
+  app.get("/api/users/:id/enrollments", async (req, res) => {
+    try {
+      const enrollments = await prisma.enrollment.findMany({
+        where: { userId: req.params.id },
+        include: { course: { include: { category: true } } }
+      });
+      const parsedEnrollments = enrollments.map(enr => ({
+        ...enr,
+        course: {
+          ...enr.course,
+          tags: JSON.parse(enr.course.tags)
+        }
+      }));
+      res.json(parsedEnrollments);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch enrollments" });
+    }
+  });
+
+  // ENROLL in a course
+  app.post("/api/enroll", async (req, res) => {
+    const { userId, courseId } = req.body;
+    try {
+      // Check if already enrolled
+      const existing = await prisma.enrollment.findFirst({
+        where: { userId, courseId }
+      });
+      if (existing) return res.json(existing);
+
+      const enrollment = await prisma.enrollment.create({
+        data: {
+          userId,
+          courseId,
+          progress: 0,
+          status: 'active',
+          completedLessons: '[]'
+        },
+        include: { course: true }
+      });
+      res.json(enrollment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to enroll in course" });
+    }
+  });
+
   // GET User profile
   app.get("/api/users/:id", async (req, res) => {
     try {
@@ -121,10 +167,31 @@ async function startServer() {
     }
   });
 
-  // SYNC: Placeholder for Firebase Sync
+  // SYNC: Create or update user in Prisma from Firebase
   app.post("/api/sync", async (req, res) => {
-    // This will be implemented in the next step
-    res.json({ message: "Sync started (stub)" });
+    const { uid, email, displayName, photoURL } = req.body;
+    try {
+      const user = await prisma.user.upsert({
+        where: { id: uid },
+        update: {
+          email,
+          displayName,
+          photoURL,
+        },
+        create: {
+          id: uid,
+          email,
+          displayName,
+          photoURL,
+          role: 'student',
+          source: 'firebase'
+        }
+      });
+      res.json(user);
+    } catch (error) {
+      console.error("Sync error:", error);
+      res.status(500).json({ error: "Failed to sync user" });
+    }
   });
 
   // GET all categories

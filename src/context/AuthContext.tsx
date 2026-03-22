@@ -50,6 +50,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!activeRole) setActiveRoleState('admin');
     } else if (user) {
       setProfileLoading(true);
+      // Sync with Prisma backend
+      fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL
+        })
+      }).catch(err => console.error("Prisma sync failed:", err));
+
       userService.getProfile(user.uid).then(p => {
         if (p) {
           setProfile(p);

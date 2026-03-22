@@ -178,6 +178,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
   
   const [activeAcademyCategory, setActiveAcademyCategory] = useState(ACADEMY_CATEGORIES[0]);
   const [activeAcademySub, setActiveAcademySub] = useState(ACADEMY_CATEGORIES[0].subcategories[0]);
@@ -209,79 +210,79 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isStudio = path.includes('/studio/') && !isDashboardPage && !isProfile;
   const isAcademy = (path.includes('/aca/') || path.includes('/learn/')) && !isCommunity && !isDashboardPage && !isProfile;
   
-  let sidebarCategories = isCommunity ? COMMUNITY_CATEGORIES : (isStudio ? STUDIO_CATEGORIES : ACADEMY_CATEGORIES);
+  // Base categories
+  const baseCategories = isCommunity ? COMMUNITY_CATEGORIES : (isStudio ? STUDIO_CATEGORIES : ACADEMY_CATEGORIES);
   
-  if (isDashboardPage) {
-    // Determine the best role to show in sidebar if activeRole is not set or is student
+  // Dashboard category (only for logged-in users)
+  const dashboardCategory = React.useMemo(() => {
+    if (!user) return null;
     const effectiveRole = activeRole || (profile?.roles.includes('admin') ? 'admin' : profile?.roles[0]);
-    if (effectiveRole && DASHBOARD_MENUS[effectiveRole]) {
-      sidebarCategories = DASHBOARD_MENUS[effectiveRole];
-    }
-  }
+    if (!effectiveRole || !DASHBOARD_MENUS[effectiveRole]) return null;
+
+    return {
+      name: 'my_dashboard',
+      icon: LayoutDashboard,
+      isDashboard: true,
+      subcategories: DASHBOARD_MENUS[effectiveRole]
+    };
+  }, [user, activeRole, profile]);
+
+  // Combined sidebar categories
+  const sidebarCategories = React.useMemo(() => {
+    if (!user) return baseCategories;
+    return dashboardCategory ? [dashboardCategory, ...baseCategories] : baseCategories;
+  }, [user, dashboardCategory, baseCategories]);
   
   const [activeDashboardCatIdx, setActiveDashboardCatIdx] = useState(0);
   const [activeDashboardSubIdx, setActiveDashboardSubIdx] = useState(0);
 
   // Sync sidebar state with URL 'view' parameter
   useEffect(() => {
-    if (isDashboardPage) {
+    if (isDashboardPage && dashboardCategory) {
       const searchParams = new URLSearchParams(location.search);
       const currentView = searchParams.get('view') || 'dashboard';
       
-      const effectiveRole = activeRole || (profile?.roles.includes('admin') ? 'admin' : profile?.roles[0]);
-      const menus = effectiveRole ? DASHBOARD_MENUS[effectiveRole] : null;
-      
-      if (menus) {
-        menus.forEach((cat, catIdx) => {
-          const subIdx = cat.subcategories.findIndex((sub: any) => 
-            sub.name.toLowerCase().replace(/ /g, '_') === currentView
-          );
-          if (subIdx !== -1) {
-            setActiveDashboardCatIdx(catIdx);
-            setActiveDashboardSubIdx(subIdx);
-          }
-        });
-      }
+      dashboardCategory.subcategories.forEach((cat: any, catIdx: number) => {
+        const subIdx = cat.subcategories.findIndex((sub: any) => 
+          sub.name.toLowerCase().replace(/ /g, '_') === currentView
+        );
+        if (subIdx !== -1) {
+          setActiveDashboardCatIdx(catIdx);
+          setActiveDashboardSubIdx(subIdx);
+        }
+      });
     }
-  }, [location.search, isDashboardPage, activeRole, profile]);
+  }, [location.search, isDashboardPage, dashboardCategory]);
 
-  const activeCategory = isDashboardPage 
-    ? (sidebarCategories[activeDashboardCatIdx] || sidebarCategories[0]) 
-    : (isCommunity ? activeCommunityCategory : (isStudio ? activeStudioCategory : activeAcademyCategory));
+  // Logic for active items
+  const [activeCatName, setActiveCatName] = useState(sidebarCategories[0]?.name);
+  const [activeSubName, setActiveSubName] = useState(sidebarCategories[0]?.subcategories[0]?.name);
 
-  const activeSub = isDashboardPage 
-    ? (activeCategory?.subcategories?.[activeDashboardSubIdx] || activeCategory?.subcategories?.[0] || { name: '', topics: [] }) 
-    : (isCommunity ? activeCommunitySub : (isStudio ? activeStudioSub : activeAcademySub));
+  // Auto-set active category based on page
+  useEffect(() => {
+    if (isDashboardPage && dashboardCategory) {
+      setActiveCatName('my_dashboard');
+    } else if (!activeCatName || activeCatName === 'my_dashboard') {
+      setActiveCatName(baseCategories[0]?.name);
+    }
+  }, [isDashboardPage, dashboardCategory, baseCategories]);
+
+  const activeCategory = sidebarCategories.find(c => c.name === activeCatName) || sidebarCategories[0];
+  const activeSub = activeCategory?.subcategories.find((s: any) => s.name === activeSubName) || activeCategory?.subcategories[0];
 
   const handleSetCategory = (cat: any) => {
-    if (isDashboardPage) {
-      const idx = sidebarCategories.indexOf(cat);
-      setActiveDashboardCatIdx(idx !== -1 ? idx : 0);
-      setActiveDashboardSubIdx(0);
-    } else if (isCommunity) {
-      setActiveCommunityCategory(cat);
-      setActiveCommunitySub(cat.subcategories[0]);
-    } else if (isStudio) {
-      setActiveStudioCategory(cat);
-      setActiveStudioSub(cat.subcategories[0]);
-    } else {
-      setActiveAcademyCategory(cat);
-      setActiveAcademySub(cat.subcategories[0]);
+    setActiveCatName(cat.name);
+    if (!cat.isDashboard) {
+      setActiveSubName(cat.subcategories[0]?.name);
     }
   };
 
-  const handleSetSub = (sub: any) => {
-    if (isDashboardPage) {
-      const idx = activeCategory.subcategories.indexOf(sub);
-      setActiveDashboardSubIdx(idx !== -1 ? idx : 0);
+  const handleSetSub = (sub: any, parentCat: any) => {
+    setActiveSubName(sub.name);
+    if (parentCat.isDashboard) {
+      // Logic for dashboard navigation
       const viewSlug = sub.name.toLowerCase().replace(/ /g, '_');
       navigate(`${location.pathname}?view=${viewSlug}`);
-    } else if (isCommunity) {
-      setActiveCommunitySub(sub);
-    } else if (isStudio) {
-      setActiveStudioSub(sub);
-    } else {
-      setActiveAcademySub(sub);
     }
   };
 
@@ -354,9 +355,73 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             {/* Desktop Center Links */}
             <div className="hidden lg:flex items-center gap-2 h-full">
-              <Link to={`/aca/${lang || 'eng'}`} className={`px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all ${isAcademy ? 'text-primary' : 'text-white/60 hover:text-white'}`}>{t('academy')}</Link>
-              <Link to={`/studio/${lang || 'eng'}`} className={`px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all ${isStudio ? 'text-primary-hover' : 'text-white/60 hover:text-white'}`}>{t('studio')}</Link>
-              <Link to={`${modePrefix}/${lang || 'eng'}/community`} className={`px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all ${isCommunity ? modeColor : 'text-white/60 hover:text-white'}`}>{t('community')}</Link>
+              {[
+                { id: 'academy', label: t('academy'), path: `/aca/${lang || 'eng'}`, categories: ACADEMY_CATEGORIES, active: isAcademy },
+                { id: 'studio', label: t('studio'), path: `/studio/${lang || 'eng'}`, categories: STUDIO_CATEGORIES, active: isStudio },
+                { id: 'community', label: t('community'), path: `${modePrefix}/${lang || 'eng'}/community`, categories: COMMUNITY_CATEGORIES, active: isCommunity }
+              ].map((item) => (
+                <div 
+                  key={item.id} 
+                  className="h-full flex items-center"
+                  onMouseEnter={() => setActiveMegaMenu(item.id)}
+                  onMouseLeave={() => setActiveMegaMenu(null)}
+                >
+                  <Link 
+                    to={item.path} 
+                    className={`px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all relative ${item.active ? (item.id === 'studio' ? 'text-primary-hover' : 'text-primary') : 'text-white/60 hover:text-white'}`}
+                  >
+                    {item.label}
+                    {item.active && <motion.div layoutId="nav-active" className={`absolute -bottom-[26px] left-0 right-0 h-[2px] ${item.id === 'studio' ? 'bg-primary-hover' : 'bg-primary'}`} />}
+                  </Link>
+
+                  <AnimatePresence>
+                    {activeMegaMenu === item.id && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }} 
+                        animate={{ opacity: 1, y: 0 }} 
+                        exit={{ opacity: 0, y: 10 }}
+                        className={`absolute top-full left-0 right-0 border-b border-white/5 shadow-2xl z-40 overflow-hidden ${cardClass} backdrop-blur-3xl`}
+                      >
+                        <div className="mx-auto max-w-[1600px] px-8 py-12">
+                          <div className="grid grid-cols-3 gap-12">
+                            {item.categories.map((cat) => (
+                              <div key={cat.name} className="space-y-6">
+                                <div className="flex items-center gap-3">
+                                  <cat.icon size={20} className={item.id === 'studio' ? 'text-primary-hover' : 'text-primary'} />
+                                  <h4 className="text-sm font-black uppercase tracking-[0.2em] text-white">{t(cat.name)}</h4>
+                                </div>
+                                <div className="grid gap-4">
+                                  {cat.subcategories.map((sub) => (
+                                    <div key={sub.name} className="group cursor-pointer" onClick={() => { navigate(item.path); setActiveMegaMenu(null); }}>
+                                      <div className="text-[10px] font-black uppercase tracking-widest text-white/40 group-hover:text-white transition-colors flex items-center justify-between">
+                                        {t(sub.name)}
+                                        <ChevronRight size={12} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                                      </div>
+                                      {sub.topics && (
+                                        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
+                                          {sub.topics.map((topic: string) => (
+                                            <span key={topic} className="text-[8px] font-bold uppercase tracking-widest text-white/10 hover:text-primary transition-colors">{topic}</span>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="bg-white/[0.02] border-t border-white/5 px-8 py-4 flex justify-between items-center">
+                          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Red Griffin Creative Ecosystem / {item.label} Hub</span>
+                          <Link to={item.path} onClick={() => setActiveMegaMenu(null)} className={`text-[9px] font-black uppercase tracking-widest flex items-center gap-2 ${item.id === 'studio' ? 'text-primary-hover' : 'text-primary'} hover:brightness-125`}>
+                            Explore All {item.label} <ChevronRight size={12} />
+                          </Link>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
             </div>
 
             <div className="flex items-center gap-3">
