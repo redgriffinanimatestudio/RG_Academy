@@ -40,7 +40,17 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   student: [],
   lecturer: [],
   client: [],
-  executor: []
+  executor: [],
+  hr: [
+    'view_users',
+    'manage_roles'
+  ],
+  finance: [
+    'view_users'
+  ],
+  support: [
+    'view_users'
+  ]
 };
 
 export const adminService = {

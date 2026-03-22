@@ -14,6 +14,9 @@ import Login from './pages/Login';
 import Messages from './pages/Messages';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import ChiefManagerDashboard from './pages/ChiefManagerDashboard';
+import ManagerDashboard from './pages/ManagerDashboard';
+import StaffDashboard from './pages/StaffDashboard';
 import CreateCourse from './pages/CreateCourse';
 import TopicPage from './pages/TopicPage';
 import ServicePage from './pages/ServicePage';
@@ -90,6 +93,12 @@ export default function App() {
             <Route path="/:lang" element={<LanguageWrapper><Layout><Home /></Layout></LanguageWrapper>} />
             <Route path="/dev/:lang" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
             <Route path="/admin/:lang" element={<LanguageWrapper><Layout><AdminDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/chief-manager/:lang" element={<LanguageWrapper><Layout><ChiefManagerDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/manager/:lang" element={<LanguageWrapper><Layout><ManagerDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/moderator/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/hr/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/finance/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/support/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><TopicPage /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/service/:serviceSlug" element={<LanguageWrapper><Layout><ServicePage /></Layout></LanguageWrapper>} />

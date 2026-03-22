@@ -1,0 +1,86 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.db{display:grid;grid-template-columns:200px 1fr;min-height:560px;font-size:13px;color:var(--color-text-primary)}
+.sidebar{background:var(--color-background-secondary);border-right:0.5px solid var(--color-border-tertiary);padding:20px 0;display:flex;flex-direction:column;gap:2px}
+.logo{padding:0 16px 20px;font-size:15px;font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:8px}
+.logo span{font-size:11px;display:block;margin-top:2px}
+.nav-item{padding:8px 16px;cursor:pointer;color:var(--color-text-secondary);transition:background .15s}
+.nav-item:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border-left:2px solid var(--color-text-success)}
+.nav-section{padding:8px 16px 4px;font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-top:8px}
+.main{display:flex;flex-direction:column}
+.topbar{padding:14px 24px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.topbar-title{font-size:15px;font-weight:500}
+.content{padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px}
+.metric-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:6px}
+.metric-value{font-size:22px;font-weight:500}
+.metric-sub{font-size:11px;color:var(--color-text-success);margin-top:4px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.section-title{font-size:13px;font-weight:500;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:6px 8px;color:var(--color-text-secondary);font-weight:400;border-bottom:0.5px solid var(--color-border-tertiary)}
+td{padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary)}
+tr:last-child td{border-bottom:none}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px}
+.pill.green{background:var(--color-background-success);color:var(--color-text-success)}
+.pill.amber{background:var(--color-background-warning);color:var(--color-text-warning)}
+.pill.red{background:var(--color-background-danger);color:var(--color-text-danger)}
+.pill.gray{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.pill.info{background:var(--color-background-info);color:var(--color-text-info)}
+.action-btn{padding:5px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);cursor:pointer;font-size:12px}
+</style>
+<div class="db">
+  <div class="sidebar">
+    <div class="logo">Red Griffin <span style="color:var(--color-text-success)">Manager</span></div>
+    <div class="nav-item active">Обзор</div>
+    <div class="nav-section">Academy</div>
+    <div class="nav-item">Курсы</div>
+    <div class="nav-item">Публикация</div>
+    <div class="nav-item">Преподаватели</div>
+    <div class="nav-section">Studio</div>
+    <div class="nav-item">Проекты</div>
+    <div class="nav-item">Контракты</div>
+    <div class="nav-item">Услуги</div>
+    <div class="nav-section">Пользователи</div>
+    <div class="nav-item">Список</div>
+    <div class="nav-item">Отзывы</div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">Операционный обзор</div>
+      <span style="font-size:12px;color:var(--color-text-secondary)">Manager · март 2026</span>
+    </div>
+    <div class="content">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">На публикацию</div><div class="metric-value">7</div><div class="metric-sub">курсов ожидают</div></div>
+        <div class="metric"><div class="metric-label">Открытых проектов</div><div class="metric-value">87</div><div class="metric-sub">+12 за неделю</div></div>
+        <div class="metric"><div class="metric-label">Активных контрактов</div><div class="metric-value">34</div><div class="metric-sub">$148k суммарно</div></div>
+        <div class="metric"><div class="metric-label">Жалоб на отзывы</div><div class="metric-value">3</div><div class="metric-sub" style="color:var(--color-text-warning)">требуют решения</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="section-title">Курсы на публикацию</div>
+          <table>
+            <tr><th>Название</th><th>Автор</th><th>Действие</th></tr>
+            <tr><td>Houdini FX Vol.2</td><td style="color:var(--color-text-secondary)">S.Chen</td><td><button class="action-btn">Опубликовать</button></td></tr>
+            <tr><td>ZBrush Creatures</td><td style="color:var(--color-text-secondary)">D.Miller</td><td><button class="action-btn">Опубликовать</button></td></tr>
+            <tr><td>UE5 Lighting</td><td style="color:var(--color-text-secondary)">E.Vance</td><td><button class="action-btn">Опубликовать</button></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="section-title">Последние проекты</div>
+          <table>
+            <tr><th>Проект</th><th>Клиент</th><th>Статус</th></tr>
+            <tr><td>Char Rigging RPG</td><td style="color:var(--color-text-secondary)">Nebula</td><td><span class="pill green">открыт</span></td></tr>
+            <tr><td>Sci-Fi City Art</td><td style="color:var(--color-text-secondary)">Starlight</td><td><span class="pill amber">в работе</span></td></tr>
+            <tr><td>VFX Short Film</td><td style="color:var(--color-text-secondary)">IndieVFX</td><td><span class="pill green">открыт</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

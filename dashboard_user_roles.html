@@ -1,0 +1,264 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-size:13px;color:var(--color-text-primary)}
+.tabs{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:16px}
+.tab{padding:10px 20px;cursor:pointer;font-size:13px;color:var(--color-text-secondary);border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:var(--color-text-primary);font-weight:500;border-bottom-color:var(--color-text-primary)}
+.panel{display:none}
+.panel.active{display:grid;grid-template-columns:180px 1fr;min-height:520px}
+.sidebar{background:var(--color-background-secondary);border-right:0.5px solid var(--color-border-tertiary);padding:16px 0;display:flex;flex-direction:column;gap:2px}
+.logo{padding:0 14px 16px;font-size:14px;font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:6px}
+.logo span{font-size:11px;display:block;margin-top:2px}
+.nav-item{padding:7px 14px;color:var(--color-text-secondary);cursor:pointer;font-size:12px}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border-left:2px solid var(--color-text-primary)}
+.nav-section{padding:8px 14px 3px;font-size:10px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-top:6px}
+.main{display:flex;flex-direction:column}
+.topbar{padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.topbar-title{font-size:14px;font-weight:500}
+.content{padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.metric-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:5px}
+.metric-value{font-size:20px;font-weight:500}
+.metric-sub{font-size:11px;margin-top:3px;color:var(--color-text-success)}
+.metric-sub.warn{color:var(--color-text-warning)}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.section-title{font-size:12px;font-weight:500;margin-bottom:10px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:5px 7px;color:var(--color-text-secondary);font-weight:400;border-bottom:0.5px solid var(--color-border-tertiary)}
+td{padding:6px 7px;border-bottom:0.5px solid var(--color-border-tertiary)}
+tr:last-child td{border-bottom:none}
+.pill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px}
+.pill.green{background:var(--color-background-success);color:var(--color-text-success)}
+.pill.amber{background:var(--color-background-warning);color:var(--color-text-warning)}
+.pill.red{background:var(--color-background-danger);color:var(--color-text-danger)}
+.pill.gray{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.pill.info{background:var(--color-background-info);color:var(--color-text-info)}
+.row-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.row-item:last-child{border-bottom:none}
+.progress-row{margin-bottom:10px}
+.progress-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.progress-label span:last-child{color:var(--color-text-secondary)}
+.track{height:6px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden}
+.fill{height:100%;border-radius:3px;background:var(--color-text-info)}
+.fill.green{background:var(--color-text-success)}
+.fill.amber{background:var(--color-text-warning)}
+.btn{padding:4px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;cursor:pointer;font-size:11px;color:var(--color-text-primary)}
+.cert-box{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px}
+</style>
+
+<div class="tabs">
+  <div class="tab active" onclick="showU('stu')">Student</div>
+  <div class="tab" onclick="showU('lec')">Lecturer</div>
+  <div class="tab" onclick="showU('cli')">Client</div>
+  <div class="tab" onclick="showU('exe')">Executor</div>
+</div>
+
+<!-- STUDENT -->
+<div class="panel active" id="stu">
+  <div class="sidebar">
+    <div class="logo">Red Griffin<span style="color:var(--color-text-info)">Student</span></div>
+    <div class="nav-item active">Мои курсы</div>
+    <div class="nav-item">Каталог</div>
+    <div class="nav-section">Прогресс</div>
+    <div class="nav-item">Уроки</div>
+    <div class="nav-item">Задания</div>
+    <div class="nav-item">Сертификаты</div>
+    <div class="nav-section">Профиль</div>
+    <div class="nav-item">Настройки</div>
+    <div class="nav-item">Сообщения</div>
+  </div>
+  <div class="main">
+    <div class="topbar"><div class="topbar-title">Мои курсы</div><span style="font-size:11px;color:var(--color-text-secondary)">Student · Alex Kim</span></div>
+    <div class="content">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Активных курсов</div><div class="metric-value">3</div><div class="metric-sub">в процессе</div></div>
+        <div class="metric"><div class="metric-label">Завершено</div><div class="metric-value">7</div><div class="metric-sub">сертификатов</div></div>
+        <div class="metric"><div class="metric-label">Часов обучения</div><div class="metric-value">142</div><div class="metric-sub">+8 на этой неделе</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="section-title">Текущий прогресс</div>
+          <div class="progress-row">
+            <div class="progress-label"><span>Maya Rigging</span><span>68%</span></div>
+            <div class="track"><div class="fill" style="width:68%"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span>Houdini FX</span><span>34%</span></div>
+            <div class="track"><div class="fill amber" style="width:34%"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span>ZBrush Creatures</span><span>12%</span></div>
+            <div class="track"><div class="fill" style="width:12%;background:var(--color-border-primary)"></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">Сертификаты</div>
+          <div class="cert-box"><span>UE5 Lighting</span><span class="pill green">получен</span></div>
+          <div class="cert-box"><span>2D Animation</span><span class="pill green">получен</span></div>
+          <div class="cert-box"><span>Maya Rigging</span><span class="pill amber">в процессе</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LECTURER -->
+<div class="panel" id="lec">
+  <div class="sidebar">
+    <div class="logo">Red Griffin<span style="color:var(--color-text-success)">Lecturer</span></div>
+    <div class="nav-item active">Мои курсы</div>
+    <div class="nav-item">Создать курс</div>
+    <div class="nav-section">Аналитика</div>
+    <div class="nav-item">Студенты</div>
+    <div class="nav-item">Доход</div>
+    <div class="nav-item">Отзывы</div>
+    <div class="nav-section">Профиль</div>
+    <div class="nav-item">Настройки</div>
+    <div class="nav-item">Сообщения</div>
+  </div>
+  <div class="main">
+    <div class="topbar"><div class="topbar-title">Мои курсы</div><span style="font-size:11px;color:var(--color-text-secondary)">Lecturer · Sara R.</span></div>
+    <div class="content">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Опубликованных</div><div class="metric-value">4</div><div class="metric-sub">активных курса</div></div>
+        <div class="metric"><div class="metric-label">Студентов</div><div class="metric-value">1 240</div><div class="metric-sub">+86 за месяц</div></div>
+        <div class="metric"><div class="metric-label">Доход (мес.)</div><div class="metric-value">$3 180</div><div class="metric-sub">+22%</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="section-title">Курсы</div>
+          <table>
+            <tr><th>Название</th><th>Студентов</th><th>Рейтинг</th><th>Статус</th></tr>
+            <tr><td>Houdini FX Vol.2</td><td>480</td><td>4.8</td><td><span class="pill green">опубл.</span></td></tr>
+            <tr><td>VFX Compositing</td><td>390</td><td>4.7</td><td><span class="pill green">опубл.</span></td></tr>
+            <tr><td>Particles Pro</td><td>220</td><td>4.9</td><td><span class="pill green">опубл.</span></td></tr>
+            <tr><td>Dynamics Vol.3</td><td>—</td><td>—</td><td><span class="pill gray">черновик</span></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="section-title">Последние отзывы</div>
+          <div class="row-item"><span>«Лучший курс по Houdini!»</span><span class="pill green">5.0</span></div>
+          <div class="row-item"><span>«Очень подробно объяснено»</span><span class="pill green">4.8</span></div>
+          <div class="row-item"><span>«Хочу продолжение»</span><span class="pill green">4.9</span></div>
+          <div class="row-item"><span>«Сложновато для новичков»</span><span class="pill amber">3.5</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENT -->
+<div class="panel" id="cli">
+  <div class="sidebar">
+    <div class="logo">Red Griffin<span style="color:var(--color-text-warning)">Client</span></div>
+    <div class="nav-item active">Мои проекты</div>
+    <div class="nav-item">Создать проект</div>
+    <div class="nav-section">Найм</div>
+    <div class="nav-item">Заявки</div>
+    <div class="nav-item">Исполнители</div>
+    <div class="nav-section">Финансы</div>
+    <div class="nav-item">Контракты</div>
+    <div class="nav-item">Выплаты</div>
+    <div class="nav-section">Профиль</div>
+    <div class="nav-item">Сообщения</div>
+  </div>
+  <div class="main">
+    <div class="topbar"><div class="topbar-title">Мои проекты</div><span style="font-size:11px;color:var(--color-text-secondary)">Client · Nebula Games</span></div>
+    <div class="content">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Активных проектов</div><div class="metric-value">3</div><div class="metric-sub">в работе</div></div>
+        <div class="metric"><div class="metric-label">Заявок получено</div><div class="metric-value">14</div><div class="metric-sub warn">5 новых</div></div>
+        <div class="metric"><div class="metric-label">Потрачено (мес.)</div><div class="metric-value">$6 200</div><div class="metric-sub">2 контракта</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="section-title">Проекты</div>
+          <table>
+            <tr><th>Название</th><th>Бюджет</th><th>Статус</th></tr>
+            <tr><td>Char Rigging RPG</td><td>$1 000</td><td><span class="pill green">открыт</span></td></tr>
+            <tr><td>Creature FX</td><td>$3 500</td><td><span class="pill amber">в работе</span></td></tr>
+            <tr><td>Cinematic Intro</td><td>$2 000</td><td><span class="pill green">открыт</span></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="section-title">Новые заявки</div>
+          <div class="row-item"><div><div>Alex Kim</div><div style="font-size:11px;color:var(--color-text-secondary)">Char Rigging RPG · $800</div></div><button class="btn">Посмотреть</button></div>
+          <div class="row-item"><div><div>John D.</div><div style="font-size:11px;color:var(--color-text-secondary)">Char Rigging RPG · $950</div></div><button class="btn">Посмотреть</button></div>
+          <div class="row-item"><div><div>Maria N.</div><div style="font-size:11px;color:var(--color-text-secondary)">Cinematic Intro · $1 800</div></div><button class="btn">Посмотреть</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXECUTOR -->
+<div class="panel" id="exe">
+  <div class="sidebar">
+    <div class="logo">Red Griffin<span style="color:var(--color-text-danger)">Executor</span></div>
+    <div class="nav-item active">Обзор</div>
+    <div class="nav-item">Найти проекты</div>
+    <div class="nav-section">Мои заявки</div>
+    <div class="nav-item">Активные</div>
+    <div class="nav-item">Отклонённые</div>
+    <div class="nav-section">Контракты</div>
+    <div class="nav-item">В работе</div>
+    <div class="nav-item">Завершённые</div>
+    <div class="nav-section">Профиль</div>
+    <div class="nav-item">Портфолио</div>
+    <div class="nav-item">Сообщения</div>
+  </div>
+  <div class="main">
+    <div class="topbar"><div class="topbar-title">Мой обзор</div><span style="font-size:11px;color:var(--color-text-secondary)">Executor · John D.</span></div>
+    <div class="content">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Активных контрактов</div><div class="metric-value">2</div><div class="metric-sub">в работе</div></div>
+        <div class="metric"><div class="metric-label">Заработано (мес.)</div><div class="metric-value">$2 800</div><div class="metric-sub">+$800 pending</div></div>
+        <div class="metric"><div class="metric-label">Рейтинг</div><div class="metric-value">4.9</div><div class="metric-sub">24 проекта</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="section-title">Текущие контракты</div>
+          <div class="row-item">
+            <div><div>Creature FX · Nebula</div><div style="font-size:11px;color:var(--color-text-secondary)">milestone 2 из 4</div></div>
+            <span class="pill amber">в работе</span>
+          </div>
+          <div class="row-item">
+            <div><div>VFX Short Film</div><div style="font-size:11px;color:var(--color-text-secondary)">milestone 3 из 4</div></div>
+            <span class="pill amber">в работе</span>
+          </div>
+          <div style="margin-top:12px">
+            <div class="progress-row">
+              <div class="progress-label"><span>Creature FX</span><span>50%</span></div>
+              <div class="track"><div class="fill amber" style="width:50%"></div></div>
+            </div>
+            <div class="progress-row">
+              <div class="progress-label"><span>VFX Short Film</span><span>75%</span></div>
+              <div class="track"><div class="fill green" style="width:75%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">Подходящие проекты</div>
+          <div class="row-item"><div><div>Char Rigging RPG</div><div style="font-size:11px;color:var(--color-text-secondary)">$500–$1 000 · Maya</div></div><button class="btn">Подать заявку</button></div>
+          <div class="row-item"><div><div>Sci-Fi City Art</div><div style="font-size:11px;color:var(--color-text-secondary)">$2 000–$3 500 · 2D</div></div><button class="btn">Подать заявку</button></div>
+          <div class="row-item"><div><div>Cinematic Intro</div><div style="font-size:11px;color:var(--color-text-secondary)">$1 500–$2 000 · UE5</div></div><button class="btn">Подать заявку</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showU(id){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const ids=['stu','lec','cli','exe'];
+    t.classList.toggle('active',ids[i]===id);
+  });
+  document.querySelectorAll('.panel').forEach(p=>{
+    p.classList.toggle('active',p.id===id);
+  });
+}
+</script>

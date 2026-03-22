@@ -9,7 +9,10 @@ export type UserRole =
   | 'admin' 
   | 'manager' 
   | 'moderator' 
-  | 'chief_manager';
+  | 'chief_manager'
+  | 'hr'
+  | 'finance'
+  | 'support';
 
 export interface UserProfile {
   uid: string;

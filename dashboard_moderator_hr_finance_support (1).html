@@ -1,0 +1,252 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-size:13px;color:var(--color-text-primary)}
+.tabs{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:16px}
+.tab{padding:10px 20px;cursor:pointer;font-size:13px;color:var(--color-text-secondary);border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:var(--color-text-primary);font-weight:500;border-bottom-color:var(--color-text-primary)}
+.panel{display:none}
+.panel.active{display:grid;grid-template-columns:180px 1fr;min-height:520px}
+.sidebar{background:var(--color-background-secondary);border-right:0.5px solid var(--color-border-tertiary);padding:16px 0;display:flex;flex-direction:column;gap:2px}
+.logo{padding:0 14px 16px;font-size:14px;font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:6px}
+.logo span{font-size:11px;display:block;margin-top:2px}
+.nav-item{padding:7px 14px;color:var(--color-text-secondary);cursor:pointer;font-size:12px}
+.nav-item.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border-left:2px solid var(--color-text-primary)}
+.nav-section{padding:8px 14px 3px;font-size:10px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-top:6px}
+.main{display:flex;flex-direction:column}
+.topbar{padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.topbar-title{font-size:14px;font-weight:500}
+.content{padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.metric-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:5px}
+.metric-value{font-size:20px;font-weight:500}
+.metric-sub{font-size:11px;margin-top:3px;color:var(--color-text-success)}
+.metric-sub.warn{color:var(--color-text-warning)}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.section-title{font-size:12px;font-weight:500;margin-bottom:10px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:5px 7px;color:var(--color-text-secondary);font-weight:400;border-bottom:0.5px solid var(--color-border-tertiary)}
+td{padding:6px 7px;border-bottom:0.5px solid var(--color-border-tertiary)}
+tr:last-child td{border-bottom:none}
+.pill{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px}
+.pill.green{background:var(--color-background-success);color:var(--color-text-success)}
+.pill.amber{background:var(--color-background-warning);color:var(--color-text-warning)}
+.pill.red{background:var(--color-background-danger);color:var(--color-text-danger)}
+.pill.gray{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.pill.info{background:var(--color-background-info);color:var(--color-text-info)}
+.row-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.row-item:last-child{border-bottom:none}
+.row-label{color:var(--color-text-secondary)}
+.btn{padding:4px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;cursor:pointer;font-size:11px;color:var(--color-text-primary)}
+.avatar{width:24px;height:24px;border-radius:50%;background:var(--color-background-info);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--color-text-info);flex-shrink:0}
+</style>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('mod')">Moderator</div>
+  <div class="tab" onclick="showTab('hr')">HR</div>
+  <div class="tab" onclick="showTab('fin')">Finance</div>
+  <div class="tab" onclick="showTab('sup')">Support</div>
+</div>
+
+<!-- MODERATOR -->
+<div class="panel active" id="mod">
+  <div class="sidebar">
+    <div class="logo">Red Griffin<span style="color:var(--color-text-warning)">Moderator</span></div>
+    <div class="nav-item active">Обзор</div>
+    <div class="nav-section">Контент</div>
+    <div class="nav-item">Отзывы</div>
+    <div class="nav-item">Жалобы</div>
+    <div class="nav-item">Курсы</div>
+    <div class="nav-section">Пользователи</div>
+    <div class="nav-item">Список</div>
+    <div class="nav-item">Блокировки</div>
+  </div>
+  <div class="main">
+    <div class="topbar"><div class="topbar-title">Модерация</div><span style="font-size:11px;color:var(--color-text-secondary)">Moderator · сегодня</span></div>
+    <div class="content">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Жалоб сегодня</div><div class="metric-value">12</div><div class="metric-sub warn">5 не обработано</div></div>
+        <div class="metric"><div class="metric-label">Заблокировано</div><div class="metric-value">3</div><div class="metric-sub">за неделю</div></div>
+        <div class="metric"><div class="metric-label">Отзывов удалено</div><div class="metric-value">8</div><div class="metric-sub">за месяц</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="section-title">Жалобы на отзывы</div>
+          <table>
+            <tr><th>Курс</th><th>Причина</th><th></th></tr>
+            <tr><td>Maya Rigging</td><td style="color:var(--color-text-secondary)">Спам</td><td><button class="btn">Удалить</button></td></tr>
+            <tr><td>Houdini FX</td><td style="color:var(--color-text-secondary)">Оскорбление</td><td><button class="btn">Удалить</button></td></tr>
+            <tr><td>ZBrush Vol.1</td><td style="color:var(--color-text-secondary)">Фейк</td><td><button class="btn">Удалить</button></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="section-title">Недавно заблокированные</div>
+          <div class="row-item"><span>spam_user_042</span><span class="pill red">заблокирован</span></div>
+          <div class="row-item"><span>fake_review_11</span><span class="pill red">заблокирован</span></div>
+          <div class="row-item"><span>bot_account_7</span><span class="pill amber">на рассмотрении</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HR -->
+<div class="panel" id="hr">
+  <div class="sidebar">
+    <div class="logo">Red Griffin<span style="color:var(--color-text-info)">HR</span></div>
+    <div class="nav-item active">Обзор</div>
+    <div class="nav-section">Сотрудники</div>
+    <div class="nav-item">Все сотрудники</div>
+    <div class="nav-item">Онбординг</div>
+    <div class="nav-section">Найм</div>
+    <div class="nav-item">Вакансии</div>
+    <div class="nav-item">Кандидаты</div>
+    <div class="nav-section">Пользователи</div>
+    <div class="nav-item">Просмотр</div>
+  </div>
+  <div class="main">
+    <div class="topbar"><div class="topbar-title">HR & Recruiting</div><span style="font-size:11px;color:var(--color-text-secondary)">HR · март 2026</span></div>
+    <div class="content">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Сотрудников</div><div class="metric-value">24</div><div class="metric-sub">+2 за месяц</div></div>
+        <div class="metric"><div class="metric-label">Открытых вакансий</div><div class="metric-value">5</div><div class="metric-sub warn">3 срочных</div></div>
+        <div class="metric"><div class="metric-label">На онбординге</div><div class="metric-value">2</div><div class="metric-sub">1-я неделя</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="section-title">Открытые вакансии</div>
+          <div class="row-item"><span>Senior 3D Artist</span><span class="pill red">срочно</span></div>
+          <div class="row-item"><span>VFX Supervisor</span><span class="pill red">срочно</span></div>
+          <div class="row-item"><span>NestJS Developer</span><span class="pill amber">в работе</span></div>
+          <div class="row-item"><span>Content Manager</span><span class="pill gray">открыта</span></div>
+          <div class="row-item"><span>Support Agent</span><span class="pill gray">открыта</span></div>
+        </div>
+        <div class="card">
+          <div class="section-title">Кандидаты на этой неделе</div>
+          <table>
+            <tr><th>Имя</th><th>Позиция</th><th>Статус</th></tr>
+            <tr><td>Pavel K.</td><td style="color:var(--color-text-secondary)">3D Artist</td><td><span class="pill info">интервью</span></td></tr>
+            <tr><td>Lena M.</td><td style="color:var(--color-text-secondary)">VFX Sup.</td><td><span class="pill amber">тест</span></td></tr>
+            <tr><td>Igor S.</td><td style="color:var(--color-text-secondary)">NestJS Dev</td><td><span class="pill green">оффер</span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FINANCE -->
+<div class="panel" id="fin">
+  <div class="sidebar">
+    <div class="logo">Red Griffin<span style="color:var(--color-text-success)">Finance</span></div>
+    <div class="nav-item active">Обзор</div>
+    <div class="nav-section">Контракты</div>
+    <div class="nav-item">Все контракты</div>
+    <div class="nav-item">Milestones</div>
+    <div class="nav-item">Просроченные</div>
+    <div class="nav-section">Выплаты</div>
+    <div class="nav-item">Очередь</div>
+    <div class="nav-item">История</div>
+  </div>
+  <div class="main">
+    <div class="topbar"><div class="topbar-title">Finance & Billing</div><span style="font-size:11px;color:var(--color-text-secondary)">Finance · март 2026</span></div>
+    <div class="content">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">К выплате (сегодня)</div><div class="metric-value">$8 200</div><div class="metric-sub warn">4 транзакции</div></div>
+        <div class="metric"><div class="metric-label">Просроченных</div><div class="metric-value">4</div><div class="metric-sub" style="color:var(--color-text-danger)">требуют действий</div></div>
+        <div class="metric"><div class="metric-label">Выплачено (мес.)</div><div class="metric-value">$34 440</div><div class="metric-sub">+18% vs пред.</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="section-title">Очередь выплат</div>
+          <table>
+            <tr><th>Исполнитель</th><th>Сумма</th><th>Milestone</th><th></th></tr>
+            <tr><td>Alex Kim</td><td style="font-weight:500">$1 200</td><td style="color:var(--color-text-secondary)">2 из 4</td><td><button class="btn">Выплатить</button></td></tr>
+            <tr><td>Sara R.</td><td style="font-weight:500">$3 600</td><td style="color:var(--color-text-secondary)">1 из 3</td><td><button class="btn">Выплатить</button></td></tr>
+            <tr><td>John D.</td><td style="font-weight:500">$800</td><td style="color:var(--color-text-secondary)">3 из 4</td><td><button class="btn">Выплатить</button></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="section-title">Просроченные milestone</div>
+          <div class="row-item"><span>CTR-441 · Starlight</span><span class="pill red">+3 дня</span></div>
+          <div class="row-item"><span>CTR-388 · Nebula</span><span class="pill red">+7 дней</span></div>
+          <div class="row-item"><span>CTR-502 · IndieVFX</span><span class="pill amber">сегодня</span></div>
+          <div class="row-item"><span>CTR-219 · PixelArts</span><span class="pill amber">завтра</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUPPORT -->
+<div class="panel" id="sup">
+  <div class="sidebar">
+    <div class="logo">Red Griffin<span style="color:var(--color-text-info)">Support</span></div>
+    <div class="nav-item active">Тикеты</div>
+    <div class="nav-section">Очередь</div>
+    <div class="nav-item">Новые</div>
+    <div class="nav-item">В работе</div>
+    <div class="nav-item">Закрытые</div>
+    <div class="nav-section">Пользователи</div>
+    <div class="nav-item">Поиск</div>
+    <div class="nav-item">Уведомления</div>
+  </div>
+  <div class="main">
+    <div class="topbar"><div class="topbar-title">Support Desk</div><span style="font-size:11px;color:var(--color-text-secondary)">Support · сегодня</span></div>
+    <div class="content">
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Открытых тикетов</div><div class="metric-value">18</div><div class="metric-sub warn">5 срочных</div></div>
+        <div class="metric"><div class="metric-label">SLA (24h)</div><div class="metric-value">91%</div><div class="metric-sub">↑ +3% за нед.</div></div>
+        <div class="metric"><div class="metric-label">Закрыто сегодня</div><div class="metric-value">7</div><div class="metric-sub">среднее: 2.4h</div></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Активные тикеты</div>
+        <table>
+          <tr><th>Пользователь</th><th>Тема</th><th>Приоритет</th><th>Время</th><th>Статус</th></tr>
+          <tr>
+            <td>alex@gmail.com</td>
+            <td style="color:var(--color-text-secondary)">Не открывается курс</td>
+            <td><span class="pill red">высокий</span></td>
+            <td style="color:var(--color-text-secondary)">3ч назад</td>
+            <td><span class="pill amber">в работе</span></td>
+          </tr>
+          <tr>
+            <td>sara@mail.ru</td>
+            <td style="color:var(--color-text-secondary)">Вопрос по оплате</td>
+            <td><span class="pill amber">средний</span></td>
+            <td style="color:var(--color-text-secondary)">5ч назад</td>
+            <td><span class="pill gray">новый</span></td>
+          </tr>
+          <tr>
+            <td>john@studio.io</td>
+            <td style="color:var(--color-text-secondary)">Сертификат не выдан</td>
+            <td><span class="pill red">высокий</span></td>
+            <td style="color:var(--color-text-secondary)">1ч назад</td>
+            <td><span class="pill amber">в работе</span></td>
+          </tr>
+          <tr>
+            <td>maria@corp.com</td>
+            <td style="color:var(--color-text-secondary)">Ошибка при регистрации</td>
+            <td><span class="pill gray">низкий</span></td>
+            <td style="color:var(--color-text-secondary)">8ч назад</td>
+            <td><span class="pill green">закрыт</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(id){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const ids=['mod','hr','fin','sup'];
+    t.classList.toggle('active', ids[i]===id);
+  });
+  document.querySelectorAll('.panel').forEach(p=>{
+    p.classList.toggle('active', p.id===id);
+  });
+}
+</script>
