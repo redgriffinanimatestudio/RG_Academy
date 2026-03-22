@@ -6,6 +6,7 @@ import AdminDashboard, { AdminDashboardContent } from './AdminDashboard';
 import ChiefManagerDashboard, { ChiefManagerDashboardContent } from './ChiefManagerDashboard';
 import ManagerDashboard, { ManagerDashboardContent } from './ManagerDashboard';
 import StaffDashboard, { StaffDashboardContent } from './StaffDashboard';
+import { ModeratorDashboardContent } from './ModeratorDashboard';
 
 // Import Generic Modules for Core Roles
 import { 
@@ -137,9 +138,11 @@ export default function Dashboard() {
         { id: 'calendar', label: 'Live Sessions', icon: CalendarDays },
       ],
       moderator: [
-        { id: 'moderation', label: 'Safety Hub', icon: Shield },
-        { id: 'reports', label: 'Report Queue', icon: AlertCircle },
-        { id: 'community', label: 'Forum Mgmt', icon: Users },
+        { id: 'dashboard', label: 'Safety Overview', icon: Shield },
+        { id: 'complaints', label: 'Report Queue', icon: AlertCircle },
+        { id: 'verification', label: 'Verification', icon: UserCheck },
+        { id: 'analytics', label: 'Security Hub', icon: Zap },
+        { id: 'mass_actions', label: 'Mass Actions', icon: Layers },
       ],
       hr: [
         { id: 'talent_mgmt', label: 'Hiring Board', icon: UserPlus },
@@ -277,7 +280,8 @@ export default function Dashboard() {
           {activeRole === 'admin' && <AdminDashboardContent activeModule={currentView} theme={{ ...theme, bg: '#0a0a0a', border: '#2a2a2a' }} user={user} />}
           {activeRole === 'chief_manager' && <ChiefManagerDashboardContent activeModule={currentView} theme={{ ...theme, bg: '#0a0a0a', border: '#2a2a2a' }} />}
           {activeRole === 'manager' && <ManagerDashboardContent activeModule={currentView} theme={{ ...theme, bg: '#0a0a0a', border: '#2a2a2a' }} />}
-          {['moderator', 'hr', 'finance', 'support'].includes(activeRole || '') && <StaffDashboardContent activeRole={activeRole} activeModule={currentView} accentColor={theme.accent} />}
+          {activeRole === 'moderator' && <ModeratorDashboardContent activeModule={currentView} accentColor={theme.accent} />}
+          {['hr', 'finance', 'support'].includes(activeRole || '') && <StaffDashboardContent activeRole={activeRole} activeModule={currentView} accentColor={theme.accent} />}
           
           {['student', 'lecturer', 'client', 'executor'].includes(activeRole || '') && <CoreDashboardView activeRole={activeRole} currentView={currentView} accent={theme.accent} user={user} lang={lang} />}
         </motion.div>
