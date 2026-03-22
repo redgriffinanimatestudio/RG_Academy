@@ -117,5 +117,23 @@ export const academyService = {
     const response = await fetch(`${API_URL}/categories`);
     if (!response.ok) throw new Error('Failed to fetch categories');
     return response.json();
+  },
+
+  async getUserEnrollments(userId: string): Promise<any[]> {
+    // This would typically be a backend call like /api/users/:id/enrollments
+    // For now, we fetch all courses and mock the enrollment status
+    const response = await fetch(`${API_URL}/courses`);
+    if (!response.ok) throw new Error('Failed to fetch enrollments');
+    const courses = await response.json();
+    
+    // Simulate enrollments for the current user
+    return courses.slice(0, 2).map((course: any, index: number) => ({
+      id: `enr_${course.id}`,
+      courseId: course.id,
+      course: course,
+      progress: index === 0 ? 68 : 34,
+      status: 'active',
+      enrolledAt: new Date().toISOString()
+    }));
   }
 };

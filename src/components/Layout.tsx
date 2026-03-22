@@ -340,23 +340,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <nav className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-colors duration-500 ${navClass}`}>
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-20 items-center justify-between gap-8">
-            <div className="flex items-center gap-4 sm:gap-6">
-              <button onClick={() => setIsMobileMenuOpen(true)} className={`lg:hidden p-2 bg-white/5 rounded-xl transition-colors ${modeColor}`}><Menu size={24} /></button>
-              <Link to={`${modePrefix}/${lang || 'eng'}`} className="flex items-center gap-4 group">
-                <img src="/logo-web.png" alt="Red Griffin" className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
+          <div className="flex h-16 lg:h-20 items-center justify-between gap-4 lg:gap-8">
+            <div className="flex items-center gap-3 sm:gap-6">
+              <button onClick={() => setIsMobileMenuOpen(true)} className={`lg:hidden p-2 bg-white/5 rounded-lg transition-colors ${modeColor}`}><Menu size={20} /></button>
+              <Link to={`${modePrefix}/${lang || 'eng'}`} className="flex items-center gap-3 group">
+                <img src="/logo-web.png" alt="Red Griffin" className="h-8 lg:h-10 w-auto object-contain transition-transform group-hover:scale-105" />
                 <div className="flex flex-col hidden xs:flex">
-                  <span className="text-base font-black tracking-tighter text-white leading-none uppercase">Red Griffin</span>
-                  <span className={`text-[8px] font-bold tracking-[0.3em] ${modeColor} leading-none mt-1 uppercase`}>{t('creative_ecosystem')}</span>
+                  <span className="text-sm lg:text-base font-black tracking-tighter text-white leading-none uppercase">Red Griffin</span>
+                  <span className={`text-[7px] lg:text-[8px] font-bold tracking-[0.3em] ${modeColor} leading-none mt-1 uppercase`}>{t('creative_ecosystem')}</span>
                 </div>
               </Link>
-              <div className="hidden sm:flex bg-white/5 rounded-full p-1 border border-white/10 relative min-w-[160px] ml-4">
-                <motion.div className={`absolute inset-y-1 rounded-full ${modeBg}`} initial={false} animate={{ left: isAcademy ? '4px' : isStudio ? '50%' : '4px', width: (isAcademy || isStudio) ? 'calc(50% - 4px)' : '0%', opacity: (isAcademy || isStudio) ? 1 : 0 }} />
-                <Link to={`/aca/${lang || 'eng'}`} className={`relative z-10 flex-1 text-center py-1.5 text-[9px] font-black uppercase tracking-widest transition-colors ${isAcademy ? 'text-bg-dark' : 'text-white/40 hover:text-white'}`}>{t('academy')}</Link>
-                <Link to={`/studio/${lang || 'eng'}`} className={`relative z-10 flex-1 text-center py-1.5 text-[9px] font-black uppercase tracking-widest transition-colors ${isStudio ? 'text-bg-dark' : 'text-white/40 hover:text-white'}`}>{t('studio')}</Link>
-              </div>
             </div>
 
+            {/* Desktop Center Links */}
             <div className="hidden lg:flex items-center gap-2 h-full">
               <Link to={`/aca/${lang || 'eng'}`} className={`px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all ${isAcademy ? 'text-primary' : 'text-white/60 hover:text-white'}`}>{t('academy')}</Link>
               <Link to={`/studio/${lang || 'eng'}`} className={`px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all ${isStudio ? 'text-primary-hover' : 'text-white/60 hover:text-white'}`}>{t('studio')}</Link>
@@ -502,7 +498,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <main className="mx-auto max-w-[1600px] px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row gap-8">
-          {(isAcademy || isStudio || isCommunity || isDashboardPage) && (
+          {(isAcademy || isStudio || isCommunity) && (
             <div className="hidden md:block relative shrink-0 overflow-visible">
               <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="absolute -right-4 top-10 z-[150] size-9 rounded-full border-2 border-primary/40 bg-[#0a0a0a] flex items-center justify-center hover:scale-110 hover:border-primary transition-all shadow-[0_0_30px_rgba(0,0,0,0.9)] group">
                 {isSidebarCollapsed ? <ChevronRight size={18} className="text-primary" /> : <ChevronLeft size={18} className="text-primary" />}

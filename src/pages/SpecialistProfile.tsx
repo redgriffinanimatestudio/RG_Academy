@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { 
   MapPin, 
@@ -26,33 +26,7 @@ import {
   X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const MOCK_PROFILE = {
-  id: 'cmn19ygty0000f0447bv3riu6',
-  name: 'Alex Rivera',
-  role: 'Senior Character Technical Artist',
-  avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png',
-  cover: 'https://picsum.photos/seed/cover/1200/400',
-  location: 'Vancouver, Canada',
-  joined: 'March 2022',
-  verified: true,
-  bio: 'Specializing in character rigging, tool development, and pipeline automation for AAA games and feature animation. 12+ years of experience in the industry.',
-  skills: ['Maya', 'Python', 'C++', 'Unreal Engine', 'Character Rigging', 'Tool Dev'],
-  stats: {
-    projects: 24,
-    rating: 4.9,
-    availability: 'Part-time',
-    experience: '12 Years',
-    clients: 18,
-    reviews: 142
-  },
-  portfolio: [
-    { id: 1, title: 'Modular Rigging System', type: 'Tool', image: 'https://picsum.photos/seed/p1/600/400' },
-    { id: 2, title: 'Realistic Face Rig', type: 'Rigging', image: 'https://picsum.photos/seed/p2/600/400' },
-    { id: 3, title: 'Muscular Deformation System', type: 'VFX', image: 'https://picsum.photos/seed/p3/600/400' },
-    { id: 4, title: 'Auto-Rig for Quadruped', type: 'Script', image: 'https://picsum.photos/seed/p4/600/400' },
-  ]
-};
+import { networkingService, Profile } from '../services/networkingService';
 
 type ProfileTab = 'about' | 'portfolio' | 'experience' | 'education' | 'reviews';
 
@@ -61,7 +35,50 @@ export default function SpecialistProfile() {
   const location = useLocation();
   const isStudio = location.pathname.includes('/studio/');
   const [activeTab, setActiveTab] = useState<ProfileTab>('about');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      if (!id) return;
+      try {
+        setLoading(true);
+        // Try to fetch extended profile first
+        try {
+          const data = await networkingService.getProfile(id);
+          setProfile(data);
+        } catch (err) {
+          console.warn("Extended profile not found, fetching basic user data...");
+          // Fallback to basic user data from our API
+          const response = await fetch(`/api/users/${id}`);
+          if (response.ok) {
+            const userData = await response.json();
+            // Adapt User to Profile structure
+            setProfile({
+              id: userData.id,
+              userId: userData.id,
+              bio: userData.bio || '',
+              location: 'Remote',
+              skills: [],
+              portfolio: [],
+              user: {
+                displayName: userData.displayName || 'User',
+                photoURL: userData.photoURL || undefined,
+                email: userData.email || undefined
+              }
+            });
+          } else {
+            throw new Error('User not found');
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProfile();
+  }, [id]);
 
   const backLink = isStudio ? `/studio/${lang || 'eng'}` : `/aca/${lang || 'eng'}`;
 
@@ -73,11 +90,28 @@ export default function SpecialistProfile() {
     { id: 'reviews', label: 'Отзывы', icon: Star },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#050505]">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#050505] text-white">
+        <h1 className="text-4xl font-black mb-4">Profile Not Found</h1>
+        <Link to={backLink} className="text-primary hover:underline uppercase tracking-widest text-xs font-black">Go Back</Link>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#050505] text-white selection:bg-primary/30 pb-20">
       {/* Cover Image */}
       <div className="h-64 md:h-80 w-full relative overflow-hidden">
-        <img src={MOCK_PROFILE.cover} alt="" className="w-full h-full object-cover opacity-40" />
+        <img src={`https://picsum.photos/seed/${profile.id}/1200/400`} alt="" className="w-full h-full object-cover opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent" />
         
         <div className="absolute top-24 left-4 sm:left-6 lg:left-8">
@@ -101,18 +135,16 @@ export default function SpecialistProfile() {
               <div className="space-y-6 text-center">
                 <div className="relative inline-block">
                   <div className="size-32 rounded-[2rem] overflow-hidden border-4 border-white/5 shadow-2xl mx-auto">
-                    <img src={MOCK_PROFILE.avatar} alt={MOCK_PROFILE.name} className="w-full h-full object-cover" />
+                    <img src={profile.avatar || profile.user.photoURL || `https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png`} alt={profile.user.displayName} className="w-full h-full object-cover" />
                   </div>
-                  {MOCK_PROFILE.verified && (
-                    <div className="absolute -bottom-2 -right-2 size-8 bg-primary rounded-xl flex items-center justify-center text-bg-dark shadow-lg shadow-primary/20">
-                      <ShieldCheck size={18} />
-                    </div>
-                  )}
+                  <div className="absolute -bottom-2 -right-2 size-8 bg-primary rounded-xl flex items-center justify-center text-bg-dark shadow-lg shadow-primary/20">
+                    <ShieldCheck size={18} />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <h1 className="text-3xl font-black tracking-tighter uppercase">{MOCK_PROFILE.name}</h1>
-                  <p className="text-xs font-black text-primary uppercase tracking-widest">{MOCK_PROFILE.role}</p>
+                  <h1 className="text-3xl font-black tracking-tighter uppercase">{profile.user.displayName}</h1>
+                  <p className="text-xs font-black text-primary uppercase tracking-widest">{profile.skills?.[0]?.name || 'Specialist'}</p>
                 </div>
 
                 <div className="flex justify-center gap-2">
@@ -168,8 +200,8 @@ export default function SpecialistProfile() {
                 </div>
                 <div className="h-8 w-[1px] bg-white/5" />
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] leading-none mb-1">Joined</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest">{MOCK_PROFILE.joined}</span>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] leading-none mb-1">Location</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest">{profile.location || 'Remote'}</span>
                 </div>
               </div>
               
@@ -198,18 +230,18 @@ export default function SpecialistProfile() {
                           About <span className="text-primary italic">Specialist.</span>
                         </h2>
                         <p className="text-lg text-white/60 font-medium leading-relaxed max-w-3xl">
-                          {MOCK_PROFILE.bio}
+                          {profile.bio || 'No bio provided.'}
                         </p>
                       </div>
                     </div>
 
-                    {/* Stats Grid */}
+                    {/* Stats Grid (Mocked values for now) */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {[
-                        { label: 'Rating', value: MOCK_PROFILE.stats.rating, icon: Star, color: 'text-amber-500' },
-                        { label: 'Projects', value: MOCK_PROFILE.stats.projects, icon: Layers, color: 'text-primary' },
-                        { label: 'Experience', value: MOCK_PROFILE.stats.experience, icon: Clock, color: 'text-emerald-500' },
-                        { label: 'Reviews', value: MOCK_PROFILE.stats.reviews, icon: MessageSquare, color: 'text-sky-500' },
+                        { label: 'Rating', value: '4.9', icon: Star, color: 'text-amber-500' },
+                        { label: 'Projects', value: profile.portfolio?.length || 0, icon: Layers, color: 'text-primary' },
+                        { label: 'Experience', value: '5+ Years', icon: Clock, color: 'text-emerald-500' },
+                        { label: 'Reviews', value: '24', icon: MessageSquare, color: 'text-sky-500' },
                       ].map((stat, i) => (
                         <div key={i} className="p-6 rounded-[2rem] bg-[#0a0a0a] border border-white/5 text-center space-y-2">
                           <stat.icon size={20} className={`${stat.color} mx-auto mb-2`} />
@@ -226,12 +258,12 @@ export default function SpecialistProfile() {
                         <h2 className="text-2xl font-black uppercase tracking-tight text-white">Expertise & Skills</h2>
                       </div>
                       <div className="flex flex-wrap gap-3">
-                        {MOCK_PROFILE.skills.map((skill, idx) => (
+                        {(profile.skills || []).map((skill: any, idx: number) => (
                           <div 
                             key={idx}
                             className="px-6 py-3 rounded-2xl bg-white/[0.03] border border-white/5 text-[11px] font-black uppercase tracking-widest text-white/40 hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-all cursor-default"
                           >
-                            {skill}
+                            {skill.name}
                           </div>
                         ))}
                       </div>
@@ -247,16 +279,16 @@ export default function SpecialistProfile() {
                     exit={{ opacity: 0, y: -20 }}
                     className="grid grid-cols-1 md:grid-cols-2 gap-6"
                   >
-                    {MOCK_PROFILE.portfolio.map((item) => (
+                    {(profile.portfolio || []).map((item: any) => (
                       <div 
                         key={item.id}
                         className="group relative aspect-video rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#0a0a0a]"
                       >
-                        <img src={item.image} alt={item.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
+                        <img src={item.mediaUrl} alt={item.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
                         <div className="absolute bottom-8 left-8 space-y-2">
                           <span className="px-3 py-1 bg-primary text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-lg">
-                            {item.type}
+                            {item.category || 'Work'}
                           </span>
                           <h3 className="text-xl font-black text-white uppercase tracking-tight">{item.title}</h3>
                         </div>
@@ -265,6 +297,11 @@ export default function SpecialistProfile() {
                         </button>
                       </div>
                     ))}
+                    {profile.portfolio?.length === 0 && (
+                      <div className="col-span-full py-20 text-center text-white/20 uppercase tracking-widest text-xs font-black">
+                        No portfolio items yet.
+                      </div>
+                    )}
                   </motion.div>
                 )}
 

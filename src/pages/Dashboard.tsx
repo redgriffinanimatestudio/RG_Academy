@@ -193,7 +193,7 @@ export default function Dashboard() {
           {/* Role Switcher - Optimized for mobile (Horizontal scroll) */}
           {profile && profile.roles.length > 1 && (
             <div className="flex lg:grid lg:grid-cols-2 gap-2 overflow-x-auto no-scrollbar pb-2 lg:pb-0">
-              {['admin', 'chief_manager', 'student', 'lecturer', 'executor', 'client']
+              {['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client']
                 .filter(r => profile.roles.includes(r as any))
                 .map(r => (
                   <button
