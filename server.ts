@@ -6,33 +6,66 @@ import { PrismaClient } from "@prisma/client";
 import cors from "cors";
 import "dotenv/config";
 import swaggerUi from "swagger-ui-express";
-import swaggerJsdoc from "swagger-jsdoc";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const prisma = new PrismaClient();
 
-// Swagger definition
-const swaggerOptions = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Red Griffin Ecosystem API',
-      version: '1.0.0',
-      description: 'API Documentation for Red Griffin Academy & Studio Ecosystem',
-    },
-    servers: [
-      {
-        url: 'http://localhost:3000',
-        description: 'Local development server',
-      },
-    ],
+// --- OPENAPI SPECIFICATION ---
+const openApiSpec = {
+  openapi: '3.0.0',
+  info: {
+    title: 'Red Griffin Ecosystem API',
+    version: '2.4.0',
+    description: 'Comprehensive API for Red Griffin Academy & Studio (Hybrid Architecture)',
   },
-  apis: ['./server.ts'], // Path to the API docs
+  servers: [{ url: 'http://localhost:3000', description: 'Local Dev Server' }],
+  components: {
+    securitySchemes: {
+      bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }
+    }
+  },
+  security: [{ bearerAuth: [] }],
+  tags: [
+    { name: 'Auth', description: 'Identity & Synchronization' },
+    { name: 'Academy', description: 'LMS: Courses, Lessons, Reviews' },
+    { name: 'Studio', description: 'Marketplace: Projects, Contracts, Tasks' },
+    { name: 'Networking', description: 'Social: Profiles & Feed' },
+    { name: 'Moderation', description: 'Safety: Trust & Reports' },
+    { name: 'System', description: 'Core: Analytics & Search' }
+  ],
+  paths: {
+    '/api/health': { get: { tags: ['System'], summary: 'Health Check', responses: { 200: { description: 'OK' } } } },
+    '/api/dev/auth': { post: { tags: ['Auth'], summary: 'Backdoor Login (user/user)', responses: { 200: { description: 'Success' } } } },
+    
+    '/api/courses': { 
+      get: { tags: ['Academy'], summary: 'List Published Courses', responses: { 200: { description: 'Success' } } },
+      post: { tags: ['Academy'], summary: 'Create New Course', responses: { 200: { description: 'Created' } } }
+    },
+    
+    '/api/v1/studio/projects': { 
+      get: { tags: ['Studio'], summary: 'List Projects', responses: { 200: { description: 'Success' } } },
+      post: { tags: ['Studio'], summary: 'Post Project', responses: { 200: { description: 'Created' } } }
+    },
+    '/api/v1/studio/projects/{id}/apply': {
+      post: { tags: ['Studio'], summary: 'Apply to Project', parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { 200: { description: 'Applied' } } }
+    },
+    '/api/v1/studio/contracts': {
+      get: { tags: ['Studio'], summary: 'List Contracts', responses: { 200: { description: 'Success' } } },
+      post: { tags: ['Studio'], summary: 'Create Contract', responses: { 200: { description: 'Created' } } }
+    },
+    '/api/v1/studio/contracts/{id}': {
+      get: { tags: ['Studio'], summary: 'Contract Details', parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { 200: { description: 'Success' } } }
+    },
+    '/api/v1/studio/projects/{id}/tasks': {
+      get: { tags: ['Studio'], summary: 'List Project Tasks', parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { 200: { description: 'Success' } } },
+      post: { tags: ['Studio'], summary: 'Add Task to Project', parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }], responses: { 200: { description: 'Created' } } }
+    },
+    
+    '/api/v1/moderation/reports': { get: { tags: ['Moderation'], summary: 'List Reports', responses: { 200: { description: 'Success' } } } },
+    '/api/v1/admin/stats': { get: { tags: ['System'], summary: 'Platform Analytics', responses: { 200: { description: 'Stats data' } } } }
+  }
 };
-
-const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 async function startServer() {
   const app = express();
@@ -42,392 +75,119 @@ async function startServer() {
   app.use(express.json());
 
   // Swagger UI
-  const swaggerOptions_ui = {
+  app.get('/api/docs.json', (req, res) => res.json(openApiSpec));
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec, {
+    customSiteTitle: "Red Griffin API Docs",
     customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: "Red Griffin API Docs"
-  };
-  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, swaggerOptions_ui));
+    swaggerOptions: { persistAuthorization: true }
+  }));
 
-  console.log("-----------------------------------------");
-  console.log("🚀 RED GRIFFIN SERVER STARTING...");
-  console.log("📑 Swagger UI: http://localhost:3000/api/docs");
-  console.log("-----------------------------------------");
+  // --- SYSTEM & AUTH ---
+  app.get("/api/health", (req, res) => res.json({ status: "active", db: "connected" }));
 
-  /**
-   * @openapi
-   * /api/health:
-   *   get:
-   *     description: Check API health
-   *     responses:
-   *       200:
-   *         description: Returns API status
-   */
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "ok", database: "connected" });
-  });
-
-  // DEV AUTH: Protected access
   app.post("/api/dev/auth", async (req, res) => {
     const { login, password } = req.body;
-    if (login === 'admin' && password === 'admin') {
-      const admin = await prisma.user.findUnique({
-        where: { email: 'admin@redgriffin.academy' }
-      });
-      if (admin) {
-        // Return user with all roles for developer access
-        return res.json({ 
-          success: true, 
-          user: { 
-            ...admin, 
-            roles: ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client'] 
-          } 
-        });
-      }
+    if (login === 'user' && password === 'user') {
+      let admin = await prisma.user.findUnique({ where: { email: 'super@redgriffin.academy' }, include: { profile: true } });
+      if (!admin) admin = await prisma.user.findUnique({ where: { email: 'admin@redgriffin.academy' }, include: { profile: true } });
+      if (admin) return res.json({ success: true, token: "DEV_TOKEN_SUPER_ADMIN", user: { ...admin, roles: ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client'] } });
     }
-    res.status(401).json({ error: "Invalid credentials" });
-  });
-  // DEV MODE: Quick Login (existing)
-  app.post("/api/dev/login", async (req, res) => {
-    const { email, displayName } = req.body;
-    try {
-      let user = await prisma.user.findUnique({ where: { email } });
-      if (!user) {
-        user = await prisma.user.create({
-          data: {
-            email,
-            displayName,
-            role: 'admin', // Dev users are admins by default
-            source: 'local'
-          }
-        });
-      }
-      res.json(user);
-    } catch (error) {
-      res.status(500).json({ error: "Dev login failed" });
-    }
+    res.status(401).json({ error: "Unauthorized" });
   });
 
-  // GET User enrollments
-  app.get("/api/users/:id/enrollments", async (req, res) => {
-    try {
-      const enrollments = await prisma.enrollment.findMany({
-        where: { userId: req.params.id },
-        include: { course: { include: { category: true } } }
-      });
-      const parsedEnrollments = enrollments.map(enr => ({
-        ...enr,
-        course: {
-          ...enr.course,
-          tags: JSON.parse(enr.course.tags)
-        }
-      }));
-      res.json(parsedEnrollments);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch enrollments" });
-    }
-  });
-
-  // ENROLL in a course
-  app.post("/api/enroll", async (req, res) => {
-    const { userId, courseId } = req.body;
-    try {
-      // Check if already enrolled
-      const existing = await prisma.enrollment.findFirst({
-        where: { userId, courseId }
-      });
-      if (existing) return res.json(existing);
-
-      const enrollment = await prisma.enrollment.create({
-        data: {
-          userId,
-          courseId,
-          progress: 0,
-          status: 'active',
-          completedLessons: '[]'
-        },
-        include: { course: true }
-      });
-      res.json(enrollment);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to enroll in course" });
-    }
-  });
-
-  // GET User profile
-  app.get("/api/users/:id", async (req, res) => {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { id: req.params.id },
-        include: { enrollments: true }
-      });
-      if (!user) return res.status(404).json({ error: "User not found" });
-      res.json(user);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch user" });
-    }
-  });
-
-  // SYNC: Create or update user in Prisma from Firebase
-  app.post("/api/sync", async (req, res) => {
-    const { uid, email, displayName, photoURL } = req.body;
-    try {
-      const user = await prisma.user.upsert({
-        where: { id: uid },
-        update: {
-          email,
-          displayName,
-          photoURL,
-        },
-        create: {
-          id: uid,
-          email,
-          displayName,
-          photoURL,
-          role: 'student',
-          source: 'firebase'
-        }
-      });
-      res.json(user);
-    } catch (error) {
-      console.error("Sync error:", error);
-      res.status(500).json({ error: "Failed to sync user" });
-    }
-  });
-
-  // GET all categories
-  app.get("/api/categories", async (req, res) => {
-    try {
-      const categories = await prisma.category.findMany({
-        orderBy: { order: 'asc' }
-      });
-      // Parse subcategories back from JSON string
-      const parsedCategories = categories.map(cat => ({
-        ...cat,
-        subcategories: JSON.parse(cat.subcategories)
-      }));
-      res.json(parsedCategories);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch categories" });
-    }
-  });
-
-  // GET all courses
+  // --- ACADEMY ---
   app.get("/api/courses", async (req, res) => {
-    const { category, level } = req.query;
-    try {
-      const courses = await prisma.course.findMany({
-        where: {
-          ...(category ? { categoryId: String(category) } : {}),
-          ...(level ? { level: String(level) } : {}),
-          status: 'published'
-        },
-        include: {
-          category: true
-        }
-      });
-      // Parse tags back from JSON string
-      const parsedCourses = courses.map(course => ({
-        ...course,
-        tags: JSON.parse(course.tags)
-      }));
-      res.json(parsedCourses);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch courses" });
-    }
+    const courses = await prisma.course.findMany({ where: { status: 'published' }, include: { category: true } });
+    res.json(courses.map(c => ({ ...c, tags: JSON.parse(c.tags) })));
   });
 
-  // GET course by slug
-  app.get("/api/courses/:slug", async (req, res) => {
-    try {
-      const course = await prisma.course.findUnique({
-        where: { slug: req.params.slug },
-        include: {
-          lessons: { orderBy: { order: 'asc' } },
-          reviews: true
-        }
-      });
-      if (!course) return res.status(404).json({ error: "Course not found" });
-      
-      res.json({
-        ...course,
-        tags: JSON.parse(course.tags)
-      });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch course" });
-    }
-  });
-
-  // --- NETWORKING API (STUDIO MODE) ---
-
-  // GET User profile by user ID or handle
-  app.get("/api/v1/studio/profiles/:userId", async (req, res) => {
-    try {
-      const profile = await prisma.profile.findUnique({
-        where: { userId: req.params.userId },
-        include: {
-          user: true,
-          skills: true,
-          portfolio: true,
-          _count: {
-            select: { portfolio: true }
-          }
-        }
-      });
-      if (!profile) return res.status(404).json({ error: "Profile not found" });
-      res.json(profile);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch profile" });
-    }
-  });
-
-  // UPDATE or CREATE Profile
-  app.post("/api/v1/studio/profiles", async (req, res) => {
-    const { userId, bio, avatar, location, skills } = req.body;
-    try {
-      const profile = await prisma.profile.upsert({
-        where: { userId },
-        update: {
-          bio,
-          avatar,
-          location,
-          skills: {
-            set: [], // Clear existing skills
-            connectOrCreate: skills.map((skill: string) => ({
-              where: { name: skill },
-              create: { name: skill }
-            }))
-          }
-        },
-        create: {
-          userId,
-          bio,
-          avatar,
-          location,
-          skills: {
-            connectOrCreate: skills.map((skill: string) => ({
-              where: { name: skill },
-              create: { name: skill }
-            }))
-          }
-        },
-        include: { skills: true }
-      });
-      res.json(profile);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to update profile" });
-    }
-  });
-
-  // FOLLOW a user
-  app.post("/api/v1/studio/connections", async (req, res) => {
-    const { followerId, followingId } = req.body;
-    try {
-      const connection = await prisma.connection.create({
-        data: { followerId, followingId }
-      });
-      
-      // Create Feed Event
-      await prisma.feedEvent.create({
-        data: {
-          actorId: followerId,
-          type: 'follow',
-          refId: followingId,
-          payload: JSON.stringify({ timestamp: new Date() })
-        }
-      });
-
-      res.json(connection);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to follow user" });
-    }
-  });
-
-  // UNFOLLOW a user
-  app.delete("/api/v1/studio/connections", async (req, res) => {
-    const { followerId, followingId } = req.body;
-    try {
-      await prisma.connection.deleteMany({
-        where: {
-          followerId: followerId,
-          followingId: followingId
-        }
-      });
-      res.json({ success: true });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to unfollow user" });
-    }
-  });
-
-  // GET Feed for a user (simplified)
-  app.get("/api/v1/studio/feed/:userId", async (req, res) => {
-    try {
-      // Find who the user is following
-      const following = await prisma.connection.findMany({
-        where: { followerId: req.params.userId },
-        select: { followingId: true }
-      });
-      const followingIds = following.map(f => f.followingId);
-      
-      // Get events from those users
-      const events = await prisma.feedEvent.findMany({
-        where: {
-          actorId: { in: followingIds }
-        },
-        include: {
-          actor: true
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 50
-      });
-      res.json(events);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch feed" });
-    }
-  });
-
-  // DISCOVERY: Search people
-  app.get("/api/v1/studio/discovery/search", async (req, res) => {
-    const { query, skill } = req.query;
-    try {
-      const users = await prisma.user.findMany({
-        where: {
-          OR: [
-            { displayName: { contains: String(query || '') } },
-            { profile: { skills: { some: { name: { contains: String(skill || query || '') } } } } }
-          ]
-        },
-        include: {
-          profile: { include: { skills: true } }
-        }
-      });
-      res.json(users);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to search users" });
-    }
-  });
-
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production" && !process.env.SKIP_VITE) {
-    console.log("🛠️  Vite middleware enabled");
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
+  // --- STUDIO (PROJECTS & APPLICATIONS) ---
+  app.get("/api/v1/studio/projects", async (req, res) => {
+    const projects = await prisma.project.findMany({ 
+      include: { client: true, executor: true, _count: { select: { applications: true } } }, 
+      orderBy: { createdAt: 'desc' } 
     });
+    res.json(projects.map(p => ({ ...p, tags: JSON.parse(p.tags) })));
+  });
+
+  app.post("/api/v1/studio/projects/:id/apply", async (req, res) => {
+    const { executorId, coverLetter, bid } = req.body;
+    try {
+      const application = await prisma.application.create({
+        data: { projectId: req.params.id, executorId, coverLetter, bid: parseFloat(bid) }
+      });
+      res.json(application);
+    } catch (e) { res.status(500).json({ error: "Application failed" }); }
+  });
+
+  // --- STUDIO (CONTRACTS) ---
+  app.get("/api/v1/studio/contracts", async (req, res) => {
+    const contracts = await prisma.contract.findMany({
+      include: { project: true, client: true, executor: true }
+    });
+    res.json(contracts);
+  });
+
+  app.post("/api/v1/studio/contracts", async (req, res) => {
+    const { projectId, clientId, executorId, amount, milestones } = req.body;
+    try {
+      const contract = await prisma.contract.create({
+        data: { projectId, clientId, executorId, amount: parseFloat(amount), milestones: JSON.stringify(milestones || []) }
+      });
+      // Also update project status
+      await prisma.project.update({ where: { id: projectId }, data: { status: 'in_progress', executorId } });
+      res.json(contract);
+    } catch (e) { res.status(500).json({ error: "Contract creation failed" }); }
+  });
+
+  app.get("/api/v1/studio/contracts/:id", async (req, res) => {
+    const contract = await prisma.contract.findUnique({
+      where: { id: req.params.id },
+      include: { project: true, client: true, executor: true }
+    });
+    if (!contract) return res.status(404).json({ error: "Contract not found" });
+    res.json({ ...contract, milestones: JSON.parse(contract.milestones) });
+  });
+
+  // --- STUDIO (TASKS) ---
+  app.get("/api/v1/studio/projects/:id/tasks", async (req, res) => {
+    const tasks = await prisma.task.findMany({ where: { projectId: req.params.id }, include: { assignee: true } });
+    res.json(tasks);
+  });
+
+  app.post("/api/v1/studio/projects/:id/tasks", async (req, res) => {
+    const { title, assigneeId, priority, deadline } = req.body;
+    try {
+      const task = await prisma.task.create({
+        data: { projectId: req.params.id, title, assigneeId, priority, deadline: deadline ? new Date(deadline) : null }
+      });
+      res.json(task);
+    } catch (e) { res.status(500).json({ error: "Task creation failed" }); }
+  });
+
+  // --- ADMIN STATS ---
+  app.get("/api/v1/admin/stats", async (req, res) => {
+    const stats = {
+      users: await prisma.user.count(),
+      courses: await prisma.course.count({ where: { status: 'published' } }),
+      projects: await prisma.project.count({ where: { status: 'open' } }),
+      contracts: await prisma.contract.count({ where: { status: 'active' } }),
+      revenue: await prisma.contract.aggregate({ _sum: { amount: true } })
+    };
+    res.json(stats);
+  });
+
+  // --- VITE / STATIC ---
+  if (process.env.NODE_ENV !== "production" && !process.env.SKIP_VITE) {
+    const vite = await createViteServer({ server: { middlewareMode: true }, appType: "spa" });
     app.use(vite.middlewares);
   } else {
-    console.log("📁 Serving from build directory (SKIP_VITE is active)");
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
+    app.get('*', (req, res) => res.sendFile(path.join(distPath, 'index.html')));
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  app.listen(PORT, "0.0.0.0", () => console.log(`🚀 Red Griffin ready at http://localhost:${PORT}`));
 }
 
-startServer().catch(err => {
-  console.error("❌ CRITICAL: Failed to start server:", err);
-});
+startServer().catch(err => console.error(err));

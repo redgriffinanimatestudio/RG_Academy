@@ -1,152 +1,135 @@
 import { PrismaClient } from '@prisma/client';
-import 'dotenv/config';
 
 const prisma = new PrismaClient();
 
-const ACADEMY_CATEGORIES = [
-  {
-    id: 'modeling_3d',
-    name: 'modeling_3d',
-    type: 'academy',
-    order: 1,
-    subcategories: JSON.stringify([
-      { name: 'char_modeling', topics: ['Anatomy for Artists', 'Stylized Characters', 'Realistic Humans', 'Creature Sculpting', 'Retopology'] },
-      { name: 'env_art', topics: ['Modular Environments', 'Foliage & Nature', 'World Building', 'Photogrammetry', 'Interior Design'] }
-    ])
-  },
-  {
-    id: 'animation',
-    name: 'animation',
-    type: 'academy',
-    order: 2,
-    subcategories: JSON.stringify([
-      { name: 'animation_3d', topics: ['Body Mechanics', 'Acting for Animation', 'Creature Animation', 'Facial Animation', 'Lip Sync'] },
-      { name: 'animation_2d', topics: ['Toon Boom Harmony', 'Spine 2D', 'Motion Graphics', 'Storyboarding'] }
-    ])
-  },
-  {
-    id: 'vfx_compositing',
-    name: 'vfx_compositing',
-    type: 'academy',
-    order: 3,
-    subcategories: JSON.stringify([
-      { name: 'visual_effects', topics: ['Houdini Dynamics', 'Niagara VFX', 'Fluid Simulation', 'Destruction FX', 'Particle Systems'] }
-    ])
-  }
-];
-
-const STUDIO_CATEGORIES = [
-  {
-    id: 'prod_services',
-    name: 'prod_services',
-    type: 'studio',
-    order: 1,
-    subcategories: JSON.stringify([
-      { name: 'anim_prod', topics: ['Feature Film Animation', 'Commercial Animation', 'Game Cinematics', 'Motion Capture'] },
-      { name: 'vfx_post', topics: ['CGI Environments', 'Digital Compositing', 'Color Grading', 'Sound Design'] }
-    ])
-  },
-  {
-    id: 'talent_network',
-    name: 'talent_network',
-    type: 'studio',
-    order: 2,
-    subcategories: JSON.stringify([
-      { name: 'creative_talent', topics: ['Concept Artists', '3D Generalists', 'Animators', 'VFX Supervisors'] },
-      { name: 'technical_talent', topics: ['Pipeline Engineers', 'Technical Directors', 'Game Developers', 'Rigger'] }
-    ])
-  },
-  {
-    id: 'studio_solutions',
-    name: 'studio_solutions',
-    type: 'studio',
-    order: 3,
-    subcategories: JSON.stringify([
-      { name: 'infrastructure', topics: ['Render Farm Access', 'Pipeline Tools', 'Asset Management', 'Collaboration Hub'] }
-    ])
-  }
-];
-
-const COURSES = [
-  {
-    id: '1',
-    slug: 'mastering-character-rigging-maya',
-    title: 'Mastering Character Rigging in Maya',
-    description: 'Learn the industry-standard techniques for creating robust, animator-friendly character rigs in Autodesk Maya.',
-    lecturerId: 'l1',
-    lecturerName: 'Alex Rivera',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png',
-    price: 89.99,
-    rating: 4.9,
-    reviewsCount: 1240,
-    studentsCount: 15420,
-    duration: '24h 15m',
-    thumbnail: 'https://picsum.photos/seed/rigging/800/600',
-    categoryId: 'animation',
-    level: 'advanced',
-    tags: JSON.stringify(['Maya', 'Rigging']),
-    status: 'published',
-  },
-  {
-    id: '2',
-    slug: 'cinematic-vfx-houdini-destruction',
-    title: 'Cinematic VFX: Houdini Destruction',
-    description: 'Master destruction and simulation in Houdini for high-end cinematic sequences.',
-    lecturerId: 'l2',
-    lecturerName: 'Sarah Chen',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-2.png',
-    price: 129.99,
-    rating: 4.8,
-    reviewsCount: 850,
-    studentsCount: 8200,
-    duration: '32h 40m',
-    thumbnail: 'https://picsum.photos/seed/houdini/800/600',
-    categoryId: 'vfx_compositing',
-    level: 'expert',
-    tags: JSON.stringify(['Houdini', 'VFX']),
-    status: 'published',
-  },
-  {
-    id: '3',
-    slug: 'environment-art-aaa-games',
-    title: 'Environment Art for AAA Games',
-    description: 'Create stunning, optimized environments for modern game engines.',
-    lecturerId: 'l3',
-    lecturerName: 'Marcus Thorne',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-3.png',
-    price: 94.99,
-    rating: 4.7,
-    reviewsCount: 2100,
-    studentsCount: 22100,
-    duration: '45h 20m',
-    thumbnail: 'https://picsum.photos/seed/envart/800/600',
-    categoryId: 'modeling_3d',
-    level: 'intermediate',
-    tags: JSON.stringify(['Unreal Engine', 'Modeling']),
-    status: 'published',
-  }
-];
-
 async function main() {
-  console.log('Start seeding...');
+  console.log('🌱 Seeding fresh ecosystem data...');
 
-  for (const cat of [...ACADEMY_CATEGORIES, ...STUDIO_CATEGORIES]) {
-    await prisma.category.upsert({
-      where: { id: cat.id },
-      update: {},
-      create: cat,
-    });
-  }
+  // 1. CLEANUP (Ordered to respect FK constraints)
+  await prisma.report.deleteMany();
+  await prisma.review.deleteMany();
+  await prisma.enrollment.deleteMany();
+  await prisma.lesson.deleteMany();
+  await prisma.course.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.contract.deleteMany();
+  await prisma.application.deleteMany();
+  await prisma.project.deleteMany();
+  await prisma.service.deleteMany();
+  await prisma.portfolioItem.deleteMany(); // Delete children first
+  await prisma.profile.deleteMany();
+  await prisma.skill.deleteMany();
+  await prisma.user.deleteMany();
 
-  for (const course of COURSES) {
-    await prisma.course.upsert({
-      where: { id: course.id },
-      update: {},
-      create: course,
-    });
-  }
+  // 2. USERS
+  const admin = await prisma.user.create({
+    data: {
+      email: 'admin@redgriffin.academy',
+      displayName: 'System Architect',
+      role: 'admin',
+      source: 'local',
+      profile: {
+        create: {
+          bio: 'Lead architect of Red Griffin Ecosystem',
+          location: 'Digital Space',
+          avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'
+        }
+      }
+    }
+  });
 
-  console.log('Seeding finished.');
+  const lecturer = await prisma.user.create({
+    data: {
+      email: 'lecturer@example.com',
+      displayName: 'Alex Rivers',
+      role: 'lecturer',
+      profile: {
+        create: {
+          bio: 'VFX Artist with 10+ years experience',
+          avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-2.png'
+        }
+      }
+    }
+  });
+
+  // 3. SKILLS
+  const skills = await Promise.all([
+    prisma.skill.create({ data: { name: 'Unreal Engine' } }),
+    prisma.skill.create({ data: { name: 'Houdini' } }),
+    prisma.skill.create({ data: { name: 'ZBrush' } }),
+    prisma.skill.create({ data: { name: 'Maya' } }),
+  ]);
+
+  // 4. CATEGORIES
+  const cat3d = await prisma.category.create({
+    data: {
+      name: '3D Modeling',
+      type: 'academy',
+      order: 1,
+      subcategories: JSON.stringify(['Character Design', 'Environment Art', 'Hard Surface'])
+    }
+  });
+
+  const catVfx = await prisma.category.create({
+    data: {
+      name: 'VFX & Dynamics',
+      type: 'academy',
+      order: 2,
+      subcategories: JSON.stringify(['Destruction', 'Water Sims', 'Fire & Smoke'])
+    }
+  });
+
+  // 5. COURSES
+  const course = await prisma.course.create({
+    data: {
+      slug: 'unreal-engine-masterclass',
+      title: 'Unreal Engine 5: The Ultimate Masterclass',
+      description: 'Master UE5 from scratch to advanced cinematic rendering.',
+      lecturerId: admin.id,
+      lecturerName: admin.displayName || 'Admin',
+      price: 199.99,
+      thumbnail: 'https://images.unsplash.com/photo-1616440835904-715057537c4f?q=80&w=1000',
+      level: 'intermediate',
+      status: 'published',
+      tags: JSON.stringify(['UE5', 'Rendering', 'Gamedev']),
+      categoryId: cat3d.id,
+      lessons: {
+        create: [
+          { title: 'Introduction to Interface', content: '...', videoUrl: '...', type: 'video', duration: '15m', order: 1, isFree: true },
+          { title: 'Nanite and Lumen', content: '...', videoUrl: '...', type: 'video', duration: '45m', order: 2 }
+        ]
+      }
+    }
+  });
+
+  // 6. PROJECTS (STUDIO)
+  await prisma.project.create({
+    data: {
+      title: 'Cinematic Trailer for Indie RPG',
+      slug: 'cinematic-indie-rpg',
+      description: 'We need a high-quality 30s trailer for our upcoming RPG.',
+      clientId: admin.id,
+      budget: 5000,
+      urgency: 'urgent',
+      tags: JSON.stringify(['Animation', 'Rendering', 'indie']),
+      status: 'open'
+    }
+  });
+
+  // 7. SERVICES
+  await prisma.service.create({
+    data: {
+      title: 'High-poly Character Sculpting',
+      description: 'I will sculpt a professional 3D character for your game.',
+      executorId: lecturer.id,
+      price: 450,
+      category: 'Character Design',
+      tags: JSON.stringify(['ZBrush', 'Sculpting']),
+      rating: 4.9
+    }
+  });
+
+  console.log('✅ Ecosystem seeded successfully!');
 }
 
 main()

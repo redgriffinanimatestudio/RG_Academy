@@ -18,12 +18,24 @@ model User {
   lastSyncedAt DateTime?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+  
+  // Relations
+  profile      Profile?
   followers    Connection[] @relation("following")
   following    Connection[] @relation("follower")
   enrollments  Enrollment[]
   feedEvents   FeedEvent[]
-  profile      Profile?
   reviews      Review[]
+  reports      Report[]     @relation("ReportedByUser")
+  
+  // Studio Relations
+  clientProjects    Project[]     @relation("ClientProjects")
+  executorProjects  Project[]     @relation("ExecutorProjects")
+  services          Service[]
+  applications      Application[]
+  clientContracts   Contract[]    @relation("ClientContracts")
+  executorContracts Contract[]    @relation("ExecutorContracts")
+  assignedTasks     Task[]        @relation("AssignedTasks")
 }
 
 model Profile {
@@ -60,7 +72,7 @@ model FeedEvent {
   actorId   String
   type      String
   refId     String?
-  payload   String
+  payload   String   @default("{}")
   createdAt DateTime @default(now())
   actor     User     @relation(fields: [actorId], references: [id])
 }
@@ -77,15 +89,85 @@ model PortfolioItem {
   profile     Profile  @relation(fields: [profileId], references: [id])
 }
 
+model Project {
+  id           String        @id @default(cuid())
+  title        String
+  slug         String        @unique
+  description  String
+  clientId     String
+  client       User          @relation("ClientProjects", fields: [clientId], references: [id])
+  executorId   String?
+  executor     User?         @relation("ExecutorProjects", fields: [executorId], references: [id])
+  status       String        @default("open")
+  urgency      String        @default("normal")
+  budget       Float         @default(0)
+  tags         String        @default("[]")
+  applications Application[]
+  contracts    Contract[]
+  tasks        Task[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  executorId  String
+  executor    User     @relation(fields: [executorId], references: [id])
+  price       Float
+  category    String
+  tags        String   @default("[]")
+  rating      Float    @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Application {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  executorId  String
+  executor    User     @relation(fields: [executorId], references: [id])
+  coverLetter String
+  bid         Float
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+}
+
+model Contract {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  clientId    String
+  client      User     @relation("ClientContracts", fields: [clientId], references: [id])
+  executorId  String
+  executor    User     @relation("ExecutorContracts", fields: [executorId], references: [id])
+  amount      Float
+  currency    String   @default("USD")
+  status      String   @default("pending")
+  milestones  String   @default("[]")
+  createdAt   DateTime @default(now())
+}
+
+model Task {
+  id         String    @id @default(cuid())
+  projectId  String
+  project    Project   @relation(fields: [projectId], references: [id])
+  title      String
+  assigneeId String?
+  assignee   User?     @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  status     String    @default("todo")
+  priority   String    @default("medium")
+  deadline   DateTime?
+  createdAt  DateTime  @default(now())
+}
+
 model Category {
   id            String    @id @default(cuid())
   name          String
   type          String
   order         Int
   subcategories String
-  remoteId      String?   @unique
-  source        String    @default("local")
-  lastSyncedAt  DateTime?
   courses       Course[]
 }
 
@@ -108,9 +190,6 @@ model Course {
   status         String
   createdAt      DateTime     @default(now())
   categoryId     String
-  remoteId       String?      @unique
-  source         String       @default("local")
-  lastSyncedAt   DateTime?
   category       Category     @relation(fields: [categoryId], references: [id])
   enrollments    Enrollment[]
   lessons        Lesson[]
@@ -128,9 +207,6 @@ model Lesson {
   order        Int
   isFree       Boolean   @default(false)
   createdAt    DateTime  @default(now())
-  remoteId     String?   @unique
-  source       String    @default("local")
-  lastSyncedAt DateTime?
   course       Course    @relation(fields: [courseId], references: [id])
 }
 
@@ -140,12 +216,9 @@ model Enrollment {
   courseId         String
   progress         Int       @default(0)
   status           String    @default("active")
-  completedLessons String
+  completedLessons String    @default("[]")
   enrolledAt       DateTime  @default(now())
   completedAt      DateTime?
-  remoteId         String?   @unique
-  source           String    @default("local")
-  lastSyncedAt     DateTime?
   course           Course    @relation(fields: [courseId], references: [id])
   user             User      @relation(fields: [userId], references: [id])
 }
@@ -158,9 +231,17 @@ model Review {
   comment      String
   isApproved   Boolean   @default(false)
   createdAt    DateTime  @default(now())
-  remoteId     String?   @unique
-  source       String    @default("local")
-  lastSyncedAt DateTime?
   user         User      @relation(fields: [userId], references: [id])
   course       Course    @relation(fields: [courseId], references: [id])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  reporterId  String
+  reporter    User     @relation("ReportedByUser", fields: [reporterId], references: [id])
+  targetType  String   // review, user, message, project
+  targetId    String
+  reason      String
+  status      String   @default("pending") // pending, resolved, dismissed
+  createdAt   DateTime @default(now())
 }

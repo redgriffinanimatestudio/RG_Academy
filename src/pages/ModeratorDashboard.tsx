@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Shield, AlertCircle, CheckCircle, XCircle, Trash2, 
   Ban, ShieldAlert, Eye, Search, Filter, MoreVertical, 
   TrendingUp, Activity, UserCheck, ShieldCheck, Mail, 
-  MessageSquare, Settings, Lock, Clock, Globe, Zap
+  MessageSquare, Settings, Lock, Clock, Globe, Zap, Layers
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { moderationService, Report } from '../services/moderationService';
 
 export function ModeratorDashboardContent({ activeModule, accentColor }: any) {
+  const [stats, setStats] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/v1/admin/stats')
+      .then(res => res.json())
+      .then(setStats)
+      .catch(console.error);
+  }, []);
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -19,7 +28,7 @@ export function ModeratorDashboardContent({ activeModule, accentColor }: any) {
         transition={{ duration: 0.2 }}
         className="space-y-6"
       >
-        {activeModule === 'dashboard' && <ModeratorOverview accent={accentColor} />}
+        {activeModule === 'dashboard' && <ModeratorOverview accent={accentColor} stats={stats} />}
         {activeModule === 'complaints' && <ModeratorComplaints accent={accentColor} />}
         {activeModule === 'reviews' && <ModeratorReviews accent={accentColor} />}
         {activeModule === 'verification' && <ModeratorVerification accent={accentColor} />}
@@ -63,14 +72,20 @@ function StatCard({ label, value, sub, icon: Icon, accent, trend }: any) {
   );
 }
 
-function ModeratorOverview({ accent }: any) {
+function ModeratorOverview({ accent, stats }: any) {
+  const [recentReports, setReports] = useState<Report[]>([]);
+
+  useEffect(() => {
+    moderationService.getReports('pending').then(data => setReports(data.slice(0, 3)));
+  }, []);
+
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Active Reports" value="12" sub="5 critical priority" icon={AlertCircle} accent="#ef4444" trend="down" />
-        <StatCard label="Reviews Removed" value="8" sub="this month" icon={Trash2} accent={accent} trend="neu" />
-        <StatCard label="Users Banned" value="3" sub="this week" icon={Ban} accent="#ef4444" trend="neu" />
-        <StatCard label="Response Time" value="1.8h" sub="↑ 20% faster" icon={Clock} accent="#10b981" trend="up" />
+        <StatCard label="Pending Reports" value={recentReports.length} sub="Needs review" icon={AlertCircle} accent="#ef4444" trend="down" />
+        <StatCard label="Total Projects" value={stats?.projects || 0} sub="Open for review" icon={Layers} accent={accent} trend="neu" />
+        <StatCard label="Total Users" value={stats?.users || 0} sub="Community size" icon={UserCheck} accent="#10b981" trend="up" />
+        <StatCard label="Response Time" value="1.2h" sub="↑ 30% faster" icon={Clock} accent="#378add" trend="up" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
@@ -83,29 +98,27 @@ function ModeratorOverview({ accent }: any) {
           </div>
           
           <div className="space-y-4">
-            {[
-              { id: '1042', user: 'user_042', reason: 'Insulting Content', content: 'Course is a waste of money, instructor is clueless...', priority: 'high' },
-              { id: '9977', user: 'spam_bot_77', reason: 'Spam Activity', content: 'Buy cheap here: [external link] (x14 times)', priority: 'high' }
-            ].map((report, i) => (
-              <div key={i} className={`p-6 bg-white/[0.02] border rounded-3xl space-y-4 group transition-all ${report.priority === 'high' ? 'border-red-500/20 hover:border-red-500/40' : 'border-white/5 hover:border-white/10'}`}>
+            {recentReports.map((report, i) => (
+              <div key={report.id} className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-4 group hover:border-red-500/20 transition-all">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-4">
-                    <div className="size-10 rounded-xl bg-white/5 flex items-center justify-center text-[10px] font-black uppercase" style={{ color: report.priority === 'high' ? '#ef4444' : accent }}>{report.user.charAt(0)}</div>
+                    <div className="size-10 rounded-xl bg-white/5 flex items-center justify-center text-[10px] font-black uppercase" style={{ color: accent }}>{report.reporter?.displayName?.charAt(0)}</div>
                     <div>
-                      <div className="text-sm font-black text-white uppercase tracking-tight">{report.user}</div>
-                      <div className="text-[9px] text-white/40 font-bold uppercase mt-0.5">UID: {report.id} · {report.reason}</div>
+                      <div className="text-sm font-black text-white uppercase tracking-tight">{report.reporter?.displayName}</div>
+                      <div className="text-[9px] text-white/40 font-bold uppercase mt-0.5">UID: {report.reporterId.slice(0, 8)} · {report.targetType}</div>
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-[9px] font-black uppercase text-red-500 hover:bg-red-500 hover:text-white transition-all">Remove</button>
-                    <button className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase text-white/40 hover:text-white transition-all">Ignore</button>
+                    <button onClick={() => moderationService.resolveReport(report.id, 'resolved')} className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-[9px] font-black uppercase text-red-500 hover:bg-red-500 hover:text-white transition-all">Resolve</button>
+                    <button onClick={() => moderationService.resolveReport(report.id, 'dismissed')} className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase text-white/40 hover:text-white transition-all">Dismiss</button>
                   </div>
                 </div>
                 <div className="p-4 bg-black/40 rounded-2xl border-l-2 border-red-500/40 italic text-xs text-white/60 leading-relaxed">
-                  "{report.content}"
+                  "{report.reason}"
                 </div>
               </div>
             ))}
+            {recentReports.length === 0 && <div className="p-20 text-center opacity-20 font-black uppercase tracking-widest">No pending reports</div>}
           </div>
         </div>
 
@@ -134,7 +147,7 @@ function ModeratorOverview({ accent }: any) {
               <ShieldCheck size={20} className="text-emerald-500" />
               <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Safety Engine</span>
             </div>
-            <p className="text-[10px] text-white/20 leading-relaxed font-black uppercase">AI models are currently monitoring 142 active discussions with 99.2% accuracy.</p>
+            <p className="text-[10px] text-white/20 leading-relaxed font-black uppercase">AI models are currently monitoring {stats?.enrollments || 0} active learning paths.</p>
           </div>
         </div>
       </div>
@@ -143,6 +156,16 @@ function ModeratorOverview({ accent }: any) {
 }
 
 function ModeratorComplaints({ accent }: any) {
+  const [reports, setReports] = useState<Report[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    moderationService.getReports().then(data => {
+      setReports(data);
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -154,39 +177,38 @@ function ModeratorComplaints({ accent }: any) {
           <button className="p-3 bg-[#111] border border-white/5 rounded-2xl text-white/40 hover:text-white transition-all"><Filter size={18} /></button>
         </div>
         <div className="flex gap-2 bg-white/5 p-1 rounded-xl">
-          <button className="px-4 py-2 bg-white/10 rounded-lg text-[9px] font-black uppercase">Pending (5)</button>
-          <button className="px-4 py-2 text-white/40 rounded-lg text-[9px] font-black uppercase">In Review (4)</button>
-          <button className="px-4 py-2 text-white/40 rounded-lg text-[9px] font-black uppercase">Closed (3)</button>
+          <button className="px-4 py-2 bg-white/10 rounded-lg text-[9px] font-black uppercase">All ({reports.length})</button>
+          <button className="px-4 py-2 text-white/40 rounded-lg text-[9px] font-black uppercase">Pending ({reports.filter(r => r.status === 'pending').length})</button>
         </div>
       </div>
 
       <div className="grid gap-4">
-        {[1, 2, 3, 4].map(i => (
-          <div key={i} className="bg-[#111] border border-white/5 rounded-[2.5rem] p-8 group hover:border-white/10 transition-all shadow-xl">
+        {reports.map(report => (
+          <div key={report.id} className="bg-[#111] border border-white/5 rounded-[2.5rem] p-8 group hover:border-white/10 transition-all shadow-xl">
             <div className="flex flex-col md:flex-row justify-between gap-6">
               <div className="space-y-4 flex-1">
                 <div className="flex items-center gap-4">
-                  <div className="size-12 rounded-2xl bg-white/5 flex items-center justify-center font-black text-red-500">U{i}</div>
+                  <div className="size-12 rounded-2xl bg-white/5 flex items-center justify-center font-black text-red-500">{report.targetType.charAt(0).toUpperCase()}</div>
                   <div>
-                    <h4 className="text-sm font-black text-white uppercase tracking-tight">Reported Review #{i}920</h4>
+                    <h4 className="text-sm font-black text-white uppercase tracking-tight">Report #{report.id.slice(-4)}</h4>
                     <div className="flex items-center gap-3 mt-1">
-                      <span className="text-[10px] font-black text-red-500/60 uppercase tracking-widest bg-red-500/10 px-2 py-0.5 rounded-md">Harassment</span>
-                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">2h ago by System AI</span>
+                      <span className="text-[10px] font-black text-red-500/60 uppercase tracking-widest bg-red-500/10 px-2 py-0.5 rounded-md">{report.targetType}</span>
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{new Date(report.createdAt).toLocaleString()} by {report.reporter?.displayName}</span>
                     </div>
                   </div>
                 </div>
                 <div className="p-6 bg-black/40 rounded-3xl border border-white/5 italic text-xs text-white/60">
-                  "This course is completely useless. The instructor doesn't know what they are talking about..."
+                  "{report.reason}"
                 </div>
               </div>
               <div className="flex flex-col gap-2 justify-center min-w-[160px]">
-                <button className="w-full py-3 bg-red-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-[1.02] transition-all">Remove Content</button>
-                <button className="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase text-white/60 hover:text-white transition-all">Ban User</button>
-                <button className="w-full py-3 text-[9px] font-black uppercase text-white/20 hover:text-white/40 transition-all">Ignore Report</button>
+                <button onClick={() => moderationService.resolveReport(report.id, 'resolved')} className="w-full py-3 bg-red-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-[1.02] transition-all">Resolve</button>
+                <button onClick={() => moderationService.resolveReport(report.id, 'dismissed')} className="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase text-white/60 hover:text-white transition-all">Dismiss</button>
               </div>
             </div>
           </div>
         ))}
+        {reports.length === 0 && !loading && <div className="p-20 text-center opacity-20 font-black uppercase tracking-widest">Safe & Clear: No reports found</div>}
       </div>
     </div>
   );
