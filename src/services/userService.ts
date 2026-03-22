@@ -19,6 +19,7 @@ export interface UserProfile {
   roles: UserRole[];
   bio?: string;
   createdAt: any;
+  updatedAt?: any;
 }
 
 export const userService = {

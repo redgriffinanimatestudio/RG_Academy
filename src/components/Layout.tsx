@@ -163,9 +163,96 @@ const COMMUNITY_CATEGORIES = [
 
 import { useAuth } from '../context/AuthContext';
 
+const DASHBOARD_MENUS: Record<string, any[]> = {
+  student: [
+    {
+      name: 'learning_center',
+      icon: GraduationCap,
+      subcategories: [
+        { name: 'my_education', topics: ['Active Courses', 'Completed', 'Certificates', 'Wishlist'] },
+        { name: 'schedule', topics: ['Live Sessions', 'Deadlines', 'Reminders'] }
+      ]
+    },
+    {
+      name: 'finances',
+      icon: Zap,
+      subcategories: [
+        { name: 'billing', topics: ['Purchase History', 'Payment Methods', 'Invoices'] }
+      ]
+    }
+  ],
+  lecturer: [
+    {
+      name: 'workshop_mgmt',
+      icon: Video,
+      subcategories: [
+        { name: 'content', topics: ['My Workshops', 'Drafts', 'Reviews', 'Create New'] },
+        { name: 'students', topics: ['Enrollments', 'Assignments', 'Q&A Support'] }
+      ]
+    },
+    {
+      name: 'lecturer_analytics',
+      icon: Zap,
+      subcategories: [
+        { name: 'earnings', topics: ['Payout History', 'Course Performance', 'Tax Settings'] }
+      ]
+    }
+  ],
+  executor: [
+    {
+      name: 'pro_hub',
+      icon: Briefcase,
+      subcategories: [
+        { name: 'work', topics: ['Active Contracts', 'Invitations', 'Job Board'] },
+        { name: 'portfolio', topics: ['Visibility', 'Skills & Bio', 'Projects List'] }
+      ]
+    },
+    {
+      name: 'executor_finance',
+      icon: Users,
+      subcategories: [
+        { name: 'earnings', topics: ['Wallet', 'Withdrawals', 'Invoices'] }
+      ]
+    }
+  ],
+  client: [
+    {
+      name: 'client_center',
+      icon: Box,
+      subcategories: [
+        { name: 'management', topics: ['My Projects', 'Post Job', 'Active Talent'] },
+        { name: 'talents', topics: ['Saved Experts', 'Interviews', 'Messages'] }
+      ]
+    },
+    {
+      name: 'client_operations',
+      icon: Settings,
+      subcategories: [
+        { name: 'billing', topics: ['Deposits', 'Payments', 'Reporting'] }
+      ]
+    }
+  ],
+  admin: [
+    {
+      name: 'system_mgmt',
+      icon: Shield,
+      subcategories: [
+        { name: 'users', topics: ['User List', 'Roles & Permissions', 'Banned Users'] },
+        { name: 'content', topics: ['Courses Review', 'Studio Moderation', 'Reports'] }
+      ]
+    },
+    {
+      name: 'infrastructure',
+      icon: Cpu,
+      subcategories: [
+        { name: 'server', topics: ['Logs', 'Sync Status', 'Backups'] }
+      ]
+    }
+  ]
+};
+
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { profile, activeRole, setActiveRole } = useAuth();
-  const [user] = useAuthState(auth);
+  const { user, profile, activeRole, setActiveRole, loading: authLoading } = useAuth();
   const { showAlert } = useAlert();
   const location = useLocation();
   const navigate = useNavigate();
@@ -231,31 +318,71 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   
   // Robust Path Detection
   const path = location.pathname.toLowerCase();
-  const isCommunity = path.includes('/community') || path.includes('/messages') || path.includes('/contracts');
-  const isStudio = path.includes('/studio/');
-  const isAcademy = (path.includes('/aca/') || path.includes('/learn/')) && !isCommunity;
+  const isDashboard = path.includes('/dashboard');
+  const isCommunity = (path.includes('/community') || path.includes('/messages') || path.includes('/contracts')) && !isDashboard;
+  const isStudio = path.includes('/studio/') && !isDashboard;
+  const isAcademy = (path.includes('/aca/') || path.includes('/learn/')) && !isCommunity && !isDashboard;
   
-  // Choose correct categories based on mode
-  const sidebarCategories = isCommunity ? COMMUNITY_CATEGORIES : (isStudio ? STUDIO_CATEGORIES : ACADEMY_CATEGORIES);
+  // Choose correct categories based on mode and role
+  let sidebarCategories = isCommunity ? COMMUNITY_CATEGORIES : (isStudio ? STUDIO_CATEGORIES : ACADEMY_CATEGORIES);
+  
+  if (isDashboard && activeRole && DASHBOARD_MENUS[activeRole]) {
+    sidebarCategories = DASHBOARD_MENUS[activeRole];
+  } else if (isDashboard && profile && adminService.isAdmin(profile.roles) && !activeRole) {
+    sidebarCategories = DASHBOARD_MENUS.admin;
+  }
   
   // Determine which state to use
-  const activeCategory = isCommunity ? activeCommunityCategory : (isStudio ? activeStudioCategory : activeAcademyCategory);
-  const activeSub = isCommunity ? activeCommunitySub : (isStudio ? activeStudioSub : activeAcademySub);
-  
-  const setActiveCategory = isCommunity ? setActiveCommunityCategory : (isStudio ? setActiveStudioCategory : setActiveAcademyCategory);
-  const setActiveSub = isCommunity ? setActiveCommunitySub : (isStudio ? setActiveStudioSub : setActiveAcademySub);
+  const [activeDashboardCatIdx, setActiveDashboardCatIdx] = useState(0);
+  const [activeDashboardSubIdx, setActiveDashboardSubIdx] = useState(0);
+
+  // Reset indices when role changes
+  useEffect(() => {
+    if (isDashboard) {
+      setActiveDashboardCatIdx(0);
+      setActiveDashboardSubIdx(0);
+    }
+  }, [activeRole, isDashboard]);
+
+  const activeCategory = isDashboard 
+    ? (sidebarCategories[activeDashboardCatIdx] || sidebarCategories[0]) 
+    : (isCommunity ? activeCommunityCategory : (isStudio ? activeStudioCategory : activeAcademyCategory));
+
+  const activeSub = isDashboard 
+    ? (activeCategory?.subcategories?.[activeDashboardSubIdx] || activeCategory?.subcategories?.[0] || { name: '', topics: [] }) 
+    : (isCommunity ? activeCommunitySub : (isStudio ? activeStudioSub : activeAcademySub));
+
+  const handleSetCategory = (cat: any) => {
+    if (isDashboard) {
+      const idx = sidebarCategories.indexOf(cat);
+      setActiveDashboardCatIdx(idx !== -1 ? idx : 0);
+      setActiveDashboardSubIdx(0);
+    } else if (isCommunity) {
+      setActiveCommunityCategory(cat);
+      setActiveCommunitySub(cat.subcategories[0]);
+    } else if (isStudio) {
+      setActiveStudioCategory(cat);
+      setActiveStudioSub(cat.subcategories[0]);
+    } else {
+      setActiveAcademyCategory(cat);
+      setActiveAcademySub(cat.subcategories[0]);
+    }
+  };
+
+  const handleSetSub = (sub: any) => {
+    if (isDashboard) {
+      const idx = activeCategory.subcategories.indexOf(sub);
+      setActiveDashboardSubIdx(idx !== -1 ? idx : 0);
+    } else if (isCommunity) {
+      setActiveCommunitySub(sub);
+    } else if (isStudio) {
+      setActiveStudioSub(sub);
+    } else {
+      setActiveAcademySub(sub);
+    }
+  };
 
   const currentLang = LANGUAGES.find(l => l.code === (lang || 'eng')) || LANGUAGES[0];
-
-  const modePrefix = isStudio ? '/studio' : '/aca';
-  const navClass = isStudio ? 'bg-bg-dark/80 border-primary/20' : 'bg-black/80 border-white/5';
-  const cardClass = isStudio ? 'bg-bg-card border-primary/10' : 'bg-white/[0.03] border-white/5';
-  
-  // Dynamic Theme Colors
-  const themeClass = isStudio ? 'theme-studio' : 'theme-academy';
-  const modeColor = isCommunity ? 'text-primary' : (isStudio ? 'text-primary-hover' : 'text-primary');
-  const modeBg = isCommunity ? 'bg-primary' : (isStudio ? 'bg-primary-hover' : 'bg-primary');
-  const modeShadow = isCommunity ? 'shadow-primary/20' : (isStudio ? 'shadow-primary-hover/20' : 'shadow-primary/20');
 
   const changeLanguage = (newLang: string) => {
     const pathParts = location.pathname.split('/');
@@ -272,16 +399,68 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     setIsLangMenuOpen(false);
   };
 
-  const navItems = [
+  const modePrefix = isStudio ? '/studio' : '/aca';
+  const navClass = isDashboard ? 'bg-zinc-900/80 border-white/5' : (isStudio ? 'bg-bg-dark/80 border-primary/20' : 'bg-black/80 border-white/5');
+  const cardClass = isDashboard ? 'bg-zinc-900 border-white/10' : (isStudio ? 'bg-bg-card border-primary/10' : 'bg-white/[0.03] border-white/5');
+  
+  // Dynamic Theme Colors
+  const themeClass = isDashboard ? 'theme-dashboard' : (isStudio ? 'theme-studio' : 'theme-academy');
+  const modeColor = isDashboard ? (activeRole === 'admin' ? 'text-red-500' : 'text-primary') : (isCommunity ? 'text-primary' : (isStudio ? 'text-primary-hover' : 'text-primary'));
+  const modeBg = isDashboard ? (activeRole === 'admin' ? 'bg-red-500' : 'bg-primary') : (isCommunity ? 'bg-primary' : (isStudio ? 'bg-primary-hover' : 'bg-primary'));
+  const modeShadow = isDashboard ? (activeRole === 'admin' ? 'shadow-red-500/20' : 'shadow-primary/20') : (isCommunity ? 'shadow-primary/20' : (isStudio ? 'shadow-primary-hover/20' : 'shadow-primary/20'));
+
+  const navItems = isDashboard ? [
+    { icon: LayoutDashboard, label: t('overview', 'Overview'), path: `/aca/${lang || 'eng'}/dashboard` },
+    ...(activeRole === 'student' ? [
+      { icon: GraduationCap, label: t('my_courses', 'My Courses'), path: '#' },
+      { icon: Zap, label: t('achievements', 'Achievements'), path: '#' },
+    ] : []),
+    ...(activeRole === 'lecturer' ? [
+      { icon: Video, label: t('my_workshops', 'My Workshops'), path: '#' },
+      { icon: Users, label: t('student_list', 'Students'), path: '#' },
+    ] : []),
+    ...(activeRole === 'executor' ? [
+      { icon: Briefcase, label: t('my_jobs', 'My Jobs'), path: '#' },
+      { icon: Sparkles, label: t('portfolio', 'Portfolio'), path: '#' },
+    ] : []),
+    ...(activeRole === 'client' ? [
+      { icon: Box, label: t('my_projects', 'My Projects'), path: '#' },
+      { icon: UserPlus, label: t('hire_experts', 'Hire Experts'), path: '#' },
+    ] : []),
+    ...(activeRole === 'admin' ? [
+      { icon: Shield, label: t('admin_console', 'Admin Console'), path: `/admin/${lang || 'eng'}` },
+      { icon: Cpu, label: t('system_logs', 'System Logs'), path: '#' },
+    ] : []),
+    { icon: MessageSquare, label: t('messages'), path: `${modePrefix}/${lang || 'eng'}/messages` },
+  ] : [
     { icon: GraduationCap, label: t('workshops'), path: `/aca/${lang || 'eng'}` },
     { icon: Briefcase, label: t('studio_collab'), path: `/studio/${lang || 'eng'}` },
     { icon: Users, label: t('community'), path: `${modePrefix}/${lang || 'eng'}/community` },
     { icon: MessageSquare, label: t('messages'), path: `${modePrefix}/${lang || 'eng'}/messages` },
-    { icon: Settings, label: t('contracts'), path: `${modePrefix}/${lang || 'eng'}/contracts` },
   ];
 
   if (profile && adminService.isAdmin(profile.roles)) {
     navItems.push({ icon: Shield, label: 'Admin Console', path: `/admin/${lang || 'eng'}` });
+  }
+
+  if (authLoading) {
+    return (
+      <div className={`min-h-screen font-sans text-white flex items-center justify-center bg-[#050505]`}>
+        <div className="flex flex-col items-center gap-6">
+          <div className="relative size-20">
+            <div className={`absolute inset-0 rounded-3xl border-4 border-primary/20 animate-pulse`} />
+            <div className={`absolute inset-0 rounded-3xl border-t-4 border-primary animate-spin`} />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-2xl font-black italic tracking-tighter text-white">RG</span>
+            </div>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="text-sm font-black uppercase tracking-[0.4em] text-white/40 animate-pulse">Red Griffin</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary mt-2">Initializing System...</span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -449,42 +628,39 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </AnimatePresence>
               </div>
 
-              <button className="p-2 text-white/40 hover:text-primary transition-colors relative">
-                <Bell size={18} />
-                {unreadCount > 0 && <span className={`absolute top-2 right-2 size-2 rounded-full border-2 ${isStudio ? 'bg-primary-hover border-[#1e1e24]' : 'bg-primary border-[#050505]'}`} />}
-              </button>
-              <Link to={`${modePrefix}/${lang || 'eng'}/messages`} className="p-2 text-white/40 hover:text-primary transition-colors"><MessageSquare size={18} /></Link>
-              
-              <div className="h-6 w-[1px] bg-white/5 mx-2 hidden md:block" />
-
               {user ? (
-                <div className="flex items-center gap-3">
-                  <div className="hidden md:flex items-center gap-2">
-                    <Link 
-                      to={`${modePrefix}/${lang || 'eng'}/profile/${user.uid}`} 
-                      className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white border border-white/5 rounded-xl hover:bg-white/5 transition-all flex items-center gap-2"
-                    >
-                      <User size={14} className={modeColor} /> {t('my_profile')}
-                    </Link>
-                    <Link 
-                      to={`${modePrefix}/${lang || 'eng'}/dashboard`} 
-                      className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 shadow-lg ${modeBg} ${modeShadow} text-bg-dark`}
-                    >
-                      <LayoutDashboard size={14} /> {t('my_dashboard')}
-                    </Link>
-                  </div>
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <button className="p-2 text-white/40 hover:text-primary transition-colors relative">
+                    <Bell size={18} />
+                    {unreadCount > 0 && <span className={`absolute top-2 right-2 size-2 rounded-full border-2 ${isStudio ? 'bg-primary-hover border-[#1e1e24]' : 'bg-primary border-[#050505]'}`} />}
+                  </button>
+                  <Link to={`${modePrefix}/${lang || 'eng'}/messages`} className="p-2 text-white/40 hover:text-primary transition-colors">
+                    <MessageSquare size={18} />
+                  </Link>
+                  
+                  <div className="h-6 w-[1px] bg-white/5 mx-1 hidden sm:block" />
 
                   <div className="relative">
-                    <div 
-                      className="size-10 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center cursor-pointer hover:border-primary/40 transition-all overflow-hidden"
+                    <button 
+                      className="flex items-center gap-3 p-1 pr-3 rounded-xl border border-white/10 bg-white/5 hover:border-primary/40 transition-all group"
                       onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     >
-                      {user.photoURL ? (
-                        <img src={user.photoURL} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <User size={20} className="text-white/60" />
-                      )}
-                    </div>
+                      <div className="size-8 rounded-lg overflow-hidden border border-white/10 group-hover:border-primary/40 transition-all">
+                        {user.photoURL ? (
+                          <img src={user.photoURL} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className={`w-full h-full flex items-center justify-center text-[10px] font-black ${modeBg} text-bg-dark uppercase`}>
+                            {user.displayName?.substring(0, 2) || 'RG'}
+                          </div>
+                        )}
+                      </div>
+                      <div className="hidden sm:flex flex-col items-start">
+                        <span className="text-[10px] font-black text-white truncate max-w-[80px] leading-none uppercase">{user.displayName?.split(' ')[0] || 'User'}</span>
+                        <span className={`text-[7px] font-bold uppercase tracking-widest ${modeColor} leading-none mt-1`}>{activeRole || 'Member'}</span>
+                      </div>
+                      <ChevronDown size={12} className={`text-white/20 group-hover:text-primary transition-all ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                    </button>
+
                     <AnimatePresence>
                       {isUserMenuOpen && (
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }} className={`absolute right-0 mt-4 w-64 border rounded-2xl shadow-2xl py-2 z-50 ${cardClass}`}>
@@ -504,7 +680,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                     onClick={() => setActiveRole(role)}
                                     className={`px-2 py-1 rounded text-[8px] font-black uppercase tracking-widest transition-all ${activeRole === role ? (isStudio ? 'bg-primary-hover text-white' : 'bg-primary text-bg-dark') : 'bg-white/5 text-white/40 hover:text-white'}`}
                                   >
-                                    {role.charAt(0)}
+                                    {role}
                                   </button>
                                 ))}
                               </div>
@@ -518,6 +694,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             <Link to={`${modePrefix}/${lang || 'eng'}/dashboard`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3">
                               <LayoutDashboard size={14} /> {t('my_dashboard')}
                             </Link>
+                            {profile && adminService.isAdmin(profile.roles) && (
+                              <Link to={`/admin/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-red-500 hover:bg-red-500/10 transition-all flex items-center gap-3">
+                                <Shield size={14} /> Admin Panel
+                              </Link>
+                            )}
                             <div className="h-[1px] bg-white/5 my-2 mx-6" />
                             <button onClick={() => { auth.signOut(); setIsUserMenuOpen(false); }} className="w-full text-left px-6 py-4 text-[10px] font-black uppercase text-primary hover:bg-primary/10 transition-all flex items-center gap-2">
                               <LogOut size={14} /> {t('logout')}
@@ -529,7 +710,41 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </div>
                 </div>
               ) : (
-                <Link to={`${modePrefix}/${lang || 'eng'}/login`} className="criativo-btn !px-6 !py-2.5 !text-[10px] hidden md:flex">{t('join_ecosystem')}</Link>
+                <div className="relative">
+                  <button 
+                    className="flex items-center gap-3 p-1 pr-3 rounded-xl border border-white/10 bg-white/5 hover:border-primary/40 transition-all group"
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  >
+                    <div className="size-8 rounded-lg overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center text-white/20 group-hover:text-primary transition-all">
+                      <User size={18} />
+                    </div>
+                    <div className="hidden sm:flex flex-col items-start">
+                      <span className="text-[10px] font-black text-white leading-none uppercase">{t('guest', 'Guest')}</span>
+                      <span className={`text-[7px] font-bold uppercase tracking-widest ${modeColor} leading-none mt-1`}>{t('account', 'Account')}</span>
+                    </div>
+                    <ChevronDown size={12} className={`text-white/20 group-hover:text-primary transition-all ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  <AnimatePresence>
+                    {isUserMenuOpen && (
+                      <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }} className={`absolute right-0 mt-4 w-56 border rounded-2xl shadow-2xl py-2 z-50 ${cardClass}`}>
+                        <div className="px-6 py-3 border-b border-white/5">
+                          <p className="text-[10px] font-black text-white uppercase tracking-widest">{t('welcome', 'Welcome')}</p>
+                        </div>
+                        <div className="py-2">
+                          <Link to={`${modePrefix}/${lang || 'eng'}/login`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-4 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3">
+                            <LogIn size={14} /> {t('login')}
+                          </Link>
+                          <div className="px-4 py-2">
+                            <Link to={`${modePrefix}/${lang || 'eng'}/login`} onClick={() => setIsUserMenuOpen(false)} className={`block w-full text-center py-3 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg ${modeBg} ${modeShadow} text-bg-dark`}>
+                              {t('join_ecosystem')}
+                            </Link>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               )}
             </div>
           </div>
@@ -570,7 +785,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 return (
                   <div key={cat.name} className="space-y-1">
                     <button 
-                      onClick={() => setActiveCategory(cat)}
+                      onClick={() => handleSetCategory(cat)}
                       className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between group
                         ${isCatActive 
                           ? (isStudio ? 'bg-primary-hover/10 border-primary-hover/20 text-white' : 'bg-primary/10 border-primary/20 text-white') 
@@ -600,7 +815,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             return (
                               <div key={sub.name} className="space-y-1">
                                 <button
-                                  onClick={() => setActiveSub(sub)}
+                                  onClick={() => handleSetSub(sub)}
                                   className={`w-full text-left px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-between
                                     ${isSubActive ? (isStudio ? 'text-primary-hover bg-white/5' : 'text-primary bg-white/5') : 'text-white/30'}`}
                                 >
@@ -736,7 +951,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                           <button 
                             onClick={() => {
                               if (isSidebarCollapsed) setIsSidebarCollapsed(false);
-                              setActiveCategory(cat);
+                              handleSetCategory(cat);
                             }}
                             title={t(cat.name)}
                             className={`w-full text-left p-3 rounded-xl border transition-all flex items-center group
@@ -774,7 +989,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                   return (
                                     <div key={sub.name} className="space-y-1">
                                       <button
-                                        onClick={() => setActiveSub(sub)}
+                                        onClick={() => handleSetSub(sub)}
                                         className={`w-full text-left px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-between group
                                           ${isSubActive ? (isStudio ? 'text-primary-hover' : 'text-primary') : 'text-white/30 hover:text-white/60'}`}
                                       >
@@ -828,10 +1043,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       animate={{ opacity: 1 }}
                       className="pt-8 border-t border-white/5 space-y-4"
                     >
+                      {/* Subscription Card for Dashboard */}
+                      {isDashboard && activeRole !== 'admin' && (
+                        <div className="p-5 rounded-[2rem] bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border border-primary/20 relative overflow-hidden group">
+                          <div className="absolute -right-4 -top-4 size-20 bg-primary/10 blur-2xl rounded-full group-hover:bg-primary/20 transition-all" />
+                          <h4 className="text-[10px] font-black uppercase tracking-widest text-white mb-2">Pro Ecosystem</h4>
+                          <p className="text-[9px] text-white/40 font-bold leading-relaxed mb-4">Unlock advanced tools and higher visibility.</p>
+                          <button className="w-full py-2.5 bg-primary text-bg-dark text-[9px] font-black uppercase tracking-widest rounded-xl hover:scale-105 transition-all shadow-lg shadow-primary/20">
+                            Upgrade Now
+                          </button>
+                        </div>
+                      )}
+
                       <div className="p-4 rounded-2xl bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5">
                         <p className="text-[8px] font-black text-white/20 uppercase tracking-[0.3em] mb-2">{t('quick_tip')}</p>
                         <p className="text-[10px] text-white/40 leading-relaxed font-medium">
-                          {isAcademy ? t('mentor_desc').split('.')[0] : t('studio_pro_desc').split('.')[0]}
+                          {isDashboard ? "Switch roles in the top-right menu to manage different aspects of your profile." : (isAcademy ? t('mentor_desc').split('.')[0] : t('studio_pro_desc').split('.')[0])}
                         </p>
                       </div>
                     </motion.div>

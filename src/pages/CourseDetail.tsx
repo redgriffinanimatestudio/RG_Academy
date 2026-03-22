@@ -100,7 +100,7 @@ export default function CourseDetail() {
           <div className="space-y-6">
             <div className="flex items-center gap-2 text-primary font-black uppercase tracking-[0.3em] text-[10px]">
               <Globe size={14} />
-              {t(course.category.toLowerCase().replace(' ', '_'))}
+              {t((course.category?.name || 'Category').toLowerCase().replace(' ', '_'))}
             </div>
             <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white uppercase leading-none">
               {course.title}

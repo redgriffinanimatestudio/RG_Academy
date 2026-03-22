@@ -13,6 +13,11 @@ export interface Course {
   studentsCount: number;
   duration: string;
   categoryId: string;
+  category?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
   level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
   tags: string[];
   status: 'draft' | 'published' | 'archived';

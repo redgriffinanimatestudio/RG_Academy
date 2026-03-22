@@ -332,13 +332,15 @@ async function startServer() {
   });
 
   // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV !== "production" && !process.env.SKIP_VITE) {
+    console.log("🛠️  Vite middleware enabled");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
     app.use(vite.middlewares);
   } else {
+    console.log("📁 Serving from build directory (SKIP_VITE is active)");
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
@@ -352,5 +354,5 @@ async function startServer() {
 }
 
 startServer().catch(err => {
-  console.error("Failed to start server:", err);
+  console.error("❌ CRITICAL: Failed to start server:", err);
 });

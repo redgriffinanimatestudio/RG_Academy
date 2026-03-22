@@ -42,6 +42,17 @@ export interface FeedEvent {
   createdAt: string;
 }
 
+export interface SearchIndex {
+  id: string;
+  userId: string;
+  displayName: string;
+  photoURL?: string;
+  bio?: string;
+  role?: string;
+  location?: string;
+  skills: string[];
+}
+
 export const networkingService = {
   // --- Profiles Module ---
   async getProfile(userId: string): Promise<Profile> {
@@ -85,11 +96,21 @@ export const networkingService = {
     return response.json();
   },
 
+  async getFollowing(userId: string): Promise<string[]> {
+    // This is a stub, usually should be an API call
+    return [];
+  },
+
   // --- Discovery Module ---
   async searchProfiles(query: string, skill?: string): Promise<any[]> {
     const params = new URLSearchParams({ query, ...(skill ? { skill } : {}) });
     const response = await fetch(`${API_BASE}/discovery/search?${params.toString()}`);
     if (!response.ok) throw new Error('Failed to search profiles');
     return response.json();
+  },
+
+  async getRecommendations(userId: string): Promise<SearchIndex[]> {
+    // This is a stub, usually should be an API call
+    return [];
   }
 };

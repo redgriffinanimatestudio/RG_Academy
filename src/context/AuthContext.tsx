@@ -22,7 +22,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeRole, setActiveRoleState] = useState<UserRole | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
-  const [devUser, setDevUser] = useState<any>(JSON.parse(localStorage.getItem('rg_dev_user') || 'null'));
+  const [devUser, setDevUser] = useState<any>(null);
+
+  useEffect(() => {
+    // Initial load and listen for storage changes
+    const loadDevUser = () => {
+      const stored = localStorage.getItem('rg_dev_user');
+      if (stored) {
+        setDevUser(JSON.parse(stored));
+      } else {
+        setDevUser(null);
+      }
+    };
+
+    loadDevUser();
+    window.addEventListener('storage', loadDevUser);
+    return () => window.removeEventListener('storage', loadDevUser);
+  }, []);
 
   useEffect(() => {
     if (devUser) {
@@ -116,9 +132,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ['admin', 'manager', 'moderator', 'chief_manager'].includes(r)
   ) || false;
 
+  const effectiveUser = user || (devUser ? {
+    uid: devUser.id,
+    email: devUser.email,
+    displayName: devUser.displayName,
+    photoURL: devUser.photoURL,
+    isDev: true
+  } : null);
+
   return (
     <AuthContext.Provider value={{ 
-      user, 
+      user: effectiveUser, 
       profile, 
       loading: loading || profileLoading, 
       activeRole, 

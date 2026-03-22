@@ -180,6 +180,11 @@ const Login: React.FC = () => {
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const filteredCountries = COUNTRIES.filter(country =>
+    country.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+    country.code.includes(countrySearch)
+  );
+
   // Removed automatic reCAPTCHA initialization from useEffect to prevent auth/argument-error
 
   const handleInitialSubmit = async (e: React.FormEvent) => {
@@ -268,7 +273,10 @@ const Login: React.FC = () => {
         const data = await response.json();
         if (data.success) {
           localStorage.setItem('rg_dev_user', JSON.stringify(data.user));
-          window.location.reload(); // Reload to update AuthContext
+          // Redirect to dashboard after successful dev login
+          const targetLang = lang || 'eng';
+          navigate(`/aca/${targetLang}/dashboard`);
+          window.location.reload(); 
         } else {
           alert("Invalid credentials from server");
         }
