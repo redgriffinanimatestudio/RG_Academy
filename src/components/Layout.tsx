@@ -144,9 +144,10 @@ const DASHBOARD_MENUS: Record<string, any[]> = {
   ],
   admin: [
     { name: 'core_management', icon: Shield, subcategories: [{ name: 'dashboard' }] },
-    { name: 'user_operations', icon: Users, subcategories: [{ name: 'users_directory' }, { name: 'roles_rbac' }, { name: 'access_logs' }] },
-    { name: 'platform_content', icon: Box, subcategories: [{ name: 'course_moderation' }, { name: 'studio_review' }, { name: 'reports' }] },
-    { name: 'system_health', icon: Cpu, subcategories: [{ name: 'server_status' }, { name: 'api_logs' }, { name: 'settings' }] }
+    { name: 'user_operations', icon: Users, subcategories: [{ name: 'users' }, { name: 'rbac' }, { name: 'profile' }] },
+    { name: 'platform_content', icon: Box, subcategories: [{ name: 'create' }, { name: 'detail' }] },
+    { name: 'communications', icon: MessageSquare, subcategories: [{ name: 'chat' }] },
+    { name: 'system_health', icon: Cpu, subcategories: [{ name: 'settings' }] }
   ],
   chief_manager: [
     { name: 'strategic_hub', icon: Target, subcategories: [{ name: 'dashboard' }, { name: 'kpi_metrics' }, { name: 'growth' }] },
@@ -200,42 +201,60 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const unreadCount = notifications.filter(n => !n.read).length;
   
   const path = location.pathname.toLowerCase();
-  const isDashboard = path.includes('/dashboard') || 
+  const isDashboardPage = path.includes('/dashboard') || 
                      ['/admin/', '/chief-manager/', '/manager/', '/moderator/', '/hr/', '/finance/', '/support/'].some(p => path.includes(p));
   
   const isProfile = path.includes('/profile/');
-  const isCommunity = (path.includes('/community') || path.includes('/messages') || path.includes('/contracts')) && !isDashboard && !isProfile;
-  const isStudio = path.includes('/studio/') && !isDashboard && !isProfile;
-  const isAcademy = (path.includes('/aca/') || path.includes('/learn/')) && !isCommunity && !isDashboard && !isProfile;
+  const isCommunity = (path.includes('/community') || path.includes('/messages') || path.includes('/contracts')) && !isDashboardPage && !isProfile;
+  const isStudio = path.includes('/studio/') && !isDashboardPage && !isProfile;
+  const isAcademy = (path.includes('/aca/') || path.includes('/learn/')) && !isCommunity && !isDashboardPage && !isProfile;
   
   let sidebarCategories = isCommunity ? COMMUNITY_CATEGORIES : (isStudio ? STUDIO_CATEGORIES : ACADEMY_CATEGORIES);
   
-  if (isDashboard && activeRole && DASHBOARD_MENUS[activeRole]) {
-    sidebarCategories = DASHBOARD_MENUS[activeRole];
-  } else if (isDashboard && profile && adminService.isAdmin(profile.roles) && !activeRole) {
-    sidebarCategories = DASHBOARD_MENUS.admin;
+  if (isDashboardPage) {
+    // Determine the best role to show in sidebar if activeRole is not set or is student
+    const effectiveRole = activeRole || (profile?.roles.includes('admin') ? 'admin' : profile?.roles[0]);
+    if (effectiveRole && DASHBOARD_MENUS[effectiveRole]) {
+      sidebarCategories = DASHBOARD_MENUS[effectiveRole];
+    }
   }
   
   const [activeDashboardCatIdx, setActiveDashboardCatIdx] = useState(0);
   const [activeDashboardSubIdx, setActiveDashboardSubIdx] = useState(0);
 
+  // Sync sidebar state with URL 'view' parameter
   useEffect(() => {
-    if (isDashboard) {
-      setActiveDashboardCatIdx(0);
-      setActiveDashboardSubIdx(0);
+    if (isDashboardPage) {
+      const searchParams = new URLSearchParams(location.search);
+      const currentView = searchParams.get('view') || 'dashboard';
+      
+      const effectiveRole = activeRole || (profile?.roles.includes('admin') ? 'admin' : profile?.roles[0]);
+      const menus = effectiveRole ? DASHBOARD_MENUS[effectiveRole] : null;
+      
+      if (menus) {
+        menus.forEach((cat, catIdx) => {
+          const subIdx = cat.subcategories.findIndex((sub: any) => 
+            sub.name.toLowerCase().replace(/ /g, '_') === currentView
+          );
+          if (subIdx !== -1) {
+            setActiveDashboardCatIdx(catIdx);
+            setActiveDashboardSubIdx(subIdx);
+          }
+        });
+      }
     }
-  }, [activeRole, isDashboard]);
+  }, [location.search, isDashboardPage, activeRole, profile]);
 
-  const activeCategory = isDashboard 
+  const activeCategory = isDashboardPage 
     ? (sidebarCategories[activeDashboardCatIdx] || sidebarCategories[0]) 
     : (isCommunity ? activeCommunityCategory : (isStudio ? activeStudioCategory : activeAcademyCategory));
 
-  const activeSub = isDashboard 
+  const activeSub = isDashboardPage 
     ? (activeCategory?.subcategories?.[activeDashboardSubIdx] || activeCategory?.subcategories?.[0] || { name: '', topics: [] }) 
     : (isCommunity ? activeCommunitySub : (isStudio ? activeStudioSub : activeAcademySub));
 
   const handleSetCategory = (cat: any) => {
-    if (isDashboard) {
+    if (isDashboardPage) {
       const idx = sidebarCategories.indexOf(cat);
       setActiveDashboardCatIdx(idx !== -1 ? idx : 0);
       setActiveDashboardSubIdx(0);
@@ -252,7 +271,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   const handleSetSub = (sub: any) => {
-    if (isDashboard) {
+    if (isDashboardPage) {
       const idx = activeCategory.subcategories.indexOf(sub);
       setActiveDashboardSubIdx(idx !== -1 ? idx : 0);
       const viewSlug = sub.name.toLowerCase().replace(/ /g, '_');
@@ -284,13 +303,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   const modePrefix = isStudio ? '/studio' : '/aca';
-  const navClass = isDashboard ? 'bg-zinc-900/80 border-white/5' : (isStudio ? 'bg-bg-dark/80 border-primary/20' : 'bg-black/80 border-white/5');
-  const cardClass = isDashboard ? 'bg-zinc-900 border-white/10' : (isStudio ? 'bg-bg-card border-primary/10' : 'bg-white/[0.03] border-white/5');
+  const navClass = isDashboardPage ? 'bg-zinc-900/80 border-white/5' : (isStudio ? 'bg-bg-dark/80 border-primary/20' : 'bg-black/80 border-white/5');
+  const cardClass = isDashboardPage ? 'bg-zinc-900 border-white/10' : (isStudio ? 'bg-bg-card border-primary/10' : 'bg-white/[0.03] border-white/5');
   
-  const themeClass = isDashboard ? 'theme-dashboard' : (isStudio ? 'theme-studio' : 'theme-academy');
-  const modeColor = isDashboard ? (activeRole === 'admin' ? 'text-red-500' : 'text-primary') : (isCommunity ? 'text-primary' : (isStudio ? 'text-primary-hover' : 'text-primary'));
-  const modeBg = isDashboard ? (activeRole === 'admin' ? 'bg-red-500' : 'bg-primary') : (isCommunity ? 'bg-primary' : (isStudio ? 'bg-primary-hover' : 'bg-primary'));
-  const modeShadow = isDashboard ? (activeRole === 'admin' ? 'shadow-red-500/20' : 'shadow-primary/20') : (isCommunity ? 'shadow-primary/20' : (isStudio ? 'shadow-primary-hover/20' : 'shadow-primary/20'));
+  const themeClass = isDashboardPage ? 'theme-dashboard' : (isStudio ? 'theme-studio' : 'theme-academy');
+  const modeColor = isDashboardPage ? (activeRole === 'admin' ? 'text-red-500' : 'text-primary') : (isCommunity ? 'text-primary' : (isStudio ? 'text-primary-hover' : 'text-primary'));
+  const modeBg = isDashboardPage ? (activeRole === 'admin' ? 'bg-red-500' : 'bg-primary') : (isCommunity ? 'bg-primary' : (isStudio ? 'bg-primary-hover' : 'bg-primary'));
+  const modeShadow = isDashboardPage ? (activeRole === 'admin' ? 'shadow-red-500/20' : 'shadow-primary/20') : (isCommunity ? 'shadow-primary/20' : (isStudio ? 'shadow-primary-hover/20' : 'shadow-primary/20'));
 
   if (authLoading) {
     return (
@@ -380,13 +399,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                           <div className="py-2">
                             <Link to={`${modePrefix}/${lang || 'eng'}/profile/${user.uid}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"><User size={14} /> {t('my_profile')}</Link>
                             <Link to={`${isStudio ? '/studio' : '/aca'}/${lang || 'eng'}/dashboard`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"><LayoutDashboard size={14} /> {t('my_dashboard')}</Link>
-                            {profile?.roles.includes('admin') && <Link to={`/admin/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-red-500 hover:bg-red-500/10 flex items-center gap-3"><Shield size={14} /> Admin Panel</Link>}
-                            {profile?.roles.includes('chief_manager') && <Link to={`/chief-manager/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-purple-500 hover:bg-purple-500/10 flex items-center gap-3"><Target size={14} /> Strategic Panel</Link>}
-                            {profile?.roles.includes('manager') && <Link to={`/manager/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-[#1d9e75] hover:bg-[#1d9e75]/10 flex items-center gap-3"><LayoutDashboard size={14} /> Ops Panel</Link>}
-                            {profile?.roles.includes('moderator') && <Link to={`/moderator/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-orange-500 hover:bg-orange-500/10 flex items-center gap-3"><Shield size={14} /> Mod Panel</Link>}
-                            {profile?.roles.includes('hr') && <Link to={`/hr/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-blue-500 hover:bg-blue-500/10 flex items-center gap-3"><Users size={14} /> HR Panel</Link>}
-                            {profile?.roles.includes('finance') && <Link to={`/finance/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-emerald-500 hover:bg-emerald-500/10 flex items-center gap-3"><DollarSign size={14} /> Finance Panel</Link>}
-                            {profile?.roles.includes('support') && <Link to={`/support/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-purple-500 hover:bg-purple-500/10 flex items-center gap-3"><LifeBuoy size={14} /> Support Panel</Link>}
+                            
+                            {profile?.roles.includes('admin') && (
+                              <Link to={`/admin/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-red-500 hover:bg-red-500/10 flex items-center gap-3 border-t border-white/5 mt-2 pt-4">
+                                <Shield size={14} /> Admin Control
+                              </Link>
+                            )}
+                            {profile?.roles.includes('chief_manager') && (
+                              <Link to={`/chief-manager/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-purple-500 hover:bg-purple-500/10 flex items-center gap-3">
+                                <Target size={14} /> Strategic Hub
+                              </Link>
+                            )}
+                            {profile?.roles.includes('manager') && (
+                              <Link to={`/manager/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-[#1d9e75] hover:bg-[#1d9e75]/10 flex items-center gap-3">
+                                <LayoutDashboard size={14} /> Ops Manager
+                              </Link>
+                            )}
+                            
                             <div className="h-[1px] bg-white/5 my-2 mx-6" />
                             <button 
                               onClick={() => { 
@@ -473,7 +502,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <main className="mx-auto max-w-[1600px] px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row gap-8">
-          {(isAcademy || isStudio || isCommunity || isDashboard) && (
+          {(isAcademy || isStudio || isCommunity || isDashboardPage) && (
             <div className="hidden md:block relative shrink-0 overflow-visible">
               <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="absolute -right-4 top-10 z-[150] size-9 rounded-full border-2 border-primary/40 bg-[#0a0a0a] flex items-center justify-center hover:scale-110 hover:border-primary transition-all shadow-[0_0_30px_rgba(0,0,0,0.9)] group">
                 {isSidebarCollapsed ? <ChevronRight size={18} className="text-primary" /> : <ChevronLeft size={18} className="text-primary" />}

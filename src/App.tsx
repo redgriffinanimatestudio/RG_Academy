@@ -92,13 +92,13 @@ export default function App() {
             {/* Language prefixed routes */}
             <Route path="/:lang" element={<LanguageWrapper><Layout><Home /></Layout></LanguageWrapper>} />
             <Route path="/dev/:lang" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/admin/:lang" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
-            <Route path="/chief-manager/:lang" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
-            <Route path="/manager/:lang" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
-            <Route path="/moderator/:lang" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
-            <Route path="/hr/:lang" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
-            <Route path="/finance/:lang" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
-            <Route path="/support/:lang" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
+            <Route path="/admin/:lang" element={<LanguageWrapper><AdminDashboard /></LanguageWrapper>} />
+            <Route path="/chief-manager/:lang" element={<LanguageWrapper><Layout><ChiefManagerDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/manager/:lang" element={<LanguageWrapper><Layout><ManagerDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/moderator/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/hr/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/finance/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/support/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><TopicPage /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/service/:serviceSlug" element={<LanguageWrapper><Layout><ServicePage /></Layout></LanguageWrapper>} />
