@@ -70,14 +70,22 @@ async function startServer() {
   app.post("/api/dev/auth", async (req, res) => {
     const { login, password } = req.body;
     if (login === 'admin' && password === 'admin') {
-      const admin = await prisma.user.findUnique({ 
-        where: { email: 'admin@redgriffin.academy' } 
+      const admin = await prisma.user.findUnique({
+        where: { email: 'admin@redgriffin.academy' }
       });
-      return res.json({ success: true, user: admin });
+      if (admin) {
+        // Return user with all roles for developer access
+        return res.json({ 
+          success: true, 
+          user: { 
+            ...admin, 
+            roles: ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client'] 
+          } 
+        });
+      }
     }
     res.status(401).json({ error: "Invalid credentials" });
   });
-
   // DEV MODE: Quick Login (existing)
   app.post("/api/dev/login", async (req, res) => {
     const { email, displayName } = req.body;

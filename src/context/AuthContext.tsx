@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: devUser.email,
         displayName: devUser.displayName,
         photoURL: devUser.photoURL || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png',
-        roles: ['student', 'lecturer', 'client', 'executor', 'chief_manager', 'admin'],
+        roles: ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client'],
         createdAt: new Date() as any,
         updatedAt: new Date() as any
       };
