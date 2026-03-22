@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { useParams, Navigate, Link } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import React, { useState, useEffect } from 'react';
+import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { auth, signInWithGoogle } from '../firebase';
+import { auth, signInWithGoogle, RecaptchaVerifier, signInWithPhoneNumber } from '../firebase';
+import { useAuth } from '../context/AuthContext';
 import OAuthConsent from '../components/OAuthConsent';
+import { ConfirmationResult } from 'firebase/auth';
 import { 
   Phone, 
-  Lock, 
+// ... rest of imports
+
   ArrowRight, 
   Eye, 
   EyeOff, 
@@ -18,7 +20,8 @@ import {
   Share2,
   ChevronDown,
   MessageSquareDot,
-  ShieldCheck
+  ShieldCheck,
+  Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -163,40 +166,64 @@ const COUNTRIES = [
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
-  const [user, loading] = useAuthState(auth);
+  const { user, profile, loading, loginAsGuest } = useAuth() as any;
   const { lang } = useParams();
+  const navigate = useNavigate();
   
   const [showConsent, setShowConsent] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [isVerificationStep, setIsVerificationStep] = useState(false);
-  
   const [selectedCountry, setSelectedCountry] = useState(COUNTRIES.find(c => c.name === 'United States') || COUNTRIES[0]);
   const [isCountryMenuOpen, setIsCountryMenuOpen] = useState(false);
   const [countrySearch, setCountrySearch] = useState('');
   const [phone, setPhone] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredCountries = COUNTRIES.filter(c => 
-    c.name.toLowerCase().includes(countrySearch.toLowerCase()) || 
-    c.code.includes(countrySearch)
-  );
+  // Removed automatic reCAPTCHA initialization from useEffect to prevent auth/argument-error
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="loading loading-spinner loading-lg text-primary"></div>
-    </div>
-  );
-  
-  if (user) return <Navigate to={`/${lang || 'eng'}`} />;
-
-  const handleInitialSubmit = (e: React.FormEvent) => {
+  const handleInitialSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsVerificationStep(true);
+    setError(null);
+    const fullPhone = `${selectedCountry.code}${phone}`;
+    try {
+      // Initialize reCAPTCHA only when needed
+      if (!(window as any).recaptchaVerifier) {
+        const container = document.getElementById('recaptcha-container');
+        if (!container) throw new Error("Recaptcha container not found");
+        
+        (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          'size': 'invisible'
+        });
+      }
+
+      const appVerifier = (window as any).recaptchaVerifier;
+      const confirmation = await signInWithPhoneNumber(auth, fullPhone, appVerifier);
+      setConfirmationResult(confirmation);
+      setIsVerificationStep(true);
+    } catch (err: any) {
+      console.error("SMS send failed:", err);
+      setError(err.message || "Failed to send SMS. Check your connection or Firebase config.");
+      // Reset reCAPTCHA on failure
+      if ((window as any).recaptchaVerifier) {
+        try {
+          (window as any).recaptchaVerifier.clear();
+          (window as any).recaptchaVerifier = null;
+        } catch (e) {}
+      }
+    }
   };
 
-  const handleVerifySubmit = (e: React.FormEvent) => {
+  const handleVerifySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Verifying code:", verificationCode);
+    setError(null);
+    if (!confirmationResult) return;
+    try {
+      await confirmationResult.confirm(verificationCode);
+    } catch (err: any) {
+      console.error("Verification failed:", err);
+      setError(err.message);
+    }
   };
 
   const handleSocialLogin = (provider: string) => {
@@ -205,10 +232,16 @@ const Login: React.FC = () => {
 
   const handleAcceptConsent = async () => {
     setShowConsent(false);
+    setError(null);
     try {
       await signInWithGoogle();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login failed:", error);
+      if (error.code === 'auth/unauthorized-domain') {
+        setError(t('login.error_unauthorized_domain', 'This domain is not authorized for Firebase Authentication. Please add localhost to Authorized Domains in Firebase Console.'));
+      } else {
+        setError(error.message);
+      }
     }
   };
 
@@ -221,8 +254,36 @@ const Login: React.FC = () => {
     { id: 'tiktok', name: 'TikTok', icon: <Music2 size={16} className="text-white/40 group-hover:text-[#EE1D52] transition-colors" /> },
   ];
 
+  const handleDevAccess = async () => {
+    const login = prompt("Enter developer login:");
+    const password = prompt("Enter developer password:");
+
+    if (login === 'admin' && password === 'admin') {
+      try {
+        const response = await fetch('/api/dev/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ login, password })
+        });
+        const data = await response.json();
+        if (data.success) {
+          localStorage.setItem('rg_dev_user', JSON.stringify(data.user));
+          window.location.reload(); // Reload to update AuthContext
+        } else {
+          alert("Invalid credentials from server");
+        }
+      } catch (error) {
+        console.error("Dev auth failed:", error);
+        alert("Server error during auth");
+      }
+    } else {
+      alert("Access denied: Incorrect login or password");
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-20 px-4 relative overflow-hidden">
+      <div id="recaptcha-container"></div>
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
@@ -245,6 +306,12 @@ const Login: React.FC = () => {
               ? "Enter the 6-digit code sent to your phone." 
               : "Enter your phone number to sign in or create an account."}
           </p>
+          
+          {error && (
+            <div className="bg-error/10 border border-error/20 text-error text-[10px] font-bold uppercase p-3 rounded-xl animate-shake">
+              {error}
+            </div>
+          )}
         </div>
         
         <AnimatePresence mode="wait">
@@ -411,13 +478,22 @@ const Login: React.FC = () => {
               </button>
             ))}
           </div>
+
+          <div className="pt-4 border-t border-white/5">
+            <button
+              onClick={handleDevAccess}
+              className="w-full py-4 bg-primary/10 text-primary border border-primary/20 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-primary/20 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/5"
+            >
+              <Zap size={14} fill="currentColor" /> Development Access (Admin Login)
+            </button>
+          </div>
         </div>
 
         <p className="text-center text-[10px] font-black uppercase tracking-widest text-white/20">
           By continuing, you agree to our {' '}
-          <Link to="/terms" className="text-primary hover:underline underline-offset-4">Terms</Link>
+          <Link to={`/${lang || 'eng'}/terms`} className="text-primary hover:underline underline-offset-4">Terms</Link>
           {' '} & {' '}
-          <Link to="/privacy" className="text-primary hover:underline underline-offset-4">Privacy</Link>
+          <Link to={`/${lang || 'eng'}/privacy`} className="text-primary hover:underline underline-offset-4">Privacy</Link>
         </p>
       </div>
 

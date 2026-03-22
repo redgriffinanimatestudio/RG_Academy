@@ -5,16 +5,30 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", sans-serif;
   
-  --color-primary: var(--primary-color, #00f5d4);
-  --color-primary-hover: var(--primary-hover-color, #00d1b5);
-  --color-bg-dark: #050505;
-  --color-bg-card: #0a0a0a;
+  --color-primary: var(--primary, #00f5d4);
+  --color-primary-hover: var(--primary-hover, #00d1b5);
+  --color-bg-dark: var(--bg-main, #050505);
+  --color-bg-card: var(--bg-card, #0a0a0a);
   --color-ink: #ffffff;
 }
 
 @layer base {
+  .theme-academy {
+    --primary: #00f5d4;
+    --primary-hover: #00d1b5;
+    --bg-main: #050505;
+    --bg-card: #0a0a0a;
+  }
+
+  .theme-studio {
+    --primary: #3b82f6; /* Blue for Studio */
+    --primary-hover: #2563eb;
+    --bg-main: #1a1a1e; /* Lighter gray */
+    --bg-card: #252529;
+  }
+  
   body {
-    @apply bg-bg-dark text-ink font-sans antialiased;
+    @apply bg-bg-dark text-ink font-sans antialiased transition-colors duration-500;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -33,5 +47,15 @@
   
   .criativo-gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-emerald-400;
+  }
+
+  @keyframes pulse-border {
+    0% { box-shadow: 0 0 0 0 rgba(0, 245, 212, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(0, 245, 212, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 245, 212, 0); }
+  }
+
+  .animate-pulse-border {
+    animation: pulse-border 2s infinite;
   }
 }

@@ -40,10 +40,10 @@ const MOCK_PROFILE = {
 };
 
 export default function SpecialistProfile() {
-  const { id } = useParams();
+  const { id, lang } = useParams();
   const location = useLocation();
   const isStudio = location.pathname.includes('/studio/');
-  const backLink = isStudio ? `/studio` : `/aca`;
+  const backLink = isStudio ? `/studio/${lang || 'eng'}` : `/aca/${lang || 'eng'}`;
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8">

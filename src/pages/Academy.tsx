@@ -1,118 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GraduationCap, Search, Filter, PlayCircle, Star, Users, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useParams } from 'react-router-dom';
+import { academyService, Course } from '../services/academyService';
 
-const MOCK_COURSES = [
+const HERO_SLIDES = [
   {
-    id: '1',
-    slug: 'mastering-character-rigging-maya',
-    title: 'Mastering Character Rigging in Maya',
-    lecturer: 'Alex Rivera',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png',
-    rating: 4.9,
-    reviews: 1240,
-    price: 89.99,
-    students: 15420,
-    duration: '24h 15m',
-    levelKey: 'advanced',
-    thumbnail: 'https://picsum.photos/seed/rigging/800/600',
-    category: 'Animation'
+    title: 'Elevate your',
+    accent: 'Digital Art',
+    desc: 'Join 42k+ artists mastering character design, environment art, and VFX.',
+    image: 'https://picsum.photos/seed/aca-hero1/1920/1080',
+    tag: 'Trending'
   },
   {
-    id: '2',
-    slug: 'cinematic-vfx-houdini-destruction',
-    title: 'Cinematic VFX: Houdini Destruction',
-    lecturer: 'Sarah Chen',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-2.png',
-    rating: 4.8,
-    reviews: 850,
-    price: 129.99,
-    students: 8200,
-    duration: '32h 40m',
-    levelKey: 'expert',
-    thumbnail: 'https://picsum.photos/seed/houdini/800/600',
-    category: 'VFX & Compositing'
-  },
-  {
-    id: '3',
-    slug: 'environment-art-aaa-games',
-    title: 'Environment Art for AAA Games',
-    lecturer: 'Marcus Thorne',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-3.png',
-    rating: 4.7,
-    reviews: 2100,
-    price: 94.99,
-    students: 22100,
-    duration: '45h 20m',
-    levelKey: 'intermediate',
-    thumbnail: 'https://picsum.photos/seed/envart/800/600',
-    category: '3D Modeling'
-  },
-  {
-    id: '4',
-    slug: 'unreal-engine-5-real-time-lighting',
-    title: 'Unreal Engine 5: Real-time Lighting',
-    lecturer: 'Elena Vance',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-4.png',
-    rating: 4.9,
-    reviews: 3400,
-    price: 79.99,
-    students: 45000,
-    duration: '18h 30m',
-    levelKey: 'intermediate',
-    thumbnail: 'https://picsum.photos/seed/ue5/800/600',
-    category: 'Game Development'
-  },
-  {
-    id: '5',
-    slug: 'digital-sculpting-zbrush',
-    title: 'Digital Sculpting with ZBrush',
-    lecturer: 'David Miller',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-5.png',
-    rating: 4.8,
-    reviews: 1500,
-    price: 69.99,
-    students: 12000,
-    duration: '28h 10m',
-    levelKey: 'beginner',
-    thumbnail: 'https://picsum.photos/seed/zbrush/800/600',
-    category: '3D Modeling'
-  },
-  {
-    id: '6',
-    slug: '2d-animation-principles-cg',
-    title: '2D Animation Principles for CG',
-    lecturer: 'Yuki Tanaka',
-    lecturerAvatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-6.png',
-    rating: 4.9,
-    reviews: 980,
-    price: 54.99,
-    students: 7500,
-    duration: '12h 45m',
-    levelKey: 'beginner',
-    thumbnail: 'https://picsum.photos/seed/2danim/800/600',
-    category: 'Animation'
+    title: 'Master real-time',
+    accent: 'Rendering',
+    desc: 'Unlock the full potential of Unreal Engine 5.4 with our expert-led workshops.',
+    image: 'https://picsum.photos/seed/aca-hero2/1920/1080',
+    tag: 'New Workshop'
   }
-];
-
-const CATEGORIES = [
-  'all_workshops',
-  'modeling_3d',
-  'animation',
-  'vfx_compositing',
-  'game_dev',
-  'digital_art',
-  'software_masterclass'
 ];
 
 export default function Academy() {
   const { t } = useTranslation();
   const { lang } = useParams();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all_workshops');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
   
   // Advanced Filter States
   const [filters, setFilters] = useState({
@@ -122,34 +41,110 @@ export default function Academy() {
     sortBy: 'popular'
   });
 
-  const filteredCourses = MOCK_COURSES.filter(course => {
-    const categoryKey = course.category === '3D Modeling' ? 'modeling_3d' :
-                       course.category === 'Animation' ? 'animation' :
-                       course.category === 'VFX & Compositing' ? 'vfx_compositing' :
-                       course.category === 'Game Development' ? 'game_dev' :
-                       course.category === 'Digital Art' ? 'digital_art' :
-                       course.category === 'Software Masterclass' ? 'software_masterclass' : '';
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const [fetchedCourses, fetchedCategories] = await Promise.all([
+          academyService.getCourses(),
+          academyService.getCategories()
+        ]);
+        setCourses(fetchedCourses);
+        setCategories(fetchedCategories);
+      } catch (error) {
+        console.error("Failed to fetch academy data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
-    const matchesCategory = selectedCategory === 'all_workshops' || categoryKey === selectedCategory;
+  const filteredCourses = courses.filter(course => {
+    const matchesCategory = selectedCategory === 'all_workshops' || course.categoryId === selectedCategory;
     const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         course.lecturer.toLowerCase().includes(searchQuery.toLowerCase());
+                         course.lecturerName.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesLevel = filters.level === 'all' || course.levelKey === filters.level;
+    const matchesLevel = filters.level === 'all' || course.level === filters.level;
     const matchesPrice = course.price <= filters.priceRange[1];
-    const matchesDuration = filters.duration === 'all' || 
-      (filters.duration === 'short' && parseInt(course.duration) < 20) ||
-      (filters.duration === 'long' && parseInt(course.duration) >= 20);
 
-    return matchesCategory && matchesSearch && matchesLevel && matchesPrice && matchesDuration;
+    return matchesCategory && matchesSearch && matchesLevel && matchesPrice;
   }).sort((a, b) => {
     if (filters.sortBy === 'price_low') return a.price - b.price;
     if (filters.sortBy === 'price_high') return b.price - a.price;
-    if (filters.sortBy === 'rating') return b.rating - a.rating;
-    return b.students - a.students; // popular
+    return 0;
   });
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-12 py-8">
+    <div className="space-y-16 py-8">
+      {/* Academy Premium Hero Slider */}
+      <section className="relative h-[450px] rounded-[3rem] overflow-hidden group shadow-2xl shadow-primary/5 border border-white/5">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0"
+          >
+            <img src={HERO_SLIDES[currentSlide].image} alt="" className="w-full h-full object-cover grayscale brightness-[0.4]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg-dark via-bg-dark/40 to-transparent" />
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="absolute inset-0 p-12 flex flex-col justify-end space-y-6">
+          <div className="max-w-2xl space-y-4">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-3"
+            >
+              <span className="px-2 py-0.5 bg-primary text-bg-dark text-[8px] font-black uppercase tracking-widest rounded">
+                {HERO_SLIDES[currentSlide].tag}
+              </span>
+              <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Specialist Workshop</span>
+            </motion.div>
+            
+            <motion.h1 
+              key={`h1-${currentSlide}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-5xl font-black tracking-tighter text-white leading-none uppercase"
+            >
+              {HERO_SLIDES[currentSlide].title} <br />
+              <span className="text-primary italic">{HERO_SLIDES[currentSlide].accent}.</span>
+            </motion.h1>
+            <motion.p 
+              key={`p-${currentSlide}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-lg text-white/60 font-medium max-w-lg"
+            >
+              {HERO_SLIDES[currentSlide].desc}
+            </motion.p>
+          </div>
+
+          <div className="flex items-center gap-4 pt-4">
+            {HERO_SLIDES.map((_, i) => (
+              <button 
+                key={i} 
+                onClick={() => setCurrentSlide(i)}
+                className={`h-1 transition-all duration-500 rounded-full ${currentSlide === i ? 'w-12 bg-primary' : 'w-4 bg-white/20 hover:bg-white/40'}`} 
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
       <header className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-4">
@@ -157,13 +152,9 @@ export default function Academy() {
               <GraduationCap size={14} />
               {t('academy_workshops')}
             </div>
-            <h1 className="text-6xl font-black tracking-tighter text-white leading-none uppercase">
-              {t('master_craft').split('.')[0]} <br />
-              <span className="text-primary italic">{t('master_craft').split('.')[1] || 'CRAFT.'}</span>
-            </h1>
-            <p className="text-lg text-white/40 max-w-xl font-medium">
-              {t('academy_desc')}
-            </p>
+            <h2 className="text-4xl font-black tracking-tighter text-white leading-none uppercase">
+              Browse <span className="text-primary italic">Workshops.</span>
+            </h2>
           </div>
           
           <div className="flex flex-col gap-4 w-full md:w-auto">
@@ -175,7 +166,7 @@ export default function Academy() {
                   placeholder={t('search_workshops')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium text-white placeholder:text-white/20"
+                  className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/5 rounded-2xl focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all font-medium text-white placeholder:text-white/20 outline-none"
                 />
               </div>
               <button 
@@ -254,17 +245,27 @@ export default function Academy() {
             <Filter size={14} />
             {t('category')}
           </div>
-          {CATEGORIES.map((category) => (
+          <button
+            onClick={() => setSelectedCategory('all_workshops')}
+            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all border ${
+              selectedCategory === 'all_workshops'
+                ? 'bg-primary text-bg-dark border-primary shadow-lg shadow-primary/20'
+                : 'bg-white/5 text-white/40 border-white/5 hover:text-white hover:bg-white/10'
+            }`}
+          >
+            {t('all_workshops')}
+          </button>
+          {categories.map((cat) => (
             <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
               className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all border ${
-                selectedCategory === category
+                selectedCategory === cat.id
                   ? 'bg-primary text-bg-dark border-primary shadow-lg shadow-primary/20'
                   : 'bg-white/5 text-white/40 border-white/5 hover:text-white hover:bg-white/10'
               }`}
             >
-              {t(category)}
+              {t(cat.name)}
             </button>
           ))}
         </div>
@@ -295,12 +296,7 @@ export default function Academy() {
                     </div>
                   </div>
                   <div className="absolute top-4 left-4 px-3 py-1 bg-black/80 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest rounded-lg">
-                    {t(course.category === '3D Modeling' ? 'modeling_3d' :
-                       course.category === 'Animation' ? 'animation' :
-                       course.category === 'VFX & Compositing' ? 'vfx_compositing' :
-                       course.category === 'Game Development' ? 'game_dev' :
-                       course.category === 'Digital Art' ? 'digital_art' :
-                       course.category === 'Software Masterclass' ? 'software_masterclass' : course.category)}
+                    {course.categoryId}
                   </div>
                 </div>
                 
@@ -311,24 +307,24 @@ export default function Academy() {
                   <div className="flex items-center gap-3">
                     <div className="avatar">
                       <div className="size-10 rounded-full border border-white/5">
-                        <img src={course.lecturerAvatar} alt={course.lecturer} referrerPolicy="no-referrer" />
+                        <img src={course.lecturerAvatar || "https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png"} alt={course.lecturerName} referrerPolicy="no-referrer" />
                       </div>
                     </div>
-                    <p className="text-sm text-white/40 font-medium">{t('by')} {course.lecturer}</p>
+                    <p className="text-sm text-white/40 font-medium">{t('by')} {course.lecturerName}</p>
                   </div>
 
                   <div className="flex items-center gap-4 text-xs font-bold text-white/20">
                     <div className="flex items-center gap-1.5">
                       <Star size={14} className="text-primary" fill="currentColor" />
                       <span className="text-white">{course.rating}</span>
-                      <span>({course.reviews})</span>
+                      <span>({course.reviewsCount})</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Users size={14} />
-                      <span>{course.students.toLocaleString()}</span>
+                      <span>{course.studentsCount.toLocaleString()}</span>
                     </div>
                     <div className="flex items-center gap-1.5 px-2 py-0.5 bg-white/5 rounded-md">
-                      <span className="text-white">{t(course.levelKey)}</span>
+                      <span className="text-white">{t(course.level)}</span>
                     </div>
                   </div>
 

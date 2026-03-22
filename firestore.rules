@@ -69,12 +69,12 @@ service cloud.firestore {
 
     function isAdmin() {
       return isAuthenticated() &&
-        ('admin' in getRoles() ||
+        ('admin' in getRoles() || 'chief_manager' in getRoles() ||
           (request.auth.token.email == "redgriffinanimatestudio@gmail.com" && request.auth.token.email_verified == true));
     }
 
     function isManager() {
-      return isAuthenticated() && ('manager' in getRoles() || isAdmin());
+      return isAuthenticated() && ('manager' in getRoles() || 'chief_manager' in getRoles() || isAdmin());
     }
 
     function isModerator() {
@@ -108,7 +108,7 @@ service cloud.firestore {
              isValidEmail(data.email) &&
              data.roles is list &&
              data.roles.size() > 0 &&
-             data.roles.hasOnly(['student', 'lecturer', 'client', 'executor', 'admin', 'manager', 'moderator']) &&
+             data.roles.hasOnly(['student', 'lecturer', 'client', 'executor', 'admin', 'manager', 'moderator', 'chief_manager']) &&
              (!('bio' in data) || (data.bio is string && data.bio.size() < 1000)) &&
              (!('displayName' in data) || (data.displayName is string && data.displayName.size() < 100));
     }

@@ -8,6 +8,7 @@ import CourseDetail from './pages/CourseDetail';
 import Learn from './pages/Learn';
 import Studio from './pages/Studio';
 import Community from './pages/Community';
+import CommunityTopic from './pages/CommunityTopic';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Messages from './pages/Messages';
@@ -15,6 +16,7 @@ import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import CreateCourse from './pages/CreateCourse';
 import TopicPage from './pages/TopicPage';
+import ServicePage from './pages/ServicePage';
 import SpecialistProfile from './pages/SpecialistProfile';
 import Contracts from './pages/Contracts';
 import InfoPage from './pages/InfoPage';
@@ -90,13 +92,23 @@ export default function App() {
             <Route path="/admin/:lang" element={<LanguageWrapper><Layout><AdminDashboard /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><TopicPage /></Layout></LanguageWrapper>} />
+            <Route path="/studio/:lang/service/:serviceSlug" element={<LanguageWrapper><Layout><ServicePage /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/course/:slug" element={<LanguageWrapper><Layout><CourseDetail /></Layout></LanguageWrapper>} />
             <Route path="/learn/:lang/:slug" element={<LanguageWrapper><Learn /></LanguageWrapper>} />
             <Route path="/studio/:lang" element={<LanguageWrapper><Layout><Studio /></Layout></LanguageWrapper>} />
             
             {/* Mode-specific sub-pages */}
             <Route path="/aca/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
+            <Route path="/aca/:lang/group/:topicSlug" element={<LanguageWrapper><Layout><CommunityTopic /></Layout></LanguageWrapper>} />
+            <Route path="/aca/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><CommunityTopic /></Layout></LanguageWrapper>} />
+            
             <Route path="/studio/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
+            <Route path="/studio/:lang/group/:topicSlug" element={<LanguageWrapper><Layout><CommunityTopic /></Layout></LanguageWrapper>} />
+            <Route path="/studio/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><CommunityTopic /></Layout></LanguageWrapper>} />
+            
+            <Route path="/community/:lang" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
+            <Route path="/community/:lang/group/:topicSlug" element={<LanguageWrapper><Layout><CommunityTopic /></Layout></LanguageWrapper>} />
+            <Route path="/community/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><CommunityTopic /></Layout></LanguageWrapper>} />
             
             <Route path="/aca/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />

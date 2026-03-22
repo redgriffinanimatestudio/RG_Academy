@@ -1,15 +1,36 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { GraduationCap, Briefcase, Play, Check, Globe, Users } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { signInWithGoogle } from '../firebase';
 import OAuthConsent from '../components/OAuthConsent';
 
+const HERO_SLIDES = [
+  {
+    title: 'We are Red Griffin',
+    accent: 'Studio',
+    desc: 'High-end CGI, Animation, and Digital Solutions for the modern industry.',
+    image: 'https://picsum.photos/seed/studio-hero/1920/1080',
+    link: '/studio'
+  },
+  {
+    title: 'Master your',
+    accent: 'Craft',
+    desc: 'Professional workshops led by industry veterans from around the globe.',
+    image: 'https://picsum.photos/seed/academy-hero/1920/1080',
+    link: '/aca'
+  }
+];
+
 const Home: React.FC = () => {
   const { t } = useTranslation();
   const { lang } = useParams();
+  const location = useLocation();
+  const isStudio = location.pathname.includes('/studio/');
+  const modePrefix = isStudio ? '/studio' : '/aca';
   const [showConsent, setShowConsent] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const handleSocialLogin = () => {
     setShowConsent(true);
@@ -26,69 +47,99 @@ const Home: React.FC = () => {
 
   return (
     <div className="space-y-32 pb-24">
-      {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex flex-col justify-center px-4 overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full opacity-20 pointer-events-none">
-          <img 
-            src="https://picsum.photos/seed/criativo-hero/800/1200" 
-            alt="" 
-            className="w-full h-full object-cover grayscale"
-            referrerPolicy="no-referrer"
-          />
-        </div>
-        
-        <div className="max-w-5xl space-y-8 relative z-10">
+      {/* Cinematic Hero Slider */}
+      <section className="relative h-[85vh] min-h-[600px] overflow-hidden rounded-[3rem] mx-4 mt-4">
+        <AnimatePresence mode="wait">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-4 text-primary font-black uppercase tracking-[0.4em] text-[10px]"
+            key={currentSlide}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0"
           >
-            <div className="w-12 h-[1px] bg-primary" />
-            {t('master_cg')}
+            <img 
+              src={HERO_SLIDES[currentSlide].image} 
+              alt="" 
+              className="w-full h-full object-cover grayscale brightness-50" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-bg-dark via-bg-dark/40 to-transparent" />
           </motion.div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] uppercase"
-          >
-            {t('we_are')} <span className="text-primary">{t('creative')}</span> <br />
-            {t('design_agency')}
-          </motion.h1>
-          
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-lg text-white/50 max-w-xl font-medium leading-relaxed"
-          >
-            {t('ecosystem_desc')}
-          </motion.p>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-wrap items-center gap-6 pt-4"
-          >
-            <Link to={`/aca/${lang}`} className="flex items-center gap-4 group">
-              <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center transition-transform group-hover:scale-110">
-                <Play size={24} className="text-bg-dark fill-current ml-1" />
-              </div>
-              <div className="text-left">
-                <div className="text-[10px] font-black uppercase tracking-widest text-white/40">{t('about_us')}</div>
-                <div className="text-sm font-black uppercase tracking-widest text-white group-hover:text-primary transition-colors">{t('promotion_studio')}</div>
-              </div>
-            </Link>
+        </AnimatePresence>
 
-            <button 
-              onClick={handleSocialLogin}
-              className="flex items-center gap-3 bg-white text-bg-dark px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-neutral-100 transition-all shadow-xl active:scale-95"
+        <div className="absolute inset-0 flex flex-col justify-center px-12 md:px-24">
+          <div className="max-w-4xl space-y-8 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-4 text-primary font-black uppercase tracking-[0.4em] text-[10px]"
             >
-              <img src="https://www.google.com/favicon.ico" alt="" className="w-4 h-4" />
-              {t('continue_google')}
-            </button>
-          </motion.div>
+              <div className="w-12 h-[1px] bg-primary" />
+              {t('master_cg')}
+            </motion.div>
+            
+            <motion.h1 
+              key={`h1-${currentSlide}`}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.85] uppercase"
+            >
+              {HERO_SLIDES[currentSlide].title} <br />
+              <span className="text-primary italic">{HERO_SLIDES[currentSlide].accent}.</span>
+            </motion.h1>
+            
+            <motion.p 
+              key={`p-${currentSlide}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-lg md:text-xl text-white/50 max-w-xl font-medium leading-relaxed"
+            >
+              {HERO_SLIDES[currentSlide].desc}
+            </motion.p>
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="flex flex-wrap items-center gap-6 pt-4"
+            >
+              <Link to={`${HERO_SLIDES[currentSlide].link}/${lang || 'eng'}`} className="flex items-center gap-4 group">
+                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center transition-transform group-hover:scale-110 shadow-xl shadow-primary/20">
+                  <Play size={24} className="text-bg-dark fill-current ml-1" />
+                </div>
+                <div className="text-left">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-white/40">{t('about_us')}</div>
+                  <div className="text-sm font-black uppercase tracking-widest text-white group-hover:text-primary transition-colors">Start Experience</div>
+                </div>
+              </Link>
+
+              <button 
+                onClick={handleSocialLogin}
+                className="flex items-center gap-3 bg-white text-bg-dark px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-neutral-100 transition-all shadow-2xl active:scale-95"
+              >
+                <img src="https://www.google.com/favicon.ico" alt="" className="w-4 h-4" />
+                {t('join_ecosystem')}
+              </button>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Slider Navigation */}
+        <div className="absolute bottom-12 right-12 flex items-center gap-4">
+          <div className="flex gap-2">
+            {HERO_SLIDES.map((_, i) => (
+              <button 
+                key={i} 
+                onClick={() => setCurrentSlide(i)}
+                className={`h-1 transition-all duration-500 rounded-full ${currentSlide === i ? 'w-12 bg-primary' : 'w-4 bg-white/20 hover:bg-white/40'}`} 
+              />
+            ))}
+          </div>
+          <div className="h-8 w-[1px] bg-white/10 mx-2" />
+          <div className="text-[10px] font-black text-white/40 uppercase tracking-widest">
+            0{currentSlide + 1} / 0{HERO_SLIDES.length}
+          </div>
         </div>
       </section>
 
@@ -206,7 +257,7 @@ const Home: React.FC = () => {
               <img src="https://www.google.com/favicon.ico" alt="" className="w-5 h-5" />
               {t('continue_google')}
             </button>
-            <Link to={`/community/${lang}`} className="px-12 py-5 border-2 border-white/10 text-white font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all w-full sm:w-auto">
+            <Link to={`${modePrefix}/${lang || 'eng'}/community`} className="px-12 py-5 border-2 border-white/10 text-white font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all w-full sm:w-auto text-center">
               {t('view_community')}
             </Link>
           </div>

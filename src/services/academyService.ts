@@ -1,6 +1,3 @@
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, serverTimestamp, addDoc, orderBy, deleteDoc, Timestamp } from 'firebase/firestore';
-import { db } from '../firebase';
-
 export interface Course {
   id: string;
   title: string;
@@ -8,13 +5,18 @@ export interface Course {
   description: string;
   lecturerId: string;
   lecturerName: string;
+  lecturerAvatar: string;
   price: number;
   thumbnail: string;
-  category: string;
+  rating: number;
+  reviewsCount: number;
+  studentsCount: number;
+  duration: string;
+  categoryId: string;
   level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
   tags: string[];
   status: 'draft' | 'published' | 'archived';
-  createdAt: Timestamp;
+  createdAt: string;
 }
 
 export interface Lesson {
@@ -27,7 +29,7 @@ export interface Lesson {
   duration: string;
   order: number;
   isFree: boolean;
-  createdAt: Timestamp;
+  createdAt: string;
 }
 
 export interface Enrollment {
@@ -37,8 +39,8 @@ export interface Enrollment {
   progress: number;
   status: 'active' | 'completed' | 'cancelled';
   completedLessons: string[];
-  enrolledAt: Timestamp;
-  completedAt?: Timestamp;
+  enrolledAt: string;
+  completedAt?: string;
 }
 
 export interface Review {
@@ -48,80 +50,39 @@ export interface Review {
   rating: number;
   comment: string;
   isApproved: boolean;
-  createdAt: Timestamp;
+  createdAt: string;
 }
 
-const MOCK_COURSES: Course[] = [
-  {
-    id: '1',
-    slug: 'mastering-character-rigging-maya',
-    title: 'Mastering Character Rigging in Maya',
-    description: 'Learn the industry-standard techniques for creating robust, animator-friendly character rigs in Autodesk Maya.',
-    lecturerId: 'l1',
-    lecturerName: 'Alex Rivera',
-    price: 89.99,
-    thumbnail: 'https://picsum.photos/seed/rigging/800/600',
-    category: 'Animation',
-    level: 'advanced',
-    tags: ['Maya', 'Rigging'],
-    status: 'published',
-    createdAt: Timestamp.now()
-  },
-  {
-    id: '2',
-    slug: 'cinematic-vfx-houdini-destruction',
-    title: 'Cinematic VFX: Houdini Destruction',
-    description: 'Master destruction and simulation in Houdini for high-end cinematic sequences.',
-    lecturerId: 'l2',
-    lecturerName: 'Sarah Chen',
-    price: 129.99,
-    thumbnail: 'https://picsum.photos/seed/houdini/800/600',
-    category: 'VFX & Compositing',
-    level: 'expert',
-    tags: ['Houdini', 'VFX'],
-    status: 'published',
-    createdAt: Timestamp.now()
-  },
-  {
-    id: '3',
-    slug: 'environment-art-aaa-games',
-    title: 'Environment Art for AAA Games',
-    description: 'Create stunning, optimized environments for modern game engines.',
-    lecturerId: 'l3',
-    lecturerName: 'Marcus Thorne',
-    price: 94.99,
-    thumbnail: 'https://picsum.photos/seed/envart/800/600',
-    category: '3D Modeling',
-    level: 'intermediate',
-    tags: ['Unreal Engine', 'Modeling'],
-    status: 'published',
-    createdAt: Timestamp.now()
-  }
-];
-
-const MOCK_LESSONS: Record<string, Lesson[]> = {
-  '1': [
-    { id: 'l1-1', courseId: '1', title: 'Introduction to Rigging', content: '<p>Basics of rigging...</p>', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', type: 'video', duration: '10:00', order: 1, isFree: true, createdAt: Timestamp.now() },
-    { id: 'l1-2', courseId: '1', title: 'Skeleton Hierarchy', content: '<p>Advanced skeleton setups...</p>', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', type: 'video', duration: '15:00', order: 2, isFree: false, createdAt: Timestamp.now() },
-  ]
-};
+const API_URL = 'http://localhost:3000/api';
 
 export const academyService = {
   async getCourses(filters?: { status?: string, category?: string, level?: string }): Promise<Course[]> {
-    // For now, return mock data mixed with real data (if any)
-    return MOCK_COURSES;
+    const params = new URLSearchParams();
+    if (filters?.category) params.append('category', filters.category);
+    if (filters?.level) params.append('level', filters.level);
+    
+    const response = await fetch(`${API_URL}/courses?${params.toString()}`);
+    if (!response.ok) throw new Error('Failed to fetch courses');
+    return response.json();
   },
 
   async getCourse(courseId: string): Promise<Course | null> {
-    return MOCK_COURSES.find(c => c.id === courseId) || null;
+    const response = await fetch(`${API_URL}/courses`);
+    const courses: Course[] = await response.json();
+    return courses.find(c => c.id === courseId) || null;
   },
 
   async getCourseBySlug(slug: string): Promise<Course | null> {
-    return MOCK_COURSES.find(c => c.slug === slug) || null;
+    const response = await fetch(`${API_URL}/courses/${slug}`);
+    if (!response.ok) return null;
+    return response.json();
   },
 
   async getLessons(courseId: string): Promise<Lesson[]> {
-    return MOCK_LESSONS[courseId] || [];
+    const response = await fetch(`${API_URL}/courses`);
+    const courses = await response.json();
+    const course = courses.find((c: any) => c.id === courseId);
+    return course?.lessons || [];
   },
 
   async enrollInCourse(userId: string, courseId: string): Promise<void> {
@@ -129,16 +90,7 @@ export const academyService = {
   },
 
   async getEnrollment(userId: string, courseId: string): Promise<Enrollment | null> {
-    // Mock active enrollment for testing
-    return {
-      id: `${userId}_${courseId}`,
-      userId,
-      courseId,
-      progress: 45,
-      status: 'active',
-      completedLessons: ['l1-1'],
-      enrolledAt: Timestamp.now()
-    };
+    return null;
   },
 
   async updateLessonProgress(userId: string, courseId: string, lessonId: string, isCompleted: boolean): Promise<void> {
@@ -146,12 +98,19 @@ export const academyService = {
   },
 
   async getReviews(courseId: string): Promise<Review[]> {
-    return [
-      { id: 'r1', courseId, userId: 'u1', rating: 5, comment: "Amazing course!", isApproved: true, createdAt: Timestamp.now() }
-    ];
+    const response = await fetch(`${API_URL}/courses`);
+    const courses = await response.json();
+    const course = courses.find((c: any) => c.id === courseId);
+    return course?.reviews || [];
   },
 
   async addReview(review: Omit<Review, 'id' | 'createdAt' | 'isApproved'>): Promise<string> {
     return "new_review_id";
+  },
+
+  async getCategories(): Promise<any[]> {
+    const response = await fetch(`${API_URL}/categories`);
+    if (!response.ok) throw new Error('Failed to fetch categories');
+    return response.json();
   }
 };

@@ -1,25 +1,24 @@
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  setDoc, 
-  deleteDoc, 
-  query, 
-  where, 
-  serverTimestamp, 
-  addDoc, 
-  orderBy, 
-  limit,
-  Timestamp
-} from 'firebase/firestore';
-import { db } from '../firebase';
+const API_BASE = '/api/v1/studio';
+
+export interface Profile {
+  id: string;
+  userId: string;
+  bio?: string;
+  avatar?: string;
+  location?: string;
+  skills: { name: string }[];
+  portfolio: any[];
+  user: {
+    displayName: string;
+    photoURL?: string;
+  };
+}
 
 export interface Connection {
   id: string;
   followerId: string;
   followingId: string;
-  createdAt: Timestamp;
+  createdAt: string;
 }
 
 export type FeedEventType = 
@@ -33,119 +32,64 @@ export type FeedEventType =
 export interface FeedEvent {
   id: string;
   actorId: string;
+  actor: {
+    displayName: string;
+    photoURL?: string;
+  };
   type: FeedEventType;
-  refId: string; // ID of the related entity (project, course, profile)
+  refId: string;
   payload: any;
-  createdAt: Timestamp;
-}
-
-export interface SearchIndex {
-  userId: string;
-  skills: string[];
-  location: string;
-  role: string;
-  updatedAt: Timestamp;
+  createdAt: string;
 }
 
 export const networkingService = {
+  // --- Profiles Module ---
+  async getProfile(userId: string): Promise<Profile> {
+    const response = await fetch(`${API_BASE}/profiles/${userId}`);
+    if (!response.ok) throw new Error('Failed to fetch profile');
+    return response.json();
+  },
+
+  async updateProfile(profileData: Partial<Profile> & { userId: string }): Promise<Profile> {
+    const response = await fetch(`${API_BASE}/profiles`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profileData),
+    });
+    if (!response.ok) throw new Error('Failed to update profile');
+    return response.json();
+  },
+
   // --- Connections Module ---
   async follow(followerId: string, followingId: string): Promise<void> {
-    const connectionId = `${followerId}_${followingId}`;
-    await setDoc(doc(db, 'connections', connectionId), {
-      followerId,
-      followingId,
-      createdAt: serverTimestamp(),
+    const response = await fetch(`${API_BASE}/connections`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ followerId, followingId }),
     });
-    
-    // Track activity
-    await this.trackActivity({
-      actorId: followerId,
-      type: 'follow',
-      refId: followingId,
-      payload: { followingId },
-    });
+    if (!response.ok) throw new Error('Failed to follow user');
   },
 
   async unfollow(followerId: string, followingId: string): Promise<void> {
-    const connectionId = `${followerId}_${followingId}`;
-    await deleteDoc(doc(db, 'connections', connectionId));
-  },
-
-  async getFollowers(userId: string): Promise<string[]> {
-    const q = query(collection(db, 'connections'), where('followingId', '==', userId));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => (doc.data() as Connection).followerId);
-  },
-
-  async getFollowing(userId: string): Promise<string[]> {
-    const q = query(collection(db, 'connections'), where('followerId', '==', userId));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => (doc.data() as Connection).followingId);
-  },
-
-  async isFollowing(followerId: string, followingId: string): Promise<boolean> {
-    const connectionId = `${followerId}_${followingId}`;
-    const docSnap = await getDoc(doc(db, 'connections', connectionId));
-    return docSnap.exists();
-  },
-
-  // --- Feed Module ---
-  async trackActivity(event: Omit<FeedEvent, 'id' | 'createdAt'>): Promise<string> {
-    const docRef = await addDoc(collection(db, 'feed_events'), {
-      ...event,
-      createdAt: serverTimestamp(),
+    const response = await fetch(`${API_BASE}/connections`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ followerId, followingId }),
     });
-    return docRef.id;
+    if (!response.ok) throw new Error('Failed to unfollow user');
   },
 
-  async getActivityFeed(userId: string, limitCount: number = 20): Promise<FeedEvent[]> {
-    // In a real app with "Fan-out", we'd fetch from a pre-computed feed.
-    // For now, we fetch events from people the user follows.
-    const following = await this.getFollowing(userId);
-    if (following.length === 0) return [];
-
-    const q = query(
-      collection(db, 'feed_events'),
-      where('actorId', 'in', following),
-      orderBy('createdAt', 'desc'),
-      limit(limitCount)
-    );
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FeedEvent));
+  async getActivityFeed(userId: string): Promise<FeedEvent[]> {
+    const response = await fetch(`${API_BASE}/feed/${userId}`);
+    if (!response.ok) throw new Error('Failed to fetch feed');
+    return response.json();
   },
 
   // --- Discovery Module ---
-  async searchProfiles(filters: { skills?: string[], role?: string, location?: string }): Promise<SearchIndex[]> {
-    let q = query(collection(db, 'search_index'));
-    
-    if (filters.role) {
-      q = query(q, where('role', '==', filters.role));
-    }
-    if (filters.location) {
-      q = query(q, where('location', '==', filters.location));
-    }
-    // Note: Firestore has limitations on array-contains with multiple values or other filters.
-    // Real search would use Algolia or ElasticSearch.
-    
-    const querySnapshot = await getDocs(q);
-    let results = querySnapshot.docs.map(doc => doc.data() as SearchIndex);
-    
-    if (filters.skills && filters.skills.length > 0) {
-      results = results.filter(profile => 
-        filters.skills!.every(skill => profile.skills.includes(skill))
-      );
-    }
-    
-    return results;
-  },
-
-  async getRecommendations(userId: string): Promise<SearchIndex[]> {
-    // Mock recommendations: just return latest profiles not followed
-    const following = await this.getFollowing(userId);
-    const q = query(collection(db, 'search_index'), limit(10));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs
-      .map(doc => doc.data() as SearchIndex)
-      .filter(profile => profile.userId !== userId && !following.includes(profile.userId));
+  async searchProfiles(query: string, skill?: string): Promise<any[]> {
+    const params = new URLSearchParams({ query, ...(skill ? { skill } : {}) });
+    const response = await fetch(`${API_BASE}/discovery/search?${params.toString()}`);
+    if (!response.ok) throw new Error('Failed to search profiles');
+    return response.json();
   }
 };
