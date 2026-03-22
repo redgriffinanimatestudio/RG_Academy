@@ -200,7 +200,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const unreadCount = notifications.filter(n => !n.read).length;
   
   const path = location.pathname.toLowerCase();
-  const isDashboard = path.includes('/dashboard');
+  const isDashboard = path.includes('/dashboard') || 
+                     ['/admin/', '/chief-manager/', '/manager/', '/moderator/', '/hr/', '/finance/', '/support/'].some(p => path.includes(p));
+  
   const isProfile = path.includes('/profile/');
   const isCommunity = (path.includes('/community') || path.includes('/messages') || path.includes('/contracts')) && !isDashboard && !isProfile;
   const isStudio = path.includes('/studio/') && !isDashboard && !isProfile;

@@ -21,9 +21,34 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 export default function Dashboard() {
-  const { activeRole, user } = useAuth();
+  const { activeRole, setActiveRole, user, profile } = useAuth();
   const [searchParams] = useSearchParams();
-  const currentView = searchParams.get('view') || (['admin', 'chief_manager', 'manager'].includes(activeRole || '') ? 'dashboard' : 'overview');
+  const location = useLocation();
+  const { lang } = useParams();
+  
+  // Sync activeRole with URL path
+  React.useEffect(() => {
+    const path = location.pathname.split('/')[1]; // e.g., 'admin' from '/admin/eng'
+    const roleMap: Record<string, string> = {
+      'admin': 'admin',
+      'chief-manager': 'chief_manager',
+      'manager': 'manager',
+      'moderator': 'moderator',
+      'hr': 'hr',
+      'finance': 'finance',
+      'support': 'support'
+    };
+    
+    const targetRole = roleMap[path];
+    if (targetRole && activeRole !== targetRole) {
+      // Only set if user actually has this role
+      if (profile?.roles.includes(targetRole as any)) {
+        setActiveRole(targetRole as any);
+      }
+    }
+  }, [location.pathname, profile, activeRole, setActiveRole]);
+
+  const currentView = searchParams.get('view') || (['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support'].includes(activeRole || '') ? 'dashboard' : 'overview');
 
   const roleThemes: Record<string, any> = {
     admin: { accent: '#ef4444', label: 'Administrator' },
