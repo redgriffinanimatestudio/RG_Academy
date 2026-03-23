@@ -65,7 +65,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       userService.getProfile(user.uid).then(p => {
         if (p) {
           setProfile(p);
-          if (!activeRole && p.roles.length > 0) setActiveRoleState(p.roles[0]);
+          // Prioritize higher roles
+          const priorities: UserRole[] = ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'lecturer', 'executor', 'client', 'student'];
+          const bestRole = priorities.find(r => p.roles.includes(r));
+          
+          // Force set active role if current one is invalid or missing
+          if (!activeRole || !p.roles.includes(activeRole)) {
+            setActiveRoleState(bestRole || p.roles[0]);
+          }
         }
         setProfileLoading(false);
       }).catch(() => setProfileLoading(false));

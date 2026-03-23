@@ -185,7 +185,22 @@ const Login: React.FC = () => {
     country.code.includes(countrySearch)
   );
 
-  // Removed automatic reCAPTCHA initialization from useEffect to prevent auth/argument-error
+  // Automatic redirect when user and profile are available
+  useEffect(() => {
+    if (user && profile && !loading) {
+      const targetLang = lang || 'eng';
+      // If user is admin/staff, send to their specific dashboard or general hub
+      if (profile.roles.includes('admin')) {
+        navigate(`/admin/${targetLang}`);
+      } else if (profile.roles.includes('chief_manager')) {
+        navigate(`/chief-manager/${targetLang}`);
+      } else if (profile.roles.includes('manager')) {
+        navigate(`/manager/${targetLang}`);
+      } else {
+        navigate(`/aca/${targetLang}/dashboard`);
+      }
+    }
+  }, [user, profile, loading, navigate, lang]);
 
   const handleInitialSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -260,10 +275,10 @@ const Login: React.FC = () => {
   ];
 
   const handleDevAccess = async () => {
-    const login = prompt("Enter developer login:");
-    const password = prompt("Enter developer password:");
+    const login = prompt("Enter developer login (admin/user):");
+    const password = prompt("Enter developer password (admin/user):");
 
-    if (login === 'admin' && password === 'admin') {
+    if ((login === 'admin' && password === 'admin') || (login === 'user' && password === 'user')) {
       try {
         const response = await fetch('/api/dev/auth', {
           method: 'POST',
@@ -273,9 +288,9 @@ const Login: React.FC = () => {
         const data = await response.json();
         if (data.success) {
           localStorage.setItem('rg_dev_user', JSON.stringify(data.user));
-          // Redirect to dashboard after successful dev login
+          // Redirect to dev dashboard after successful dev login
           const targetLang = lang || 'eng';
-          navigate(`/aca/${targetLang}/dashboard`);
+          navigate(`/dev/${targetLang}`);
           window.location.reload(); 
         } else {
           alert("Invalid credentials from server");

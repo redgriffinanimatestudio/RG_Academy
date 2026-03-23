@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, Briefcase, Play, Check, Globe, Users } from 'lucide-react';
+import { GraduationCap, Briefcase, Play, Check, Globe, Users, LayoutDashboard } from 'lucide-react';
 import { Link, useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { signInWithGoogle } from '../firebase';
 import OAuthConsent from '../components/OAuthConsent';
+import { useAuth } from '../context/AuthContext';
 
 const HERO_SLIDES = [
   {
@@ -27,6 +28,7 @@ const Home: React.FC = () => {
   const { t } = useTranslation();
   const { lang } = useParams();
   const location = useLocation();
+  const { user, profile } = useAuth();
   const isStudio = location.pathname.includes('/studio/');
   const modePrefix = isStudio ? '/studio' : '/aca';
   const [showConsent, setShowConsent] = useState(false);
@@ -43,6 +45,14 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error("Login failed:", error);
     }
+  };
+
+  const getDashboardLink = () => {
+    const targetLang = lang || 'eng';
+    if (profile?.roles.includes('admin')) return `/admin/${targetLang}`;
+    if (profile?.roles.includes('chief_manager')) return `/chief-manager/${targetLang}`;
+    if (profile?.roles.includes('manager')) return `/manager/${targetLang}`;
+    return `/aca/${targetLang}/dashboard`;
   };
 
   return (
@@ -114,13 +124,23 @@ const Home: React.FC = () => {
                 </div>
               </Link>
 
-              <button 
-                onClick={handleSocialLogin}
-                className="flex items-center gap-3 bg-white text-bg-dark px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-neutral-100 transition-all shadow-2xl active:scale-95"
-              >
-                <img src="https://www.google.com/favicon.ico" alt="" className="w-4 h-4" />
-                {t('join_ecosystem')}
-              </button>
+              {user ? (
+                <Link 
+                  to={getDashboardLink()}
+                  className="flex items-center gap-3 bg-primary text-bg-dark px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-2xl shadow-primary/20 active:scale-95"
+                >
+                  <LayoutDashboard size={16} />
+                  {t('my_dashboard')}
+                </Link>
+              ) : (
+                <button 
+                  onClick={handleSocialLogin}
+                  className="flex items-center gap-3 bg-white text-bg-dark px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-neutral-100 transition-all shadow-2xl active:scale-95"
+                >
+                  <img src="https://www.google.com/favicon.ico" alt="" className="w-4 h-4" />
+                  {t('join_ecosystem')}
+                </button>
+              )}
             </motion.div>
           </div>
         </div>
@@ -250,13 +270,23 @@ const Home: React.FC = () => {
         </p>
         <div className="flex flex-col items-center justify-center gap-8">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full">
-            <button 
-              onClick={handleSocialLogin}
-              className="bg-white text-bg-dark px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-neutral-100 transition-all w-full sm:w-auto flex items-center justify-center gap-4 shadow-2xl shadow-white/5"
-            >
-              <img src="https://www.google.com/favicon.ico" alt="" className="w-5 h-5" />
-              {t('continue_google')}
-            </button>
+            {user ? (
+              <Link 
+                to={getDashboardLink()}
+                className="bg-primary text-bg-dark px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:scale-105 transition-all w-full sm:w-auto flex items-center justify-center gap-4 shadow-2xl shadow-primary/20"
+              >
+                <LayoutDashboard size={18} />
+                {t('my_dashboard')}
+              </Link>
+            ) : (
+              <button 
+                onClick={handleSocialLogin}
+                className="bg-white text-bg-dark px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-neutral-100 transition-all w-full sm:w-auto flex items-center justify-center gap-4 shadow-2xl shadow-white/5"
+              >
+                <img src="https://www.google.com/favicon.ico" alt="" className="w-5 h-5" />
+                {t('continue_google')}
+              </button>
+            )}
             <Link to={`${modePrefix}/${lang || 'eng'}/community`} className="px-12 py-5 border-2 border-white/10 text-white font-black uppercase tracking-widest text-xs hover:bg-white/5 transition-all w-full sm:w-auto text-center">
               {t('view_community')}
             </Link>

@@ -10,12 +10,12 @@ import {
   X, 
   Search, 
   Users, 
-  Bell, 
-  Settings, 
-  ChevronRight, 
-  Globe, 
-  ChevronDown, 
-  MessageSquare, 
+  Bell,
+  Settings,
+  ChevronRight,
+  Globe,
+  ChevronDown,
+  MessageSquare,
   LogIn,
   LayoutDashboard,
   Shield,
@@ -173,19 +173,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { lang } = useParams();
   const { t, i18n } = useTranslation();
-  
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
-  
-  const [activeAcademyCategory, setActiveAcademyCategory] = useState(ACADEMY_CATEGORIES[0]);
-  const [activeAcademySub, setActiveAcademySub] = useState(ACADEMY_CATEGORIES[0].subcategories[0]);
-  const [activeStudioCategory, setActiveStudioCategory] = useState(STUDIO_CATEGORIES[0]);
-  const [activeStudioSub, setActiveStudioSub] = useState(STUDIO_CATEGORIES[0].subcategories[0]);
-  const [activeCommunityCategory, setActiveCommunityCategory] = useState(COMMUNITY_CATEGORIES[0]);
-  const [activeCommunitySub, setActiveCommunitySub] = useState(COMMUNITY_CATEGORIES[0].subcategories[0]);
 
   const [showBanner, setShowBanner] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -200,19 +193,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
-  
+
   const path = location.pathname.toLowerCase();
   const isDashboardPage = path.includes('/dashboard') || 
-                     ['/admin/', '/chief-manager/', '/manager/', '/moderator/', '/hr/', '/finance/', '/support/'].some(p => path.includes(p));
-  
+                          path.includes('/admin') || 
+                          path.includes('/chief-manager') || 
+                          path.includes('/manager') || 
+                          path.includes('/moderator') || 
+                          path.includes('/hr') || 
+                          path.includes('/finance') || 
+                          path.includes('/support');
+
   const isProfile = path.includes('/profile/');
   const isCommunity = (path.includes('/community') || path.includes('/messages') || path.includes('/contracts')) && !isDashboardPage && !isProfile;
   const isStudio = path.includes('/studio/') && !isDashboardPage && !isProfile;
   const isAcademy = (path.includes('/aca/') || path.includes('/learn/')) && !isCommunity && !isDashboardPage && !isProfile;
-  
+
   // Base categories
   const baseCategories = isCommunity ? COMMUNITY_CATEGORIES : (isStudio ? STUDIO_CATEGORIES : ACADEMY_CATEGORIES);
-  
+
   // Dashboard category (only for logged-in users)
   const dashboardCategory = React.useMemo(() => {
     if (!user) return null;
@@ -232,40 +231,30 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     if (!user) return baseCategories;
     return dashboardCategory ? [dashboardCategory, ...baseCategories] : baseCategories;
   }, [user, dashboardCategory, baseCategories]);
-  
-  const [activeDashboardCatIdx, setActiveDashboardCatIdx] = useState(0);
-  const [activeDashboardSubIdx, setActiveDashboardSubIdx] = useState(0);
 
   // Sync sidebar state with URL 'view' parameter
-  useEffect(() => {
-    if (isDashboardPage && dashboardCategory) {
-      const searchParams = new URLSearchParams(location.search);
-      const currentView = searchParams.get('view') || 'dashboard';
-      
-      dashboardCategory.subcategories.forEach((cat: any, catIdx: number) => {
-        const subIdx = cat.subcategories.findIndex((sub: any) => 
-          sub.name.toLowerCase().replace(/ /g, '_') === currentView
-        );
-        if (subIdx !== -1) {
-          setActiveDashboardCatIdx(catIdx);
-          setActiveDashboardSubIdx(subIdx);
-        }
-      });
-    }
-  }, [location.search, isDashboardPage, dashboardCategory]);
-
-  // Logic for active items
   const [activeCatName, setActiveCatName] = useState(sidebarCategories[0]?.name);
   const [activeSubName, setActiveSubName] = useState(sidebarCategories[0]?.subcategories[0]?.name);
 
-  // Auto-set active category based on page
   useEffect(() => {
     if (isDashboardPage && dashboardCategory) {
       setActiveCatName('my_dashboard');
+      const searchParams = new URLSearchParams(location.search);
+      const currentView = searchParams.get('view') || 'dashboard';
+
+      dashboardCategory.subcategories.forEach((cat: any) => {
+        const sub = cat.subcategories.find((s: any) =>
+          s.name.toLowerCase().replace(/ /g, '_') === currentView
+        );
+        if (sub) {
+          setActiveSubName(sub.name);
+        }
+      });
     } else if (!activeCatName || activeCatName === 'my_dashboard') {
       setActiveCatName(baseCategories[0]?.name);
+      setActiveSubName(baseCategories[0]?.subcategories[0]?.name);
     }
-  }, [isDashboardPage, dashboardCategory, baseCategories]);
+  }, [location.search, isDashboardPage, dashboardCategory, baseCategories]);
 
   const activeCategory = sidebarCategories.find(c => c.name === activeCatName) || sidebarCategories[0];
   const activeSub = activeCategory?.subcategories.find((s: any) => s.name === activeSubName) || activeCategory?.subcategories[0];
@@ -280,7 +269,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const handleSetSub = (sub: any, parentCat: any) => {
     setActiveSubName(sub.name);
     if (parentCat.isDashboard) {
-      // Logic for dashboard navigation
       const viewSlug = sub.name.toLowerCase().replace(/ /g, '_');
       navigate(`${location.pathname}?view=${viewSlug}`);
     }
@@ -306,7 +294,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const modePrefix = isStudio ? '/studio' : '/aca';
   const navClass = isDashboardPage ? 'bg-zinc-900/80 border-white/5' : (isStudio ? 'bg-bg-dark/80 border-primary/20' : 'bg-black/80 border-white/5');
   const cardClass = isDashboardPage ? 'bg-zinc-900 border-white/10' : (isStudio ? 'bg-bg-card border-primary/10' : 'bg-white/[0.03] border-white/5');
-  
+
   const themeClass = isDashboardPage ? 'theme-dashboard' : (isStudio ? 'theme-studio' : 'theme-academy');
   const modeColor = isDashboardPage ? (activeRole === 'admin' ? 'text-red-500' : 'text-primary') : (isCommunity ? 'text-primary' : (isStudio ? 'text-primary-hover' : 'text-primary'));
   const modeBg = isDashboardPage ? (activeRole === 'admin' ? 'bg-red-500' : 'bg-primary') : (isCommunity ? 'bg-primary' : (isStudio ? 'bg-primary-hover' : 'bg-primary'));
@@ -348,7 +336,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <img src="/logo-web.png" alt="Red Griffin" className="h-8 lg:h-10 w-auto object-contain transition-transform group-hover:scale-105" />
                 <div className="flex flex-col hidden xs:flex">
                   <span className="text-sm lg:text-base font-black tracking-tighter text-white leading-none uppercase">Red Griffin</span>
-                  <span className={`text-[7px] lg:text-[8px] font-bold tracking-[0.3em] ${modeColor} leading-none mt-1 uppercase`}>{t('creative_ecosystem')}</span>
+                  <span className={`text-[7px] lg:text-[8px] font-bold tracking-[0.3em] ${modeColor} leading-none mt-1 uppercase`}>{t('creative_ecosystem')}</span> 
                 </div>
               </Link>
             </div>
@@ -358,68 +346,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {[
                 { id: 'academy', label: t('academy'), path: `/aca/${lang || 'eng'}`, categories: ACADEMY_CATEGORIES, active: isAcademy },
                 { id: 'studio', label: t('studio'), path: `/studio/${lang || 'eng'}`, categories: STUDIO_CATEGORIES, active: isStudio },
-                { id: 'community', label: t('community'), path: `${modePrefix}/${lang || 'eng'}/community`, categories: COMMUNITY_CATEGORIES, active: isCommunity }
+                { id: 'community', label: t('community'), path: `${modePrefix}/${lang || 'eng'}/community`, categories: COMMUNITY_CATEGORIES, active: isCommunity } 
               ].map((item) => (
-                <div 
-                  key={item.id} 
+                <div
+                  key={item.id}
                   className="h-full flex items-center"
                   onMouseEnter={() => setActiveMegaMenu(item.id)}
                   onMouseLeave={() => setActiveMegaMenu(null)}
                 >
-                  <Link 
-                    to={item.path} 
+                  <Link
+                    to={item.path}
                     className={`px-4 py-2 text-[11px] font-black uppercase tracking-widest transition-all relative ${item.active ? (item.id === 'studio' ? 'text-primary-hover' : 'text-primary') : 'text-white/60 hover:text-white'}`}
                   >
                     {item.label}
                     {item.active && <motion.div layoutId="nav-active" className={`absolute -bottom-[26px] left-0 right-0 h-[2px] ${item.id === 'studio' ? 'bg-primary-hover' : 'bg-primary'}`} />}
                   </Link>
-
-                  <AnimatePresence>
-                    {activeMegaMenu === item.id && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 10 }} 
-                        animate={{ opacity: 1, y: 0 }} 
-                        exit={{ opacity: 0, y: 10 }}
-                        className={`absolute top-full left-0 right-0 border-b border-white/5 shadow-2xl z-40 overflow-hidden ${cardClass} backdrop-blur-3xl`}
-                      >
-                        <div className="mx-auto max-w-[1600px] px-8 py-12">
-                          <div className="grid grid-cols-3 gap-12">
-                            {item.categories.map((cat) => (
-                              <div key={cat.name} className="space-y-6">
-                                <div className="flex items-center gap-3">
-                                  <cat.icon size={20} className={item.id === 'studio' ? 'text-primary-hover' : 'text-primary'} />
-                                  <h4 className="text-sm font-black uppercase tracking-[0.2em] text-white">{t(cat.name)}</h4>
-                                </div>
-                                <div className="grid gap-4">
-                                  {cat.subcategories.map((sub) => (
-                                    <div key={sub.name} className="group cursor-pointer" onClick={() => { navigate(item.path); setActiveMegaMenu(null); }}>
-                                      <div className="text-[10px] font-black uppercase tracking-widest text-white/40 group-hover:text-white transition-colors flex items-center justify-between">
-                                        {t(sub.name)}
-                                        <ChevronRight size={12} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-                                      </div>
-                                      {sub.topics && (
-                                        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
-                                          {sub.topics.map((topic: string) => (
-                                            <span key={topic} className="text-[8px] font-bold uppercase tracking-widest text-white/10 hover:text-primary transition-colors">{topic}</span>
-                                          ))}
-                                        </div>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="bg-white/[0.02] border-t border-white/5 px-8 py-4 flex justify-between items-center">
-                          <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Red Griffin Creative Ecosystem / {item.label} Hub</span>
-                          <Link to={item.path} onClick={() => setActiveMegaMenu(null)} className={`text-[9px] font-black uppercase tracking-widest flex items-center gap-2 ${item.id === 'studio' ? 'text-primary-hover' : 'text-primary'} hover:brightness-125`}>
-                            Explore All {item.label} <ChevronRight size={12} />
-                          </Link>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
               ))}
             </div>
@@ -458,9 +399,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }} className={`absolute right-0 mt-4 w-64 border rounded-2xl shadow-2xl py-2 z-50 ${cardClass}`}>
                           <div className="px-6 py-4 border-b border-white/5"><p className="text-xs font-black text-white truncate">{user.displayName || 'User'}</p><p className="text-[9px] text-white/40 truncate font-bold uppercase mt-1">{user.email}</p></div>
                           <div className="py-2">
-                            <Link to={`${modePrefix}/${lang || 'eng'}/profile/${user.uid}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"><User size={14} /> {t('my_profile')}</Link>
+                            <Link to={`${modePrefix}/${lang || 'eng'}/profile/${user.uid}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"><User size={14} /> {t('my_profile')}</Link>  
                             <Link to={`${isStudio ? '/studio' : '/aca'}/${lang || 'eng'}/dashboard`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"><LayoutDashboard size={14} /> {t('my_dashboard')}</Link>
-                            
+
                             {profile?.roles.includes('admin') && (
                               <Link to={`/admin/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-red-500 hover:bg-red-500/10 flex items-center gap-3 border-t border-white/5 mt-2 pt-4">
                                 <Shield size={14} /> Admin Control
@@ -476,15 +417,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 <LayoutDashboard size={14} /> Ops Manager
                               </Link>
                             )}
-                            
+
                             <div className="h-[1px] bg-white/5 my-2 mx-6" />
-                            <button 
-                              onClick={() => { 
-                                auth.signOut(); 
+                            <button
+                              onClick={() => {
+                                auth.signOut();
                                 localStorage.removeItem('rg_dev_user');
                                 window.location.href = `/${lang || 'eng'}`;
-                                setIsUserMenuOpen(false); 
-                              }} 
+                                setIsUserMenuOpen(false);
+                              }}
                               className="w-full text-left px-6 py-4 text-[10px] font-black uppercase text-primary hover:bg-primary/10 transition-all flex items-center gap-2"
                             >
                               <LogOut size={14} /> {t('logout')}
@@ -497,18 +438,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </div>
               ) : (
                 <div className="flex items-center gap-6">
-                  <Link 
-                    to={`/aca/${lang || 'eng'}/login`} 
-                    className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white transition-all"
-                  >
-                    {t('login')}
-                  </Link>
-                  <Link 
-                    to={`/aca/${lang || 'eng'}/login`} 
-                    className="criativo-btn !px-8 !py-3 !text-[10px] shadow-xl shadow-primary/20"
-                  >
-                    {t('join_ecosystem')}
-                  </Link>
+                  <Link to={`/aca/${lang || 'eng'}/login`} className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 hover:text-white transition-all">{t('login')}</Link>
+                  <Link to={`/aca/${lang || 'eng'}/login`} className="criativo-btn !px-8 !py-3 !text-[10px] shadow-xl shadow-primary/20">{t('join_ecosystem')}</Link>
                 </div>
               )}
             </div>
@@ -516,54 +447,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
 
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div 
-            initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[200] lg:hidden"
-          >
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setIsMobileMenuOpen(false)} />
-            <div className="relative w-full max-w-sm h-full bg-[#0a0a0a] border-r border-white/10 flex flex-col shadow-2xl">
-              <div className="p-6 border-b border-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`size-10 ${modeBg} rounded-xl flex items-center justify-center text-bg-dark shadow-lg`}><span className="text-lg font-black italic">RG</span></div>
-                  <span className="text-lg font-black tracking-tighter uppercase text-white">Red Griffin</span>
-                </div>
-                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-white/40 hover:text-white"><X size={24} /></button>
-              </div>
-              <div className="flex-1 overflow-y-auto py-8 px-6 space-y-8">
-                <div className="space-y-4">
-                  <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Navigation</p>
-                  <div className="grid gap-2">
-                    <Link to={`/aca/${lang || 'eng'}`} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${isAcademy ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-white/5 border-white/5 text-white/60'}`}><GraduationCap size={20} /><span className="text-xs font-black uppercase tracking-widest">{t('academy')}</span></Link>
-                    <Link to={`/studio/${lang || 'eng'}`} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${isStudio ? 'bg-primary-hover/10 border-primary-hover/20 text-primary-hover' : 'bg-white/5 border-white/5 text-white/60'}`}><Briefcase size={20} /><span className="text-xs font-black uppercase tracking-widest">{t('studio')}</span></Link>
-                    <Link to={`${modePrefix}/${lang || 'eng'}/community`} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${isCommunity ? 'bg-primary/10 border-primary/20 text-primary' : 'bg-white/5 border-white/5 text-white/60'}`}><Users size={20} /><span className="text-xs font-black uppercase tracking-widest">{t('community')}</span></Link>
-                  </div>
-                </div>
-                {!user && (
-                  <div className="space-y-4">
-                    <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Account</p>
-                    <div className="grid gap-3">
-                      <Link to={`/aca/${lang || 'eng'}/login`} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center p-4 bg-white/5 border border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white">{t('login')}</Link>
-                      <Link to={`/aca/${lang || 'eng'}/login`} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center justify-center p-4 ${modeBg} text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl ${modeShadow}`}>{t('join_ecosystem')}</Link>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="p-6 border-t border-white/5 bg-white/[0.02]">
-                <button className="w-full flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-                  <div className="flex items-center gap-3 text-white/60"><Globe size={18} /><span className="text-[10px] font-black uppercase tracking-widest">{currentLang.name}</span></div>
-                  <ChevronRight size={16} className="text-white/20" />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <main className="mx-auto max-w-[1600px] px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row gap-8">
-          {(isAcademy || isStudio || isCommunity) && (
+          {(isAcademy || isStudio || isCommunity || isDashboardPage) && (
             <div className="hidden md:block relative shrink-0 overflow-visible">
               <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} className="absolute -right-4 top-10 z-[150] size-9 rounded-full border-2 border-primary/40 bg-[#0a0a0a] flex items-center justify-center hover:scale-110 hover:border-primary transition-all shadow-[0_0_30px_rgba(0,0,0,0.9)] group">
                 {isSidebarCollapsed ? <ChevronRight size={18} className="text-primary" /> : <ChevronLeft size={18} className="text-primary" />}
@@ -572,7 +458,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <div className="space-y-8">
                   <div className="space-y-2">
                     {sidebarCategories.map((cat) => {
-                      const isCatActive = activeCategory.name === cat.name;
+                      const isCatActive = activeCatName === cat.name;
                       const Icon = cat.icon;
                       return (
                         <div key={cat.name} className="space-y-1">
@@ -583,9 +469,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                           <AnimatePresence initial={false}>
                             {isCatActive && !isSidebarCollapsed && (
                               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden ml-3 pl-3 border-l border-white/5 space-y-1 mt-1">
-                                {cat.subcategories.map((sub) => (
-                                  <button key={sub.name} onClick={() => handleSetSub(sub)} className={`w-full text-left px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-between ${activeSub.name === sub.name ? (isStudio ? 'text-primary-hover' : 'text-primary') : 'text-white/30 hover:text-white/60'}`}>
-                                    {t(sub.name)}<div className={`size-1 rounded-full ${activeSub.name === sub.name ? (isStudio ? 'bg-primary-hover' : 'bg-primary') : 'bg-white/10'}`} />
+                                {cat.subcategories.map((sub: any) => (
+                                  <button key={sub.name} onClick={() => handleSetSub(sub, cat)} className={`w-full text-left px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-between ${activeSubName === sub.name ? (isStudio ? 'text-primary-hover' : 'text-primary') : 'text-white/30 hover:text-white/60'}`}>
+                                    {t(sub.name)}<div className={`size-1 rounded-full ${activeSubName === sub.name ? (isStudio ? 'bg-primary-hover' : 'bg-primary') : 'bg-white/10'}`} />
                                   </button>
                                 ))}
                               </motion.div>

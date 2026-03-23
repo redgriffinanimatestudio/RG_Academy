@@ -66,6 +66,15 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { useAuth } from '../context/AuthContext';
 
 export function AdminDashboardContent({ activeModule, theme, user }: any) {
+  const currentTheme = theme || {
+    accent: '#00f5d4',
+    blue: '#378add',
+    green: '#1d9e75',
+    amber: '#ef9f27',
+    red: '#e24b4a',
+    purple: '#7f77dd'
+  };
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -74,20 +83,20 @@ export function AdminDashboardContent({ activeModule, theme, user }: any) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.2 }}
-        className="flex-1"
+        className="flex-1 w-full"
       >
-        {activeModule === 'dashboard' && <AdminOverview theme={theme} />}
-        {activeModule === 'users' && <UsersList theme={theme} />}
-        {activeModule === 'profile' && <UserProfileView theme={theme} />}
-        {activeModule === 'create' && <EditUserView theme={theme} />}
-        {activeModule === 'detail' && <UserDetailsView theme={theme} />}
-        {activeModule === 'chat' && <AdminChat theme={theme} />}
-        {activeModule === 'settings' && <AdminSettings theme={theme} />}
-        {activeModule === 'rbac' && <AdminRBACMatrix theme={theme} />}
+        {activeModule === 'dashboard' && <AdminOverview theme={currentTheme} />}
+        {activeModule === 'users' && <UsersList theme={currentTheme} />}
+        {activeModule === 'profile' && <UserProfileView theme={currentTheme} />}
+        {activeModule === 'create' && <EditUserView theme={currentTheme} />}
+        {activeModule === 'detail' && <UserDetailsView theme={currentTheme} />}
+        {activeModule === 'chat' && <AdminChat theme={currentTheme} />}
+        {activeModule === 'settings' && <AdminSettings theme={currentTheme} />}
+        {activeModule === 'rbac' && <AdminRBACMatrix theme={currentTheme} />}
         
         {!['dashboard', 'users', 'profile', 'create', 'detail', 'chat', 'settings', 'rbac'].includes(activeModule) && (
           <div className="flex flex-col items-center justify-center py-40 opacity-20">
-            <ShieldAlert size={64} className="mb-6" style={{ color: theme.accent }} />
+            <ShieldAlert size={64} className="mb-6" style={{ color: currentTheme.accent }} />
             <h2 className="text-xl font-black uppercase tracking-[0.5em]">Module Initializing...</h2>
           </div>
         )}

@@ -20,6 +20,7 @@ import {
 import { motion } from 'framer-motion';
 import { useParams, useSearchParams, useLocation, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import Preloader from '../components/Preloader';
 
 export default function Dashboard() {
   const { activeRole, setActiveRole, user, profile, logout } = useAuth();
@@ -30,8 +31,9 @@ export default function Dashboard() {
   
   // Sync activeRole with URL path or profile
   React.useEffect(() => {
-    const segments = location.pathname.split('/');
-    const firstSegment = segments[1];
+    const segments = location.pathname.split('/').filter(Boolean);
+    const searchParams = new URLSearchParams(location.search);
+    const roleParam = searchParams.get('role');
     
     const roleMap: Record<string, string> = {
       'admin': 'admin',
@@ -47,11 +49,20 @@ export default function Dashboard() {
       'client': 'client'
     };
     
-    const targetRoleFromPath = roleMap[firstSegment];
+    // Check all segments for a role name
+    let roleFromPath = null;
+    for (const segment of segments) {
+      if (roleMap[segment]) {
+        roleFromPath = roleMap[segment];
+        break;
+      }
+    }
+
+    const targetRole = roleParam || roleFromPath;
     
-    if (targetRoleFromPath) {
-      if (profile?.roles.includes(targetRoleFromPath as any) && activeRole !== targetRoleFromPath) {
-        setActiveRole(targetRoleFromPath as any);
+    if (targetRole) {
+      if (profile?.roles.includes(targetRole as any) && activeRole !== targetRole) {
+        setActiveRole(targetRole as any);
       }
     } else if (location.pathname.includes('/dashboard') && profile && profile.roles.length > 0) {
       // On general dashboard, ensure a role is selected if none is active.
@@ -345,9 +356,7 @@ function StudentDashboard({ view, accent, user, lang }: any) {
               </div>
               
               {loading ? (
-                <div className="flex justify-center py-20">
-                  <span className="loading loading-spinner loading-lg text-primary"></span>
-                </div>
+                <Preloader message="Loading Enrollments..." size="md" />
               ) : (
                 <div className="grid gap-6">
                   {enrollments.length > 0 ? enrollments.map((enr, i) => (
