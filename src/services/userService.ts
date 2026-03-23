@@ -23,6 +23,7 @@ export interface UserProfile {
   bio?: string;
   createdAt: any;
   updatedAt?: any;
+  isAdmin?: boolean;
 }
 
 export const userService = {

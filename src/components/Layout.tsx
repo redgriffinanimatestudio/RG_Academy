@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -171,7 +171,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { lang } = useParams();
   const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -212,7 +212,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const baseCategories = isCommunity ? COMMUNITY_CATEGORIES : (isStudio ? STUDIO_CATEGORIES : ACADEMY_CATEGORIES);
 
   // Dashboard category (only for logged-in users)
-  const dashboardCategory = React.useMemo(() => {
+  const dashboardCategory = useMemo(() => {
     if (!profile) return null;
     const effectiveRole = activeRole || (profile?.roles.includes('admin') ? 'admin' : profile?.roles[0]);
     if (!effectiveRole || !DASHBOARD_MENUS[effectiveRole]) return null;
@@ -226,7 +226,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [profile, activeRole]);
 
   // Combined sidebar categories
-  const sidebarCategories = React.useMemo(() => {
+  const sidebarCategories = useMemo(() => {
     if (!profile) return baseCategories;
     return dashboardCategory ? [dashboardCategory, ...baseCategories] : baseCategories;
   }, [profile, dashboardCategory, baseCategories]);
@@ -289,6 +289,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
     navigate(pathParts.join('/'));
     setIsLangMenuOpen(false);
+  };
+
+  const getDashboardLinkForRole = (role: string) => {
+    const specializedRoles = ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support'];
+    if (specializedRoles.includes(role)) {
+      return `/${role.replace('_', '-')}/${lang || 'eng'}`;
+    }
+    return `/${isStudio ? 'studio' : 'aca'}/${lang || 'eng'}/dashboard`;
   };
 
   const modePrefix = isStudio ? '/studio' : '/aca';
@@ -453,9 +461,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                           </div>
                           
                           <div className="py-2">
-                            <Link to={`${modePrefix}/${lang || 'eng'}/profile/${profile.uid}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"><User size={14} /> {t('my_profile')}</Link>  
-                            <Link to={`${isStudio ? '/studio' : '/aca'}/${lang || 'eng'}/dashboard`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"><LayoutDashboard size={14} /> {t('my_dashboard')}</Link>
+                            <Link to={`/${isStudio ? 'studio' : 'aca'}/${lang || 'eng'}/profile/${profile.uid}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"><User size={14} /> {t('my_profile')}</Link>  
 
+                            {profile?.isAdmin && (
+                              <Link to={`/admin/${lang || 'eng'}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-red-500 hover:bg-red-500/10 transition-all flex items-center gap-3 font-bold border-t border-white/5 mt-2 pt-4">
+                                <Shield size={14} /> Master Control Engine
+                              </Link>
+                            )}
+
+                            <Link to={`${isStudio ? '/studio' : '/aca'}/${lang || 'eng'}/dashboard`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"><LayoutDashboard size={14} /> {t('my_dashboard')}</Link>
                             <div className="px-6 py-2 border-t border-white/5 mt-2">
                               <p className="text-[8px] font-black text-white/20 uppercase tracking-widest mb-2">Switch identity</p>
                               {profile.roles.map(r => (
@@ -464,10 +478,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                   onClick={() => {
                                     setActiveRole(r as any);
                                     setIsUserMenuOpen(false);
-                                    const targetPath = ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support'].includes(r) 
-                                      ? `/${r.replace('_', '-')}/${lang || 'eng'}` 
-                                      : `/${isStudio ? 'studio' : 'aca'}/${lang || 'eng'}/dashboard`;
-                                    navigate(targetPath);
+                                    navigate(getDashboardLinkForRole(r));
                                   }}
                                   className={`w-full text-left px-3 py-2 rounded-lg text-[9px] font-black uppercase transition-all flex items-center gap-2 ${activeRole === r ? 'text-primary bg-primary/10' : 'text-white/40 hover:bg-white/5'}`}
                                 >

@@ -15,10 +15,13 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const ALL_ROLES: UserRole[] = [
+  'admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client'
+];
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [fbUser, fbLoading] = useAuthState(auth);
   
-  // IMMEDIATELY initialize profile from localStorage for Dev Access to avoid flickering
   const [profile, setProfile] = useState<UserProfile | null>(() => {
     const devStored = localStorage.getItem('rg_dev_user');
     if (devStored) {
@@ -29,8 +32,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: dev.email,
           displayName: dev.displayName,
           photoURL: dev.photoURL || null,
-          roles: ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client'],
-          createdAt: new Date()
+          roles: ALL_ROLES,
+          createdAt: new Date(),
+          isAdmin: true
         };
       } catch (e) { return null; }
     }
@@ -60,9 +64,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const dbRes = await response.json();
         const dbUser = dbRes.data;
         
-        let finalRoles: UserRole[] = dbUser.role === 'admin' || dbUser.email === 'super@redgriffin.academy' 
-          ? ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client']
-          : [dbUser.role || 'student'];
+        const isAdmin = dbUser.role === 'admin' || dbUser.email === 'super@redgriffin.academy';
+        let finalRoles: UserRole[] = isAdmin ? ALL_ROLES : (dbUser.roles || [dbUser.role || 'student']);
 
         const mappedProfile: UserProfile = {
           uid: dbUser.remoteId || dbUser.id,
@@ -71,27 +74,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           photoURL: dbUser.photoURL,
           roles: finalRoles,
           createdAt: dbUser.createdAt,
+          isAdmin: isAdmin
         };
 
         setProfile(mappedProfile);
         
         const savedRole = localStorage.getItem(`rg_active_role_${mappedProfile.uid}`) as UserRole;
         setActiveRoleState(savedRole && finalRoles.includes(savedRole) ? savedRole : finalRoles[0]);
+      } else {
+        const firestoreProfile = await userService.getProfile(uid);
+        if (firestoreProfile) {
+          const isAdmin = firestoreProfile.roles?.includes('admin') || firestoreProfile.email === 'super@redgriffin.academy';
+          let finalRoles = isAdmin ? ALL_ROLES : (firestoreProfile.roles || ['student']);
+          
+          const mappedProfile: UserProfile = {
+            ...firestoreProfile,
+            roles: finalRoles as UserRole[],
+            isAdmin: isAdmin
+          };
+          
+          setProfile(mappedProfile);
+          const savedRole = localStorage.getItem(`rg_active_role_${mappedProfile.uid}`) as UserRole;
+          setActiveRoleState(savedRole && finalRoles.includes(savedRole) ? savedRole : finalRoles[0]);
+        }
       }
     } catch (err) {
-      console.error("Backend fetch error:", err);
+      console.error("Auth initialization error:", err);
     }
   };
 
   useEffect(() => {
     const initAuth = async () => {
-      // 1. If already set by initial state (Dev Access), just stop loading
       if (localStorage.getItem('rg_dev_user')) {
         setProfileLoading(false);
         return;
       }
 
-      // 2. Handle Firebase Auth
       if (!fbLoading) {
         if (fbUser) {
           await fetchProfileFromBackend(fbUser.uid);
@@ -105,14 +123,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initAuth();
   }, [fbUser, fbLoading]);
-
-  // Safety timer
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (profileLoading) setProfileLoading(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [profileLoading]);
 
   const refreshProfile = async () => {
     if (fbUser) await fetchProfileFromBackend(fbUser.uid);
