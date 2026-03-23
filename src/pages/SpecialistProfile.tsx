@@ -28,11 +28,13 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { networkingService, Profile } from '../services/networkingService';
 import Preloader from '../components/Preloader';
+import { useAuth } from '../context/AuthContext';
 
 type ProfileTab = 'about' | 'portfolio' | 'experience' | 'education' | 'reviews';
 
 export default function SpecialistProfile() {
   const { id, lang } = useParams();
+  const { profile: currentUserProfile, loading: authLoading } = useAuth();
   const location = useLocation();
   const isStudio = location.pathname.includes('/studio/');
   const [activeTab, setActiveTab] = useState<ProfileTab>('about');
@@ -42,22 +44,38 @@ export default function SpecialistProfile() {
   useEffect(() => {
     async function fetchProfile() {
       if (!id) return;
+      
+      // Optimization: If viewing own profile, use context data
+      if (currentUserProfile && id === currentUserProfile.uid) {
+        setProfile({
+          id: currentUserProfile.uid,
+          userId: currentUserProfile.uid,
+          bio: 'Red Griffin Specialist',
+          location: 'Remote',
+          skills: [],
+          portfolio: [],
+          user: {
+            displayName: currentUserProfile.displayName,
+            photoURL: currentUserProfile.photoURL || undefined
+          }
+        });
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        // Try to fetch extended profile first
         try {
           const data = await networkingService.getProfile(id);
           setProfile(data);
         } catch (err) {
-          console.warn("Extended profile not found, fetching basic user data...");
-          // Fallback to basic user data from our API
           const response = await fetch(`/api/users/${id}`);
           if (response.ok) {
-            const userData = await response.json();
-            // Adapt User to Profile structure
+            const resData = await response.json();
+            const userData = resData.data || resData;
             setProfile({
-              id: userData.id,
-              userId: userData.id,
+              id: userData.remoteId || userData.id,
+              userId: userData.remoteId || userData.id,
               bio: userData.bio || '',
               location: 'Remote',
               skills: [],
@@ -78,11 +96,11 @@ export default function SpecialistProfile() {
       }
     }
     fetchProfile();
-  }, [id]);
+  }, [id, currentUserProfile]);
 
   const backLink = isStudio ? `/studio/${lang || 'eng'}` : `/aca/${lang || 'eng'}`;
 
-  const sidebarItems: { id: ProfileTab; label: string; icon: any }[] = [
+  const tabs: { id: ProfileTab; label: string; icon: any }[] = [
     { id: 'about', label: 'О специалисте', icon: User },
     { id: 'portfolio', label: 'Портфолио', icon: Layers },
     { id: 'experience', label: 'Опыт работы', icon: Briefcase },
@@ -90,13 +108,13 @@ export default function SpecialistProfile() {
     { id: 'reviews', label: 'Отзывы', icon: Star },
   ];
 
-  if (loading) {
+  if (loading || authLoading) {
     return <Preloader message="Loading Profile..." size="lg" className="min-h-screen bg-[#050505]" />;
   }
 
   if (!profile) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#050505] text-white">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-white">
         <h1 className="text-4xl font-black mb-4">Profile Not Found</h1>
         <Link to={backLink} className="text-primary hover:underline uppercase tracking-widest text-xs font-black">Go Back</Link>
       </div>
@@ -104,217 +122,121 @@ export default function SpecialistProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-primary/30 pb-20">
-      {/* Cover Image */}
-      <div className="h-64 md:h-80 w-full relative overflow-hidden">
-        <img src={`https://picsum.photos/seed/${profile.id}/1200/400`} alt="" className="w-full h-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent" />
+    <div className="space-y-8">
+      {/* Profile Header Card */}
+      <div className="relative rounded-[3rem] bg-[#0a0a0a] border border-white/5 overflow-hidden shadow-2xl">
+        <div className="h-48 bg-gradient-to-r from-primary/20 to-primary-hover/20 relative">
+          <img src={`https://picsum.photos/seed/${profile.id}/1200/400`} alt="" className="w-full h-full object-cover opacity-30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
+        </div>
         
-        <div className="absolute top-24 left-4 sm:left-6 lg:left-8">
-           <Link 
-            to={backLink}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-primary transition-all group"
-          >
-            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-            {isStudio ? 'Studio Network' : 'Academy Hub'}
-          </Link>
+        <div className="px-10 pb-10 -mt-16 relative z-10 flex flex-col md:flex-row items-end gap-8">
+          <div className="relative group">
+            <div className="size-40 rounded-[2.5rem] overflow-hidden border-4 border-[#0a0a0a] shadow-2xl bg-[#111]">
+              <img src={profile.avatar || profile.user.photoURL || `https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png`} alt="" className="w-full h-full object-cover" />
+            </div>
+            <div className="absolute -bottom-2 -right-2 size-10 bg-primary rounded-2xl flex items-center justify-center text-bg-dark shadow-lg">
+              <ShieldCheck size={20} />
+            </div>
+          </div>
+
+          <div className="flex-1 space-y-4 pb-4">
+            <div className="space-y-1 text-center md:text-left">
+              <h1 className="text-4xl font-black tracking-tighter uppercase">{profile.user.displayName}</h1>
+              <div className="flex flex-wrap justify-center md:justify-start gap-4 text-[10px] font-black uppercase tracking-widest text-white/40">
+                <div className="flex items-center gap-2"><MapPin size={12} className="text-primary" /> {profile.location || 'Remote'}</div>
+                <div className="flex items-center gap-2"><Briefcase size={12} className="text-primary" /> {profile.skills?.[0]?.name || 'Visual Specialist'}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-3 pb-4">
+            <button className="px-8 py-4 bg-primary text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary/20">Connect</button>
+            <button className="p-4 bg-white/5 border border-white/10 rounded-2xl text-white/40 hover:text-white transition-all"><MessageSquare size={20} /></button>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
-          
-          {/* LEFT SIDEBAR */}
-          <aside className="space-y-6">
-            {/* Profile Brief Card */}
-            <div className="p-8 rounded-[2.5rem] bg-[#0a0a0a] border border-white/5 shadow-2xl space-y-8 sticky top-24">
-              <div className="space-y-6 text-center">
-                <div className="relative inline-block">
-                  <div className="size-32 rounded-[2rem] overflow-hidden border-4 border-white/5 shadow-2xl mx-auto">
-                    <img src={profile.avatar || profile.user.photoURL || `https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png`} alt={profile.user.displayName} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="absolute -bottom-2 -right-2 size-8 bg-primary rounded-xl flex items-center justify-center text-bg-dark shadow-lg shadow-primary/20">
-                    <ShieldCheck size={18} />
-                  </div>
-                </div>
+      {/* Tab Navigation */}
+      <div className="flex gap-2 p-1 bg-white/5 border border-white/5 rounded-[2rem] overflow-x-auto no-scrollbar">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-3 px-8 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+              activeTab === tab.id ? 'bg-white text-bg-dark shadow-xl' : 'text-white/40 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <tab.icon size={16} />
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-                <div className="space-y-2">
-                  <h1 className="text-3xl font-black tracking-tighter uppercase">{profile.user.displayName}</h1>
-                  <p className="text-xs font-black text-primary uppercase tracking-widest">{profile.skills?.[0]?.name || 'Specialist'}</p>
+      {/* Tab Content */}
+      <div className="min-h-[400px]">
+        <AnimatePresence mode="wait">
+          {activeTab === 'about' && (
+            <motion.div key="about" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-8">
+                <div className="p-10 rounded-[3rem] bg-[#0a0a0a] border border-white/5 space-y-6">
+                  <h2 className="text-2xl font-black uppercase tracking-tight">Biography</h2>
+                  <p className="text-lg text-white/60 font-medium leading-relaxed">{profile.bio || 'Professional CG Specialist in the Red Griffin Ecosystem.'}</p>
                 </div>
-
-                <div className="flex justify-center gap-2">
-                  <button className="size-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-all border border-white/5 hover:border-primary/40"><Twitter size={16} /></button>
-                  <button className="size-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-all border border-white/5 hover:border-primary/40"><Github size={16} /></button>
-                  <button className="size-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-all border border-white/5 hover:border-primary/40"><LinkIcon size={16} /></button>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { label: 'Completion', value: '98%', color: 'text-emerald-500' },
+                    { label: 'Response', value: '< 2h', color: 'text-sky-500' },
+                  ].map((stat, i) => (
+                    <div key={i} className="p-8 rounded-[2.5rem] bg-[#0a0a0a] border border-white/5">
+                      <div className={`text-3xl font-black ${stat.color} mb-1`}>{stat.value}</div>
+                      <div className="text-[10px] font-black uppercase tracking-widest text-white/20">{stat.label}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Navigation Menu */}
-              <nav className="space-y-1 pt-4 border-t border-white/5">
-                {sidebarItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl transition-all group ${
-                      activeTab === item.id 
-                        ? 'bg-primary text-bg-dark font-black' 
-                        : 'text-white/40 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <item.icon size={18} className={activeTab === item.id ? 'text-bg-dark' : 'group-hover:text-primary transition-colors'} />
-                      <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
-                    </div>
-                    {activeTab === item.id && <ChevronRight size={14} />}
-                  </button>
-                ))}
-              </nav>
-
-              <div className="pt-6 border-t border-white/5 space-y-3">
-                <button className="w-full py-4 bg-primary text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary/20">
-                  Связаться
-                </button>
-                <button className="w-full py-4 bg-white/5 text-white border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-                  <Heart size={14} className="text-red-500" /> В избранное
-                </button>
-              </div>
-            </div>
-          </aside>
-
-          {/* MAIN CONTENT AREA */}
-          <main className="space-y-8">
-            {/* Action Bar */}
-            <div className="flex items-center justify-between p-4 bg-[#0a0a0a] border border-white/5 rounded-3xl">
-              <div className="flex items-center gap-6 px-4">
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] leading-none mb-1">Status</span>
-                  <div className="flex items-center gap-2">
-                    <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Available</span>
-                  </div>
-                </div>
-                <div className="h-8 w-[1px] bg-white/5" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] leading-none mb-1">Location</span>
-                  <span className="text-[10px] font-black uppercase tracking-widest">{profile.location || 'Remote'}</span>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <button className="size-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-all border border-white/5"><Share2 size={16} /></button>
-                <button className="size-10 rounded-xl bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-all border border-white/5"><MessageSquare size={16} /></button>
-              </div>
-            </div>
-
-            {/* Content Tabs */}
-            <div className="min-h-[600px]">
-              <AnimatePresence mode="wait">
-                {activeTab === 'about' && (
-                  <motion.div
-                    key="about"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="space-y-8"
-                  >
-                    {/* Header Info */}
-                    <div className="p-10 rounded-[3rem] bg-[#0a0a0a] border border-white/5 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full" />
-                      <div className="relative space-y-6">
-                        <h2 className="text-4xl font-black uppercase tracking-tighter leading-none">
-                          About <span className="text-primary italic">Specialist.</span>
-                        </h2>
-                        <p className="text-lg text-white/60 font-medium leading-relaxed max-w-3xl">
-                          {profile.bio || 'No bio provided.'}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Stats Grid (Mocked values for now) */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {[
-                        { label: 'Rating', value: '4.9', icon: Star, color: 'text-amber-500' },
-                        { label: 'Projects', value: profile.portfolio?.length || 0, icon: Layers, color: 'text-primary' },
-                        { label: 'Experience', value: '5+ Years', icon: Clock, color: 'text-emerald-500' },
-                        { label: 'Reviews', value: '24', icon: MessageSquare, color: 'text-sky-500' },
-                      ].map((stat, i) => (
-                        <div key={i} className="p-6 rounded-[2rem] bg-[#0a0a0a] border border-white/5 text-center space-y-2">
-                          <stat.icon size={20} className={`${stat.color} mx-auto mb-2`} />
-                          <div className="text-2xl font-black text-white">{stat.value}</div>
-                          <div className="text-[9px] font-black uppercase tracking-widest text-white/20">{stat.label}</div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Skills Tag Cloud */}
-                    <div className="p-10 rounded-[3rem] bg-[#0a0a0a] border border-white/5 space-y-8">
-                      <div className="flex items-center gap-3">
-                        <Zap className="text-primary" size={24} />
-                        <h2 className="text-2xl font-black uppercase tracking-tight text-white">Expertise & Skills</h2>
-                      </div>
-                      <div className="flex flex-wrap gap-3">
-                        {(profile.skills || []).map((skill: any, idx: number) => (
-                          <div 
-                            key={idx}
-                            className="px-6 py-3 rounded-2xl bg-white/[0.03] border border-white/5 text-[11px] font-black uppercase tracking-widest text-white/40 hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-all cursor-default"
-                          >
-                            {skill.name}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {activeTab === 'portfolio' && (
-                  <motion.div
-                    key="portfolio"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                  >
-                    {(profile.portfolio || []).map((item: any) => (
-                      <div 
-                        key={item.id}
-                        className="group relative aspect-video rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#0a0a0a]"
-                      >
-                        <img src={item.mediaUrl} alt={item.title} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-                        <div className="absolute bottom-8 left-8 space-y-2">
-                          <span className="px-3 py-1 bg-primary text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-lg">
-                            {item.category || 'Work'}
-                          </span>
-                          <h3 className="text-xl font-black text-white uppercase tracking-tight">{item.title}</h3>
-                        </div>
-                        <button className="absolute top-8 right-8 size-12 bg-white rounded-2xl flex items-center justify-center text-bg-dark opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all">
-                          <ExternalLink size={20} />
-                        </button>
-                      </div>
+              <div className="space-y-8">
+                <div className="p-10 rounded-[3rem] bg-[#0a0a0a] border border-white/5 space-y-6">
+                  <h2 className="text-xl font-black uppercase tracking-tight">Expertise</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {['Unreal Engine', 'Maya', 'Houdini', 'ZBrush', 'Substance'].map(skill => (
+                      <span key={skill} className="px-4 py-2 bg-white/5 border border-white/5 rounded-xl text-[9px] font-black uppercase tracking-widest text-white/40">{skill}</span>
                     ))}
-                    {profile.portfolio?.length === 0 && (
-                      <div className="col-span-full py-20 text-center text-white/20 uppercase tracking-widest text-xs font-black">
-                        No portfolio items yet.
-                      </div>
-                    )}
-                  </motion.div>
-                )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
-                {activeTab !== 'about' && activeTab !== 'portfolio' && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex flex-col items-center justify-center py-40 opacity-20"
-                  >
-                    {React.createElement(sidebarItems.find(i => i.id === activeTab)?.icon || Layers, { size: 64 })}
-                    <span className="text-[12px] font-black uppercase tracking-[0.5em] mt-6">{activeTab} Section Initializing...</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </main>
-        </div>
+          {activeTab === 'portfolio' && (
+            <motion.div key="portfolio" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {profile.portfolio?.length ? profile.portfolio.map((item: any) => (
+                <div key={item.id} className="group relative aspect-video rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#0a0a0a]">
+                  <img src={item.mediaUrl} alt="" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+                  <div className="absolute bottom-8 left-8 space-y-2">
+                    <span className="px-3 py-1 bg-primary text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-lg">{item.category || 'Visual Art'}</span>
+                    <h3 className="text-xl font-black text-white uppercase tracking-tight">{item.title}</h3>
+                  </div>
+                </div>
+              )) : (
+                <div className="col-span-full py-20 text-center bg-white/[0.01] border border-dashed border-white/5 rounded-[3rem]">
+                  <Layers size={48} className="mx-auto text-white/10 mb-4" />
+                  <p className="text-white/20 font-black uppercase tracking-widest text-xs">No portfolio entries available</p>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {activeTab !== 'about' && activeTab !== 'portfolio' && (
+            <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-40 opacity-20">
+              <Zap size={64} />
+              <span className="text-[12px] font-black uppercase tracking-[0.5em] mt-6">{activeTab} section coming soon</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

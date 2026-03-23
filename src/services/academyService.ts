@@ -58,7 +58,7 @@ export interface Review {
   createdAt: string;
 }
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 
 export const academyService = {
   async getCourses(filters?: { status?: string, category?: string, level?: string, search?: string, page?: number, limit?: number }): Promise<Course[]> {

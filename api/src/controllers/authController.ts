@@ -166,13 +166,18 @@ export const authController = {
     }
   },
 
-  // Get user by ID
+  // Get user by ID or remoteId
   async getUser(req: Request, res: Response) {
     try {
       const { id } = req.params;
 
-      const user = await prisma.user.findUnique({
-        where: { id },
+      let user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { id: id },
+            { remoteId: id }
+          ]
+        },
         include: { profile: { include: { skills: true, portfolio: true } } }
       });
 

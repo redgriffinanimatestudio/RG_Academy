@@ -245,130 +245,106 @@ export default function Studio() {
           <KanbanBoard />
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-2 space-y-8">
-            <section className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-black tracking-tight text-white uppercase">{t('active_projects')}</h2>
-                <button className="text-xs font-black uppercase tracking-widest text-primary hover:text-primary-hover transition-colors">{t('view_all')}</button>
-              </div>
-              <div className="space-y-6">
-                {filteredProjects.map((project) => (
-                  <motion.div
-                    key={project.id}
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    whileHover={{ y: -4 }}
-                    className="criativo-card space-y-6 rounded-[2rem]"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-black text-2xl tracking-tight text-white uppercase">{project.title}</h3>
-                          {project.urgency === 'urgent' && (
-                            <span className="px-2 py-0.5 bg-primary text-bg-dark text-[8px] font-black uppercase tracking-widest rounded-md flex items-center gap-1">
-                              <Zap size={8} fill="currentColor" /> {t('urgent')}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-white/40 font-medium">{t('posted_by')} <span className="text-white">{project.client}</span></p>
+        <div className="space-y-12">
+          <section className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-black tracking-tight text-white uppercase">{t('active_projects')}</h2>
+              <button className="text-xs font-black uppercase tracking-widest text-primary hover:text-primary-hover transition-colors">{t('view_all')}</button>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {filteredProjects.map((project) => (
+                <motion.div
+                  key={project.id}
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  whileHover={{ y: -4 }}
+                  className="criativo-card space-y-6 rounded-[2rem]"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-black text-2xl tracking-tight text-white uppercase">{project.title}</h3>
+                        {project.urgency === 'urgent' && (
+                          <span className="px-2 py-0.5 bg-primary text-bg-dark text-[8px] font-black uppercase tracking-widest rounded-md flex items-center gap-1">
+                            <Zap size={8} fill="currentColor" /> {t('urgent')}
+                          </span>
+                        )}
                       </div>
-                      <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                        project.status === 'open' ? 'bg-primary/10 text-primary' : 'bg-white/5 text-white/40'
-                      }`}>
-                        {t(project.status)}
+                      <p className="text-sm text-white/40 font-medium">{t('posted_by')} <span className="text-white">{project.client}</span></p>
+                    </div>
+                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                      project.status === 'open' ? 'bg-primary/10 text-primary' : 'bg-white/5 text-white/40'
+                    }`}>
+                      {t(project.status)}
+                    </span>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {project.tags.map(tag => (
+                      <span key={tag} className="px-3 py-1 rounded-lg bg-white/5 text-[10px] font-black uppercase tracking-widest text-white/40">
+                        {tag}
                       </span>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2">
-                      {project.tags.map(tag => (
-                        <span key={tag} className="px-3 py-1 rounded-lg bg-white/5 text-[10px] font-black uppercase tracking-widest text-white/40">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                    ))}
+                  </div>
 
-                    <div className="flex items-center justify-between pt-6 border-t border-white/5">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{t('budget_range')}</span>
-                        <span className="text-lg font-black text-white">${project.budget.toLocaleString()}</span>
-                      </div>
-                      <button 
-                        onClick={() => {
-                          setSelectedProject(project);
-                          setShowApplyModal(true);
-                        }}
-                        className="flex items-center gap-2 bg-white/5 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-white hover:bg-primary hover:text-bg-dark transition-all border border-white/5"
-                      >
-                        {t('view_details')} <ChevronRight size={14} />
-                      </button>
+                  <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{t('budget_range')}</span>
+                      <span className="text-lg font-black text-white">${project.budget.toLocaleString()}</span>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
-            </section>
-          </div>
-
-          <aside className="space-y-12">
-            <section className="space-y-6">
-              <h2 className="text-2xl font-black tracking-tight text-white uppercase">{t('top_talent')}</h2>
-              <div className="space-y-4">
-                {loadingTalent ? (
-                  <Preloader message="Loading Talent..." size="sm" />
-                ) : Array.isArray(talent) && talent.length > 0 ? (
-                  talent.map((person) => (
-                    <Link 
-                      key={person.id} 
-                      to={`/studio/${lang || 'eng'}/profile/${person.id}`}
-                      className="group flex items-center gap-4 p-5 rounded-[1.5rem] border border-white/5 bg-white/5 hover:border-primary/20 transition-all cursor-pointer"
+                    <button 
+                      onClick={() => {
+                        setSelectedProject(project);
+                        setShowApplyModal(true);
+                      }}
+                      className="flex items-center gap-2 bg-white/5 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-white hover:bg-primary hover:text-bg-dark transition-all border border-white/5"
                     >
-                      <div className="avatar">
-                        <div className="size-14 rounded-2xl shadow-lg shadow-black/20 border border-white/5">
-                          <img src={person.profile?.avatar || person.photoURL || `https://picsum.photos/seed/${person.id}/200/200`} alt={person.displayName} referrerPolicy="no-referrer" />
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-black text-white truncate tracking-tight uppercase">{person.displayName}</h4>
-                        <p className="text-xs text-white/40 font-medium truncate">
-                          {person.profile?.skills?.[0]?.name || person.role || 'Specialist'}
-                        </p>
-                        <div className="flex items-center gap-1 mt-1 text-[10px] text-white/20 font-bold uppercase tracking-widest">
-                          <MapPin size={10} />
-                          <span>{person.profile?.location || 'Remote'}</span>
-                        </div>
-                      </div>
-                      <div className="p-3 bg-white/5 text-white/20 rounded-xl group-hover:bg-primary group-hover:text-bg-dark transition-all">
-                        <MessageSquare size={18} />
-                      </div>
-                    </Link>
-                  ))
-                ) : (
-                  <p className="text-sm text-white/50">No talent profiles found.</p>
-                )}
+                      {t('view_details')} <ChevronRight size={14} />
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </section>
 
-              </div>
-              <button className="w-full py-4 rounded-2xl border-2 border-white/5 text-xs font-black uppercase tracking-widest text-white/40 hover:bg-white/5 hover:border-white/10 transition-all">
-                {t('browse_talent')}
-              </button>
-            </section>
-
-            <section className="p-8 rounded-[2.5rem] bg-bg-card border border-white/5 text-white space-y-6 relative overflow-hidden shadow-2xl shadow-black/20">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2" />
-              <div className="flex items-center gap-3 text-primary">
-                <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-bg-dark">
-                  <Globe size={20} />
-                </div>
-                <h3 className="font-black uppercase tracking-widest text-sm">{t('studio_pro')}</h3>
-              </div>
-              <p className="text-sm text-white/40 font-medium leading-relaxed">
-                {t('studio_pro_desc')}
-              </p>
-              <button className="w-full py-4 rounded-2xl bg-primary text-bg-dark text-xs font-black uppercase tracking-widest hover:bg-primary-hover transition-all hover:scale-105 shadow-xl shadow-primary/20">
-                {t('upgrade_pro')}
-              </button>
-            </section>
-          </aside>
+          {/* Featured Talent Grid (Moved from Sidebar to main area) */}
+          <section className="space-y-8 pt-12 border-t border-white/5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-black tracking-tight text-white uppercase">{t('top_talent')}</h2>
+              <button className="text-xs font-black uppercase tracking-widest text-primary hover:text-primary-hover transition-colors">{t('browse_talent')}</button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {loadingTalent ? (
+                <Preloader message="Loading Talent..." size="sm" />
+              ) : Array.isArray(talent) && talent.length > 0 ? (
+                talent.map((person) => (
+                  <Link 
+                    key={person.id} 
+                    to={`/studio/${lang || 'eng'}/profile/${person.id}`}
+                    className="group flex items-center gap-4 p-5 rounded-[1.5rem] border border-white/5 bg-white/5 hover:border-primary/20 transition-all cursor-pointer"
+                  >
+                    <div className="avatar">
+                      <div className="size-14 rounded-2xl shadow-lg shadow-black/20 border border-white/5">
+                        <img src={person.profile?.avatar || person.photoURL || `https://picsum.photos/seed/${person.id}/200/200`} alt={person.displayName} referrerPolicy="no-referrer" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-black text-white truncate tracking-tight uppercase">{person.displayName}</h4>
+                      <p className="text-xs text-white/40 font-medium truncate">
+                        {person.profile?.skills?.[0]?.name || person.role || 'Specialist'}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-white/5 text-white/20 rounded-xl group-hover:bg-primary group-hover:text-bg-dark transition-all">
+                      <MessageSquare size={18} />
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <p className="text-sm text-white/50">No talent profiles found.</p>
+              )}
+            </div>
+          </section>
         </div>
       )}
 
