@@ -93,8 +93,9 @@ export function AdminDashboardContent({ activeModule, theme, user }: any) {
         {activeModule === 'chat' && <AdminChat theme={currentTheme} />}
         {activeModule === 'settings' && <AdminSettings theme={currentTheme} />}
         {activeModule === 'rbac' && <AdminRBACMatrix theme={currentTheme} />}
+        {['courses', 'topics', 'services'].includes(activeModule) && <div className="p-20 text-center bg-[#111] border border-white/5 rounded-[2.5rem] opacity-40 uppercase font-black tracking-widest">{activeModule} Management System Initializing...</div>}
         
-        {!['dashboard', 'users', 'profile', 'create', 'detail', 'chat', 'settings', 'rbac'].includes(activeModule) && (
+        {!['dashboard', 'users', 'profile', 'create', 'detail', 'chat', 'settings', 'rbac', 'courses', 'topics', 'services'].includes(activeModule) && (
           <div className="flex flex-col items-center justify-center py-40 opacity-20">
             <ShieldAlert size={64} className="mb-6" style={{ color: currentTheme.accent }} />
             <h2 className="text-xl font-black uppercase tracking-[0.5em]">Module Initializing...</h2>

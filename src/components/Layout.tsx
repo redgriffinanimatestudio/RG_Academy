@@ -149,9 +149,9 @@ const DASHBOARD_MENUS: Record<string, any[]> = {
     { name: 'system_health', icon: Cpu, subcategories: [{ name: 'settings' }] }
   ],
   chief_manager: [
-    { name: 'strategic_hub', icon: Target, subcategories: [{ name: 'dashboard' }, { name: 'kpi_metrics' }, { name: 'growth' }] },
-    { name: 'team_mgmt', icon: Users, subcategories: [{ name: 'staff_list' }, { name: 'performance' }] },
-    { name: 'ops_mgmt', icon: Briefcase, subcategories: [{ name: 'all_contracts' }, { name: 'legal' }] }
+    { name: 'strategic_hub', icon: Target, subcategories: [{ name: 'dashboard' }, { name: 'kpi_metrics' }, { name: 'growth' }, { name: 'financials' }, { name: 'risk_management' }] },
+    { name: 'team_mgmt', icon: Users, subcategories: [{ name: 'staff_list' }, { name: 'performance' }, { name: 'audit_log' }] },
+    { name: 'ops_mgmt', icon: Briefcase, subcategories: [{ name: 'all_contracts' }, { name: 'legal' }, { name: 'roadmap' }] }
   ],
   manager: [
     { name: 'operational_overview', icon: LayoutDashboard, subcategories: [{ name: 'overview' }] },

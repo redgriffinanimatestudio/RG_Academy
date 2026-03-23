@@ -61,13 +61,176 @@ export function ChiefManagerDashboardContent({ activeModule, theme }: any) {
       {activeModule === 'growth' && <GrowthView theme={theme} />}
       {activeModule === 'staff_list' && <StaffListView theme={theme} />}
       {activeModule === 'performance' && <PerformanceView theme={theme} />}
-      {activeModule !== 'dashboard' && activeModule !== 'all_contracts' && activeModule !== 'kpi_metrics' && activeModule !== 'growth' && activeModule !== 'staff_list' && activeModule !== 'performance' && (
+      {activeModule === 'legal' && <LegalView theme={theme} />}
+      {activeModule === 'financials' && <FinancialsView theme={theme} />}
+      {activeModule === 'risk_management' && <RiskView theme={theme} />}
+      {activeModule === 'audit_log' && <AuditLogView theme={theme} />}
+      {activeModule === 'roadmap' && <RoadmapView theme={theme} />}
+      {!['dashboard', 'all_contracts', 'kpi_metrics', 'growth', 'staff_list', 'performance', 'legal', 'financials', 'risk_management', 'audit_log', 'roadmap'].includes(activeModule) && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full py-20 opacity-20 text-center">
           <Target size={64} className="mb-6" />
           <div className="text-[12px] font-black uppercase tracking-[0.5em]">{activeModule} View Initializing...</div>
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function RiskView({ theme }: any) {
+  return (
+    <div className="space-y-8">
+      <div className="bg-red-500/5 border border-red-500/20 rounded-[2.5rem] p-10 shadow-2xl">
+        <h3 className="text-xl font-black uppercase tracking-tight text-red-500 mb-8 flex items-center gap-3"><ShieldAlert size={24} /> Systemic Risk Analysis</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { label: 'Operational Risk', val: 'Low', color: '#1d9e75' },
+            { label: 'Financial Risk', val: 'Moderate', color: '#ef9f27' },
+            { label: 'Compliance Risk', val: 'Low', color: '#1d9e75' }
+          ].map((r, i) => (
+            <div key={i} className="p-6 bg-black/40 border border-white/5 rounded-3xl">
+              <div className="text-[10px] font-black text-white/40 uppercase mb-2">{r.label}</div>
+              <div className="text-2xl font-black uppercase" style={{ color: r.color }}>{r.val}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AuditLogView({ theme }: any) {
+  return (
+    <div className="bg-[#111] border border-[#2a2a2a] rounded-2xl overflow-hidden shadow-2xl">
+      <div className="p-6 border-b border-[#2a2a2a] bg-black/20 flex items-center justify-between">
+        <h3 className="text-[11px] font-black uppercase tracking-widest">Global Operations Audit</h3>
+      </div>
+      <div className="p-8 space-y-4">
+        {[1,2,3,4,5].map(i => (
+          <div key={i} className="flex gap-6 p-4 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-white/10 transition-all">
+            <div className="text-[10px] font-black text-white/20 pt-1">14:{30-i}</div>
+            <div>
+              <div className="text-xs font-black text-white uppercase tracking-tight">Admin Action: Role Update</div>
+              <div className="text-[10px] text-white/40 mt-1 uppercase tracking-widest font-bold">User uid_0042 role changed to manager by super_admin</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RoadmapView({ theme }: any) {
+  return (
+    <div className="space-y-12 py-10">
+      <div className="relative">
+        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/5 -translate-x-1/2" />
+        {[
+          { q: 'Q2 2026', title: 'Global Expansion', desc: 'Opening server clusters in Tokyo and London.' },
+          { q: 'Q3 2026', title: 'Studio AI Integration', desc: 'Automated rendering optimization.' },
+          { q: 'Q4 2026', title: 'Mobile Ecosystem', desc: 'Full RG Academy mobile app launch.' }
+        ].map((m, i) => (
+          <div key={i} className={`relative flex items-center gap-12 mb-20 ${i % 2 === 0 ? 'flex-row-reverse' : ''}`}>
+            <div className="flex-1 text-right">
+              <div className={`space-y-2 ${i % 2 === 0 ? 'text-left' : 'text-right'}`}>
+                <div className="text-xl font-black text-white uppercase tracking-tighter">{m.title}</div>
+                <div className="text-xs text-white/40 font-medium leading-relaxed">{m.desc}</div>
+              </div>
+            </div>
+            <div className="size-4 rounded-full bg-[#7f77dd] relative z-10 shadow-[0_0_20px_#7f77dd]" />
+            <div className="flex-1">
+              <div className={`text-2xl font-black text-[#7f77dd] uppercase tracking-tighter ${i % 2 === 0 ? 'text-right' : 'text-left'}`}>{m.q}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LegalView({ theme }: any) {
+  return (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-[#111] border border-[#2a2a2a] rounded-[2.5rem] p-8 space-y-6 shadow-2xl relative overflow-hidden group">
+          <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
+            <ShieldCheck className="text-[#7f77dd]" size={24} />
+            Compliance Status
+          </h3>
+          <div className="space-y-4">
+            {[
+              { label: 'GDPR Data Privacy', status: 'Compliant', color: '#1d9e75' },
+              { label: 'Platform Terms of Service', status: 'Updated', color: '#378add' },
+              { label: 'Lecturer Agreements', status: '98% Signed', color: '#7f77dd' },
+              { label: 'Content Copyright Audit', status: 'In Progress', color: '#ef9f27' }
+            ].map((item, i) => (
+              <div key={i} className="flex justify-between items-center p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <span className="text-xs font-bold text-white/60">{item.label}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border" style={{ borderColor: item.color + '40', color: item.color, backgroundColor: item.color + '10' }}>{item.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-[#111] border border-[#2a2a2a] rounded-[2.5rem] p-8 space-y-6 shadow-2xl relative overflow-hidden group">
+          <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
+            <FileText className="text-[#7f77dd]" size={24} />
+            Legal Action Queue
+          </h3>
+          <div className="space-y-4">
+            {[
+              { type: 'Dispute', project: 'CGI Environment Alpha', priority: 'High' },
+              { type: 'Trademark', entity: 'Red Griffin Logo IP', priority: 'Medium' },
+              { type: 'Licensing', asset: 'Unreal Engine Plugin', priority: 'Low' }
+            ].map((item, i) => (
+              <div key={i} className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl flex justify-between items-center">
+                <div>
+                  <div className="text-xs font-black text-white uppercase tracking-tight">{item.type}</div>
+                  <div className="text-[10px] text-white/40 mt-1">{Object.values(item)[1]}</div>
+                </div>
+                <div className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border ${item.priority === 'High' ? 'text-red-500 border-red-500/20' : 'text-blue-500 border-blue-500/20'}`}>{item.priority}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FinancialsView({ theme }: any) {
+  return (
+    <div className="space-y-8">
+      <div className="bg-[#111] border border-[#2a2a2a] rounded-[2.5rem] p-10 shadow-2xl overflow-hidden relative group">
+        <div className="flex justify-between items-center mb-12">
+          <div>
+            <h3 className="text-2xl font-black uppercase tracking-tight">Financial Treasury</h3>
+            <p className="text-xs text-white/40 font-bold uppercase tracking-widest mt-2">Platform Revenue and Expenditure Flow</p>
+          </div>
+          <div className="text-right">
+            <div className="text-3xl font-black text-white tracking-tighter">$482,900.00</div>
+            <div className="text-[10px] font-black text-[#1d9e75] uppercase tracking-widest mt-1">Total Assets Under Management</div>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {[
+            { label: 'Academy Revenue', val: '$312,400', p: 65, color: '#7f77dd' },
+            { label: 'Studio Contracts', val: '$142,500', p: 30, color: '#378add' },
+            { label: 'Other Income', val: '$28,000', p: 5, color: '#1d9e75' }
+          ].map((item, i) => (
+            <div key={i} className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">{item.label}</span>
+                <span className="text-xs font-black text-white">{item.val}</span>
+              </div>
+              <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full rounded-full" style={{ width: `${item.p}%`, background: item.color }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
