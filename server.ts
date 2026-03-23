@@ -236,26 +236,22 @@ async function startServer() {
     }
   });
 
-  const PORT = process.env.PORT || 5000;
-
+  const PORT = process.env.PORT || 3000;
 
   // Socket.IO connection handling
   io.on('connection', (socket) => {
     logger.info('User connected', { socketId: socket.id });
 
-    // Join user room for personal notifications
     socket.on('join-user', (userId: string) => {
       socket.join(`user-${userId}`);
       logger.info('User joined room', { socketId: socket.id, userId });
     });
 
-    // Join project room for project updates
     socket.on('join-project', (projectId: string) => {
       socket.join(`project-${projectId}`);
       logger.info('User joined project room', { socketId: socket.id, projectId });
     });
 
-    // Join chat room
     socket.on('join-chat', (roomId: string) => {
       socket.join(`chat-${roomId}`);
       logger.info('User joined chat room', { socketId: socket.id, roomId });
@@ -269,25 +265,24 @@ async function startServer() {
   // Middleware
   app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-      ? ['https://rgacademy.space', 'https://www.rgacademy.space']
+      ? ['https://rgacademy.space', 'https://www.rgacademy.space', 'http://localhost:3000', 'http://localhost:5173']
       : true,
     credentials: true
   }));
 
   // Rate limiting
   const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000, 
+    max: 100,
     message: 'Too many requests from this IP, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
   });
   app.use('/api/', limiter);
 
-  // Stricter rate limiting for auth endpoints - increased for dev
   const authLimiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute
-    max: 100, // increased to 100 for testing
+    windowMs: 1 * 60 * 1000,
+    max: 100,
     message: 'Too many authentication attempts, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
@@ -300,11 +295,7 @@ async function startServer() {
 
   // Request logging
   app.use((req, res, next) => {
-    logger.info(`${req.method} ${req.url}`, {
-      ip: req.ip,
-      userAgent: req.get('User-Agent'),
-      body: req.method !== 'GET' ? req.body : undefined
-    });
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
   });
 
@@ -317,10 +308,14 @@ async function startServer() {
   }));
 
   // API Routes
+  console.log('Registering API routes...');
   app.use('/api', routes);
 
   // Error handling
-  app.use('/api/*', notFound);
+  app.use('/api/*', (req, res) => {
+    console.warn(`[404] API Route not found: ${req.method} ${req.url}`);
+    res.status(404).json({ success: false, message: `API Route ${req.url} not found` });
+  });
   app.use(errorHandler);
 
   // Vite / Static files
