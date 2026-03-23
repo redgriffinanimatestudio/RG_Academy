@@ -21,6 +21,7 @@ import { motion } from 'framer-motion';
 import { academyService, Course, Lesson, Review } from '../services/academyService';
 import { auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import Preloader from '../components/Preloader';
 
 export default function CourseDetail() {
   const { t } = useTranslation();
@@ -77,11 +78,7 @@ export default function CourseDetail() {
     }
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-bg-dark">
-      <div className="loading loading-spinner loading-lg text-primary"></div>
-    </div>
-  );
+  if (loading) return <Preloader message="Loading Course..." size="lg" className="min-h-screen bg-bg-dark" />;
 
   if (!course) return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-bg-dark space-y-6">

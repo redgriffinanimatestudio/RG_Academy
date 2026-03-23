@@ -93,173 +93,8 @@ export default function Dashboard() {
 
   const theme = roleThemes[activeRole || 'student'] || { accent: '#00f5d4', label: 'Member' };
 
-  const getSidebarItems = (role: string) => {
-    const commonTop = [
-      { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-      { id: 'profile', label: 'My Profile', icon: User },
-    ];
-    
-    const commonBottom = [
-      { id: 'messages', label: 'Messages', icon: MessageSquare },
-      { id: 'wallet', label: 'Wallet', icon: Wallet },
-      { id: 'settings', label: 'Settings', icon: Settings },
-    ];
-
-    const roleSpecific: Record<string, any[]> = {
-      admin: [
-        { id: 'users', label: 'User Control', icon: Users },
-        { id: 'content', label: 'CMS Engine', icon: Box },
-        { id: 'system', label: 'Infrastructure', icon: Cpu },
-        { id: 'logs', label: 'Audit Logs', icon: FileText },
-      ],
-      chief_manager: [
-        { id: 'strategy', label: 'Strategic Hub', icon: Target },
-        { id: 'performance', label: 'KPI Analytics', icon: TrendingUp },
-        { id: 'team', label: 'Team Leads', icon: Users },
-        { id: 'global_ops', label: 'Global Ops', icon: Globe },
-      ],
-      manager: [
-        { id: 'academy_ops', label: 'Academy Ops', icon: GraduationCap },
-        { id: 'studio_ops', label: 'Studio Board', icon: Briefcase },
-        { id: 'contracts', label: 'Contracts', icon: FileSearch },
-        { id: 'reviews', label: 'Review Queue', icon: ClipboardList },
-      ],
-      lecturer: [
-        { id: 'instructor_hub', label: 'Teaching Hub', icon: Video },
-        { id: 'my_courses', label: 'Course Builder', icon: Layers },
-        { id: 'students', label: 'My Students', icon: UserCheck },
-        { id: 'analytics', label: 'Class Stats', icon: TrendingUp },
-      ],
-      executor: [
-        { id: 'pro_workspace', label: 'Production', icon: Zap },
-        { id: 'my_progress', label: 'Skill Path', icon: BookOpen },
-        { id: 'job_pipeline', label: 'Job Pipeline', icon: Briefcase },
-        { id: 'portfolio', label: 'Portfolio CMS', icon: Layers },
-      ],
-      client: [
-        { id: 'projects', label: 'My Productions', icon: Box },
-        { id: 'talent_search', label: 'Talent Scout', icon: SearchCode },
-        { id: 'billing', label: 'Finance Hub', icon: CreditCard },
-        { id: 'briefs', label: 'Project Briefs', icon: FileText },
-      ],
-      student: [
-        { id: 'my_progress', label: 'My Workshops', icon: BookOpen },
-        { id: 'projects', label: 'Studio Projects', icon: Briefcase },
-        { id: 'certificates', label: 'Certificates', icon: Award },
-        { id: 'calendar', label: 'Live Sessions', icon: CalendarDays },
-      ],
-      moderator: [
-        { id: 'dashboard', label: 'Safety Overview', icon: Shield },
-        { id: 'complaints', label: 'Report Queue', icon: AlertCircle },
-        { id: 'verification', label: 'Verification', icon: UserCheck },
-        { id: 'analytics', label: 'Security Hub', icon: Zap },
-        { id: 'mass_actions', label: 'Mass Actions', icon: Layers },
-      ],
-      hr: [
-        { id: 'talent_mgmt', label: 'Hiring Board', icon: UserPlus },
-        { id: 'interviews', label: 'Schedule', icon: Calendar },
-        { id: 'applications', label: 'Review Hub', icon: ClipboardList },
-      ],
-      finance: [
-        { id: 'payouts', label: 'Payout Queue', icon: DollarSign },
-        { id: 'revenue', label: 'Revenue Share', icon: TrendingUp },
-        { id: 'escrow', label: 'Escrow Control', icon: ShieldCheck },
-      ],
-      support: [
-        { id: 'tickets', label: 'Help Desk', icon: LifeBuoy },
-        { id: 'user_search', label: 'Deep Search', icon: SearchCode },
-        { id: 'kb', label: 'Base Mgmt', icon: BookOpen },
-      ]
-    };
-
-    return [...commonTop, ...(roleSpecific[role] || roleSpecific.student), ...commonBottom];
-  };
-
-  const sidebarItems = getSidebarItems(activeRole || 'student');
-
   return (
-    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 max-w-[1600px] mx-auto py-4 lg:py-8 px-4 lg:px-8 min-h-screen">
-      {/* SIDEBAR / MOBILE NAVIGATION */}
-      <aside className="lg:w-72 shrink-0">
-        <div className="lg:p-8 lg:rounded-[2.5rem] lg:bg-[#0a0a0a] lg:border lg:border-white/5 lg:shadow-2xl space-y-6 lg:space-y-10 lg:sticky lg:top-24">
-          
-          {/* Profile Section - Hidden on very small mobile if needed, but here kept compact */}
-          <div className="flex items-center justify-between lg:flex-col lg:items-start gap-4 bg-[#0a0a0a] lg:bg-transparent p-4 lg:p-0 rounded-2xl border border-white/5 lg:border-0">
-            <div className="flex items-center gap-4">
-              <div className="size-10 lg:size-12 rounded-xl lg:rounded-2xl overflow-hidden border-2 border-white/5">
-                <img src={profile?.photoURL || `https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png`} alt="" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-xs lg:text-sm font-black text-white truncate uppercase tracking-tight">{user?.displayName?.split(' ')[0]}</h3>
-                <p className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest" style={{ color: theme.accent }}>{theme.label}</p>
-              </div>
-            </div>
-            
-            {/* Quick logout for mobile */}
-            <button onClick={() => logout()} className="lg:hidden p-2 text-red-500/40 hover:text-red-500">
-              <LogOut size={18} />
-            </button>
-          </div>
-
-          {/* Role Switcher - Optimized for mobile (Horizontal scroll) */}
-          {profile && profile.roles.length > 1 && (
-            <div className="flex lg:grid lg:grid-cols-2 gap-2 overflow-x-auto no-scrollbar pb-2 lg:pb-0">
-              {['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client']
-                .filter(r => profile.roles.includes(r as any))
-                .map(r => (
-                  <button
-                    key={r}
-                    onClick={() => setActiveRole(r as any)}
-                    className={`whitespace-nowrap px-4 lg:px-2 py-2 rounded-xl text-[8px] lg:text-[7px] font-black uppercase tracking-widest transition-all border shrink-0 ${
-                      activeRole === r 
-                      ? 'bg-white text-black border-white shadow-lg' 
-                      : 'text-white/40 border-white/5 hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    {r.replace('_', ' ')}
-                  </button>
-                ))}
-            </div>
-          )}
-
-          {/* Navigation - Horizontal scroll on mobile, vertical on desktop */}
-          <nav className="flex lg:flex-col gap-1 overflow-x-auto no-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0">
-            {sidebarItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  if (item.id === 'profile' && user?.uid) {
-                    const mode = location.pathname.split('/')[1] || 'aca';
-                    navigate(`/${mode}/${lang || 'eng'}/profile/${user.uid}`);
-                  } else {
-                    navigate(`?view=${item.id}`);
-                  }
-                }}
-                className={`flex items-center gap-3 lg:gap-4 px-5 lg:px-6 py-3 lg:py-4 rounded-xl lg:rounded-2xl transition-all group shrink-0 ${
-                  currentView === item.id 
-                    ? 'bg-white text-black font-black shadow-xl scale-[1.02]' 
-                    : 'text-white/40 hover:bg-white/5 hover:text-white'
-                }`}
-              >
-                <item.icon size={16} className={currentView === item.id ? 'text-black' : 'group-hover:text-primary transition-colors'} />
-                <span className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest whitespace-nowrap">{item.label}</span>
-              </button>
-            ))}
-          </nav>
-
-          {/* Desktop Footer */}
-          <div className="hidden lg:block pt-6 border-t border-white/5">
-            <button 
-              onClick={() => logout()}
-              className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-red-500/40 hover:text-red-500 hover:bg-red-500/5 transition-all group"
-            >
-              <LogOut size={18} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Secure Logout</span>
-            </button>
-          </div>
-        </div>
-      </aside>
-
+    <div className="flex flex-col min-h-screen">
       {/* MAIN CONTENT AREA */}
       <main className="flex-1 space-y-8 lg:space-y-12">
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -275,14 +110,14 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center gap-3 lg:gap-4">
             <button className="p-3 lg:p-4 bg-white/5 rounded-xl lg:rounded-2xl border border-white/5 text-white/40 hover:text-white transition-all relative">
-              <Bell size={20} lg:size={24} />
+              <Bell size={24} />
               <div className="absolute top-3 right-3 lg:top-4 lg:right-4 size-2 rounded-full border-2 border-[#0a0a0a]" style={{ background: theme.accent }} />
             </button>
             <Link 
               to={`/aca/${lang || 'eng'}`}
               className="flex-1 lg:flex-none px-6 lg:px-8 py-3 lg:py-4 bg-primary text-bg-dark rounded-xl lg:rounded-2xl text-[9px] lg:text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 lg:gap-3"
             >
-              <Rocket size={16} lg:size={18} /> <span className="whitespace-nowrap">Explore Workshops</span>
+              <Rocket size={18} /> <span className="whitespace-nowrap">Explore Workshops</span>
             </Link>
           </div>
         </header>

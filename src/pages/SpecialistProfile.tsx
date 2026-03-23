@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { networkingService, Profile } from '../services/networkingService';
+import Preloader from '../components/Preloader';
 
 type ProfileTab = 'about' | 'portfolio' | 'experience' | 'education' | 'reviews';
 
@@ -63,8 +64,7 @@ export default function SpecialistProfile() {
               portfolio: [],
               user: {
                 displayName: userData.displayName || 'User',
-                photoURL: userData.photoURL || undefined,
-                email: userData.email || undefined
+                photoURL: userData.photoURL || undefined
               }
             });
           } else {
@@ -91,11 +91,7 @@ export default function SpecialistProfile() {
   ];
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-[#050505]">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
+    return <Preloader message="Loading Profile..." size="lg" className="min-h-screen bg-[#050505]" />;
   }
 
   if (!profile) {

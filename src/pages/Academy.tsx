@@ -4,6 +4,7 @@ import { GraduationCap, Search, Filter, PlayCircle, Star, Users, ChevronRight } 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useParams } from 'react-router-dom';
 import { academyService, Course } from '../services/academyService';
+import Preloader from '../components/Preloader';
 
 const HERO_SLIDES = [
   {
@@ -60,7 +61,9 @@ export default function Academy() {
     fetchData();
   }, []);
 
-  const filteredCourses = courses.filter(course => {
+  const safeCourses = Array.isArray(courses) ? courses : [];
+
+  const filteredCourses = safeCourses.filter(course => {
     const matchesCategory = selectedCategory === 'all_workshops' || course.categoryId === selectedCategory;
     const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          course.lecturerName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -76,11 +79,7 @@ export default function Academy() {
   });
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
+    return <Preloader message="Loading Academy..." size="lg" />;
   }
 
   return (

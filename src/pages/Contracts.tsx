@@ -7,6 +7,7 @@ import { userService, UserProfile } from '../services/userService';
 import { FileText, CheckCircle, Clock, AlertCircle, DollarSign, ChevronRight, User, Briefcase, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import Preloader from '../components/Preloader';
 
 export default function Contracts() {
   const { t } = useTranslation();
@@ -50,11 +51,7 @@ export default function Contracts() {
     fetchData();
   }, [user]);
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="loading loading-spinner loading-lg text-primary"></div>
-    </div>
-  );
+  if (loading) return <Preloader message="Loading Contracts..." size="lg" />;
 
   if (!user) return <Navigate to={`/login/${lang || 'eng'}`} />;
 

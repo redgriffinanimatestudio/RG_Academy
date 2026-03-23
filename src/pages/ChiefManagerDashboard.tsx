@@ -267,7 +267,7 @@ export default function ChiefManagerDashboard() {
   const { lang } = useParams();
   const [user, loading] = useAuthState(auth);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const activeModule = searchParams.get('view') || 'dashboard';
 
   const theme = {
@@ -288,87 +288,35 @@ export default function ChiefManagerDashboard() {
     }
   }, [user]);
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen bg-[#0a0a0a]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7f77dd]" /></div>;
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
+    </div>
+  );
   
   const isChief = userProfile?.roles.includes('chief_manager') || userProfile?.roles.includes('admin');
   if (!user || (userProfile && !isChief)) return <Navigate to={`/${lang || 'eng'}`} />;
 
-  const sidebarItems = [
-    { id: 'dashboard', label: 'Strategy', icon: Target, color: theme.accent },
-    { type: 'section', label: 'Analysis' },
-    { id: 'kpi_metrics', label: 'KPI Dashboard', icon: TrendingUp, color: '#00f5d4' },
-    { id: 'growth', label: 'Market Growth', icon: Rocket, color: '#ef9f27' },
-    { type: 'section', label: 'Team' },
-    { id: 'staff_list', label: 'Directory', icon: Users, color: '#378add' },
-    { id: 'performance', label: 'Performance', icon: Zap, color: '#7f77dd' },
-    { type: 'section', label: 'Operations' },
-    { id: 'all_contracts', label: 'Contracts', icon: Briefcase, color: '#ef9f27', badge: '4' },
-    { id: 'legal', label: 'Legal & Risk', icon: Scale, color: '#e24b4a' },
-  ];
-
-  const handleModuleChange = (id: string) => {
-    setSearchParams({ view: id });
-  };
-
   return (
-    <div className="flex min-h-screen bg-[#0a0a0a] text-[#e8e6df] font-sans selection:bg-[#7f77dd]/30 overflow-hidden h-screen">
-      {/* SIDEBAR */}
-      <aside className="w-[220px] bg-[#111] border-r border-[#2a2a2a] flex flex-col h-full shrink-0 z-50">
-        <div className="p-6 border-b border-[#2a2a2a] flex items-center gap-3">
-          <div className="size-8 bg-[#7f77dd] rounded-lg flex items-center justify-center font-bold text-white tracking-tighter shadow-lg shadow-[#7f77dd]/20">RG</div>
-          <div className="min-w-0">
-            <div className="text-sm font-bold tracking-tight truncate">Red Griffin</div>
-            <div className="text-[9px] font-black text-[#7f77dd] uppercase tracking-widest leading-none mt-1">Chief Manager</div>
-          </div>
-        </div>
-
-        <nav className="flex-1 py-4 overflow-y-auto no-scrollbar">
-          {sidebarItems.map((item, idx) => {
-            if (item.type === 'section') return <div key={idx} className="px-6 pt-6 pb-2 text-[10px] font-black text-[#555] uppercase tracking-[0.2em]">{item.label}</div>;
-            const Icon = item.icon as any;
-            const isActive = activeModule === item.id;
-            return (
-              <button key={item.id} onClick={() => handleModuleChange(item.id)} className={`w-full flex items-center gap-3 px-6 py-2.5 text-xs font-medium transition-all relative group ${isActive ? 'text-[#7f77dd] bg-[#7f77dd]/5' : 'text-[#888] hover:text-[#e8e6df] hover:bg-white/5'}`}>
-                {isActive && <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#7f77dd]" />}
-                <div className="size-1.5 rounded-full flex-shrink-0" style={{ background: item.color }} />
-                <span className="flex-1 text-left uppercase tracking-widest text-[10px] font-black truncate">{item.label}</span>
-                {item.badge && <span className="bg-red-500/10 text-red-500 text-[8px] font-black px-1.5 py-0.5 rounded-full">{item.badge}</span>}
-              </button>
-            );
-          })}
-        </nav>
-
-        <div className="p-4 border-t border-[#2a2a2a] bg-black/20 flex items-center gap-3">
-          <div className="size-8 rounded-full bg-[#7f77dd]/10 flex items-center justify-center text-[10px] font-black text-[#7f77dd] shrink-0">CM</div>
-          <div className="min-w-0"><div className="text-xs font-bold truncate">Head of Ops</div><div className="text-[9px] text-[#555] truncate font-black uppercase tracking-widest">{user?.email}</div></div>
-        </div>
-      </aside>
-
-      {/* MAIN */}
-      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <header className="h-16 bg-[#111] border-b border-[#2a2a2a] flex items-center justify-between px-8 shrink-0">
-          <div className="flex flex-col">
-            <div className="text-sm font-bold uppercase tracking-tight">{activeModule.replace(/_/g, ' ')}</div>
-            <div className="text-[9px] text-[#555] font-black uppercase tracking-widest">Global Operations / {activeModule === 'dashboard' ? 'Strategy' : activeModule}</div>
-          </div>
+    <div className="space-y-10">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-10">
+        <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <button className="h-8 px-4 bg-[#7f77dd] text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all">+ New Project</button>
+            <div className="size-2 rounded-full animate-pulse" style={{ background: theme.accent, boxShadow: `0 0 10px ${theme.accent}` }} />
+            <h1 className="text-3xl font-black uppercase tracking-tighter text-white">
+              {activeModule.replace(/_/g, ' ')}
+            </h1>
           </div>
-        </header>
-
-        <div className="flex-1 overflow-y-auto p-8 no-scrollbar bg-[#0a0a0a]">
-          <AnimatePresence mode="wait">
-            {activeModule === 'dashboard' && <StrategyView theme={theme} />}
-            {activeModule === 'all_contracts' && <ContractsView theme={theme} />}
-            {activeModule !== 'dashboard' && activeModule !== 'all_contracts' && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full py-20 opacity-20 text-center">
-                <Target size={64} className="mb-6" />
-                <div className="text-[12px] font-black uppercase tracking-[0.5em]">{activeModule} View Initializing...</div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">
+            Global Operations / {activeModule === 'dashboard' ? 'Strategy' : activeModule}
+          </p>
         </div>
-      </main>
+        <div className="flex gap-2">
+          <button className="h-8 px-4 bg-[#7f77dd] text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all">+ New Project</button>
+        </div>
+      </div>
+
+      <ChiefManagerDashboardContent activeModule={activeModule} theme={theme} />
     </div>
   );
 }

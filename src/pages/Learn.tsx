@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { academyService, Course, Lesson, Enrollment } from '../services/academyService';
 import { auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import Preloader from '../components/Preloader';
 
 export default function Learn() {
   const { slug, lang } = useParams();
@@ -122,11 +123,7 @@ export default function Learn() {
     }
   };
 
-  if (loading) return (
-    <div className="h-screen bg-bg-dark flex items-center justify-center">
-      <div className="loading loading-spinner loading-lg text-primary"></div>
-    </div>
-  );
+  if (loading) return <Preloader message="Loading Course..." size="lg" className="h-screen bg-bg-dark" />;
 
   if (!course || !currentLesson) return (
     <div className="h-screen bg-bg-dark flex flex-col items-center justify-center space-y-6">

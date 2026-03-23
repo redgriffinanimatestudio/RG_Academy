@@ -1,14 +1,11 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link, useParams, useNavigate, useLocation } from 'react-router-dom';
-import { GraduationCap, Briefcase, ChevronRight, Play, Check, Users, Award, Globe } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useNavigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import Academy from './pages/Academy';
 import CourseDetail from './pages/CourseDetail';
 import Learn from './pages/Learn';
 import Studio from './pages/Studio';
 import Community from './pages/Community';
-import CommunityTopic from './pages/CommunityTopic';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Messages from './pages/Messages';
@@ -17,7 +14,6 @@ import AdminDashboard from './pages/AdminDashboard';
 import ChiefManagerDashboard from './pages/ChiefManagerDashboard';
 import ManagerDashboard from './pages/ManagerDashboard';
 import StaffDashboard from './pages/StaffDashboard';
-import CreateCourse from './pages/CreateCourse';
 import TopicPage from './pages/TopicPage';
 import ServicePage from './pages/ServicePage';
 import SpecialistProfile from './pages/SpecialistProfile';
@@ -53,17 +49,11 @@ function LanguageWrapper({ children }: { children: React.ReactNode }) {
       const segments = path.split('/').filter(Boolean);
       const firstSegment = segments[0];
 
-      if (['aca', 'studio', 'community', 'login', 'dev', 'messages', 'dashboard', 'contracts', 'admin', 'chief-manager', 'manager', 'moderator', 'hr', 'finance', 'support'].includes(firstSegment)) {
+      if (['aca', 'studio', 'community', 'login', 'dev', 'messages', 'dashboard', 'contracts', 'admin', 'chief-manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'staff'].includes(firstSegment)) {
         const newPath = `/${firstSegment}/${targetLang}/${segments.slice(1).join('/')}`;
         navigate(newPath, { replace: true });
-      } else if (firstSegment === 'dashboard') {
-        navigate(`/aca/${targetLang}/dashboard`, { replace: true });
-      } else if (firstSegment === 'academy') {
-        navigate(`/aca/${targetLang}/${segments.slice(1).join('/')}`, { replace: true });
       } else if (!LANGUAGES.includes(firstSegment)) {
-        if (!['privacy', 'terms'].includes(firstSegment)) {
-          navigate(`/${targetLang}${path}`, { replace: true });
-        }
+        navigate(`/${targetLang}${path}`, { replace: true });
       }
     }
   }, [lang, i18n, navigate, location.pathname]);
@@ -77,24 +67,18 @@ export default function App() {
       <AuthProvider>
         <AlertProvider>
           <Routes>
-            <Route path="/academy" element={<LanguageWrapper children={null} />} />
-            <Route path="/aca" element={<LanguageWrapper children={null} />} />
-            <Route path="/studio" element={<LanguageWrapper children={null} />} />
-            <Route path="/community" element={<LanguageWrapper children={null} />} />
-            <Route path="/login" element={<LanguageWrapper children={null} />} />
-            <Route path="/dev" element={<LanguageWrapper children={null} />} />
-            
             <Route path="/:lang" element={<LanguageWrapper><Layout><Home /></Layout></LanguageWrapper>} />
             <Route path="/dev/:lang" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
             
-            {/* Direct Admin/Manager Routes (Independent Panels) */}
-            <Route path="/admin/:lang" element={<LanguageWrapper><AdminDashboard /></LanguageWrapper>} />
-            <Route path="/chief-manager/:lang" element={<LanguageWrapper><ChiefManagerDashboard /></LanguageWrapper>} />
-            <Route path="/manager/:lang" element={<LanguageWrapper><ManagerDashboard /></LanguageWrapper>} />
-            <Route path="/moderator/:lang" element={<LanguageWrapper><StaffDashboard /></LanguageWrapper>} />
-            <Route path="/hr/:lang" element={<LanguageWrapper><StaffDashboard /></LanguageWrapper>} />
-            <Route path="/finance/:lang" element={<LanguageWrapper><StaffDashboard /></LanguageWrapper>} />
-            <Route path="/support/:lang" element={<LanguageWrapper><StaffDashboard /></LanguageWrapper>} />
+            {/* WRAPPING ALL DASHBOARDS IN LAYOUT FOR GLOBAL NAV CONSISTENCY */}
+            <Route path="/admin/:lang" element={<LanguageWrapper><Layout><AdminDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/chief-manager/:lang" element={<LanguageWrapper><Layout><ChiefManagerDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/manager/:lang" element={<LanguageWrapper><Layout><ManagerDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/staff/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/moderator/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/hr/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/finance/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/support/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
 
             <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><TopicPage /></Layout></LanguageWrapper>} />

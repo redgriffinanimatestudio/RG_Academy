@@ -37,6 +37,21 @@ export interface Service {
   createdAt: string;
 }
 
+export interface Contract {
+  id: string;
+  projectId: string;
+  clientId: string;
+  executorId: string;
+  amount: number;
+  status: 'active' | 'completed' | 'disputed' | 'cancelled';
+  milestones: {
+    title: string;
+    amount: number;
+    status: 'pending' | 'released' | 'disputed';
+  }[];
+  createdAt: any;
+}
+
 export const studioService = {
   // --- Projects Module ---
   async getProjects(filters?: { status?: string, urgency?: string }): Promise<Project[]> {
@@ -59,6 +74,23 @@ export const studioService = {
       body: JSON.stringify(project),
     });
     if (!response.ok) throw new Error('Failed to create project');
+    return response.json();
+  },
+
+  // --- Contracts Module ---
+  async getContracts(userId: string, role: 'client' | 'executor'): Promise<Contract[]> {
+    const response = await fetch(`${API_BASE}/contracts?userId=${userId}&role=${role}`);
+    if (!response.ok) throw new Error('Failed to fetch contracts');
+    return response.json();
+  },
+
+  async updateContractMilestone(contractId: string, milestoneIdx: number, status: string): Promise<Contract> {
+    const response = await fetch(`${API_BASE}/contracts/${contractId}/milestones/${milestoneIdx}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    if (!response.ok) throw new Error('Failed to update milestone');
     return response.json();
   },
 

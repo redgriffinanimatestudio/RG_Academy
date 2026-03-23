@@ -108,9 +108,8 @@ export function AdminDashboardContent({ activeModule, theme, user }: any) {
 export default function AdminDashboard() {
   const { lang } = useParams();
   const { user, profile, activeRole, loading } = useAuth();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const activeModule = searchParams.get('view') || 'dashboard';
-  const navigate = useNavigate();
 
   const theme = {
     bg: '#0a0a0a',
@@ -131,92 +130,57 @@ export default function AdminDashboard() {
     purple: '#7f77dd'
   };
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen bg-[#0a0a0a]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00f5d4]" /></div>;
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
+    </div>
+  );
+  
   if (!user || (profile && !adminService.isAdmin(profile.roles))) return <Navigate to={`/${lang || 'eng'}`} />;
-
-  const handleModuleChange = (id: string) => {
-    setSearchParams({ view: id });
-  };
 
   const titles: Record<string, string[]> = {
     dashboard: ['Dashboard', 'Red Griffin / Overview'],
     users: ['Пользователи', 'Red Griffin / Users'],
+    roles: ['Матрица прав', 'Red Griffin / Users / Permissions'],
+    settings: ['Настройки', 'Red Griffin / Settings'],
+    audit_logs: ['Аудит Логи', 'Red Griffin / System / Audit Logs'],
+    courses: ['Курсы', 'Red Griffin / Content / Courses'],
+    topics: ['Темы', 'Red Griffin / Content / Topics'],
+    services: ['Услуги', 'Red Griffin / Content / Services'],
     profile: ['Профиль · Alex Kim', 'Red Griffin / Users / Alex Kim'],
     create: ['Редактировать пользователя', 'Red Griffin / Users / Edit'],
     detail: ['Детальная страница · Alex Kim', 'Red Griffin / Users / Alex Kim / Detail'],
     chat: ['Сообщения', 'Red Griffin / Messages'],
-    settings: ['Настройки', 'Red Griffin / Settings'],
     rbac: ['Матрица прав', 'Red Griffin / Users / Permissions']
   };
 
-  const currentTitle = titles[activeModule] || ['Admin Panel', 'Red Griffin / Admin'];
+  const currentTitle = titles[activeModule] || ['Admin Panel', `Red Griffin / Admin / ${activeModule}`];
 
   return (
-    <div className="flex min-h-screen bg-[#0a0a0a] text-[#e8e6df] font-sans selection:bg-[#00f5d4]/30 overflow-hidden h-screen">
-      {/* FULL SIDEBAR (matches admin_full_ui_dark.html) */}
-      <aside className="w-[220px] bg-[#111] border-r border-[#2a2a2a] flex flex-col h-full shrink-0 z-50">
-        <div className="p-5 border-b border-[#2a2a2a] flex items-center gap-3">
-          <div className="size-8 bg-[#00f5d4] rounded-lg flex items-center justify-center font-bold text-[#050505] tracking-tighter shadow-lg shadow-[#00f5d4]/20">RG</div>
-          <div className="min-w-0">
-            <div className="text-sm font-bold tracking-tight">Red Griffin</div>
-            <div className="text-[10px] font-black text-[#00f5d4] uppercase tracking-widest leading-none mt-1">Admin Panel</div>
-          </div>
-        </div>
-
-        <nav className="flex-1 py-4 overflow-y-auto no-scrollbar">
-          <SidebarItem id="dashboard" label="Dashboard" icon={Layout} active={activeModule} color={theme.accent} onChange={handleModuleChange} />
-          
-          <div className="px-6 pt-6 pb-2 text-[10px] font-black text-[#555] uppercase tracking-[0.2em]">Пользователи</div>
-          <SidebarItem id="users" label="Все пользователи" icon={Users} active={activeModule} color={theme.blue} badge="4821" onChange={handleModuleChange} />
-          <SidebarItem id="rbac" label="Матрица прав" icon={ShieldCheck} active={activeModule} color={theme.purple} onChange={handleModuleChange} />
-          <SidebarItem id="profile" label="Профиль" icon={UserCheck} active={activeModule} color={theme.purple} onChange={handleModuleChange} />
-          
-          <div className="px-6 pt-6 pb-2 text-[10px] font-black text-[#555] uppercase tracking-[0.2em]">Контент</div>
-          <SidebarItem id="create" label="Создать / редакт." icon={Edit} active={activeModule} color={theme.green} onChange={handleModuleChange} />
-          <SidebarItem id="detail" label="Детальная страница" icon={FileSearch} active={activeModule} color={theme.amber} onChange={handleModuleChange} />
-          
-          <div className="px-6 pt-6 pb-2 text-[10px] font-black text-[#555] uppercase tracking-[0.2em]">Коммуникации</div>
-          <SidebarItem id="chat" label="Чат / сообщения" icon={MessageSquare} active={activeModule} color={theme.green} badge="3" onChange={handleModuleChange} />
-          
-          <div className="px-6 pt-6 pb-2 text-[10px] font-black text-[#555] uppercase tracking-[0.2em]">Система</div>
-          <SidebarItem id="settings" label="Настройки" icon={Settings} active={activeModule} color={theme.text3} onChange={handleModuleChange} />
-        </nav>
-
-        <div className="p-4 border-t border-[#2a2a2a] bg-black/20 flex flex-col gap-4">
-          <button onClick={() => navigate(`/aca/${lang || 'eng'}`)} className="flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-all">
-            <ChevronLeft size={14} /> Back to Site
-          </button>
+    <div className="space-y-10">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-10">
+        <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="size-8 rounded-full bg-red-500/10 flex items-center justify-center text-[11px] font-black text-[#e24b4a] shrink-0">AD</div>
-            <div className="min-w-0">
-              <div className="text-xs font-bold truncate">Admin</div>
-              <div className="text-[9px] text-[#555] truncate font-black uppercase tracking-widest leading-none mt-0.5">{user?.email}</div>
-            </div>
+            <div className="size-2 rounded-full animate-pulse" style={{ background: theme.accent, boxShadow: `0 0 10px ${theme.accent}` }} />
+            <h1 className="text-3xl font-black uppercase tracking-tighter text-white">
+              {currentTitle[0]}
+            </h1>
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">
+            {currentTitle[1]}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/5 text-[10px] font-black uppercase tracking-widest text-white/40">
+            System Online
+          </div>
+          <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/5 text-[10px] font-black uppercase tracking-widest text-white/40">
+            Node v2.0
           </div>
         </div>
-      </aside>
+      </div>
 
-      {/* MAIN */}
-      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <header className="h-16 bg-[#111] border-b border-[#2a2a2a] flex items-center justify-between px-8 shrink-0">
-          <div className="flex flex-col">
-            <div className="text-[15px] font-medium">{currentTitle[0]}</div>
-            <div className="text-[11px] text-[#555]">{currentTitle[1]}</div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="size-8 border border-[#333] rounded-lg flex items-center justify-center relative cursor-pointer hover:border-[#00f5d4] transition-all group">
-              <Bell size={14} className="text-[#888] group-hover:text-[#00f5d4]" />
-              <div className="absolute top-1.5 right-1.5 size-1.5 bg-[#e24b4a] rounded-full border border-[#111]" />
-            </div>
-            <button onClick={() => handleModuleChange('create')} className="h-8 px-4 border border-[#333] rounded-lg text-[12px] text-[#888] hover:text-[#00f5d4] hover:border-[#00f5d4] transition-all">+ Создать</button>
-            <button onClick={() => handleModuleChange('users')} className="h-8 px-4 bg-[#00f5d4] text-[#050505] rounded-lg text-[12px] font-medium hover:bg-[#00c4aa] transition-all shadow-lg shadow-[#00f5d4]/10">Пользователи</button>
-          </div>
-        </header>
-
-        <div className="flex-1 overflow-y-auto p-8 no-scrollbar bg-[#0a0a0a]">
-          <AdminDashboardContent activeModule={activeModule} theme={theme} user={user} />
-        </div>
-      </main>
+      <AdminDashboardContent activeModule={activeModule} theme={theme} user={user} />
     </div>
   );
 }

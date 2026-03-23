@@ -363,7 +363,7 @@ export default function ManagerDashboard() {
   const { lang } = useParams();
   const [user, loading] = useAuthState(auth);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const activeModule = searchParams.get('view') || 'overview';
 
   const theme = {
@@ -384,82 +384,37 @@ export default function ManagerDashboard() {
     }
   }, [user]);
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen bg-[#0a0a0a]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1d9e75]" /></div>;
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.accent }} />
+    </div>
+  );
   
   const isManager = userProfile?.roles.includes('manager') || userProfile?.roles.includes('admin') || userProfile?.roles.includes('chief_manager');
   if (!user || (userProfile && !isManager)) return <Navigate to={`/${lang || 'eng'}`} />;
 
-  const sidebarItems = [
-    { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, color: theme.accent },
-    { type: 'section', label: 'Academy Ops' },
-    { id: 'courses_review', label: 'Courses Review', icon: ClipboardCheck, color: '#378add', badge: '7' },
-    { id: 'student_feedback', label: 'Feedback', icon: MessageSquare, color: '#ef9f27' },
-    { type: 'section', label: 'Studio Ops' },
-    { id: 'project_board', label: 'Project Board', icon: Box, color: '#7f77dd' },
-    { id: 'contract_status', label: 'Contracts', icon: Briefcase, color: '#00f5d4' },
-    { id: 'escrow_alerts', label: 'Escrow Alerts', icon: AlertTriangle, color: '#e24b4a', badge: '2' },
-    { type: 'section', label: 'Users' },
-    { id: 'user_list', label: 'Directory', icon: Users, color: '#888' },
-    { id: 'role_requests', label: 'Role Requests', icon: ShieldCheck, color: '#378add', badge: '5' },
-  ];
-
-  const handleModuleChange = (id: string) => {
-    setSearchParams({ view: id });
-  };
-
   return (
-    <div className="flex min-h-screen bg-[#0a0a0a] text-[#e8e6df] font-sans selection:bg-[#1d9e75]/30 overflow-hidden h-screen">
-      {/* SIDEBAR */}
-      <aside className="w-[200px] bg-[#111] border-r border-[#2a2a2a] flex flex-col h-full shrink-0 z-50">
-        <div className="p-6 border-b border-[#2a2a2a] mb-2">
-          <div className="text-[15px] font-bold tracking-tight">Red Griffin</div>
-          <div className="text-[11px] font-medium text-[#1d9e75] mt-0.5 uppercase tracking-widest">Operations</div>
-        </div>
-
-        <nav className="flex-1 py-2 overflow-y-auto no-scrollbar">
-          {sidebarItems.map((item, idx) => {
-            if (item.type === 'section') return <div key={idx} className="px-4 pt-4 pb-1 text-[11px] font-black text-[#555] uppercase tracking-wider">{item.label}</div>;
-            const Icon = item.icon as any;
-            const isActive = activeModule === item.id;
-            return (
-              <button key={item.id} onClick={() => handleModuleChange(item.id)} className={`w-full flex items-center gap-3 px-4 py-2 text-[13px] transition-all relative group ${isActive ? 'text-white bg-[#181818] font-medium border-l-2 border-[#1d9e75]' : 'text-[#888] hover:text-white hover:bg-[#181818]'}`}>
-                <Icon size={14} className={isActive ? 'text-[#1d9e75]' : 'text-[#555] group-hover:text-[#888]'} />
-                <span className="flex-1 text-left truncate">{item.label}</span>
-                {item.badge && <span className="bg-red-500/10 text-red-500 text-[9px] font-black px-1.5 py-0.5 rounded-full">{item.badge}</span>}
-              </button>
-            );
-          })}
-        </nav>
-
-        <div className="p-4 border-t border-[#2a2a2a] bg-black/20">
+    <div className="space-y-10">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-10">
+        <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="size-8 rounded-full bg-[#1d9e75]/10 flex items-center justify-center text-[10px] font-black text-[#1d9e75] shrink-0">MG</div>
-            <div className="min-w-0"><div className="text-[12px] font-bold truncate">Ops Manager</div><div className="text-[10px] text-[#555] truncate font-medium">{user?.email}</div></div>
+            <div className="size-2 rounded-full animate-pulse" style={{ background: theme.accent, boxShadow: `0 0 10px ${theme.accent}` }} />
+            <h1 className="text-3xl font-black uppercase tracking-tighter text-white">
+              {activeModule.replace(/_/g, ' ')}
+            </h1>
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20">
+            Manager · LIVE Control / {activeModule}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/5 text-[10px] font-black uppercase tracking-widest text-white/40">
+            System Online
           </div>
         </div>
-      </aside>
+      </div>
 
-      {/* MAIN CONTENT */}
-      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <header className="h-14 bg-[#111] border-b border-[#2a2a2a] flex items-center justify-between px-6 shrink-0">
-          <div className="text-[15px] font-medium">{activeModule.replace(/_/g, ' ')}</div>
-          <div className="flex items-center gap-4"><span className="text-[12px] text-[#888]">Manager · LIVE Control</span></div>
-        </header>
-
-        <div className="flex-1 overflow-y-auto p-6 no-scrollbar bg-[#0a0a0a]">
-          <AnimatePresence mode="wait">
-            {activeModule === 'overview' && <ManagerOverview theme={theme} />}
-            {activeModule === 'courses_review' && <CoursesReview theme={theme} />}
-            {activeModule !== 'overview' && activeModule !== 'courses_review' && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full py-20 opacity-20 text-center">
-                <Box size={64} className="mb-6" />
-                <div className="text-xl font-black uppercase tracking-[0.5em]">{activeModule} Module</div>
-                <div className="text-sm mt-2">Section content coming soon...</div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </main>
+      <ManagerDashboardContent activeModule={activeModule} theme={theme} />
     </div>
   );
 }

@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@plugin "flyonui";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  
+  --color-primary: var(--primary-color, #00f5d4);
+  --color-primary-hover: var(--primary-hover-color, #00d1b5);
+  --color-bg-dark: #050505;
+  --color-bg-card: #0a0a0a;
+  --color-ink: #ffffff;
+}
+
+@layer base {
+  body {
+    @apply bg-bg-dark text-ink font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-black tracking-tighter;
+  }
+}
+
+@layer components {
+  .criativo-btn {
+    @apply px-8 py-4 bg-primary text-bg-dark font-black uppercase tracking-widest text-xs transition-all hover:bg-primary-hover hover:scale-105 active:scale-95;
+  }
+  
+  .criativo-card {
+    @apply bg-bg-card border border-white/5 p-8 transition-all hover:border-primary/20 hover:bg-white/5;
+  }
+  
+  .criativo-gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-emerald-400;
+  }
+}

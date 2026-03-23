@@ -18,6 +18,7 @@ import {
   Filter
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Preloader from '../components/Preloader';
 import { useTranslation } from 'react-i18next';
 import KanbanBoard from '../components/KanbanBoard';
 import { networkingService } from '../services/networkingService';
@@ -314,35 +315,38 @@ export default function Studio() {
               <h2 className="text-2xl font-black tracking-tight text-white uppercase">{t('top_talent')}</h2>
               <div className="space-y-4">
                 {loadingTalent ? (
-                  <div className="flex justify-center py-10">
-                    <span className="loading loading-spinner text-primary"></span>
-                  </div>
-                ) : talent.map((person) => (
-                  <Link 
-                    key={person.id} 
-                    to={`/studio/${lang || 'eng'}/profile/${person.id}`}
-                    className="group flex items-center gap-4 p-5 rounded-[1.5rem] border border-white/5 bg-white/5 hover:border-primary/20 transition-all cursor-pointer"
-                  >
-                    <div className="avatar">
-                      <div className="size-14 rounded-2xl shadow-lg shadow-black/20 border border-white/5">
-                        <img src={person.profile?.avatar || person.photoURL || `https://picsum.photos/seed/${person.id}/200/200`} alt={person.displayName} referrerPolicy="no-referrer" />
+                  <Preloader message="Loading Talent..." size="sm" />
+                ) : Array.isArray(talent) && talent.length > 0 ? (
+                  talent.map((person) => (
+                    <Link 
+                      key={person.id} 
+                      to={`/studio/${lang || 'eng'}/profile/${person.id}`}
+                      className="group flex items-center gap-4 p-5 rounded-[1.5rem] border border-white/5 bg-white/5 hover:border-primary/20 transition-all cursor-pointer"
+                    >
+                      <div className="avatar">
+                        <div className="size-14 rounded-2xl shadow-lg shadow-black/20 border border-white/5">
+                          <img src={person.profile?.avatar || person.photoURL || `https://picsum.photos/seed/${person.id}/200/200`} alt={person.displayName} referrerPolicy="no-referrer" />
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-black text-white truncate tracking-tight uppercase">{person.displayName}</h4>
-                      <p className="text-xs text-white/40 font-medium truncate">
-                        {person.profile?.skills?.[0]?.name || person.role || 'Specialist'}
-                      </p>
-                      <div className="flex items-center gap-1 mt-1 text-[10px] text-white/20 font-bold uppercase tracking-widest">
-                        <MapPin size={10} />
-                        <span>{person.profile?.location || 'Remote'}</span>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-black text-white truncate tracking-tight uppercase">{person.displayName}</h4>
+                        <p className="text-xs text-white/40 font-medium truncate">
+                          {person.profile?.skills?.[0]?.name || person.role || 'Specialist'}
+                        </p>
+                        <div className="flex items-center gap-1 mt-1 text-[10px] text-white/20 font-bold uppercase tracking-widest">
+                          <MapPin size={10} />
+                          <span>{person.profile?.location || 'Remote'}</span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="p-3 bg-white/5 text-white/20 rounded-xl group-hover:bg-primary group-hover:text-bg-dark transition-all">
-                      <MessageSquare size={18} />
-                    </div>
-                  </Link>
-                ))}
+                      <div className="p-3 bg-white/5 text-white/20 rounded-xl group-hover:bg-primary group-hover:text-bg-dark transition-all">
+                        <MessageSquare size={18} />
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-sm text-white/50">No talent profiles found.</p>
+                )}
+
               </div>
               <button className="w-full py-4 rounded-2xl border-2 border-white/5 text-xs font-black uppercase tracking-widest text-white/40 hover:bg-white/5 hover:border-white/10 transition-all">
                 {t('browse_talent')}

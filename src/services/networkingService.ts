@@ -106,7 +106,19 @@ export const networkingService = {
     const params = new URLSearchParams({ query, ...(skill ? { skill } : {}) });
     const response = await fetch(`${API_BASE}/discovery/search?${params.toString()}`);
     if (!response.ok) throw new Error('Failed to search profiles');
-    return response.json();
+
+    const result = await response.json();
+    // Backend returns paginated response: { success: true, data: [...], pagination: {...} }
+    if (Array.isArray(result.data)) {
+      return result.data;
+    }
+
+    // Fallback for old payload shapes
+    if (Array.isArray(result)) {
+      return result;
+    }
+
+    return [];
   },
 
   async getRecommendations(userId: string): Promise<SearchIndex[]> {

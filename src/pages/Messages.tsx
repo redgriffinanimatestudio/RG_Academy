@@ -7,6 +7,7 @@ import { userService, UserProfile } from '../services/userService';
 import { Send, Search, User, MoreVertical, Phone, Video, Info, Hash, MessageSquare, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import Preloader from '../components/Preloader';
 
 export default function Messages() {
   const { t } = useTranslation();
@@ -94,11 +95,7 @@ export default function Messages() {
     }
   };
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="loading loading-spinner loading-lg text-primary"></div>
-    </div>
-  );
+  if (loading) return <Preloader message="Loading Messages..." size="lg" />;
 
   if (!user) return <Navigate to={`/login/${lang || 'eng'}`} />;
 
