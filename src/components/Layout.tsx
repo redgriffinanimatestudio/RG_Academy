@@ -211,21 +211,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   // Base categories
   const baseCategories = isCommunity ? COMMUNITY_CATEGORIES : (isStudio ? STUDIO_CATEGORIES : ACADEMY_CATEGORIES);
 
-  // Dashboard category (only for logged-in users)
+  // Dashboard category (only for logged-in users) - Shows modules for the ONE active role
   const dashboardCategory = useMemo(() => {
     if (!profile) return null;
     const effectiveRole = activeRole || (profile?.roles.includes('admin') ? 'admin' : profile?.roles[0]);
     if (!effectiveRole || !DASHBOARD_MENUS[effectiveRole]) return null;
 
     return {
-      name: 'my_dashboard',
+      name: 'dashboards',
       icon: LayoutDashboard,
       isDashboard: true,
       subcategories: DASHBOARD_MENUS[effectiveRole]
     };
   }, [profile, activeRole]);
 
-  // Combined sidebar categories
+  // Combined sidebar categories - Reverted to original sequence
   const sidebarCategories = useMemo(() => {
     if (!profile) return baseCategories;
     return dashboardCategory ? [dashboardCategory, ...baseCategories] : baseCategories;
@@ -237,7 +237,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isDashboardPage && dashboardCategory) {
-      setActiveCatName('my_dashboard');
+      setActiveCatName('dashboards');
       const currentView = searchParams.get('view') || 'dashboard';
 
       dashboardCategory.subcategories.forEach((cat: any) => {
@@ -248,7 +248,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           setActiveSubName(sub.name);
         }
       });
-    } else if (!activeCatName || activeCatName === 'my_dashboard') {
+    } else if (!activeCatName || activeCatName === 'dashboards') {
       setActiveCatName(baseCategories[0]?.name);
       setActiveSubName(baseCategories[0]?.subcategories[0]?.name);
     }
@@ -292,11 +292,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   const getDashboardLinkForRole = (role: string) => {
-    const specializedRoles = ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support'];
-    if (specializedRoles.includes(role)) {
-      return `/${role.replace('_', '-')}/${lang || 'eng'}`;
-    }
-    return `/${isStudio ? 'studio' : 'aca'}/${lang || 'eng'}/dashboard`;
+    return `/${isStudio ? 'studio' : 'aca'}/${lang || 'eng'}/dashboard?role=${role}`;
   };
 
   const modePrefix = isStudio ? '/studio' : '/aca';

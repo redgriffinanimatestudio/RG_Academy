@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const dbRes = await response.json();
         const dbUser = dbRes.data;
         
-        const isAdmin = dbUser.role === 'admin' || dbUser.email === 'super@redgriffin.academy';
+        const isAdmin = dbUser.role === 'admin' || dbUser.role === 'chief_manager' || dbUser.email === 'super@redgriffin.academy';
         let finalRoles: UserRole[] = isAdmin ? ALL_ROLES : (dbUser.roles || [dbUser.role || 'student']);
 
         const mappedProfile: UserProfile = {

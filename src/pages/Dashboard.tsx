@@ -73,7 +73,7 @@ export default function Dashboard() {
         setActiveRole(bestRole as any);
       }
     }
-  }, [location.pathname, profile, activeRole, setActiveRole]);
+  }, [location.pathname, location.search, profile, activeRole, setActiveRole]);
 
   const currentView = searchParams.get('view') || (['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support'].includes(activeRole || '') ? 'dashboard' : 'overview');
 

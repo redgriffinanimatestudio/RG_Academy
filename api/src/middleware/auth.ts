@@ -39,15 +39,15 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
     
     // Dev token for testing
     if (token === 'DEV_TOKEN_SUPER_ADMIN') {
-      const admin = await prisma.user.findFirst({ 
+      const adminUser = await prisma.user.findFirst({ 
         where: { role: 'admin' },
         include: { profile: true }
       });
-      if (admin) {
+      if (adminUser) {
         req.user = {
-          id: admin.id,
-          email: admin.email || '',
-          role: admin.role,
+          id: adminUser.id,
+          email: adminUser.email || '',
+          role: adminUser.role,
           roles: ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client']
         };
         return next();
@@ -72,10 +72,18 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
       return res.status(401).json({ error: 'User not found in database' });
     }
 
+    // Map roles: if user is admin, give all roles for now or use their specific roles array if it existed
+    // For now, we support the 'role' field and assumed 'roles' if we add it to schema
+    const isAdmin = ['admin', 'chief_manager'].includes(user.role);
+    const roles = isAdmin 
+      ? ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client']
+      : [user.role];
+
     req.user = {
       id: user.id,
       email: user.email || decodedToken.email || '',
-      role: user.role
+      role: user.role,
+      roles: roles
     };
 
     next();
