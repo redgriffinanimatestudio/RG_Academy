@@ -27,7 +27,6 @@ import {
   MessageSquare,
   Ticket,
   LifeBuoy,
-  Target,
   DollarSign,
   UserPlus,
   AlertCircle

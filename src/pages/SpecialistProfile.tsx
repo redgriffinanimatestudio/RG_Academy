@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   MapPin, 
   Link as LinkIcon, 
@@ -18,6 +19,7 @@ import {
   Layers,
   GraduationCap,
   Heart,
+  Target,
   Share2,
   ShieldCheck,
   CheckCircle2,
@@ -34,6 +36,7 @@ type ProfileTab = 'about' | 'portfolio' | 'experience' | 'education' | 'reviews'
 
 export default function SpecialistProfile() {
   const { id, lang } = useParams();
+  const { t } = useTranslation();
   const { profile: currentUserProfile, loading: authLoading } = useAuth();
   const location = useLocation();
   const isStudio = location.pathname.includes('/studio/');
@@ -50,12 +53,12 @@ export default function SpecialistProfile() {
         setProfile({
           id: currentUserProfile.uid,
           userId: currentUserProfile.uid,
-          bio: 'Red Griffin Specialist',
+          bio: (currentUserProfile as any).bio || t('default_bio', 'Professional CG Specialist in the Red Griffin Ecosystem.'),
           location: 'Remote',
           skills: [],
           portfolio: [],
           user: {
-            displayName: currentUserProfile.displayName,
+            displayName: currentUserProfile.displayName || 'User',
             photoURL: currentUserProfile.photoURL || undefined
           }
         });
@@ -67,15 +70,20 @@ export default function SpecialistProfile() {
         setLoading(true);
         try {
           const data = await networkingService.getProfile(id);
-          setProfile(data);
+          if (data) {
+            setProfile(data);
+          } else {
+            throw new Error('Not found');
+          }
         } catch (err) {
+          // Fallback to general user info if specialist profile doesn't exist
           const response = await fetch(`/api/users/${id}`);
           if (response.ok) {
             const resData = await response.json();
             const userData = resData.data || resData;
             setProfile({
-              id: userData.remoteId || userData.id,
-              userId: userData.remoteId || userData.id,
+              id: userData.id,
+              userId: userData.id,
               bio: userData.bio || '',
               location: 'Remote',
               skills: [],
@@ -86,43 +94,44 @@ export default function SpecialistProfile() {
               }
             });
           } else {
-            throw new Error('User not found');
+            setProfile(null);
           }
         }
       } catch (error) {
         console.error("Failed to fetch profile:", error);
+        setProfile(null);
       } finally {
         setLoading(false);
       }
     }
     fetchProfile();
-  }, [id, currentUserProfile]);
+  }, [id, currentUserProfile, t]);
 
   const backLink = isStudio ? `/studio/${lang || 'eng'}` : `/aca/${lang || 'eng'}`;
 
   const tabs: { id: ProfileTab; label: string; icon: any }[] = [
-    { id: 'about', label: 'О специалисте', icon: User },
-    { id: 'portfolio', label: 'Портфолио', icon: Layers },
-    { id: 'experience', label: 'Опыт работы', icon: Briefcase },
-    { id: 'education', label: 'Образование', icon: GraduationCap },
-    { id: 'reviews', label: 'Отзывы', icon: Star },
+    { id: 'about', label: t('about_specialist', 'О специалисте'), icon: User },
+    { id: 'portfolio', label: t('portfolio', 'Портфолио'), icon: Layers },
+    { id: 'experience', label: t('experience', 'Опыт работы'), icon: Briefcase },
+    { id: 'education', label: t('education', 'Образование'), icon: GraduationCap },
+    { id: 'reviews', label: t('reviews', 'Отзывы'), icon: Star },
   ];
 
   if (loading || authLoading) {
-    return <Preloader message="Loading Profile..." size="lg" className="min-h-screen bg-[#050505]" />;
+    return <Preloader message={t('loading_profile', 'Loading Profile...')} size="lg" className="min-h-screen bg-[#050505]" />;
   }
 
   if (!profile) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-white">
-        <h1 className="text-4xl font-black mb-4">Profile Not Found</h1>
-        <Link to={backLink} className="text-primary hover:underline uppercase tracking-widest text-xs font-black">Go Back</Link>
+        <h1 className="text-4xl font-black mb-4">{t('profile_not_found', 'Profile Not Found')}</h1>
+        <Link to={backLink} className="text-primary hover:underline uppercase tracking-widest text-xs font-black">{t('go_back', 'Go Back')}</Link>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Profile Header Card */}
       <div className="relative rounded-[3rem] bg-[#0a0a0a] border border-white/5 overflow-hidden shadow-2xl">
         <div className="h-48 bg-gradient-to-r from-primary/20 to-primary-hover/20 relative">
@@ -151,7 +160,7 @@ export default function SpecialistProfile() {
           </div>
 
           <div className="flex gap-3 pb-4">
-            <button className="px-8 py-4 bg-primary text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary/20">Connect</button>
+            <button className="px-8 py-4 bg-primary text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary/20">{t('connect', 'Connect')}</button>
             <button className="p-4 bg-white/5 border border-white/10 rounded-2xl text-white/40 hover:text-white transition-all"><MessageSquare size={20} /></button>
           </div>
         </div>
@@ -174,20 +183,20 @@ export default function SpecialistProfile() {
       </div>
 
       {/* Tab Content */}
-      <div className="min-h-[400px]">
+      <div className="min-h-[400px] pb-20">
         <AnimatePresence mode="wait">
           {activeTab === 'about' && (
             <motion.div key="about" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">
                 <div className="p-10 rounded-[3rem] bg-[#0a0a0a] border border-white/5 space-y-6">
-                  <h2 className="text-2xl font-black uppercase tracking-tight">Biography</h2>
-                  <p className="text-lg text-white/60 font-medium leading-relaxed">{profile.bio || 'Professional CG Specialist in the Red Griffin Ecosystem.'}</p>
+                  <h2 className="text-2xl font-black uppercase tracking-tight">{t('biography', 'Biography')}</h2>
+                  <p className="text-lg text-white/60 font-medium leading-relaxed">{profile.bio || t('default_bio', 'Professional CG Specialist in the Red Griffin Ecosystem.')}</p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { label: 'Completion', value: '98%', color: 'text-emerald-500' },
-                    { label: 'Response', value: '< 2h', color: 'text-sky-500' },
+                    { label: t('completion', 'Completion'), value: '98%', color: 'text-emerald-500' },
+                    { label: t('response', 'Response'), value: '< 2h', color: 'text-sky-500' },
                   ].map((stat, i) => (
                     <div key={i} className="p-8 rounded-[2.5rem] bg-[#0a0a0a] border border-white/5">
                       <div className={`text-3xl font-black ${stat.color} mb-1`}>{stat.value}</div>
@@ -199,7 +208,7 @@ export default function SpecialistProfile() {
 
               <div className="space-y-8">
                 <div className="p-10 rounded-[3rem] bg-[#0a0a0a] border border-white/5 space-y-6">
-                  <h2 className="text-xl font-black uppercase tracking-tight">Expertise</h2>
+                  <h2 className="text-xl font-black uppercase tracking-tight">{t('expertise', 'Expertise')}</h2>
                   <div className="flex flex-wrap gap-2">
                     {['Unreal Engine', 'Maya', 'Houdini', 'ZBrush', 'Substance'].map(skill => (
                       <span key={skill} className="px-4 py-2 bg-white/5 border border-white/5 rounded-xl text-[9px] font-black uppercase tracking-widest text-white/40">{skill}</span>

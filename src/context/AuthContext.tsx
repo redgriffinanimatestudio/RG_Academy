@@ -64,8 +64,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const dbRes = await response.json();
         const dbUser = dbRes.data;
         
-        const isAdmin = dbUser.role === 'admin' || dbUser.role === 'chief_manager' || dbUser.email === 'super@redgriffin.academy';
-        let finalRoles: UserRole[] = isAdmin ? ALL_ROLES : (dbUser.roles || [dbUser.role || 'student']);
+        // Role Hierarchy and Super Admin Logic from the Matrix
+        const SUPER_ADMIN_EMAIL = 'redgriffinanimatestudio@gmail.com';
+        const isSuperAdmin = dbUser.email === SUPER_ADMIN_EMAIL;
+        const role = isSuperAdmin ? 'admin' : (dbUser.role || 'student');
+        
+        // Admins and Chief Managers get everything
+        const isAdmin = role === 'admin' || role === 'chief_manager' || isSuperAdmin;
+        
+        let finalRoles: UserRole[] = [];
+        if (isAdmin) {
+          finalRoles = ALL_ROLES;
+        } else {
+          // Add hierarchy roles
+          if (role === 'manager') finalRoles.push('manager', 'moderator');
+          else if (role === 'moderator') finalRoles.push('moderator');
+          
+          // Add independent roles from profile roles array
+          if (dbUser.roles && Array.isArray(dbUser.roles)) {
+            dbUser.roles.forEach((r: UserRole) => {
+              if (!finalRoles.includes(r)) finalRoles.push(r);
+            });
+          } else if (dbUser.role) {
+            if (!finalRoles.includes(dbUser.role)) finalRoles.push(dbUser.role);
+          }
+          
+          // Default role if none
+          if (finalRoles.length === 0) finalRoles.push('student');
+        }
 
         const mappedProfile: UserProfile = {
           uid: dbUser.remoteId || dbUser.id,

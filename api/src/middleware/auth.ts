@@ -62,28 +62,53 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
       return res.status(401).json({ error: 'Invalid Firebase token' });
     }
 
+    // Hardcoded Super Admin check by email
+    const superAdminEmail = 'redgriffinanimatestudio@gmail.com';
+    const isSuperAdmin = decodedToken.email === superAdminEmail;
+
     // Get user from database using Firebase UID
     const user = await prisma.user.findUnique({
       where: { remoteId: decodedToken.uid },
       include: { profile: true }
     });
 
-    if (!user) {
+    if (!user && !isSuperAdmin) {
       return res.status(401).json({ error: 'User not found in database' });
     }
 
-    // Map roles: if user is admin, give all roles for now or use their specific roles array if it existed
-    // For now, we support the 'role' field and assumed 'roles' if we add it to schema
-    const isAdmin = ['admin', 'chief_manager'].includes(user.role);
-    const roles = isAdmin 
+    // Role Hierarchy: Admin > Manager > Moderator
+    // User roles: student, lecturer, client, executor (independent)
+    let role = user?.role || 'student';
+    if (isSuperAdmin) role = 'admin';
+
+    const isAdmin = role === 'admin';
+    const isManager = role === 'manager' || role === 'chief_manager' || isAdmin;
+    const isModerator = role === 'moderator' || isManager;
+
+    const roles: string[] = [];
+    if (isAdmin) roles.push('admin');
+    if (isManager) roles.push('manager', 'chief_manager');
+    if (isModerator) roles.push('moderator');
+    
+    // Add independent roles from profile if they exist
+    if (user?.profile?.roles) {
+      (user.profile.roles as string[]).forEach(r => {
+        if (!roles.includes(r)) roles.push(r);
+      });
+    } else if (user?.role && !roles.includes(user.role)) {
+      roles.push(user.role);
+    }
+
+    // If admin, they get everything
+    const finalRoles = isAdmin 
       ? ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client']
-      : [user.role];
+      : roles;
 
     req.user = {
-      id: user.id,
-      email: user.email || decodedToken.email || '',
-      role: user.role,
-      roles: roles
+      id: user?.id || 'super-admin-id',
+      email: decodedToken.email || user?.email || '',
+      role: role,
+      roles: finalRoles
     };
 
     next();

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Role Permission Matrix — Red Griffin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#fff;color:#111;padding:2rem}
+.tab-bar{display:flex;gap:0;border:0.5px solid #ddd;border-radius:8px;overflow:hidden;margin-bottom:1.5rem;background:#f5f5f3}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;color:#666;cursor:pointer;text-align:center;border-right:0.5px solid #ddd;transition:all .15s}
+.tab:last-child{border-right:none}
+.tab.on{background:#fff;color:#111}
+.view{display:none}.view.on{display:block}
+
+.hier{display:flex;flex-direction:column;gap:12px}
+.tier{display:flex;align-items:stretch;gap:10px}
+.tier-label{width:90px;font-size:10px;color:#666;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.tier-cards{display:flex;gap:8px;flex:1;flex-wrap:wrap}
+.hcard{border:0.5px solid #ddd;border-radius:8px;padding:10px 14px;background:#fff;min-width:110px}
+.hcard-name{font-size:13px;font-weight:500;color:#111;margin-bottom:3px}
+.hcard-sub{font-size:11px;color:#666}
+.hcard.t-admin{border-color:#BA7517;background:#FAEEDA}
+.hcard.t-admin .hcard-name{color:#412402}
+.hcard.t-admin .hcard-sub{color:#633806}
+.hcard.t-manager{border-color:#BA7517;background:#FAC775}
+.hcard.t-manager .hcard-name{color:#412402}
+.hcard.t-mod{border-color:#D85A30;background:#FAECE7}
+.hcard.t-mod .hcard-name{color:#4A1B0C}
+.hcard.t-mod .hcard-sub{color:#993C1D}
+.hcard.t-studio{border-color:#1D9E75;background:#E1F5EE}
+.hcard.t-studio .hcard-name{color:#04342C}
+.hcard.t-studio .hcard-sub{color:#0F6E56}
+.hcard.t-academy{border-color:#534AB7;background:#EEEDFE}
+.hcard.t-academy .hcard-name{color:#26215C}
+.hcard.t-academy .hcard-sub{color:#3C3489}
+.hcard.t-guest{border-color:#ddd;background:#f5f5f3}
+.connector{width:90px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#666;font-size:16px}
+.inherit-note{font-size:11px;color:#666;padding:8px 12px;background:#f5f5f3;border-radius:8px;border:0.5px solid #ddd;margin-top:4px}
+
+.matrix-wrap{overflow-x:auto}
+.matrix{border-collapse:collapse;width:100%;min-width:700px}
+.matrix th{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:#666;padding:8px 10px;border:0.5px solid #ddd;text-align:center;background:#f5f5f3;white-space:nowrap}
+.matrix th.res-h{text-align:left;min-width:160px}
+.matrix td{padding:7px 10px;border:0.5px solid #ddd;font-size:11px;text-align:center;vertical-align:middle}
+.matrix td.res-name{text-align:left;font-size:12px;color:#111;font-weight:500;white-space:nowrap;background:#f5f5f3}
+.matrix td.action{text-align:left;font-size:11px;color:#666;padding-left:20px;white-space:nowrap}
+.matrix tr.section-row td{background:#f5f5f3;font-weight:500;font-size:11px;color:#111;padding:6px 10px;text-align:left}
+.ok{color:#0F6E56;font-size:14px}
+.no{color:#ccc;font-size:14px}
+.cond{color:#854F0B;font-size:14px}
+.own{color:#185FA5;font-size:14px}
+.rh-guest{background:#F1EFE8}
+.rh-student{background:#E6F1FB}
+.rh-lecturer{background:#EEEDFE}
+.rh-client{background:#E1F5EE}
+.rh-exec{background:#E1F5EE}
+.rh-mod{background:#FAECE7}
+.rh-manager{background:#FAEEDA}
+.rh-admin{background:#FAC775}
+
+.combo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.combo-card{border:0.5px solid #ddd;border-radius:12px;padding:14px;background:#fff}
+.combo-title{font-size:13px;font-weight:500;color:#111;margin-bottom:6px}
+.combo-roles{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.pill{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
+.p-s{background:#E6F1FB;color:#185FA5}
+.p-l{background:#EEEDFE;color:#3C3489}
+.p-c{background:#E1F5EE;color:#0F6E56}
+.p-e{background:#9FE1CB;color:#04342C}
+.p-m{background:#FAECE7;color:#993C1D}
+.p-mg{background:#FAEEDA;color:#854F0B}
+.p-a{background:#FAC775;color:#412402}
+.p-g{background:#F1EFE8;color:#5F5E5A}
+.combo-desc{font-size:11px;color:#666;line-height:1.6}
+
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.dash-role{border:0.5px solid #ddd;border-radius:12px;overflow:hidden;background:#fff}
+.dash-role-head{padding:10px 14px;font-size:12px;font-weight:500;border-bottom:0.5px solid #ddd}
+.dash-role-head.h-s{background:#E6F1FB;color:#185FA5}
+.dash-role-head.h-l{background:#EEEDFE;color:#3C3489}
+.dash-role-head.h-c{background:#E1F5EE;color:#0F6E56}
+.dash-role-head.h-e{background:#9FE1CB;color:#04342C}
+.dash-role-head.h-m{background:#FAECE7;color:#993C1D}
+.dash-role-head.h-mg{background:#FAEEDA;color:#854F0B}
+.dash-role-head.h-a{background:#FAC775;color:#412402}
+.dash-item{padding:6px 14px;font-size:11px;color:#666;border-bottom:0.5px solid #ddd;display:flex;align-items:center;gap:6px}
+.dash-item:last-child{border-bottom:none}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.d-read{background:#378ADD}.d-write{background:#1D9E75}.d-del{background:#D85A30}.d-view{background:#888780}
+
+.cond-table{width:100%;border-collapse:collapse}
+.cond-table th{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:#666;padding:8px 12px;border:0.5px solid #ddd;background:#f5f5f3;text-align:left}
+.cond-table td{padding:8px 12px;border:0.5px solid #ddd;font-size:12px;vertical-align:top;color:#111}
+.cond-table td:first-child{font-weight:500;white-space:nowrap;width:130px}
+.cond-table td:nth-child(2){color:#666;width:130px}
+.tag{display:inline-block;font-size:10px;padding:1px 7px;border-radius:4px;margin:1px}
+.tag-allow{background:#E1F5EE;color:#0F6E56}
+.tag-deny{background:#FAECE7;color:#993C1D}
+.tag-cond{background:#FAEEDA;color:#854F0B}
+.tag-own{background:#E6F1FB;color:#185FA5}
+
+.hier-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 0}
+.arrow-sep{color:#666;font-size:12px}
+.page{padding:1rem 0}
+.sec-label{font-size:11px;font-weight:500;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<div style="margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:0.5px solid #ddd">
+  <div style="font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Red Griffin Platform</div>
+  <div style="font-size:20px;font-weight:500;color:#111">Role permission matrix</div>
+</div>
+
+<div class="tab-bar">
+  <div class="tab on" onclick="show('hier')">Иерархия</div>
+  <div class="tab" onclick="show('matrix')">Матрица прав</div>
+  <div class="tab" onclick="show('dash')">Дашборд</div>
+  <div class="tab" onclick="show('combo')">Комбинации</div>
+  <div class="tab" onclick="show('cond')">Условия доступа</div>
+</div>
+
+<!-- HIERARCHY -->
+<div id="v-hier" class="view on hier">
+
+  <div style="margin-bottom:10px">
+    <div class="sec-label">Иерархия прав (наследование)</div>
+    <div style="border:0.5px solid #ddd;border-radius:8px;padding:10px 16px;background:#fff">
+      <div class="hier-row">
+        <span class="pill p-mg">admin</span><span class="arrow-sep">⊃</span>
+        <span class="pill p-mg">manager</span><span class="arrow-sep">⊃</span>
+        <span class="pill p-m">moderator</span><span class="arrow-sep">—</span>
+        <span class="pill p-l">lecturer</span><span class="arrow-sep">—</span>
+        <span class="pill p-e">executor</span><span class="arrow-sep">—</span>
+        <span class="pill p-c">client</span><span class="arrow-sep">—</span>
+        <span class="pill p-s">student</span><span class="arrow-sep">—</span>
+        <span class="pill p-g">guest</span>
+      </div>
+      <div style="font-size:11px;color:#666;margin-top:2px">⊃ = полное наследование · — = независимые роли, можно комбинировать</div>
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-top:16px">Структура</div>
+
+  <div class="hier">
+    <div class="tier">
+      <div class="tier-label">Super</div>
+      <div class="tier-cards">
+        <div class="hcard t-admin">
+          <div class="hcard-name">Admin</div>
+          <div class="hcard-sub">Полный доступ · bypass rules · выдаёт admin</div>
+        </div>
+      </div>
+    </div>
+    <div class="tier">
+      <div class="connector">↑ включает</div>
+    </div>
+    <div class="tier">
+      <div class="tier-label">Ops</div>
+      <div class="tier-cards">
+        <div class="hcard t-manager">
+          <div class="hcard-name">Manager</div>
+          <div class="hcard-sub">Операции · контракты · аналитика</div>
+        </div>
+      </div>
+    </div>
+    <div class="tier">
+      <div class="connector">↑ включает</div>
+    </div>
+    <div class="tier">
+      <div class="tier-label">Content</div>
+      <div class="tier-cards">
+        <div class="hcard t-mod">
+          <div class="hcard-name">Moderator</div>
+          <div class="hcard-sub">Контент · читает всё · бан юзеров</div>
+        </div>
+      </div>
+    </div>
+    <div style="height:16px;border-left:1.5px dashed #ddd;margin-left:44px"></div>
+    <div style="font-size:10px;color:#666;margin-bottom:8px">
+      <span style="background:#f5f5f3;padding:2px 8px;border-radius:4px;border:0.5px solid #ddd">Независимые роли — комбинируются друг с другом</span>
+    </div>
+    <div class="tier">
+      <div class="tier-label">Academy</div>
+      <div class="tier-cards">
+        <div class="hcard t-academy">
+          <div class="hcard-name">Lecturer</div>
+          <div class="hcard-sub">Создаёт курсы · уроки · публикует</div>
+        </div>
+        <div class="hcard t-academy" style="opacity:.7">
+          <div class="hcard-name">Student</div>
+          <div class="hcard-sub">Учится · прогресс · сертификаты</div>
+        </div>
+      </div>
+    </div>
+    <div class="tier" style="margin-top:8px">
+      <div class="tier-label">Studio</div>
+      <div class="tier-cards">
+        <div class="hcard t-studio">
+          <div class="hcard-name">Client</div>
+          <div class="hcard-sub">Создаёт проекты · нанимает · контракты</div>
+        </div>
+        <div class="hcard t-studio" style="opacity:.7">
+          <div class="hcard-name">Executor</div>
+          <div class="hcard-sub">Берёт проекты · milestones · услуги</div>
+        </div>
+      </div>
+    </div>
+    <div class="tier" style="margin-top:8px">
+      <div class="tier-label">Public</div>
+      <div class="tier-cards">
+        <div class="hcard t-guest">
+          <div class="hcard-name">Guest</div>
+          <div class="hcard-sub">Только чтение публичного</div>
+        </div>
+      </div>
+    </div>
+    <div class="inherit-note" style="margin-top:16px">
+      Admin ⊃ Manager ⊃ Moderator &nbsp;·&nbsp; Student, Lecturer, Client, Executor — независимые, можно иметь несколько одновременно &nbsp;·&nbsp; Admin hardcoded по email: redgriffinanimatestudio@gmail.com
+    </div>
+  </div>
+</div>
+
+<!-- MATRIX -->
+<div id="v-matrix" class="view">
+<div class="matrix-wrap">
+<table class="matrix">
+<thead>
+<tr>
+  <th class="res-h">Ресурс / Действие</th>
+  <th class="rh-guest">Guest</th>
+  <th class="rh-student">Student</th>
+  <th class="rh-lecturer">Lecturer</th>
+  <th class="rh-client">Client</th>
+  <th class="rh-exec">Executor</th>
+  <th class="rh-mod">Moderator</th>
+  <th class="rh-manager">Manager</th>
+  <th class="rh-admin">Admin</th>
+</tr>
+</thead>
+<tbody>
+<tr class="section-row"><td colspan="9">📚 ACADEMY — Courses</td></tr>
+<tr><td class="action">Просмотр списка</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Просмотр черновиков</td><td class="no">—</td><td class="no">—</td><td class="own">★</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Создать курс</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Редактировать курс</td><td class="no">—</td><td class="no">—</td><td class="own">★</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Опубликовать/снять</td><td class="no">—</td><td class="no">—</td><td class="own">★</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Удалить курс</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Аналитика курса</td><td class="no">—</td><td class="no">—</td><td class="own">★</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr class="section-row"><td colspan="9">📖 ACADEMY — Lessons</td></tr>
+<tr><td class="action">Список уроков</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Контент урока</td><td class="no">—</td><td class="cond">▲</td><td class="own">★</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Создать / редактировать урок</td><td class="no">—</td><td class="no">—</td><td class="own">★</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Загрузить видео</td><td class="no">—</td><td class="no">—</td><td class="own">★</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Отметить урок завершённым</td><td class="no">—</td><td class="cond">▲</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr class="section-row"><td colspan="9">🎓 ACADEMY — Enrollments & Certs</td></tr>
+<tr><td class="action">Записаться на курс</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Просмотр своего прогресса</td><td class="no">—</td><td class="own">★</td><td class="own">★</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Оставить отзыв</td><td class="no">—</td><td class="cond">▲</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td></tr>
+<tr><td class="action">Удалить чужой отзыв</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Выдать сертификат</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr class="section-row"><td colspan="9">🎬 STUDIO — Projects</td></tr>
+<tr><td class="action">Список открытых проектов</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Создать проект</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Редактировать проект</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="own">★</td><td class="cond">▲</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Удалить проект</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Подать заявку</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td></tr>
+<tr><td class="action">Принять / отклонить заявку</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="own">★</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Управлять задачами</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="cond">▲</td><td class="cond">▲</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr class="section-row"><td colspan="9">📄 STUDIO — Contracts & Services</td></tr>
+<tr><td class="action">Просмотр контракта</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="own">★</td><td class="own">★</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Создать контракт</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Выплатить milestone</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="cond">▲</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Создать / редактировать услугу</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Удалить услугу</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr class="section-row"><td colspan="9">💬 SHARED — Chat & Notifications</td></tr>
+<tr><td class="action">Читать / писать в чат</td><td class="no">—</td><td class="cond">▲</td><td class="cond">▲</td><td class="cond">▲</td><td class="cond">▲</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Свои уведомления</td><td class="no">—</td><td class="own">★</td><td class="own">★</td><td class="own">★</td><td class="own">★</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Отправить уведомление (система)</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr class="section-row"><td colspan="9">🔒 ADMIN — Users & Platform</td></tr>
+<tr><td class="action">Читать любой профиль</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Изменить роли пользователя</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="cond">▲</td><td class="ok">●</td></tr>
+<tr><td class="action">Дать роль admin</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td></tr>
+<tr><td class="action">Заблокировать пользователя</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Удалить пользователя</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td></tr>
+<tr><td class="action">Платформенная аналитика</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td><td class="ok">●</td></tr>
+<tr><td class="action">Audit log</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="ok">●</td></tr>
+</tbody>
+</table>
+</div>
+<div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">
+  <span style="font-size:11px;color:#666"><span class="ok">●</span> полный доступ</span>
+  <span style="font-size:11px;color:#666"><span class="own">★</span> только свои ресурсы</span>
+  <span style="font-size:11px;color:#666"><span class="cond">▲</span> условный доступ</span>
+  <span style="font-size:11px;color:#666"><span class="no" style="color:#999">—</span> нет доступа</span>
+</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="v-dash" class="view">
+<div style="font-size:12px;color:#666;margin-bottom:12px">Секции дашборда /dashboard — что видит каждая роль</div>
+<div class="dash-grid">
+  <div class="dash-role">
+    <div class="dash-role-head h-s">Student</div>
+    <div class="dash-item"><span class="dot d-read"></span>Мои курсы + прогресс</div>
+    <div class="dash-item"><span class="dot d-read"></span>Сертификаты</div>
+    <div class="dash-item"><span class="dot d-read"></span>История записей</div>
+    <div class="dash-item"><span class="dot d-view"></span>Рекомендованные курсы</div>
+  </div>
+  <div class="dash-role">
+    <div class="dash-role-head h-l">Lecturer</div>
+    <div class="dash-item"><span class="dot d-write"></span>Мои созданные курсы</div>
+    <div class="dash-item"><span class="dot d-read"></span>Список студентов</div>
+    <div class="dash-item"><span class="dot d-read"></span>Доход / аналитика</div>
+    <div class="dash-item"><span class="dot d-read"></span>Отзывы на мои курсы</div>
+    <div class="dash-item"><span class="dot d-write"></span>Создать / редактировать курс</div>
+  </div>
+  <div class="dash-role">
+    <div class="dash-role-head h-c">Client</div>
+    <div class="dash-item"><span class="dot d-write"></span>Мои проекты</div>
+    <div class="dash-item"><span class="dot d-read"></span>Входящие заявки</div>
+    <div class="dash-item"><span class="dot d-read"></span>Активные контракты</div>
+    <div class="dash-item"><span class="dot d-write"></span>Выплата milestone</div>
+    <div class="dash-item"><span class="dot d-view"></span>Поиск исполнителей</div>
+  </div>
+  <div class="dash-role">
+    <div class="dash-role-head h-e">Executor</div>
+    <div class="dash-item"><span class="dot d-read"></span>Мои заявки на проекты</div>
+    <div class="dash-item"><span class="dot d-read"></span>Активные контракты</div>
+    <div class="dash-item"><span class="dot d-write"></span>Milestones прогресс</div>
+    <div class="dash-item"><span class="dot d-write"></span>Мои услуги (Services)</div>
+    <div class="dash-item"><span class="dot d-view"></span>Открытые проекты</div>
+  </div>
+  <div class="dash-role">
+    <div class="dash-role-head h-m">Moderator</div>
+    <div class="dash-item"><span class="dot d-write"></span>Очередь на публикацию</div>
+    <div class="dash-item"><span class="dot d-del"></span>Жалобы / отзывы</div>
+    <div class="dash-item"><span class="dot d-read"></span>Все пользователи (чтение)</div>
+    <div class="dash-item"><span class="dot d-del"></span>Бан пользователей</div>
+    <div class="dash-item"><span class="dot d-write"></span>Системные уведомления</div>
+  </div>
+  <div class="dash-role">
+    <div class="dash-role-head h-mg">Manager</div>
+    <div class="dash-item"><span class="dot d-read"></span>Все контракты платформы</div>
+    <div class="dash-item"><span class="dot d-write"></span>Создание контрактов</div>
+    <div class="dash-item"><span class="dot d-write"></span>Выдача сертификатов</div>
+    <div class="dash-item"><span class="dot d-read"></span>Платформенная аналитика</div>
+    <div class="dash-item"><span class="dot d-write"></span>Управление ролями (без admin)</div>
+    <div class="dash-item"><span class="dot d-del"></span>Удаление курсов / проектов</div>
+  </div>
+  <div class="dash-role">
+    <div class="dash-role-head h-a">Admin</div>
+    <div class="dash-item"><span class="dot d-write"></span>Все права Manager+</div>
+    <div class="dash-item"><span class="dot d-write"></span>Выдача роли Admin</div>
+    <div class="dash-item"><span class="dot d-del"></span>Hard delete пользователей</div>
+    <div class="dash-item"><span class="dot d-read"></span>Audit log</div>
+    <div class="dash-item"><span class="dot d-write"></span>Настройки платформы</div>
+    <div class="dash-item"><span class="dot d-write"></span>Firebase Admin SDK bypass</div>
+  </div>
+</div>
+<div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap">
+  <span style="font-size:11px;color:#666"><span class="dot d-read" style="display:inline-block;margin-right:4px;vertical-align:middle"></span>чтение</span>
+  <span style="font-size:11px;color:#666"><span class="dot d-write" style="display:inline-block;margin-right:4px;vertical-align:middle"></span>создание / редактирование</span>
+  <span style="font-size:11px;color:#666"><span class="dot d-del" style="display:inline-block;margin-right:4px;vertical-align:middle"></span>удаление / модерация</span>
+  <span style="font-size:11px;color:#666"><span class="dot d-view" style="display:inline-block;margin-right:4px;vertical-align:middle"></span>обзорный</span>
+</div>
+</div>
+
+<!-- COMBOS -->
+<div id="v-combo" class="view">
+<div style="font-size:12px;color:#666;margin-bottom:12px">Пользователь может иметь несколько ролей одновременно. Типичные рабочие комбинации:</div>
+<div class="combo-grid">
+  <div class="combo-card">
+    <div class="combo-title">Обычный студент</div>
+    <div class="combo-roles"><span class="pill p-s">student</span></div>
+    <div class="combo-desc">Самый базовый случай. Только записывается на курсы, смотрит уроки, получает сертификаты.</div>
+  </div>
+  <div class="combo-card">
+    <div class="combo-title">Студент-преподаватель</div>
+    <div class="combo-roles"><span class="pill p-s">student</span><span class="pill p-l">lecturer</span></div>
+    <div class="combo-desc">Учится сам и одновременно ведёт свои курсы. Типичный сценарий для середняка.</div>
+  </div>
+  <div class="combo-card">
+    <div class="combo-title">Фрилансер</div>
+    <div class="combo-roles"><span class="pill p-e">executor</span></div>
+    <div class="combo-desc">Берёт проекты от клиентов, работает по контрактам, выставляет услуги в маркетплейсе.</div>
+  </div>
+  <div class="combo-card">
+    <div class="combo-title">Фрилансер с субподрядом</div>
+    <div class="combo-roles"><span class="pill p-e">executor</span><span class="pill p-c">client</span></div>
+    <div class="combo-desc">Берёт крупный проект как executor и сам нанимает других исполнителей как client.</div>
+  </div>
+  <div class="combo-card">
+    <div class="combo-title">Студия / агентство</div>
+    <div class="combo-roles"><span class="pill p-c">client</span><span class="pill p-l">lecturer</span></div>
+    <div class="combo-desc">Заказывает работу у фрилансеров и параллельно ведёт обучающие курсы для своей аудитории.</div>
+  </div>
+  <div class="combo-card">
+    <div class="combo-title">Универсальный участник</div>
+    <div class="combo-roles"><span class="pill p-s">student</span><span class="pill p-l">lecturer</span><span class="pill p-e">executor</span></div>
+    <div class="combo-desc">Учится, преподаёт и берёт проекты. Нет ограничений на комбинирование пользовательских ролей.</div>
+  </div>
+  <div class="combo-card">
+    <div class="combo-title">Контент-модератор</div>
+    <div class="combo-roles"><span class="pill p-m">moderator</span></div>
+    <div class="combo-desc">Только модерация. Не создаёт контракты, не публикует курсы — только проверяет и банит.</div>
+  </div>
+  <div class="combo-card">
+    <div class="combo-title">Операционный менеджер</div>
+    <div class="combo-roles"><span class="pill p-mg">manager</span></div>
+    <div class="combo-desc">Включает все права moderator. Создаёт контракты, выдаёт сертификаты, видит всю аналитику.</div>
+  </div>
+  <div class="combo-card">
+    <div class="combo-title">Суперадмин</div>
+    <div class="combo-roles"><span class="pill p-a">admin</span></div>
+    <div class="combo-desc">Включает все права. Email redgriffinanimatestudio@gmail.com получает auto-grant без записи в roles[].</div>
+  </div>
+  <div class="combo-card" style="border-color:#D85A30;background:#FAECE7">
+    <div class="combo-title" style="color:#4A1B0C">⚠️ Невалидные комбинации</div>
+    <div class="combo-roles"><span class="pill p-mg">manager</span><span class="pill p-m">moderator</span></div>
+    <div class="combo-desc" style="color:#993C1D">Manager уже включает все права moderator — дублировать бессмысленно. Аналогично admin + manager.</div>
+  </div>
+</div>
+</div>
+
+<!-- CONDITIONS -->
+<div id="v-cond" class="view">
+<div style="font-size:12px;color:#666;margin-bottom:12px">Условия (▲) и ограничения (★) из матрицы — что именно проверяется на бэкенде</div>
+<table class="cond-table">
+<tr><th>Действие</th><th>Роль</th><th>Условие проверки</th></tr>
+<tr><td>Читать урок</td><td><span class="tag tag-cond">▲ student</span></td><td>Существует enrollment: userId = uid + courseId совпадает</td></tr>
+<tr><td>Отметить урок</td><td><span class="tag tag-cond">▲ student</span></td><td>enrolled + lesson входит в тот же курс</td></tr>
+<tr><td>Оставить отзыв</td><td><span class="tag tag-cond">▲ student</span></td><td>progress = 100% ИЛИ все уроки completed</td></tr>
+<tr><td>Редактировать курс</td><td><span class="tag tag-own">★ lecturer</span></td><td>course.lecturerId = req.uid</td></tr>
+<tr><td>Читать черновик курса</td><td><span class="tag tag-own">★ lecturer</span></td><td>course.lecturerId = req.uid</td></tr>
+<tr><td>Аналитика курса</td><td><span class="tag tag-own">★ lecturer</span></td><td>course.lecturerId = req.uid</td></tr>
+<tr><td>CRUD уроков</td><td><span class="tag tag-own">★ lecturer</span></td><td>parent course.lecturerId = req.uid</td></tr>
+<tr><td>Редактировать проект</td><td><span class="tag tag-own">★ client</span></td><td>project.clientId = req.uid</td></tr>
+<tr><td>Принять заявку</td><td><span class="tag tag-own">★ client</span></td><td>project.clientId = req.uid</td></tr>
+<tr><td>Выплатить milestone</td><td><span class="tag tag-cond">▲ client</span></td><td>contract.clientId = uid + contract.status = active</td></tr>
+<tr><td>Редактировать задачи</td><td><span class="tag tag-cond">▲ executor</span></td><td>project.executorId = uid (заявка принята)</td></tr>
+<tr><td>Смотреть контракт</td><td><span class="tag tag-own">★ executor</span></td><td>contract.executorId = uid</td></tr>
+<tr><td>Читать чат</td><td><span class="tag tag-cond">▲ любой</span></td><td>uid входит в chatRoom.participants[]</td></tr>
+<tr><td>Писать в чат</td><td><span class="tag tag-cond">▲ любой</span></td><td>uid входит в chatRoom.participants[]</td></tr>
+<tr><td>Смотреть уведомления</td><td><span class="tag tag-own">★ любой</span></td><td>notification.userId = uid</td></tr>
+<tr><td>Изменить роли</td><td><span class="tag tag-cond">▲ manager</span></td><td>Нельзя назначить роль admin — только admin может</td></tr>
+<tr><td colspan="3" style="background:#f5f5f3;font-size:11px;color:#666;padding:8px 12px">
+  Bypass: admin + manager имеют приоритет над всеми условиями выше. isModerator() = read-only bypass.
+</td></tr>
+</table>
+</div>
+
+<script>
+function show(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('v-'+id).classList.add('on');
+  event.target.classList.add('on');
+}
+</script>
+
+</body>
+</html>

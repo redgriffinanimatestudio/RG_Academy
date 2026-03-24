@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Role Combinations — Red Griffin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#fff;color:#111;padding:2rem}
+.w{padding:1rem 0}
+
+.roles-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.role-toggle{padding:8px 16px;border:1.5px solid #ddd;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;background:#fff;color:#666;user-select:none}
+.role-toggle:hover{border-color:#aaa;color:#111}
+.role-toggle.on-s{background:#E6F1FB;color:#185FA5;border-color:#85B7EB}
+.role-toggle.on-l{background:#EEEDFE;color:#3C3489;border-color:#AFA9EC}
+.role-toggle.on-c{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5}
+.role-toggle.on-e{background:#9FE1CB;color:#04342C;border-color:#1D9E75}
+
+.hint{font-size:11px;color:#666;margin-bottom:16px}
+
+.result-wrap{border:0.5px solid #ddd;border-radius:12px;overflow:hidden;background:#fff}
+.result-head{padding:12px 16px;border-bottom:0.5px solid #ddd;background:#f5f5f3;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.result-title{font-size:12px;font-weight:500;color:#111}
+.combo-pills{display:flex;gap:6px;flex-wrap:wrap}
+.cpill{font-size:10px;padding:2px 10px;border-radius:20px;font-weight:500}
+.cp-s{background:#E6F1FB;color:#185FA5}
+.cp-l{background:#EEEDFE;color:#3C3489}
+.cp-c{background:#E1F5EE;color:#0F6E56}
+.cp-e{background:#9FE1CB;color:#04342C}
+.cp-none{background:#f5f5f3;color:#666}
+
+.zones{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.zone{padding:14px 16px;border-right:0.5px solid #ddd;border-bottom:0.5px solid #ddd}
+.zone:nth-child(2n){border-right:none}
+.zone:nth-last-child(-n+2){border-bottom:none}
+.zone-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.perm-list{display:flex;flex-direction:column;gap:5px}
+.perm-item{display:flex;align-items:flex-start;gap:7px;font-size:11px}
+.perm-dot{width:6px;height:6px;border-radius:50%;margin-top:3px;flex-shrink:0}
+.perm-text{color:#111;line-height:1.4}
+.empty-hint{font-size:11px;color:#888;font-style:italic}
+
+.d-s{background:#378ADD}
+.d-l{background:#7F77DD}
+.d-c{background:#1D9E75}
+.d-e{background:#5DCAA5}
+
+.overlap-block{border-top:0.5px solid #ddd;padding:12px 16px;background:#f5f5f3}
+.overlap-title{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:#666;margin-bottom:8px}
+.overlap-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;font-size:11px}
+.overlap-row:last-child{margin-bottom:0}
+.ov-icon{font-size:12px;width:18px;text-align:center;flex-shrink:0;margin-top:1px}
+
+.presets-row{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.preset-label{font-size:10px;color:#666}
+.preset-btn{font-size:11px;padding:5px 12px;border:0.5px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;color:#666;transition:all .15s}
+.preset-btn:hover{background:#f5f5f3;color:#111}
+
+.page-header{margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:0.5px solid #ddd}
+.page-sup{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.page-title{font-size:20px;font-weight:500;color:#111}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:0.5px solid #ddd;font-size:11px;color:#666}
+.leg-item{display:flex;align-items:center;gap:5px}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-sup">Red Griffin Platform</div>
+  <div class="page-title">Role combinations — interactive</div>
+</div>
+
+<div class="w">
+
+<div class="hint">Выбери одну или несколько ролей — увидишь что получает этот пользователь</div>
+
+<div class="roles-row" id="toggles">
+  <div class="role-toggle" data-role="s" onclick="toggle(this)">student</div>
+  <div class="role-toggle" data-role="l" onclick="toggle(this)">lecturer</div>
+  <div class="role-toggle" data-role="c" onclick="toggle(this)">client</div>
+  <div class="role-toggle" data-role="e" onclick="toggle(this)">executor</div>
+</div>
+
+<div class="presets-row">
+  <span class="preset-label">Готовые профили:</span>
+  <button class="preset-btn" onclick="setPreset(['s'])">Студент</button>
+  <button class="preset-btn" onclick="setPreset(['l'])">Лектор</button>
+  <button class="preset-btn" onclick="setPreset(['s','l'])">Студент + лектор</button>
+  <button class="preset-btn" onclick="setPreset(['e'])">Фрилансер</button>
+  <button class="preset-btn" onclick="setPreset(['c','e'])">Студия (субподряд)</button>
+  <button class="preset-btn" onclick="setPreset(['s','l','c','e'])">Всё сразу</button>
+</div>
+
+<div class="result-wrap">
+  <div class="result-head">
+    <div class="result-title" id="profile-title">Выбери роли выше</div>
+    <div class="combo-pills" id="combo-pills"><span class="cpill cp-none">нет ролей</span></div>
+  </div>
+
+  <div class="zones">
+    <div class="zone">
+      <div class="zone-label" style="color:#3C3489">Academy</div>
+      <div class="perm-list" id="pl-academy"><div class="empty-hint">нет доступа</div></div>
+    </div>
+    <div class="zone">
+      <div class="zone-label" style="color:#0F6E56">Studio</div>
+      <div class="perm-list" id="pl-studio"><div class="empty-hint">нет доступа</div></div>
+    </div>
+    <div class="zone">
+      <div class="zone-label" style="color:#5F5E5A">Общее</div>
+      <div class="perm-list" id="pl-shared"><div class="empty-hint">нет доступа</div></div>
+    </div>
+    <div class="zone">
+      <div class="zone-label" style="color:#854F0B">Дашборд /dashboard</div>
+      <div class="perm-list" id="pl-dashboard"><div class="empty-hint">нет секций</div></div>
+    </div>
+  </div>
+
+  <div class="overlap-block" id="overlap-block" style="display:none">
+    <div class="overlap-title">Пересечения и синергия ролей</div>
+    <div id="overlap-list"></div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="leg-item"><div class="leg-dot" style="background:#378ADD"></div>student</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#7F77DD"></div>lecturer</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>client</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#5DCAA5"></div>executor</div>
+</div>
+
+</div>
+
+<script>
+const PERMS = {
+  s: {
+    academy: [
+      'Просматривать опубликованные курсы',
+      'Смотреть список уроков',
+      'Читать контент урока (если enrolled)',
+      'Записаться на курс',
+      'Отслеживать прогресс',
+      'Завершить урок',
+      'Оставить отзыв (после прохождения)',
+      'Получить сертификат',
+    ],
+    studio: [],
+    shared: [
+      'Читать/писать в чат (если в participants)',
+      'Свои уведомления',
+    ],
+    dashboard: [
+      'Мои курсы + прогресс',
+      'Сертификаты',
+      'История записей',
+      'Рекомендованные курсы',
+    ],
+  },
+  l: {
+    academy: [
+      'Создавать курсы (draft)',
+      'Редактировать свои курсы',
+      'Публиковать / снимать свои курсы',
+      'Создавать / редактировать уроки',
+      'Загружать видео (→ S3)',
+      'Переставлять порядок уроков',
+      'Видеть список студентов курса',
+      'Аналитика своих курсов (доход, просмотры)',
+      'Читать черновики своих курсов',
+    ],
+    studio: [],
+    shared: [
+      'Читать/писать в чат (если в participants)',
+      'Свои уведомления',
+    ],
+    dashboard: [
+      'Мои созданные курсы',
+      'Список студентов',
+      'Доход / аналитика',
+      'Отзывы на мои курсы',
+      'Создать / редактировать курс',
+    ],
+  },
+  c: {
+    academy: [],
+    studio: [
+      'Создавать проекты (clientId = uid)',
+      'Редактировать свои проекты',
+      'Просматривать все открытые проекты',
+      'Видеть заявки на свои проекты',
+      'Принимать / отклонять заявки',
+      'Управлять задачами своего проекта',
+      'Просматривать свои контракты',
+      'Выплачивать milestone (если active)',
+      'Просматривать список услуг (executor)',
+    ],
+    shared: [
+      'Читать/писать в чат (если в participants)',
+      'Свои уведомления',
+    ],
+    dashboard: [
+      'Мои проекты',
+      'Входящие заявки от исполнителей',
+      'Активные контракты',
+      'Выплата milestone',
+      'Поиск исполнителей',
+    ],
+  },
+  e: {
+    academy: [],
+    studio: [
+      'Просматривать открытые проекты',
+      'Подавать заявки на проекты',
+      'Видеть свои поданные заявки',
+      'Редактировать задачи (если назначен)',
+      'Просматривать свои контракты',
+      'Обновлять статус milestone (done)',
+      'Создавать / редактировать услуги',
+    ],
+    shared: [
+      'Читать/писать в чат (если в participants)',
+      'Свои уведомления',
+    ],
+    dashboard: [
+      'Мои заявки на проекты',
+      'Активные контракты',
+      'Milestones прогресс',
+      'Мои услуги (Services)',
+      'Открытые проекты',
+    ],
+  },
+};
+
+const COLOR = {s:'d-s',l:'d-l',c:'d-c',e:'d-e'};
+const PILL_CLASS = {s:'cp-s',l:'cp-l',c:'cp-c',e:'cp-e'};
+const PILL_LABEL = {s:'student',l:'lecturer',c:'client',e:'executor'};
+const NAMES = {
+  '': 'Выбери роли выше',
+  's': 'Студент',
+  'l': 'Лектор',
+  'c': 'Клиент',
+  'e': 'Исполнитель',
+  'sl': 'Студент + лектор',
+  'sc': 'Студент + клиент',
+  'se': 'Студент + исполнитель',
+  'lc': 'Лектор + клиент',
+  'le': 'Лектор + исполнитель',
+  'ce': 'Клиент + исполнитель (субподряд)',
+  'slc': 'Студент + лектор + клиент',
+  'sle': 'Студент + лектор + исполнитель',
+  'sce': 'Студент + клиент + исполнитель',
+  'lce': 'Лектор + клиент + исполнитель',
+  'slce': 'Максимальный пользовательский профиль',
+};
+
+const OVERLAPS = {
+  'sl': ['Может учиться сам на своих же курсах','Видит студентов — и сам является студентом'],
+  'ce': ['Может нанимать других и сам браться за работу','Субподряд: взял проект как executor, нанял помощника как client'],
+  'lce': ['Преподаёт, берёт проекты, нанимает помощников — полный CG-фрилансер'],
+  'slce': ['Полный участник платформы — учится, преподаёт, заказывает и исполняет'],
+  'sc': ['Учится и одновременно заказывает CG-услуги для своих проектов'],
+  'se': ['Учится и параллельно берёт заказы на фриланс'],
+  'le': ['Преподаёт и сам берёт студийные проекты'],
+  'lc': ['Преподаёт и заказывает услуги у других исполнителей'],
+};
+
+let active = new Set();
+
+function toggle(el) {
+  const r = el.dataset.role;
+  if (active.has(r)) {
+    active.delete(r);
+    el.className = 'role-toggle';
+  } else {
+    active.add(r);
+    el.className = 'role-toggle on-' + r;
+  }
+  render();
+}
+
+function setPreset(roles) {
+  active = new Set(roles);
+  document.querySelectorAll('.role-toggle').forEach(el => {
+    const r = el.dataset.role;
+    el.className = 'role-toggle' + (active.has(r) ? ' on-' + r : '');
+  });
+  render();
+}
+
+function render() {
+  const roles = ['s','l','c','e'].filter(r => active.has(r));
+  const key = roles.join('');
+
+  const pillsEl = document.getElementById('combo-pills');
+  if (roles.length === 0) {
+    pillsEl.innerHTML = '<span class="cpill cp-none">нет ролей</span>';
+  } else {
+    pillsEl.innerHTML = roles.map(r => `<span class="cpill ${PILL_CLASS[r]}">${PILL_LABEL[r]}</span>`).join('');
+  }
+
+  document.getElementById('profile-title').textContent = NAMES[key] || (roles.length + ' роли');
+
+  ['academy','studio','shared','dashboard'].forEach(zone => {
+    const el = document.getElementById('pl-' + zone);
+    const items = [];
+    roles.forEach(r => {
+      (PERMS[r][zone] || []).forEach(p => {
+        items.push({text: p, role: r});
+      });
+    });
+    const seen = new Set();
+    const unique = items.filter(i => {
+      if (seen.has(i.text)) return false;
+      seen.add(i.text);
+      return true;
+    });
+    if (unique.length === 0) {
+      el.innerHTML = '<div class="empty-hint">нет доступа</div>';
+    } else {
+      el.innerHTML = unique.map(i => `
+        <div class="perm-item">
+          <span class="perm-dot ${COLOR[i.role]}"></span>
+          <span class="perm-text">${i.text}</span>
+        </div>`).join('');
+    }
+  });
+
+  const ob = document.getElementById('overlap-block');
+  const ol = document.getElementById('overlap-list');
+  const msgs = [];
+  for (let i = 0; i < roles.length; i++) {
+    for (let j = i + 1; j <= roles.length; j++) {
+      const s = roles.slice(i, j).join('');
+      if (OVERLAPS[s]) msgs.push(...OVERLAPS[s]);
+    }
+  }
+  if (OVERLAPS[key]) msgs.push(...OVERLAPS[key]);
+  const uniqMsgs = [...new Set(msgs)];
+  if (uniqMsgs.length > 0 && roles.length > 1) {
+    ob.style.display = 'block';
+    ol.innerHTML = uniqMsgs.map(m => `
+      <div class="overlap-row">
+        <span class="ov-icon">→</span>
+        <span style="font-size:11px;color:#111">${m}</span>
+      </div>`).join('');
+  } else {
+    ob.style.display = 'none';
+  }
+}
+</script>
+
+</body>
+</html>

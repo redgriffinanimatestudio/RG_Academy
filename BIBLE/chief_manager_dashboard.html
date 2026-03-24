@@ -1,0 +1,585 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.db{font-family:var(--font-sans);padding:0 0 2rem}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 0 16px;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:20px}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.role-badge{font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px;background:#FAEEDA;color:#633806;border:0.5px solid #EF9F27}
+.page-title{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.topbar-right{display:flex;gap:8px}
+.tb-btn{font-size:11px;padding:6px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer}
+.tb-btn:hover{background:var(--color-background-secondary)}
+.tb-btn.pri{background:#FAEEDA;color:#633806;border-color:#EF9F27}
+
+.nav{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:20px}
+.nv{padding:8px 16px;font-size:12px;font-weight:500;color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.nv:hover{color:var(--color-text-primary)}
+.nv.on{color:#854F0B;border-bottom-color:#BA7517}
+
+.sec{display:none}.sec.on{display:block}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.kpi{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px}
+.kpi-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:6px}
+.kpi-val{font-size:22px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.kpi-delta{font-size:11px}
+.up{color:#3B6D11}.dn{color:#A32D2D}.flat{color:var(--color-text-secondary)}
+
+.two-col{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:12px;margin-bottom:16px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px}
+.card-title{font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em}
+
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-label{font-size:12px;color:var(--color-text-primary);width:80px;flex-shrink:0}
+.bar-track{flex:1;height:6px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px}
+.bar-val{font-size:11px;color:var(--color-text-secondary);width:36px;text-align:right;flex-shrink:0}
+
+.donut-wrap{display:flex;align-items:center;gap:16px}
+.legend{flex:1}
+.leg-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.leg-label{font-size:12px;color:var(--color-text-primary);flex:1}
+.leg-val{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+
+.list-row{display:flex;align-items:center;padding:9px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.list-row:last-child{border-bottom:none}
+.list-main{flex:1;font-size:12px;color:var(--color-text-primary)}
+.list-sub{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+.list-right{text-align:right}
+.list-amt{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.list-status{font-size:10px;padding:2px 8px;border-radius:20px;margin-top:2px;display:inline-block}
+.s-active{background:#E1F5EE;color:#0F6E56}
+.s-dispute{background:#FCEBEB;color:#A32D2D}
+.s-pending{background:#FAEEDA;color:#854F0B}
+.s-done{background:#F1EFE8;color:#5F5E5A}
+
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0}
+.av-a{background:#EEEDFE;color:#3C3489}
+.av-b{background:#E1F5EE;color:#0F6E56}
+.av-c{background:#FAECE7;color:#993C1D}
+.av-d{background:#E6F1FB;color:#185FA5}
+.av-e{background:#FBEAF0;color:#993556}
+
+.team-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.team-row:last-child{border-bottom:none}
+.team-info{flex:1}
+.team-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.team-role{font-size:11px;color:var(--color-text-secondary)}
+.team-stat{text-align:right;font-size:11px;color:var(--color-text-secondary)}
+.team-num{font-size:13px;font-weight:500;color:var(--color-text-primary);display:block}
+
+.three-col{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}
+
+.dept-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px}
+.dept-head{font-size:12px;font-weight:500;margin-bottom:12px;padding-bottom:8px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.dept-kpi{display:flex;justify-content:space-between;margin-bottom:8px}
+.dept-k-label{font-size:11px;color:var(--color-text-secondary)}
+.dept-k-val{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.prog-bar{height:4px;background:var(--color-background-secondary);border-radius:2px;overflow:hidden;margin-top:10px}
+.prog-fill{height:100%;border-radius:2px}
+
+.action-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.act-btn{font-size:12px;padding:8px 16px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer}
+.act-btn:hover{background:var(--color-background-secondary)}
+.act-btn.warn{background:#FAEEDA;color:#633806;border-color:#EF9F27}
+
+.queue-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.queue-item:last-child{border-bottom:none}
+.q-icon{width:36px;height:36px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.q-i-amber{background:#FAEEDA}
+.q-i-blue{background:#E6F1FB}
+.q-i-red{background:#FCEBEB}
+.q-main{flex:1}
+.q-title{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.q-sub{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+.q-actions{display:flex;gap:6px}
+.q-btn{font-size:10px;padding:4px 10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);cursor:pointer;color:var(--color-text-secondary)}
+.q-btn.approve{background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5}
+.q-btn.reject{background:#FCEBEB;color:#A32D2D;border-color:#F09595}
+
+.sparkline-row{display:flex;align-items:flex-end;gap:3px;height:40px;margin:8px 0}
+.spark-bar{border-radius:2px 2px 0 0;flex:1;min-width:0}
+
+.full-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:16px;margin-bottom:16px}
+</style>
+
+<div class="db">
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="page-title">Dashboard</div>
+    <div class="role-badge">chief manager</div>
+  </div>
+  <div class="topbar-right">
+    <button class="tb-btn" onclick="sendPrompt('Покажи детальный отчёт по платформе за последний месяц')">Отчёт ↗</button>
+    <button class="tb-btn pri" onclick="sendPrompt('Что требует срочного внимания chief manager прямо сейчас?')">Срочные задачи ↗</button>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="nv on" onclick="switchTab('overview')">Обзор</div>
+  <div class="nv" onclick="switchTab('academy')">Academy</div>
+  <div class="nv" onclick="switchTab('studio')">Studio</div>
+  <div class="nv" onclick="switchTab('team')">Команда</div>
+  <div class="nv" onclick="switchTab('contracts')">Контракты</div>
+  <div class="nv" onclick="switchTab('queue')">Очередь</div>
+</div>
+
+<!-- ═══════════ OVERVIEW ═══════════ -->
+<div id="s-overview" class="sec on">
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-label">Выручка платформы</div>
+      <div class="kpi-val">$148 200</div>
+      <div class="kpi-delta up">+12% к прошлому месяцу</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Активных пользователей</div>
+      <div class="kpi-val">42 380</div>
+      <div class="kpi-delta up">+8% к прошлому месяцу</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Активных контрактов</div>
+      <div class="kpi-val">318</div>
+      <div class="kpi-delta dn">-3 в споре</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Контент на модерации</div>
+      <div class="kpi-val">24</div>
+      <div class="kpi-delta flat">ожидают решения</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Выручка — Academy vs Studio</div>
+      <div style="margin-bottom:10px">
+        <div class="bar-row">
+          <div class="bar-label">Academy</div>
+          <div class="bar-track"><div class="bar-fill" style="width:72%;background:#534AB7"></div></div>
+          <div class="bar-val">$106k</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Studio</div>
+          <div class="bar-track"><div class="bar-fill" style="width:28%;background:#1D9E75"></div></div>
+          <div class="bar-val">$42k</div>
+        </div>
+      </div>
+      <div class="card-title" style="margin-top:16px">По месяцам (спарклайн)</div>
+      <div class="sparkline-row">
+        <div class="spark-bar" style="height:40%;background:#CECBF6"></div>
+        <div class="spark-bar" style="height:55%;background:#CECBF6"></div>
+        <div class="spark-bar" style="height:48%;background:#CECBF6"></div>
+        <div class="spark-bar" style="height:62%;background:#CECBF6"></div>
+        <div class="spark-bar" style="height:58%;background:#CECBF6"></div>
+        <div class="spark-bar" style="height:70%;background:#AFA9EC"></div>
+        <div class="spark-bar" style="height:65%;background:#AFA9EC"></div>
+        <div class="spark-bar" style="height:78%;background:#AFA9EC"></div>
+        <div class="spark-bar" style="height:82%;background:#7F77DD"></div>
+        <div class="spark-bar" style="height:88%;background:#7F77DD"></div>
+        <div class="spark-bar" style="height:94%;background:#534AB7"></div>
+        <div class="spark-bar" style="height:100%;background:#3C3489"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--color-text-secondary)">
+        <span>Янв</span><span>Мар</span><span>Май</span><span>Июл</span><span>Сен</span><span>Ноя</span><span>Дек</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Распределение ролей</div>
+      <div class="donut-wrap">
+        <svg width="72" height="72" viewBox="0 0 72 72">
+          <circle cx="36" cy="36" r="28" fill="none" stroke="#E6F1FB" stroke-width="12"/>
+          <circle cx="36" cy="36" r="28" fill="none" stroke="#534AB7" stroke-width="12" stroke-dasharray="88 88" stroke-dashoffset="0" transform="rotate(-90 36 36)"/>
+          <circle cx="36" cy="36" r="28" fill="none" stroke="#1D9E75" stroke-width="12" stroke-dasharray="44 132" stroke-dashoffset="-88" transform="rotate(-90 36 36)"/>
+          <circle cx="36" cy="36" r="28" fill="none" stroke="#D85A30" stroke-width="12" stroke-dasharray="22 154" stroke-dashoffset="-132" transform="rotate(-90 36 36)"/>
+          <circle cx="36" cy="36" r="28" fill="none" stroke="#BA7517" stroke-width="12" stroke-dasharray="22 154" stroke-dashoffset="-154" transform="rotate(-90 36 36)"/>
+        </svg>
+        <div class="legend">
+          <div class="leg-row"><div class="leg-dot" style="background:#534AB7"></div><div class="leg-label">Student</div><div class="leg-val">50%</div></div>
+          <div class="leg-row"><div class="leg-dot" style="background:#1D9E75"></div><div class="leg-label">Executor</div><div class="leg-val">25%</div></div>
+          <div class="leg-row"><div class="leg-dot" style="background:#D85A30"></div><div class="leg-label">Lecturer</div><div class="leg-val">13%</div></div>
+          <div class="leg-row"><div class="leg-dot" style="background:#BA7517"></div><div class="leg-label">Client</div><div class="leg-val">12%</div></div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;padding-top:12px;border-top:0.5px solid var(--color-border-tertiary)">
+        <div class="card-title">Новые регистрации (7 дней)</div>
+        <div class="sparkline-row" style="height:28px">
+          <div class="spark-bar" style="height:60%;background:#9FE1CB"></div>
+          <div class="spark-bar" style="height:80%;background:#9FE1CB"></div>
+          <div class="spark-bar" style="height:50%;background:#9FE1CB"></div>
+          <div class="spark-bar" style="height:90%;background:#5DCAA5"></div>
+          <div class="spark-bar" style="height:70%;background:#5DCAA5"></div>
+          <div class="spark-bar" style="height:100%;background:#1D9E75"></div>
+          <div class="spark-bar" style="height:85%;background:#1D9E75"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="three-col">
+    <div class="dept-card">
+      <div class="dept-head" style="color:#3C3489">Academy</div>
+      <div class="dept-kpi"><span class="dept-k-label">Курсов опубликовано</span><span class="dept-k-val">214</span></div>
+      <div class="dept-kpi"><span class="dept-k-label">Записей активных</span><span class="dept-k-val">18 420</span></div>
+      <div class="dept-kpi"><span class="dept-k-label">Завершённость</span><span class="dept-k-val">64%</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:64%;background:#7F77DD"></div></div>
+    </div>
+    <div class="dept-card">
+      <div class="dept-head" style="color:#0F6E56">Studio</div>
+      <div class="dept-kpi"><span class="dept-k-label">Проектов открыто</span><span class="dept-k-val">87</span></div>
+      <div class="dept-kpi"><span class="dept-k-label">Контрактов active</span><span class="dept-k-val">318</span></div>
+      <div class="dept-kpi"><span class="dept-k-label">Успешных сделок</span><span class="dept-k-val">82%</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:82%;background:#1D9E75"></div></div>
+    </div>
+    <div class="dept-card">
+      <div class="dept-head" style="color:#993C1D">Moderation</div>
+      <div class="dept-kpi"><span class="dept-k-label">Отзывов на проверке</span><span class="dept-k-val">12</span></div>
+      <div class="dept-kpi"><span class="dept-k-label">Курсов ожидают</span><span class="dept-k-val">8</span></div>
+      <div class="dept-kpi"><span class="dept-k-label">Решено сегодня</span><span class="dept-k-val">19</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:79%;background:#D85A30"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ ACADEMY ═══════════ -->
+<div id="s-academy" class="sec">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Курсов всего</div><div class="kpi-val">241</div><div class="kpi-delta up">+14 этот месяц</div></div>
+    <div class="kpi"><div class="kpi-label">Выручка Academy</div><div class="kpi-val">$106 400</div><div class="kpi-delta up">+18%</div></div>
+    <div class="kpi"><div class="kpi-label">Средний рейтинг</div><div class="kpi-val">4.7</div><div class="kpi-delta flat">из 5.0</div></div>
+    <div class="kpi"><div class="kpi-label">Сертификатов выдано</div><div class="kpi-val">3 240</div><div class="kpi-delta up">+210 этот месяц</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Топ лекторы по доходу</div>
+      <div class="list-row">
+        <div class="avatar av-a">AR</div>
+        <div style="flex:1;padding-left:10px"><div class="list-main">Alex Rivera</div><div class="list-sub">12 курсов · 15 420 студентов</div></div>
+        <div class="list-right"><div class="list-amt">$24 800</div><div class="list-status s-active">активен</div></div>
+      </div>
+      <div class="list-row">
+        <div class="avatar av-b">SC</div>
+        <div style="flex:1;padding-left:10px"><div class="list-main">Sarah Chen</div><div class="list-sub">8 курсов · 8 200 студентов</div></div>
+        <div class="list-right"><div class="list-amt">$18 300</div><div class="list-status s-active">активен</div></div>
+      </div>
+      <div class="list-row">
+        <div class="avatar av-c">MT</div>
+        <div style="flex:1;padding-left:10px"><div class="list-main">Marcus Thorne</div><div class="list-sub">6 курсов · 22 100 студентов</div></div>
+        <div class="list-right"><div class="list-amt">$15 600</div><div class="list-status s-active">активен</div></div>
+      </div>
+      <div class="list-row">
+        <div class="avatar av-d">EV</div>
+        <div style="flex:1;padding-left:10px"><div class="list-main">Elena Vance</div><div class="list-sub">4 курса · 45 000 студентов</div></div>
+        <div class="list-right"><div class="list-amt">$12 900</div><div class="list-status s-pending">пауза</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Категории курсов</div>
+      <div class="bar-row"><div class="bar-label">3D Modeling</div><div class="bar-track"><div class="bar-fill" style="width:85%;background:#534AB7"></div></div><div class="bar-val">86</div></div>
+      <div class="bar-row"><div class="bar-label">Animation</div><div class="bar-track"><div class="bar-fill" style="width:62%;background:#534AB7"></div></div><div class="bar-val">63</div></div>
+      <div class="bar-row"><div class="bar-label">VFX</div><div class="bar-track"><div class="bar-fill" style="width:48%;background:#7F77DD"></div></div><div class="bar-val">49</div></div>
+      <div class="bar-row"><div class="bar-label">Game Dev</div><div class="bar-track"><div class="bar-fill" style="width:32%;background:#AFA9EC"></div></div><div class="bar-val">33</div></div>
+      <div class="bar-row"><div class="bar-label">Digital Art</div><div class="bar-track"><div class="bar-fill" style="width:22%;background:#CECBF6"></div></div><div class="bar-val">24</div></div>
+      <div style="margin-top:14px;padding-top:12px;border-top:0.5px solid var(--color-border-tertiary)">
+        <button class="act-btn" style="width:100%;justify-content:center" onclick="sendPrompt('Какие категории курсов растут быстрее всего и где нужно привлекать новых лекторов?')">Анализ роста категорий ↗</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ STUDIO ═══════════ -->
+<div id="s-studio" class="sec">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Открытых проектов</div><div class="kpi-val">87</div><div class="kpi-delta up">+11 этот месяц</div></div>
+    <div class="kpi"><div class="kpi-label">Выручка Studio</div><div class="kpi-val">$41 800</div><div class="kpi-delta up">+6%</div></div>
+    <div class="kpi"><div class="kpi-label">Споры</div><div class="kpi-val">3</div><div class="kpi-delta dn">требуют решения</div></div>
+    <div class="kpi"><div class="kpi-label">Исполнителей</div><div class="kpi-val">2 140</div><div class="kpi-delta up">+88 новых</div></div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-title">Воронка Studio — статусы проектов</div>
+    <div style="display:flex;gap:0;margin:8px 0">
+      <div style="flex:87;background:#E1F5EE;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#0F6E56;border-radius:4px 0 0 4px">Открыто 87</div>
+      <div style="flex:46;background:#9FE1CB;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#085041">В работе 46</div>
+      <div style="flex:318;background:#5DCAA5;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#04342C">Active contracts 318</div>
+      <div style="flex:280;background:#1D9E75;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#E1F5EE">Завершено 280</div>
+      <div style="flex:3;background:#E24B4A;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#FCEBEB;border-radius:0 4px 4px 0" title="Споры">3</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:4px">
+      <span style="font-size:10px;color:var(--color-text-secondary)">ширина полосы пропорциональна количеству</span>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Топ исполнители (по сумме контрактов)</div>
+      <div class="list-row">
+        <div class="avatar av-b">SC</div>
+        <div style="flex:1;padding-left:10px"><div class="list-main">Sarah Connor</div><div class="list-sub">Senior 3D Artist · LA</div></div>
+        <div class="list-right"><div class="list-amt">$48 200</div><div class="list-status s-active">онлайн</div></div>
+      </div>
+      <div class="list-row">
+        <div class="avatar av-d">JD</div>
+        <div style="flex:1;padding-left:10px"><div class="list-main">John Doe</div><div class="list-sub">VFX Supervisor · London</div></div>
+        <div class="list-right"><div class="list-amt">$36 700</div><div class="list-status s-done">офлайн</div></div>
+      </div>
+      <div class="list-row">
+        <div class="avatar av-e">JS</div>
+        <div style="flex:1;padding-left:10px"><div class="list-main">Jane Smith</div><div class="list-sub">Concept Artist · Tokyo</div></div>
+        <div class="list-right"><div class="list-amt">$29 400</div><div class="list-status s-active">онлайн</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Споры — требуют действия</div>
+      <div class="list-row">
+        <div style="flex:1"><div class="list-main">Neon City VFX</div><div class="list-sub">Client vs Executor · $12 400</div></div>
+        <div><button class="q-btn" onclick="sendPrompt('Как разрешить спор по контракту Neon City VFX между клиентом и исполнителем?')">Разрешить ↗</button></div>
+      </div>
+      <div class="list-row">
+        <div style="flex:1"><div class="list-main">Game Rig Pack</div><div class="list-sub">Milestone dispute · $3 200</div></div>
+        <div><button class="q-btn" onclick="sendPrompt('Спор по milestone в проекте Game Rig Pack, что делать?')">Разрешить ↗</button></div>
+      </div>
+      <div class="list-row">
+        <div style="flex:1"><div class="list-main">Concept Sprint</div><div class="list-sub">Delivery delay · $1 800</div></div>
+        <div><button class="q-btn" onclick="sendPrompt('Задержка delivery в проекте Concept Sprint, как разрешить?')">Разрешить ↗</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TEAM ═══════════ -->
+<div id="s-team" class="sec">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Всего сотрудников</div><div class="kpi-val">24</div><div class="kpi-delta flat">+2 в этом месяце</div></div>
+    <div class="kpi"><div class="kpi-label">Модераторов</div><div class="kpi-val">6</div><div class="kpi-delta flat">3 онлайн</div></div>
+    <div class="kpi"><div class="kpi-label">Менеджеров</div><div class="kpi-val">4</div><div class="kpi-delta flat">все активны</div></div>
+    <div class="kpi"><div class="kpi-label">Support</div><div class="kpi-val">14</div><div class="kpi-delta flat">8 на смене</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Команда — менеджеры</div>
+      <div class="team-row">
+        <div class="avatar av-a">KM</div>
+        <div class="team-info" style="padding-left:10px">
+          <div class="team-name">Katya Morozova</div>
+          <div class="team-role">Manager · Academy ops</div>
+        </div>
+        <div class="team-stat"><span class="team-num">214</span>курсов ведёт</div>
+      </div>
+      <div class="team-row">
+        <div class="avatar av-b">DS</div>
+        <div class="team-info" style="padding-left:10px">
+          <div class="team-name">Dmitri Sokolov</div>
+          <div class="team-role">Manager · Studio ops</div>
+        </div>
+        <div class="team-stat"><span class="team-num">318</span>контрактов</div>
+      </div>
+      <div class="team-row">
+        <div class="avatar av-c">LA</div>
+        <div class="team-info" style="padding-left:10px">
+          <div class="team-name">Lena Azimova</div>
+          <div class="team-role">Manager · Finance</div>
+        </div>
+        <div class="team-stat"><span class="team-num">$148k</span>выручка</div>
+      </div>
+      <div class="team-row">
+        <div class="avatar av-d">PH</div>
+        <div class="team-info" style="padding-left:10px">
+          <div class="team-name">Pavel Hassan</div>
+          <div class="team-role">Manager · Support</div>
+        </div>
+        <div class="team-stat"><span class="team-num">98%</span>SLA</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Команда — модераторы</div>
+      <div class="team-row">
+        <div class="avatar av-e">NB</div>
+        <div class="team-info" style="padding-left:10px">
+          <div class="team-name">Nina Bloch</div>
+          <div class="team-role">Moderator · Content</div>
+        </div>
+        <div class="team-stat"><span class="team-num">47</span>решений</div>
+      </div>
+      <div class="team-row">
+        <div class="avatar av-a">OK</div>
+        <div class="team-info" style="padding-left:10px">
+          <div class="team-name">Omar Khadr</div>
+          <div class="team-role">Moderator · Community</div>
+        </div>
+        <div class="team-stat"><span class="team-num">38</span>решений</div>
+      </div>
+      <div class="team-row">
+        <div class="avatar av-b">YL</div>
+        <div class="team-info" style="padding-left:10px">
+          <div class="team-name">Yuki Larsson</div>
+          <div class="team-role">Moderator · Reviews</div>
+        </div>
+        <div class="team-stat"><span class="team-num">29</span>решений</div>
+      </div>
+      <div style="margin-top:12px;padding-top:10px;border-top:0.5px solid var(--color-border-tertiary)">
+        <button class="act-btn warn" onclick="sendPrompt('Нужно ли нанять дополнительных модераторов исходя из текущей нагрузки?')">Оценить загрузку ↗</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ CONTRACTS ═══════════ -->
+<div id="s-contracts" class="sec">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Всего контрактов</div><div class="kpi-val">318</div><div class="kpi-delta up">+22 этот месяц</div></div>
+    <div class="kpi"><div class="kpi-label">Объём (active)</div><div class="kpi-val">$890k</div><div class="kpi-delta up">+14%</div></div>
+    <div class="kpi"><div class="kpi-label">Среднее время сделки</div><div class="kpi-val">18 дн</div><div class="kpi-delta flat">без изменений</div></div>
+    <div class="kpi"><div class="kpi-label">Выплачено milestone</div><div class="kpi-val">$340k</div><div class="kpi-delta up">этот квартал</div></div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-title">Крупные контракты</div>
+    <div class="list-row" style="padding:6px 0">
+      <div style="width:180px;flex-shrink:0;font-size:12px;font-weight:500;color:var(--color-text-primary)">Cyberpunk Cinematics</div>
+      <div style="flex:1;font-size:11px;color:var(--color-text-secondary)">Starlight Studios → John Doe</div>
+      <div style="width:90px;text-align:right;font-size:13px;font-weight:500;color:var(--color-text-primary)">$120 000</div>
+      <div style="width:80px;text-align:right"><span class="list-status s-active">active</span></div>
+      <div style="width:60px;text-align:right"><button class="q-btn" onclick="sendPrompt('Покажи детали контракта Cyberpunk Cinematics')">детали</button></div>
+    </div>
+    <div class="list-row" style="padding:6px 0">
+      <div style="width:180px;flex-shrink:0;font-size:12px;font-weight:500;color:var(--color-text-primary)">RPG Character Pack</div>
+      <div style="flex:1;font-size:11px;color:var(--color-text-secondary)">Nebula Games → Sarah Connor</div>
+      <div style="width:90px;text-align:right;font-size:13px;font-weight:500;color:var(--color-text-primary)">$85 000</div>
+      <div style="width:80px;text-align:right"><span class="list-status s-active">active</span></div>
+      <div style="width:60px;text-align:right"><button class="q-btn">детали</button></div>
+    </div>
+    <div class="list-row" style="padding:6px 0">
+      <div style="width:180px;flex-shrink:0;font-size:12px;font-weight:500;color:var(--color-text-primary)">Neon City VFX</div>
+      <div style="flex:1;font-size:11px;color:var(--color-text-secondary)">Independent → Jane Smith</div>
+      <div style="width:90px;text-align:right;font-size:13px;font-weight:500;color:var(--color-text-primary)">$48 500</div>
+      <div style="width:80px;text-align:right"><span class="list-status s-dispute">спор</span></div>
+      <div style="width:60px;text-align:right"><button class="q-btn reject" onclick="sendPrompt('Помоги разрешить спор по контракту Neon City VFX')">спор ↗</button></div>
+    </div>
+    <div class="list-row" style="padding:6px 0">
+      <div style="width:180px;flex-shrink:0;font-size:12px;font-weight:500;color:var(--color-text-primary)">Env Art Collection</div>
+      <div style="flex:1;font-size:11px;color:var(--color-text-secondary)">GameForge → Marcus Thorne</div>
+      <div style="width:90px;text-align:right;font-size:13px;font-weight:500;color:var(--color-text-primary)">$36 200</div>
+      <div style="width:80px;text-align:right"><span class="list-status s-done">завершён</span></div>
+      <div style="width:60px;text-align:right"><button class="q-btn">детали</button></div>
+    </div>
+    <div class="list-row" style="padding:6px 0">
+      <div style="width:180px;flex-shrink:0;font-size:12px;font-weight:500;color:var(--color-text-primary)">Houdini FX Library</div>
+      <div style="flex:1;font-size:11px;color:var(--color-text-secondary)">VFX House → Elena Vance</div>
+      <div style="width:90px;text-align:right;font-size:13px;font-weight:500;color:var(--color-text-primary)">$28 000</div>
+      <div style="width:80px;text-align:right"><span class="list-status s-pending">pending</span></div>
+      <div style="width:60px;text-align:right"><button class="q-btn" onclick="sendPrompt('Активировать контракт Houdini FX Library?')">активировать</button></div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="act-btn warn" onclick="sendPrompt('Создай новый контракт для Studio проекта')">+ Создать контракт</button>
+    <button class="act-btn" onclick="sendPrompt('Покажи все контракты в статусе disputed и предложи стратегию разрешения')">Все споры ↗</button>
+    <button class="act-btn" onclick="sendPrompt('Экспорт финансового отчёта по контрактам за квартал')">Экспорт отчёта ↗</button>
+  </div>
+</div>
+
+<!-- ═══════════ QUEUE ═══════════ -->
+<div id="s-queue" class="sec">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Курсов на публикацию</div><div class="kpi-val">8</div><div class="kpi-delta flat">ожидают</div></div>
+    <div class="kpi"><div class="kpi-label">Отзывов на проверку</div><div class="kpi-val">12</div><div class="kpi-delta dn">3 жалобы</div></div>
+    <div class="kpi"><div class="kpi-label">Споры</div><div class="kpi-val">3</div><div class="kpi-delta dn">срочно</div></div>
+    <div class="kpi"><div class="kpi-label">Пользователей на бан</div><div class="kpi-val">2</div><div class="kpi-delta dn">жалобы</div></div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-title">Очередь модерации — курсы</div>
+    <div class="queue-item">
+      <div class="q-icon q-i-amber">
+        <svg width="16" height="16" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" fill="#BA7517"/></svg>
+      </div>
+      <div class="q-main">
+        <div class="q-title">Mastering Substance Painter 2025</div>
+        <div class="q-sub">Alex Rivera · 3D Modeling · 24 урока · отправлен 2ч назад</div>
+      </div>
+      <div class="q-actions">
+        <button class="q-btn approve">Одобрить</button>
+        <button class="q-btn reject">Отклонить</button>
+        <button class="q-btn" onclick="sendPrompt('Проверить качество курса Mastering Substance Painter 2025 перед публикацией')">Просмотр ↗</button>
+      </div>
+    </div>
+    <div class="queue-item">
+      <div class="q-icon q-i-blue">
+        <svg width="16" height="16" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" fill="#378ADD"/></svg>
+      </div>
+      <div class="q-main">
+        <div class="q-title">Rigging for Games — Advanced</div>
+        <div class="q-sub">Marcus Thorne · Animation · 18 уроков · отправлен 5ч назад</div>
+      </div>
+      <div class="q-actions">
+        <button class="q-btn approve">Одобрить</button>
+        <button class="q-btn reject">Отклонить</button>
+        <button class="q-btn">Просмотр ↗</button>
+      </div>
+    </div>
+    <div class="queue-item">
+      <div class="q-icon q-i-amber">
+        <svg width="16" height="16" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2" fill="#BA7517"/></svg>
+      </div>
+      <div class="q-main">
+        <div class="q-title">ZBrush Creature Design</div>
+        <div class="q-sub">David Miller · 3D Modeling · 31 урок · отправлен 1д назад</div>
+      </div>
+      <div class="q-actions">
+        <button class="q-btn approve">Одобрить</button>
+        <button class="q-btn reject">Отклонить</button>
+        <button class="q-btn">Просмотр ↗</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-title">Жалобы на отзывы</div>
+    <div class="queue-item">
+      <div class="q-icon q-i-red">
+        <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="#E24B4A"/></svg>
+      </div>
+      <div class="q-main">
+        <div class="q-title">Отзыв на "Houdini Destruction" — спам</div>
+        <div class="q-sub">3 жалобы · рейтинг 1/5 · подозрение на накрутку</div>
+      </div>
+      <div class="q-actions">
+        <button class="q-btn reject">Удалить</button>
+        <button class="q-btn approve">Оставить</button>
+      </div>
+    </div>
+    <div class="queue-item">
+      <div class="q-icon q-i-red">
+        <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="#E24B4A"/></svg>
+      </div>
+      <div class="q-main">
+        <div class="q-title">Отзыв на "UE5 Lighting" — оскорбления</div>
+        <div class="q-sub">1 жалоба · нарушение правил платформы</div>
+      </div>
+      <div class="q-actions">
+        <button class="q-btn reject">Удалить</button>
+        <button class="q-btn approve">Оставить</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+<script>
+function switchTab(id){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nv').forEach(n=>n.classList.remove('on'));
+  document.getElementById('s-'+id).classList.add('on');
+  event.target.classList.add('on');
+}
+</script>

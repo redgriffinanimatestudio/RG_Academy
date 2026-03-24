@@ -510,10 +510,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <img src="/logo-web.png" alt="" className="h-8 w-auto" />
                   <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 bg-white/5 rounded-xl text-white/40 hover:text-white"><X size={20} /></button>
                 </div>
+                {/* TEST LINK */}
+                <div className="bg-red-500/20 p-4 rounded-xl border border-red-500/40 mb-4 mx-1">
+                  <span className="text-[10px] font-black uppercase text-red-500">System Test: API Menu active</span>
+                </div>
+
                 <div className="flex-1 space-y-8 overflow-y-auto no-scrollbar">
                   <nav className="space-y-2">
-                    {['academy', 'studio', 'community'].map(id => (
-                      <Link key={id} to={id === 'academy' ? `/aca/${lang || 'eng'}` : id === 'studio' ? `/studio/${lang || 'eng'}` : `${modePrefix}/${lang || 'eng'}/community`} onClick={() => setIsMobileMenuOpen(false)} className={`block py-4 text-lg font-black uppercase tracking-tighter ${path.includes(id) ? 'text-primary' : 'text-white/40'}`}>{t(id)}</Link>
+                    {[
+                      { id: 'academy', label: 'API_ACADEMY_DEBUG', path: `/aca/${lang || 'eng'}`, icon: GraduationCap, active: path.includes('academy') || path.includes('/aca'), color: 'text-primary' },
+                      { id: 'studio', label: 'API_STUDIO_DEBUG', path: `/studio/${lang || 'eng'}`, icon: Box, active: path.includes('studio'), color: 'text-primary-hover' },
+                      { id: 'community', label: 'API_COMMUNITY_DEBUG', path: `${modePrefix}/${lang || 'eng'}/community`, icon: Users, active: path.includes('community'), color: 'text-white/40' }
+                    ].map((item) => (
+                      <Link
+                        key={item.id}
+                        to={item.path}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex items-center gap-4 px-4 py-4 rounded-2xl transition-all ${item.active ? 'bg-white/5 text-white' : 'text-white/40 hover:text-white hover:bg-white/[0.02]'}`}
+                      >
+                        <item.icon size={18} className={item.active ? item.color : 'opacity-40'} />
+                        <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
+                      </Link>
                     ))}
                   </nav>
                   <div className="pt-8 border-t border-white/5 space-y-6">

@@ -13,7 +13,7 @@ import {
   BookOpen, Clock, Award, TrendingUp, Play, ChevronRight, ChevronLeft, Calendar, Star, Zap, CheckCircle, 
   Search, Filter, Users, DollarSign, Briefcase, Plus, Layout as LayoutIcon, ArrowUpRight, ArrowDownRight, 
   MessageSquare, Layers, Box, Video, Shield, Cpu, MoreVertical, LayoutDashboard, FileText, 
-  CreditCard, History, Target, UserCheck, LifeBuoy, Settings, Mail, Heart, ExternalLink, 
+  CreditCard, History, Crosshair, UserCheck, LifeBuoy, Settings, Mail, Heart, ExternalLink, 
   ShieldCheck, CheckCircle2, AlertCircle, CalendarDays, FileSearch, ClipboardList, Wallet, 
   Globe, Rocket, SearchCode, Bell, Eye, User, GraduationCap, UserPlus, LogOut 
 } from 'lucide-react';
@@ -250,7 +250,7 @@ function StudentDashboard({ view, accent, user, lang }: any) {
 
             {/* Daily Challenge */}
             <div className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] p-10 space-y-6 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 text-primary/20"><Target size={40} /></div>
+              <div className="absolute top-0 right-0 p-8 text-primary/20"><Crosshair size={40} /></div>
               <h3 className="text-xs font-black uppercase tracking-widest text-white/40">Daily Challenge</h3>
               <p className="text-lg font-black text-white uppercase leading-tight">Sculpt a human ear <br /> in under 20 mins.</p>
               <div className="flex items-center gap-4 pt-4">
@@ -270,7 +270,7 @@ function StudentDashboard({ view, accent, user, lang }: any) {
   // Handle other views
   return (
     <div className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] p-20 text-center space-y-8">
-      <div className="flex justify-center"><Target size={64} className="text-white/10 animate-pulse" /></div>
+      <div className="flex justify-center"><Crosshair size={64} className="text-white/10 animate-pulse" /></div>
       <div className="space-y-2">
         <h2 className="text-2xl font-black uppercase tracking-tighter text-white">{view.replace(/_/g, ' ')} Module</h2>
         <p className="text-xs font-bold text-white/20 uppercase tracking-widest">Section initializing with real-time data streaming...</p>

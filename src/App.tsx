@@ -16,6 +16,7 @@ import ManagerDashboard from './pages/ManagerDashboard';
 import StaffDashboard from './pages/StaffDashboard';
 import TopicPage from './pages/TopicPage';
 import ServicePage from './pages/ServicePage';
+import CommunityTopic from './pages/CommunityTopic';
 import SpecialistProfile from './pages/SpecialistProfile';
 import Contracts from './pages/Contracts';
 import InfoPage from './pages/InfoPage';
@@ -88,6 +89,7 @@ export default function App() {
             <Route path="/studio/:lang" element={<LanguageWrapper><Layout><Studio /></Layout></LanguageWrapper>} />
             
             <Route path="/aca/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
+            <Route path="/aca/:lang/community/topic/:topicSlug" element={<LanguageWrapper><Layout><CommunityTopic /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
             <Route path="/community/:lang" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
             

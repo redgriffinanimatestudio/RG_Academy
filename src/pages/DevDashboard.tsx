@@ -18,6 +18,8 @@ import { ChiefManagerDashboardContent } from './ChiefManagerDashboard';
 import { ManagerDashboardContent } from './ManagerDashboard';
 import { StaffDashboardContent } from './StaffDashboard';
 import { ModeratorDashboardContent } from './ModeratorDashboard';
+import { RoleCombinationMatrix } from '../components/RoleCombinationMatrix';
+import { RolePermissionMatrix } from '../components/RolePermissionMatrix';
 
 const ROLES = [
   { id: 'admin', label: 'Admin', icon: Shield, color: '#ef4444' },
@@ -231,6 +233,7 @@ const DevDashboard: React.FC = () => {
         <div className="flex items-center gap-2 border-b border-white/5">
           {[
             { id: 'matrix', label: 'Roles Matrix', icon: Layers },
+            { id: 'combinations', label: 'User Combinations', icon: Sparkles },
             { id: 'roles', label: 'All Role Panels', icon: Users },
             { id: 'api', label: 'API Interactive', icon: Code },
             { id: 'system', label: 'System Health', icon: Activity },
@@ -268,59 +271,31 @@ const DevDashboard: React.FC = () => {
                     <h3 className="text-xl font-black uppercase tracking-tight text-white">Permission Assignment Matrix</h3>
                     <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Global Administrative Access Levels</p>
                   </div>
-                  <div className="flex gap-2 bg-white/5 p-1 rounded-xl">
-                    {['all', 'users', 'content', 'finance', 'system'].map(f => (
-                      <button
-                        key={f}
-                        onClick={() => setActiveMatrixFilter(f)}
-                        className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${
-                          activeMatrixFilter === f ? 'bg-indigo-500 text-white shadow-lg' : 'text-white/40 hover:text-white'
-                        }`}
-                      >
-                        {f}
-                      </button>
-                    ))}
-                  </div>
                 </div>
 
-                <div className="overflow-hidden border border-white/5 rounded-2xl">
-                  <table className="w-full text-left">
-                    <thead>
-                      <tr className="bg-white/5 text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">
-                        <th className="px-8 py-5">Platform Action / API Route</th>
-                        <th className="px-8 py-5 text-center">Chief Manager</th>
-                        <th className="px-8 py-5 text-center">Manager</th>
-                        <th className="px-8 py-5 text-center">Moderator</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                      {MATRIX_DATA.map((row, idx) => {
-                        if (row.section) {
-                          if (activeMatrixFilter !== 'all' && row.g !== activeMatrixFilter) return null;
-                          return (
-                            <tr key={`sec-${idx}`} className="bg-indigo-500/5">
-                              <td colSpan={4} className="px-8 py-3 text-[10px] font-black text-indigo-400 uppercase tracking-widest">
-                                {row.section}
-                              </td>
-                            </tr>
-                          );
-                        }
-                        if (activeMatrixFilter !== 'all' && row.g !== activeMatrixFilter) return null;
-                        return (
-                          <tr key={idx} className="hover:bg-white/[0.02] group transition-colors">
-                            <td className="px-8 py-5">
-                              <div className="text-xs font-black text-white/80 uppercase tracking-tight group-hover:text-indigo-400 transition-colors">{row.label}</div>
-                              <div className="text-[9px] text-white/20 font-mono mt-1 uppercase tracking-widest">{row.sub}</div>
-                            </td>
-                            <td className="px-8 py-5 text-center">{sym(row.cm || 0)}</td>
-                            <td className="px-8 py-5 text-center">{sym(row.mg || 0)}</td>
-                            <td className="px-8 py-5 text-center">{sym(row.mo || 0)}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                <RolePermissionMatrix />
+              </div>
+            </motion.div>
+          )}
+
+          {/* USER COMBINATIONS VIEW */}
+          {activeTab === 'combinations' && (
+            <motion.div
+              key="combinations"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-8"
+            >
+              <div className="bg-[#0a0a0a] border border-white/5 rounded-[2.5rem] p-10 shadow-2xl">
+                <div className="flex items-center justify-between mb-10">
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-black uppercase tracking-tight text-white">Interactive Role Combinations</h3>
+                    <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Simulate cross-role synergy and permissions</p>
+                  </div>
                 </div>
+                
+                <RoleCombinationMatrix />
               </div>
             </motion.div>
           )}
