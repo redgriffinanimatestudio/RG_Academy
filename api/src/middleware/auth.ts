@@ -90,11 +90,18 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
     if (isManager) roles.push('manager', 'chief_manager');
     if (isModerator) roles.push('moderator');
     
-    // Add independent roles from profile if they exist
-    if (user?.profile?.roles) {
-      (user.profile.roles as string[]).forEach(r => {
-        if (!roles.includes(r)) roles.push(r);
-      });
+    // Add independent roles from user.roles if they exist
+    if (user?.roles) {
+      try {
+        const parsedRoles = JSON.parse(user.roles);
+        if (Array.isArray(parsedRoles)) {
+          parsedRoles.forEach(r => {
+            if (!roles.includes(r)) roles.push(r);
+          });
+        }
+      } catch (e) {
+        console.error('Failed to parse user roles:', e);
+      }
     } else if (user?.role && !roles.includes(user.role)) {
       roles.push(user.role);
     }

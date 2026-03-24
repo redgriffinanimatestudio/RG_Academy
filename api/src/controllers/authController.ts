@@ -134,9 +134,22 @@ export const authController = {
         }
       }
 
+      let parsedRoles = ['student'];
+      try {
+        if (user.roles) {
+          parsedRoles = JSON.parse(user.roles);
+        }
+      } catch(e) {}
+      
+      const payloadUser = {
+        ...user,
+        roles: parsedRoles,
+        profile: user.profile ? { ...user.profile, roles: parsedRoles } : null
+      };
+
       return success(res, {
         token: remoteId,
-        user
+        user: payloadUser
       });
     } catch (e) {
       console.error(e);
@@ -160,7 +173,23 @@ export const authController = {
         return error(res, 'User not found', 404);
       }
 
-      return success(res, user);
+      let parsedRoles = ['student'];
+      try {
+        if (user.roles) {
+          parsedRoles = JSON.parse(user.roles);
+        }
+        if (user.role === 'admin' || user.email === 'super@redgriffin.academy') {
+          parsedRoles = ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client'];
+        }
+      } catch(e) {}
+
+      const payloadUser = {
+        ...user,
+        roles: parsedRoles,
+        profile: user.profile ? { ...user.profile, roles: parsedRoles } : null
+      };
+
+      return success(res, payloadUser);
     } catch (e) {
       return error(res, 'Failed to get user');
     }
@@ -185,7 +214,23 @@ export const authController = {
         return error(res, 'User not found', 404);
       }
 
-      return success(res, user);
+      let parsedRoles = ['student'];
+      try {
+        if (user.roles) {
+          parsedRoles = JSON.parse(user.roles);
+        }
+        if (user.role === 'admin' || user.email === 'super@redgriffin.academy') {
+          parsedRoles = ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client'];
+        }
+      } catch(e) {}
+
+      const payloadUser = {
+        ...user,
+        roles: parsedRoles,
+        profile: user.profile ? { ...user.profile, roles: parsedRoles } : null
+      };
+
+      return success(res, payloadUser);
     } catch (e) {
       return error(res, 'Failed to get user');
     }

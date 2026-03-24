@@ -91,11 +91,17 @@ export const adminController = {
   async updateUserRole(req: AuthRequest, res: Response) {
     try {
       const { userId } = req.params;
-      const { role } = req.body;
+      const { role, roles } = req.body;
+
+      const dataToUpdate: any = {};
+      if (role) dataToUpdate.role = role;
+      if (roles && Array.isArray(roles)) {
+        dataToUpdate.roles = JSON.stringify(roles);
+      }
 
       const user = await prisma.user.update({
         where: { id: userId },
-        data: { role }
+        data: dataToUpdate
       });
 
       return success(res, user);

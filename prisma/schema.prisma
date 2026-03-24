@@ -12,7 +12,8 @@ model User {
   email        String?      @unique
   displayName  String?
   photoURL     String?
-  role         String       @default("student")
+  role         String       @default("student") // Primary/Highest role
+  roles        String       @default("[\"student\"]") // JSON array of active roles
   remoteId     String?      @unique
   source       String       @default("local")
   lastSyncedAt DateTime?

@@ -25,4 +25,7 @@ router.get('/feed/:userId', networkingController.getActivityFeed);
 router.get('/discovery/search', networkingController.searchProfiles);
 router.get('/discovery/recommendations', authMiddleware, networkingController.getRecommendations);
 
+// Logic Validation (Bible Rules)
+router.get('/validate/chat/:targetUserId', authMiddleware, networkingController.validateChatAccess);
+
 export default router;

@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useNavigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
-import Academy from './pages/Academy';
+import Academy from './pages/Academy/AcademyPage';
 import CourseDetail from './pages/CourseDetail';
 import Learn from './pages/Learn';
-import Studio from './pages/Studio';
-import Community from './pages/Community';
+import Studio from './pages/Studio/StudioPage';
+import Community from './pages/Community/CommunityPage';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Messages from './pages/Messages';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard/DashboardController';
 import AdminDashboard from './pages/AdminDashboard';
 import ChiefManagerDashboard from './pages/ChiefManagerDashboard';
 import ManagerDashboard from './pages/ManagerDashboard';
@@ -23,10 +23,17 @@ import InfoPage from './pages/InfoPage';
 import DevDashboard from './pages/DevDashboard';
 import { AlertProvider } from './components/Alert';
 import { AuthProvider } from './context/AuthContext';
+import { PlatformProvider } from './context/PlatformContext';
+import { useSyncManager } from './services/syncManager';
 import { useTranslation } from 'react-i18next';
 import './i18n';
 
 const LANGUAGES = ['eng', 'ru', 'tr', 'az'];
+
+function SyncHandler({ children }: { children: React.ReactNode }) {
+  useSyncManager();
+  return <>{children}</>;
+}
 
 function LanguageWrapper({ children }: { children: React.ReactNode }) {
   const { lang } = useParams();
@@ -36,25 +43,13 @@ function LanguageWrapper({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (lang && LANGUAGES.includes(lang)) {
-      i18n.changeLanguage(lang);
-    } else if (!lang) {
-      const detectedLang = i18n.language.split('-')[0];
-      const targetLang = LANGUAGES.includes(detectedLang) ? detectedLang : 'eng';
-      const path = location.pathname;
-      
-      if (path === '/') {
-        navigate(`/${targetLang}`, { replace: true });
-        return;
+      if (i18n.language !== lang) {
+        i18n.changeLanguage(lang);
       }
-
-      const segments = path.split('/').filter(Boolean);
-      const firstSegment = segments[0];
-
-      if (['aca', 'studio', 'community', 'login', 'dev', 'messages', 'dashboard', 'contracts', 'admin', 'chief-manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'staff'].includes(firstSegment)) {
-        const newPath = `/${firstSegment}/${targetLang}/${segments.slice(1).join('/')}`;
-        navigate(newPath, { replace: true });
-      } else if (!LANGUAGES.includes(firstSegment)) {
-        navigate(`/${targetLang}${path}`, { replace: true });
+    } else {
+      const pathParts = location.pathname.split('/').filter(Boolean);
+      if (!(pathParts.length > 0 && LANGUAGES.includes(pathParts[0]))) {
+        navigate(`/eng${location.pathname}`, { replace: true });
       }
     }
   }, [lang, i18n, navigate, location.pathname]);
@@ -66,54 +61,59 @@ export default function App() {
   return (
     <Router>
       <AuthProvider>
-        <AlertProvider>
-          <Routes>
+        <PlatformProvider>
+          <SyncHandler>
+            <AlertProvider>
+              <Routes>
+                <Route path="/" element={<Navigate to="/eng" replace />} />
+                {/* ... rest of the routes ... */}
+            {/* Main Routes */}
             <Route path="/:lang" element={<LanguageWrapper><Layout><Home /></Layout></LanguageWrapper>} />
-            <Route path="/dev/:lang" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/:lang/dev" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
             
-            {/* WRAPPING ALL DASHBOARDS IN LAYOUT FOR GLOBAL NAV CONSISTENCY */}
-            <Route path="/admin/:lang" element={<LanguageWrapper><Layout><AdminDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/chief-manager/:lang" element={<LanguageWrapper><Layout><ChiefManagerDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/manager/:lang" element={<LanguageWrapper><Layout><ManagerDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/staff/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/moderator/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/hr/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/finance/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/support/:lang" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            {/* Specific Dashboards */}
+            <Route path="/:lang/admin" element={<LanguageWrapper><Layout><AdminDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/:lang/chief-manager" element={<LanguageWrapper><Layout><ChiefManagerDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/:lang/manager" element={<LanguageWrapper><Layout><ManagerDashboard /></Layout></LanguageWrapper>} />
+            
+            {/* Staff Routes */}
+            <Route path="/:lang/staff" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/:lang/moderator" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/:lang/hr" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/:lang/finance" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            <Route path="/:lang/support" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
 
+            {/* Academy Routes */}
             <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><TopicPage /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/service/:serviceSlug" element={<LanguageWrapper><Layout><ServicePage /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/course/:slug" element={<LanguageWrapper><Layout><CourseDetail /></Layout></LanguageWrapper>} />
-            <Route path="/learn/:lang/:slug" element={<LanguageWrapper><Learn /></LanguageWrapper>} />
-            <Route path="/studio/:lang" element={<LanguageWrapper><Layout><Studio /></Layout></LanguageWrapper>} />
-            
             <Route path="/aca/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
-            <Route path="/aca/:lang/community/topic/:topicSlug" element={<LanguageWrapper><Layout><CommunityTopic /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
-            <Route path="/community/:lang" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
-            
-            <Route path="/aca/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
-            
             <Route path="/aca/:lang/messages" element={<LanguageWrapper><Layout><Messages /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
-            
             <Route path="/aca/:lang/profile/:id" element={<LanguageWrapper><Layout><SpecialistProfile /></Layout></LanguageWrapper>} />
+            <Route path="/aca/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
+            
+            {/* Studio Routes */}
+            <Route path="/studio/:lang" element={<LanguageWrapper><Layout><Studio /></Layout></LanguageWrapper>} />
+            <Route path="/studio/:lang/service/:serviceSlug" element={<LanguageWrapper><Layout><ServicePage /></Layout></LanguageWrapper>} />
+            <Route path="/studio/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
+            <Route path="/studio/:lang/messages" element={<LanguageWrapper><Layout><Messages /></Layout></LanguageWrapper>} />
+            <Route path="/studio/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/profile/:id" element={<LanguageWrapper><Layout><SpecialistProfile /></Layout></LanguageWrapper>} />
+            <Route path="/studio/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
+
+            {/* Other */}
+            <Route path="/learn/:lang/:slug" element={<LanguageWrapper><Learn /></LanguageWrapper>} />
+            <Route path="/:lang/privacy" element={<LanguageWrapper><Layout><InfoPage /></Layout></LanguageWrapper>} />
+            <Route path="/:lang/terms" element={<LanguageWrapper><Layout><InfoPage /></Layout></LanguageWrapper>} />
             
-            <Route path="/aca/:lang/contracts" element={<LanguageWrapper><Layout><Contracts /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/contracts" element={<LanguageWrapper><Layout><Contracts /></Layout></LanguageWrapper>} />
-            
-            <Route path="/privacy" element={<LanguageWrapper><Layout><InfoPage /></Layout></LanguageWrapper>} />
-            <Route path="/terms" element={<LanguageWrapper><Layout><InfoPage /></Layout></LanguageWrapper>} />
-            
-            <Route path="/" element={<LanguageWrapper children={null} />} />
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route path="*" element={<Navigate to="/eng" replace />} />
           </Routes>
         </AlertProvider>
-      </AuthProvider>
-    </Router>
+      </SyncHandler>
+    </PlatformProvider>
+  </AuthProvider>
+</Router>
   );
 }

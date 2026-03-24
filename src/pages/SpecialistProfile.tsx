@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -25,24 +25,81 @@ import {
   CheckCircle2,
   ChevronRight,
   Menu,
-  X
+  X,
+  Sparkles,
+  Rocket
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { networkingService, Profile } from '../services/networkingService';
 import Preloader from '../components/Preloader';
 import { useAuth } from '../context/AuthContext';
+import { useAlert } from '../components/Alert';
+import { useNavigate } from 'react-router-dom';
 
 type ProfileTab = 'about' | 'portfolio' | 'experience' | 'education' | 'reviews';
 
 export default function SpecialistProfile() {
   const { id, lang } = useParams();
   const { t } = useTranslation();
-  const { profile: currentUserProfile, loading: authLoading } = useAuth();
+  const { user: firebaseUser, profile: currentUserProfile, loading: authLoading } = useAuth();
+  const alert = useAlert();
+  const navigate = useNavigate();
   const location = useLocation();
   const isStudio = location.pathname.includes('/studio/');
   const [activeTab, setActiveTab] = useState<ProfileTab>('about');
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isValidating, setIsValidating] = useState(false);
+
+  const handleStartChat = async () => {
+    if (!firebaseUser || !id) {
+      alert.showError('Please login to send messages');
+      return;
+    }
+
+    try {
+      setIsValidating(true);
+      const token = await firebaseUser.getIdToken();
+      const validation = await networkingService.validateChatAccess(id, token);
+
+      if (!validation.canMessage) {
+        alert.showError(validation.error || 'Access denied');
+        return;
+      }
+
+      // If allowed, navigate to messages
+      const prefix = isStudio ? '/studio' : '/aca';
+      navigate(`${prefix}/${lang || 'eng'}/messages?userId=${id}`);
+    } catch (e) {
+      alert.showError('Failed to validate messaging rights');
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  // Synergy logic from role_combinations_interactive.html
+  const synergyBadges = useMemo(() => {
+    if (!profile) return [];
+    const roles = profile.roles || [];
+    const badges = [];
+
+    const isL = roles.includes('lecturer') || roles.includes('admin');
+    const isE = roles.includes('executor') || roles.includes('admin');
+    const isC = roles.includes('client') || roles.includes('admin');
+    const isS = roles.includes('student');
+
+    if (isL && isE) badges.push({ id: 'practicing_mentor', label: 'Practicing Mentor', icon: GraduationCap, color: 'bg-indigo-500', synergy: 'le' });
+    if (isC && isE) badges.push({ id: 'ecosystem_partner', label: 'Ecosystem Partner', icon: Rocket, color: 'bg-sky-500', synergy: 'ce' });
+    if (isS && isE) badges.push({ id: 'rising_specialist', label: 'Rising Specialist', icon: Sparkles, color: 'bg-emerald-500', synergy: 'se' });
+    
+    // Add primary role as badge if no synergies
+    if (badges.length === 0 && roles.length > 0) {
+      const primary = roles[0];
+      badges.push({ id: primary, label: primary.replace('_', ' '), icon: User, color: 'bg-white/10', synergy: null });
+    }
+
+    return badges;
+  }, [profile]);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -57,6 +114,7 @@ export default function SpecialistProfile() {
           location: 'Remote',
           skills: [],
           portfolio: [],
+          roles: currentUserProfile.roles || [],
           user: {
             displayName: currentUserProfile.displayName || 'User',
             photoURL: currentUserProfile.photoURL || undefined
@@ -76,11 +134,17 @@ export default function SpecialistProfile() {
             throw new Error('Not found');
           }
         } catch (err) {
-          // Fallback to general user info if specialist profile doesn't exist
+          // Fallback to general user info
           const response = await fetch(`/api/users/${id}`);
           if (response.ok) {
             const resData = await response.json();
             const userData = resData.data || resData;
+            
+            let userRoles = ['student'];
+            if (userData.roles) {
+              userRoles = Array.isArray(userData.roles) ? userData.roles : JSON.parse(userData.roles);
+            }
+
             setProfile({
               id: userData.id,
               userId: userData.id,
@@ -88,6 +152,7 @@ export default function SpecialistProfile() {
               location: 'Remote',
               skills: [],
               portfolio: [],
+              roles: userRoles,
               user: {
                 displayName: userData.displayName || 'User',
                 photoURL: userData.photoURL || undefined
@@ -150,7 +215,15 @@ export default function SpecialistProfile() {
           </div>
 
           <div className="flex-1 space-y-4 pb-4">
-            <div className="space-y-1 text-center md:text-left">
+            <div className="space-y-3 text-center md:text-left">
+              <div className="flex flex-wrap justify-center md:justify-start gap-2">
+                {synergyBadges.map(badge => (
+                  <span key={badge.id} className={`flex items-center gap-1.5 px-3 py-1 ${badge.color} text-bg-dark text-[8px] font-black uppercase tracking-widest rounded-lg shadow-lg`}>
+                    <badge.icon size={10} />
+                    {badge.label}
+                  </span>
+                ))}
+              </div>
               <h1 className="text-4xl font-black tracking-tighter uppercase">{profile.user.displayName}</h1>
               <div className="flex flex-wrap justify-center md:justify-start gap-4 text-[10px] font-black uppercase tracking-widest text-white/40">
                 <div className="flex items-center gap-2"><MapPin size={12} className="text-primary" /> {profile.location || 'Remote'}</div>
@@ -160,11 +233,37 @@ export default function SpecialistProfile() {
           </div>
 
           <div className="flex gap-3 pb-4">
-            <button className="px-8 py-4 bg-primary text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary/20">{t('connect', 'Connect')}</button>
-            <button className="p-4 bg-white/5 border border-white/10 rounded-2xl text-white/40 hover:text-white transition-all"><MessageSquare size={20} /></button>
+            <button 
+              onClick={handleStartChat}
+              disabled={isValidating}
+              className={`px-8 py-4 bg-primary text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary/20 flex items-center gap-2 ${isValidating ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {isValidating ? (
+                <div className="size-3 border-2 border-bg-dark border-t-transparent animate-spin rounded-full" />
+              ) : <MessageSquare size={14} />}
+              {t('connect', 'Connect')}
+            </button>
+            <button 
+              onClick={handleStartChat}
+              disabled={isValidating}
+              className="p-4 bg-white/5 border border-white/10 rounded-2xl text-white/40 hover:text-white transition-all disabled:opacity-50"
+            >
+              <Zap size={20} />
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Synergy Alert (Optional Info) */}
+      {synergyBadges.some(b => b.synergy === 'le') && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-6 bg-indigo-500/10 border border-indigo-500/20 rounded-3xl flex items-center gap-4">
+          <div className="size-10 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400"><Award size={20} /></div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Practicing Mentor Synergy</p>
+            <p className="text-xs text-white/60 font-medium">Этот специалист не только преподает, но и активно работает над проектами в Студии. Его портфолио включает реальные кейсы из индустрии.</p>
+          </div>
+        </motion.div>
+      )}
 
       {/* Tab Navigation */}
       <div className="flex gap-2 p-1 bg-white/5 border border-white/5 rounded-[2rem] overflow-x-auto no-scrollbar">
@@ -226,7 +325,14 @@ export default function SpecialistProfile() {
                   <img src={item.mediaUrl} alt="" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
                   <div className="absolute bottom-8 left-8 space-y-2">
-                    <span className="px-3 py-1 bg-primary text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-lg">{item.category || 'Visual Art'}</span>
+                    <div className="flex gap-2">
+                      <span className="px-3 py-1 bg-primary text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-lg">{item.category || 'Visual Art'}</span>
+                      {synergyBadges.some(b => b.synergy === 'le') && (
+                        <span className="px-3 py-1 bg-indigo-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg flex items-center gap-1.5 shadow-lg shadow-indigo-500/20">
+                          <GraduationCap size={10} /> Teaching Logic
+                        </span>
+                      )}
+                    </div>
                     <h3 className="text-xl font-black text-white uppercase tracking-tight">{item.title}</h3>
                   </div>
                 </div>

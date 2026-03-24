@@ -324,5 +324,55 @@ export const networkingController = {
     } catch (e) {
       return error(res, 'Failed to get recommendations');
     }
+  },
+
+  // --- NETWORKING LOGIC (Bible Rules) ---
+  async validateChatAccess(req: AuthRequest, res: Response) {
+    try {
+      const { targetUserId } = req.params;
+      const senderId = req.user!.id;
+
+      if (senderId === targetUserId) return success(res, { canMessage: true });
+
+      const [sender, receiver] = await Promise.all([
+        prisma.user.findUnique({ where: { id: senderId } }),
+        prisma.user.findUnique({ where: { id: targetUserId } })
+      ]);
+
+      if (!sender || !receiver) return error(res, 'User not found', 404);
+
+      // Parse roles arrays
+      const sRoles: string[] = JSON.parse(sender.roles || '["student"]');
+      const rRoles: string[] = JSON.parse(receiver.roles || '["student"]');
+
+      // 1. Admin/Staff bypass
+      const isStaff = (roles: string[]) => roles.some(r => ['admin', 'manager', 'chief_manager', 'moderator', 'support'].includes(r));
+      if (isStaff(sRoles)) return success(res, { canMessage: true, reason: 'Staff access' });
+
+      // 2. Client -> Executor (Business Context)
+      if (sRoles.includes('client') && rRoles.includes('executor')) return success(res, { canMessage: true, reason: 'Client to Executor' });
+
+      // 3. Student <-> Lecturer (Learning Context)
+      if (sRoles.includes('student') && rRoles.includes('lecturer')) return success(res, { canMessage: true, reason: 'Student to Lecturer' });
+      if (sRoles.includes('lecturer') && rRoles.includes('student')) return success(res, { canMessage: true, reason: 'Lecturer to Student' });
+
+      // 4. Same roles can chat (Peer to peer)
+      const hasIntersection = sRoles.filter(value => rRoles.includes(value)).length > 0;
+      if (hasIntersection) return success(res, { canMessage: true, reason: 'Peer access' });
+
+      // 5. Explicitly block Student -> Client without shared context (Bible Rule)
+      if (sRoles.includes('student') && rRoles.includes('client') && !isStaff(rRoles)) {
+        return success(res, { 
+          canMessage: false, 
+          error: 'Students cannot message clients directly. Join a studio project first.',
+          code: 'BLOCK_STUDENT_TO_CLIENT'
+        });
+      }
+
+      // Default: Allow for now but with warning or restricted
+      return success(res, { canMessage: true, reason: 'General access' });
+    } catch (e) {
+      return error(res, 'Validation failed');
+    }
   }
 };

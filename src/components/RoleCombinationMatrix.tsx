@@ -15,6 +15,9 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { useAuth } from '../context/AuthContext';
+import { useAlert } from './Alert';
+
 const PERMS: Record<string, any> = {
   s: {
     id: 'student',
@@ -187,7 +190,25 @@ const PRESETS = [
 
 export const RoleCombinationMatrix = () => {
   const { t } = useTranslation();
+  const { user, profile } = useAuth();
+  const alert = useAlert();
   const [activeRoles, setActiveRoles] = useState<Set<string>>(new Set(['s']));
+  const [isApplying, setIsApplying] = useState(false);
+
+  // Initialize from user profile if available
+  React.useEffect(() => {
+    if (profile?.roles && profile.roles.length > 0) {
+      // Map full role names back to short keys (s, l, c, e)
+      const mapped = new Set<string>();
+      profile.roles.forEach(r => {
+        if (r === 'student') mapped.add('s');
+        if (r === 'lecturer') mapped.add('l');
+        if (r === 'client') mapped.add('c');
+        if (r === 'executor') mapped.add('e');
+      });
+      if (mapped.size > 0) setActiveRoles(mapped);
+    }
+  }, [profile]);
 
   const toggleRole = (role: string) => {
     const next = new Set(activeRoles);
@@ -201,6 +222,36 @@ export const RoleCombinationMatrix = () => {
 
   const setPreset = (roles: string[]) => {
     setActiveRoles(new Set(roles));
+  };
+
+  const applyRoles = async () => {
+    if (!user) {
+      alert.showError('Authentication required to apply roles');
+      return;
+    }
+
+    try {
+      setIsApplying(true);
+      const rolesArray = Array.from(activeRoles).map(r => PERMS[r].id);
+      
+      const res = await fetch(`/api/v1/admin/users/${user.uid}/role`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await user.getIdToken()}`
+        },
+        body: JSON.stringify({ roles: rolesArray })
+      });
+
+      if (!res.ok) throw new Error('Failed to update roles');
+      
+      alert.showSuccess('Роли успешно применены! Перезагрузите страницу.');
+      setTimeout(() => window.location.reload(), 1500);
+    } catch (e: any) {
+      alert.showError(e.message || 'Ошибка применения ролей');
+    } finally {
+      setIsApplying(false);
+    }
   };
 
   const rolesArray = useMemo(() => ['s', 'l', 'c', 'e'].filter(r => activeRoles.has(r)), [activeRoles]);
@@ -276,17 +327,31 @@ export const RoleCombinationMatrix = () => {
           })}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Пресеты:</span>
-          {PRESETS.map(preset => (
-            <button
-              key={preset.id}
-              onClick={() => setPreset(preset.roles)}
-              className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[10px] font-bold text-white/60 hover:text-white hover:bg-white/10 transition-all uppercase tracking-wider"
-            >
-              {preset.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center justify-between gap-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Пресеты:</span>
+            {PRESETS.map(preset => (
+              <button
+                key={preset.id}
+                onClick={() => setPreset(preset.roles)}
+                className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-[10px] font-bold text-white/60 hover:text-white hover:bg-white/10 transition-all uppercase tracking-wider"
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+          
+          <button
+            onClick={applyRoles}
+            disabled={isApplying}
+            className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              isApplying 
+                ? 'bg-white/5 text-white/20 cursor-not-allowed' 
+                : 'bg-primary text-bg-dark hover:scale-105 shadow-lg shadow-primary/20'
+            }`}
+          >
+            {isApplying ? 'Сохранение...' : 'Применить к моему профилю'}
+          </button>
         </div>
       </div>
 

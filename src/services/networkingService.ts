@@ -8,6 +8,7 @@ export interface Profile {
   location?: string;
   skills: { name: string }[];
   portfolio: any[];
+  roles: string[];
   user: {
     displayName: string;
     photoURL?: string;
@@ -124,5 +125,13 @@ export const networkingService = {
   async getRecommendations(userId: string): Promise<SearchIndex[]> {
     // This is a stub, usually should be an API call
     return [];
+  },
+
+  async validateChatAccess(targetUserId: string, token: string): Promise<{ canMessage: boolean; error?: string; code?: string }> {
+    const response = await fetch(`${API_BASE}/validate/chat/${targetUserId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const result = await response.json();
+    return result.data || result;
   }
 };

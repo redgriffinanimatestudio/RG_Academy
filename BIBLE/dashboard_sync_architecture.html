@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Sync Architecture — Red Griffin</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, sans-serif;
+    background: #050505;
+    color: #fff;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .header-label {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: #00f5d4;
+    margin-bottom: 8px;
+  }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -.03em;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .header p {
+    font-size: 12px;
+    color: rgba(255,255,255,.4);
+    font-weight: 500;
+  }
+
+  .diagram-wrap {
+    max-width: 800px;
+    margin: 0 auto 2.5rem;
+    background: #0a0a0a;
+    border: 0.5px solid rgba(255,255,255,.08);
+    border-radius: 20px;
+    padding: 2rem;
+  }
+
+  svg text { font-family: system-ui, sans-serif; }
+
+  /* Legend */
+  .legend {
+    max-width: 800px;
+    margin: 0 auto 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #0a0a0a;
+    border: 0.5px solid rgba(255,255,255,.08);
+    border-radius: 10px;
+  }
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .legend-item span { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: .05em; }
+
+  /* Layers description */
+  .layers {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .layer-card {
+    background: #0a0a0a;
+    border: 0.5px solid rgba(255,255,255,.08);
+    border-left: 3px solid;
+    border-radius: 0 12px 12px 0;
+    padding: 14px 18px;
+  }
+  .layer-card h3 {
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    margin-bottom: 4px;
+  }
+  .layer-card p {
+    font-size: 12px;
+    color: rgba(255,255,255,.45);
+    line-height: 1.6;
+    font-weight: 500;
+  }
+  .layer-card code {
+    font-size: 11px;
+    background: rgba(255,255,255,.06);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: rgba(255,255,255,.7);
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 2.5rem;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .25em;
+    color: rgba(255,255,255,.15);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Red Griffin Platform</div>
+  <h1>Dashboard Sync Architecture</h1>
+  <p>Унидирекциональный поток данных: Firestore → Context → Hooks → UI</p>
+</div>
+
+<div class="diagram-wrap">
+<svg width="100%" viewBox="0 0 680 820" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- LAYER 0: Firestore -->
+<rect x="40" y="744" width="600" height="54" rx="10" fill="#1a1a1a" stroke="#5F5E5A" stroke-width="0.5"/>
+<text font-family="system-ui" font-size="14" font-weight="500" fill="#D3D1C7" x="340" y="766" text-anchor="middle" dominant-baseline="central">Firestore</text>
+<text font-family="system-ui" font-size="12" fill="#888780" x="340" y="784" text-anchor="middle" dominant-baseline="central">onSnapshot — real-time listeners</text>
+
+<!-- LAYER 1: Platform Context -->
+<rect x="40" y="622" width="600" height="88" rx="10" fill="#1a1830" stroke="#7F77DD" stroke-width="0.5"/>
+<text font-family="system-ui" font-size="14" font-weight="500" fill="#CECBF6" x="340" y="648" text-anchor="middle" dominant-baseline="central">PlatformContext  (единый стор)</text>
+<text font-family="system-ui" font-size="12" fill="#AFA9EC" x="130" y="674" text-anchor="middle" dominant-baseline="central">user + roles</text>
+<text font-family="system-ui" font-size="12" fill="#AFA9EC" x="280" y="674" text-anchor="middle" dominant-baseline="central">enrollments</text>
+<text font-family="system-ui" font-size="12" fill="#AFA9EC" x="420" y="674" text-anchor="middle" dominant-baseline="central">contracts</text>
+<text font-family="system-ui" font-size="12" fill="#AFA9EC" x="560" y="674" text-anchor="middle" dominant-baseline="central">notifications</text>
+<text font-family="system-ui" font-size="12" fill="#AFA9EC" x="130" y="694" text-anchor="middle" dominant-baseline="central">projects</text>
+<text font-family="system-ui" font-size="12" fill="#AFA9EC" x="280" y="694" text-anchor="middle" dominant-baseline="central">stats</text>
+<text font-family="system-ui" font-size="12" fill="#AFA9EC" x="420" y="694" text-anchor="middle" dominant-baseline="central">messages</text>
+<text font-family="system-ui" font-size="12" fill="#AFA9EC" x="560" y="694" text-anchor="middle" dominant-baseline="central">loading flags</text>
+
+<!-- Arrow Firestore → Context -->
+<line x1="340" y1="744" x2="340" y2="712" stroke="#7F77DD" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text font-family="system-ui" font-size="11" fill="#888780" x="356" y="730" dominant-baseline="central">subscribe</text>
+
+<!-- LAYER 2: Role Router -->
+<rect x="200" y="530" width="280" height="56" rx="10" fill="#0d2420" stroke="#1D9E75" stroke-width="0.5"/>
+<text font-family="system-ui" font-size="14" font-weight="500" fill="#9FE1CB" x="340" y="554" text-anchor="middle" dominant-baseline="central">RoleRouter</text>
+<text font-family="system-ui" font-size="12" fill="#5DCAA5" x="340" y="572" text-anchor="middle" dominant-baseline="central">читает roles из Context → выбирает Dashboard</text>
+
+<!-- Arrow Context → RoleRouter -->
+<line x1="340" y1="622" x2="340" y2="588" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<!-- LAYER 3: Dashboards -->
+<!-- Student -->
+<rect x="40" y="420" width="140" height="82" rx="10" fill="#0d1a2e" stroke="#378ADD" stroke-width="0.5"/>
+<text font-family="system-ui" font-size="14" font-weight="500" fill="#B5D4F4" x="110" y="448" text-anchor="middle" dominant-baseline="central">Student</text>
+<text font-family="system-ui" font-size="12" fill="#85B7EB" x="110" y="466" text-anchor="middle" dominant-baseline="central">прогресс</text>
+<text font-family="system-ui" font-size="12" fill="#85B7EB" x="110" y="482" text-anchor="middle" dominant-baseline="central">сертификаты</text>
+<text font-family="system-ui" font-size="12" fill="#85B7EB" x="110" y="498" text-anchor="middle" dominant-baseline="central">записи</text>
+
+<!-- Lecturer -->
+<rect x="196" y="420" width="140" height="82" rx="10" fill="#0d1a2e" stroke="#378ADD" stroke-width="0.5"/>
+<text font-family="system-ui" font-size="14" font-weight="500" fill="#B5D4F4" x="266" y="448" text-anchor="middle" dominant-baseline="central">Lecturer</text>
+<text font-family="system-ui" font-size="12" fill="#85B7EB" x="266" y="466" text-anchor="middle" dominant-baseline="central">курсы</text>
+<text font-family="system-ui" font-size="12" fill="#85B7EB" x="266" y="482" text-anchor="middle" dominant-baseline="central">аналитика</text>
+<text font-family="system-ui" font-size="12" fill="#85B7EB" x="266" y="498" text-anchor="middle" dominant-baseline="central">студенты</text>
+
+<!-- Client/Executor -->
+<rect x="352" y="420" width="140" height="82" rx="10" fill="#2a1208" stroke="#D85A30" stroke-width="0.5"/>
+<text font-family="system-ui" font-size="14" font-weight="500" fill="#F5C4B3" x="422" y="448" text-anchor="middle" dominant-baseline="central">Client/Executor</text>
+<text font-family="system-ui" font-size="12" fill="#F0997B" x="422" y="466" text-anchor="middle" dominant-baseline="central">проекты</text>
+<text font-family="system-ui" font-size="12" fill="#F0997B" x="422" y="482" text-anchor="middle" dominant-baseline="central">контракты</text>
+<text font-family="system-ui" font-size="12" fill="#F0997B" x="422" y="498" text-anchor="middle" dominant-baseline="central">milestone</text>
+
+<!-- Admin/Manager -->
+<rect x="508" y="420" width="132" height="82" rx="10" fill="#241a04" stroke="#EF9F27" stroke-width="0.5"/>
+<text font-family="system-ui" font-size="14" font-weight="500" fill="#FAC775" x="574" y="448" text-anchor="middle" dominant-baseline="central">Manager/Admin</text>
+<text font-family="system-ui" font-size="12" fill="#EF9F27" x="574" y="466" text-anchor="middle" dominant-baseline="central">платформа</text>
+<text font-family="system-ui" font-size="12" fill="#EF9F27" x="574" y="482" text-anchor="middle" dominant-baseline="central">команда</text>
+<text font-family="system-ui" font-size="12" fill="#EF9F27" x="574" y="498" text-anchor="middle" dominant-baseline="central">модерация</text>
+
+<!-- Arrows RoleRouter → Dashboards -->
+<line x1="290" y1="530" x2="150" y2="504" stroke="#378ADD" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="316" y1="530" x2="270" y2="504" stroke="#378ADD" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="360" y1="530" x2="396" y2="504" stroke="#D85A30" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="390" y1="530" x2="552" y2="504" stroke="#EF9F27" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<!-- LAYER 4: Shared Widgets -->
+<rect x="40" y="300" width="600" height="90" rx="10" fill="#161616" stroke="#5F5E5A" stroke-width="0.5"/>
+<text font-family="system-ui" font-size="14" font-weight="500" fill="#D3D1C7" x="340" y="322" text-anchor="middle" dominant-baseline="central">Shared Widgets  (используются всеми дашбордами)</text>
+<text font-family="system-ui" font-size="12" fill="#888780" x="100" y="350" text-anchor="middle" dominant-baseline="central">StatCard</text>
+<text font-family="system-ui" font-size="12" fill="#888780" x="220" y="350" text-anchor="middle" dominant-baseline="central">NotifFeed</text>
+<text font-family="system-ui" font-size="12" fill="#888780" x="340" y="350" text-anchor="middle" dominant-baseline="central">ContractCard</text>
+<text font-family="system-ui" font-size="12" fill="#888780" x="460" y="350" text-anchor="middle" dominant-baseline="central">ProgressBar</text>
+<text font-family="system-ui" font-size="12" fill="#888780" x="580" y="350" text-anchor="middle" dominant-baseline="central">MilestoneList</text>
+<text font-family="system-ui" font-size="12" fill="#888780" x="100" y="374" text-anchor="middle" dominant-baseline="central">ActivityFeed</text>
+<text font-family="system-ui" font-size="12" fill="#888780" x="220" y="374" text-anchor="middle" dominant-baseline="central">ChatPreview</text>
+<text font-family="system-ui" font-size="12" fill="#888780" x="340" y="374" text-anchor="middle" dominant-baseline="central">UserCard</text>
+<text font-family="system-ui" font-size="12" fill="#888780" x="460" y="374" text-anchor="middle" dominant-baseline="central">ChartWidget</text>
+<text font-family="system-ui" font-size="12" fill="#888780" x="580" y="374" text-anchor="middle" dominant-baseline="central">AlertBanner</text>
+
+<!-- Arrows Dashboards → SharedWidgets -->
+<line x1="110" y1="420" x2="200" y2="392" stroke="#5F5E5A" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line x1="266" y1="420" x2="290" y2="392" stroke="#5F5E5A" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line x1="422" y1="420" x2="380" y2="392" stroke="#5F5E5A" stroke-width="1.2" marker-end="url(#arrow)"/>
+<line x1="574" y1="420" x2="490" y2="392" stroke="#5F5E5A" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+<!-- LAYER 5: Hooks -->
+<rect x="40" y="174" width="600" height="90" rx="10" fill="#0f1f0a" stroke="#639922" stroke-width="0.5"/>
+<text font-family="system-ui" font-size="14" font-weight="500" fill="#C0DD97" x="340" y="196" text-anchor="middle" dominant-baseline="central">Custom Hooks  (usePlatform + специфичные)</text>
+<text font-family="system-ui" font-size="12" fill="#97C459" x="100" y="224" text-anchor="middle" dominant-baseline="central">usePlatform()</text>
+<text font-family="system-ui" font-size="12" fill="#97C459" x="240" y="224" text-anchor="middle" dominant-baseline="central">useEnrollments()</text>
+<text font-family="system-ui" font-size="12" fill="#97C459" x="390" y="224" text-anchor="middle" dominant-baseline="central">useContracts()</text>
+<text font-family="system-ui" font-size="12" fill="#97C459" x="570" y="224" text-anchor="middle" dominant-baseline="central">useProjects()</text>
+<text font-family="system-ui" font-size="12" fill="#97C459" x="100" y="246" text-anchor="middle" dominant-baseline="central">useRole()</text>
+<text font-family="system-ui" font-size="12" fill="#97C459" x="240" y="246" text-anchor="middle" dominant-baseline="central">useNotifications()</text>
+<text font-family="system-ui" font-size="12" fill="#97C459" x="390" y="246" text-anchor="middle" dominant-baseline="central">useAnalytics()</text>
+<text font-family="system-ui" font-size="12" fill="#97C459" x="570" y="246" text-anchor="middle" dominant-baseline="central">useStats()</text>
+
+<!-- Arrow SharedWidgets → Hooks -->
+<line x1="340" y1="300" x2="340" y2="266" stroke="#639922" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<!-- LAYER 6: SyncManager -->
+<rect x="170" y="48" width="340" height="92" rx="10" fill="#1e0a14" stroke="#D4537E" stroke-width="0.5"/>
+<text font-family="system-ui" font-size="14" font-weight="500" fill="#F4C0D1" x="340" y="70" text-anchor="middle" dominant-baseline="central">SyncManager  (инициализация)</text>
+<text font-family="system-ui" font-size="12" fill="#ED93B1" x="340" y="92" text-anchor="middle" dominant-baseline="central">запускает listeners при login</text>
+<text font-family="system-ui" font-size="12" fill="#ED93B1" x="340" y="110" text-anchor="middle" dominant-baseline="central">отписывает при logout / unmount</text>
+<text font-family="system-ui" font-size="12" fill="#ED93B1" x="340" y="128" text-anchor="middle" dominant-baseline="central">обрабатывает offline / reconnect</text>
+
+<!-- Arrow Hooks → SyncManager -->
+<line x1="340" y1="174" x2="340" y2="142" stroke="#D4537E" stroke-width="1.5" marker-end="url(#arrow)"/>
+</svg>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#D4537E"></div>
+    <span>SyncManager — инициализация</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#639922"></div>
+    <span>Custom Hooks — абстракция</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#5F5E5A"></div>
+    <span>Shared Widgets — UI-компоненты</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#378ADD"></div>
+    <span>Academy Dashboards</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#D85A30"></div>
+    <span>Studio Dashboards</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#EF9F27"></div>
+    <span>Admin/Manager Dashboards</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#1D9E75"></div>
+    <span>RoleRouter — маршрутизация</span>
+  </div>
+  <div class="legend-item">
+    <div class="legend-dot" style="background:#7F77DD"></div>
+    <span>PlatformContext — единый стор</span>
+  </div>
+</div>
+
+<!-- Layer descriptions -->
+<div class="layers">
+  <div class="layer-card" style="border-color:#D4537E">
+    <h3 style="color:#ED93B1">SyncManager</h3>
+    <p>Монтируется один раз в <code>App.tsx</code>. При логине запускает все <code>onSnapshot</code> listeners, при логауте — отписывается. Управляет offline/reconnect состоянием.</p>
+  </div>
+  <div class="layer-card" style="border-color:#7F77DD">
+    <h3 style="color:#CECBF6">PlatformContext</h3>
+    <p>Единый <code>useReducer</code> стор. Хранит всё состояние платформы: user, enrollments, contracts, projects, notifications, stats, loading flags. Никто не ходит в Firestore напрямую.</p>
+  </div>
+  <div class="layer-card" style="border-color:#639922">
+    <h3 style="color:#C0DD97">Custom Hooks</h3>
+    <p>Тонкие обёртки над Context. Компоненты используют только хуки — <code>useEnrollments()</code>, <code>useContracts()</code>, <code>useRole()</code>. Изолируют изменения структуры стора.</p>
+  </div>
+  <div class="layer-card" style="border-color:#5F5E5A">
+    <h3 style="color:#D3D1C7">Shared Widgets</h3>
+    <p>Чистые компоненты без логики — только рендер через props. <code>StatCard</code>, <code>ContractCard</code>, <code>ProgressBar</code> используются во всех дашбордах без дублирования.</p>
+  </div>
+  <div class="layer-card" style="border-color:#1D9E75">
+    <h3 style="color:#9FE1CB">RoleRouter</h3>
+    <p>Читает <code>user.roles</code> из Context и монтирует нужный дашборд. Поддерживает комбинированные роли — <code>['student', 'lecturer']</code> показывает табы для обоих режимов.</p>
+  </div>
+</div>
+
+<div class="footer">
+  &copy; 2026 Red Griffin Platform · Dashboard Sync Architecture · Unidirectional Data Flow
+</div>
+
+</body>
+</html>

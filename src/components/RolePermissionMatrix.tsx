@@ -17,7 +17,11 @@ import {
   Edit3,
   Trash2,
   Database,
-  Target
+  Target,
+  Video,
+  GraduationCap,
+  Box,
+  Briefcase
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

@@ -15,13 +15,18 @@ import {
   CheckCircle, 
   Clock,
   Search,
-  Filter
+  Filter,
+  Box,
+  LayoutDashboard,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Preloader from '../components/Preloader';
 import { useTranslation } from 'react-i18next';
 import KanbanBoard from '../components/KanbanBoard';
 import { networkingService } from '../services/networkingService';
+import { useAuth } from '../context/AuthContext';
 
 const MOCK_PROJECTS = [
   {
@@ -65,6 +70,7 @@ const MOCK_PROJECTS = [
 export default function Studio() {
   const { t } = useTranslation();
   const { lang } = useParams();
+  const { profile } = useAuth();
   const [activeTab, setActiveTab] = useState<'browse' | 'manage'>('browse');
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [showApplyModal, setShowApplyModal] = useState(false);
@@ -77,6 +83,11 @@ export default function Studio() {
     urgency: 'all',
     budgetMin: 0
   });
+
+  const userRoles = profile?.roles || [];
+  const isClient = userRoles.includes('client') || userRoles.includes('admin');
+  const isExecutor = userRoles.includes('executor') || userRoles.includes('admin');
+  const hasSynergyCE = isClient && isExecutor;
 
   const [talent, setTalent] = useState<any[]>([]);
   const [loadingTalent, setLoadingTalent] = useState(true);
@@ -113,6 +124,41 @@ export default function Studio() {
 
   return (
     <div className="space-y-12 py-8">
+      {/* 1. Client + Executor Synergy Header (Bible: ce synergy) */}
+      {hasSynergyCE && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="p-1 border border-sky-500/20 bg-sky-500/5 rounded-[2.5rem] backdrop-blur-xl mb-12 overflow-hidden"
+        >
+          <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="flex items-center gap-6">
+              <div className="size-16 rounded-2xl bg-sky-500/20 flex items-center justify-center text-sky-400 border border-sky-500/20 shadow-lg shadow-sky-500/10">
+                <Layers size={32} />
+              </div>
+              <div>
+                <div className="flex items-center gap-3">
+                  <h3 className="text-xl font-black uppercase tracking-tight text-white italic">Subcontracting Hub</h3>
+                  <span className="px-2 py-0.5 bg-sky-500 text-bg-dark text-[8px] font-black uppercase tracking-widest rounded shadow-lg shadow-sky-500/20">Production Synergy</span>
+                </div>
+                <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1 italic">
+                  "Может нанимать других и сам браться за работу — идеальный баланс субподряда"
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap justify-center gap-4">
+              <button className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white">
+                <Sparkles size={14} className="text-sky-400" /> Delegate Tasks
+              </button>
+              <button className="flex items-center gap-2 px-6 py-3 bg-sky-500 text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-sky-500/20">
+                Master Dashboard
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-primary font-black uppercase tracking-[0.3em] text-[10px]">
@@ -143,10 +189,12 @@ export default function Studio() {
                 My Projects
               </button>
             </div>
-            <button className="criativo-btn flex items-center gap-3">
-              <Plus size={18} />
-              {t('post_project')}
-            </button>
+            {isClient && (
+              <button className="criativo-btn flex items-center gap-3">
+                <Plus size={18} />
+                {t('post_project')}
+              </button>
+            )}
           </div>
           
           <div className="flex gap-4">
@@ -170,6 +218,26 @@ export default function Studio() {
           </div>
         </div>
       </header>
+
+      {/* Specialist Quick Stats Block (for Executors) */}
+      {isExecutor && activeTab === 'browse' && (
+        <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[
+            { l: 'Open Requests', v: '124', i: Briefcase, c: 'text-primary' },
+            { l: 'Your Active Bids', v: '3', i: Clock, c: 'text-sky-400' },
+            { l: 'Success Rate', v: '98%', i: CheckCircle, c: 'text-emerald-400' },
+            { l: 'Revenue Share', v: '$4.2k', i: Zap, c: 'text-amber-400' }
+          ].map((s, i) => (
+            <div key={i} className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between group hover:border-white/10 transition-all">
+              <div className="space-y-1">
+                <p className="text-[9px] font-black uppercase tracking-widest text-white/20">{s.l}</p>
+                <p className="text-xl font-black text-white">{s.v}</p>
+              </div>
+              <s.i size={20} className={`${s.c} opacity-20 group-hover:opacity-100 transition-opacity`} />
+            </div>
+          ))}
+        </section>
+      )}
 
       {/* Advanced Filters Panel */}
       <AnimatePresence>

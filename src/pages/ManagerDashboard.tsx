@@ -55,30 +55,85 @@ import { userService, UserProfile } from '../services/userService';
 import { auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-export function ManagerDashboardContent({ activeModule, theme }: any) {
+function StatCard({ label, value, sub, icon: Icon, accent }: any) {
   return (
-    <AnimatePresence mode="wait">
-      {activeModule === 'overview' && <ManagerOverview theme={theme} />}
-      {activeModule === 'courses_review' && <CoursesReview theme={theme} />}
-      {activeModule === 'student_feedback' && <StudentFeedbackView theme={theme} />}
-      {activeModule === 'project_board' && <ProjectBoardView theme={theme} />}
-      {activeModule === 'contract_status' && <ContractStatusView theme={theme} />}
-      {activeModule === 'escrow_alerts' && <EscrowAlertsView theme={theme} />}
-      {activeModule === 'user_list' && <UserListView theme={theme} />}
-      {activeModule === 'role_requests' && <RoleRequestsView theme={theme} />}
-      
-      {activeModule !== 'overview' && activeModule !== 'courses_review' && activeModule !== 'student_feedback' && activeModule !== 'project_board' && activeModule !== 'contract_status' && activeModule !== 'escrow_alerts' && activeModule !== 'user_list' && activeModule !== 'role_requests' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full py-20 opacity-20 text-center">
-          <Box size={64} className="mb-6" />
-          <div className="text-xl font-black uppercase tracking-[0.5em]">{activeModule} Module</div>
-          <div className="text-sm mt-2">Section content coming soon...</div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div className="bg-[#111] border border-[#2a2a2a] rounded-[2rem] p-6 space-y-4 hover:border-white/10 transition-all shadow-xl group">
+      <div className="flex justify-between items-start">
+        <div className="text-[10px] font-black text-white/20 uppercase tracking-widest group-hover:text-white/40 transition-colors">{label}</div>
+        <Icon size={18} style={{ color: accent }} className="opacity-40 group-hover:opacity-100 transition-opacity" />
+      </div>
+      <div className="text-4xl font-black text-white tracking-tighter">{value}</div>
+      <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: accent }}>{sub}</div>
+    </div>
   );
 }
 
-// ... existing code for ManagerOverview and CoursesReview ...
+function ManagerOverview({ theme }: any) {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[{l:'To Publish',v:'7',s:'courses waiting',c:'#ef9f27'},{l:'Open Projects',v:'87',s:'↑ +12 this week',c:theme.accent},{l:'Active Contracts',v:'34',s:'$148k total',c:'#378add'},{l:'Review Reports',v:'3',s:'require action',c:'#e24b4a'}].map((m, i) => (
+          <div key={i} className="bg-[#111] border border-[#2a2a2a] rounded-lg p-4 space-y-2 shadow-xl">
+            <div className="text-[11px] text-[#888] font-medium uppercase tracking-wider">{m.l}</div>
+            <div className="text-2xl font-semibold text-white">{m.v}</div>
+            <div className="text-[11px] font-medium" style={{ color: m.c }}>{m.s}</div>
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-[#111] border border-[#2a2a2a] rounded-xl p-6">
+          <div className="text-[13px] font-medium mb-6 text-white">Pending Course Publications</div>
+          <table className="w-full text-left">
+            <thead>
+              <tr className="text-[11px] text-[#555] uppercase border-b border-[#2a2a2a]"><th className="pb-3">Title</th><th className="pb-3">Author</th><th className="pb-3"></th></tr>
+            </thead>
+            <tbody className="divide-y divide-[#2a2a2a]">
+              {[1,2,3].map(i => (
+                <tr key={i} className="hover:bg-white/[0.01]">
+                  <td className="py-4 text-xs font-bold text-[#e8e6df]">Mastering Houdini FX Vol.{i}</td>
+                  <td className="py-4 text-xs text-[#888]">S. Chen</td>
+                  <td className="py-4 text-right"><button className="px-3 py-1.5 bg-[#1d9e75] text-white rounded text-[10px] font-black uppercase">Publish</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="bg-[#111] border border-[#2a2a2a] rounded-xl p-6 text-center flex flex-col items-center justify-center opacity-40">
+          <PieChart size={48} className="mb-4 text-[#1d9e75]" />
+          <div className="text-sm font-bold uppercase tracking-widest">Analytics Pulse Coming Soon</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CoursesReview({ theme }: any) {
+  return (
+    <div className="space-y-6">
+      <div className="bg-[#111] border border-[#2a2a2a] rounded-xl overflow-hidden shadow-2xl">
+        <div className="p-6 border-b border-[#2a2a2a] bg-black/20 flex items-center justify-between">
+          <div className="text-[11px] font-black uppercase tracking-widest">Course Verification Queue</div>
+          <span className="text-[10px] font-bold text-white/40">7 courses awaiting review</span>
+        </div>
+        <table className="w-full text-left">
+          <thead>
+            <tr className="bg-black/20 text-[9px] font-black text-[#555] uppercase tracking-widest"><th className="px-8 py-4">Course Title</th><th className="px-8 py-4">Lecturer</th><th className="px-8 py-4">Category</th><th className="px-8 py-4 text-right">Actions</th></tr>
+          </thead>
+          <tbody className="divide-y divide-[#2a2a2a]">
+            {[1,2,3,4,5].map(i => (
+              <tr key={i} className="hover:bg-white/[0.01]">
+                <td className="px-8 py-5 text-xs font-bold text-white">Advanced Character Rigging Course {i}</td>
+                <td className="px-8 py-5 text-xs text-[#888]">Alex Rivera</td>
+                <td className="px-8 py-5"><span className="px-2 py-0.5 bg-white/5 text-white/40 text-[9px] font-black uppercase rounded-full">3D Animation</span></td>
+                <td className="px-8 py-5 text-right flex justify-end gap-2"><button className="size-8 rounded-lg bg-[#1d9e75]/10 text-[#1d9e75] flex items-center justify-center"><CheckCircle size={14} /></button><button className="size-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center"><XCircle size={14} /></button><button className="size-8 rounded-lg bg-white/5 text-white/40 flex items-center justify-center"><Eye size={14} /></button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
 function StudentFeedbackView({ theme }: any) {
   return (
@@ -346,16 +401,26 @@ function RoleRequestsView({ theme }: any) {
   );
 }
 
-function StatCard({ label, value, sub, icon: Icon, accent }: any) {
+export function ManagerDashboardContent({ activeModule, theme }: any) {
   return (
-    <div className="bg-[#111] border border-[#2a2a2a] rounded-[2rem] p-6 space-y-4 hover:border-white/10 transition-all shadow-xl group">
-      <div className="flex justify-between items-start">
-        <div className="text-[10px] font-black text-white/20 uppercase tracking-widest group-hover:text-white/40 transition-colors">{label}</div>
-        <Icon size={18} style={{ color: accent }} className="opacity-40 group-hover:opacity-100 transition-opacity" />
-      </div>
-      <div className="text-4xl font-black text-white tracking-tighter">{value}</div>
-      <div className="text-[10px] font-bold uppercase tracking-widest" style={{ color: accent }}>{sub}</div>
-    </div>
+    <AnimatePresence mode="wait">
+      {activeModule === 'overview' && <ManagerOverview theme={theme} />}
+      {activeModule === 'courses_review' && <CoursesReview theme={theme} />}
+      {activeModule === 'student_feedback' && <StudentFeedbackView theme={theme} />}
+      {activeModule === 'project_board' && <ProjectBoardView theme={theme} />}
+      {activeModule === 'contract_status' && <ContractStatusView theme={theme} />}
+      {activeModule === 'escrow_alerts' && <EscrowAlertsView theme={theme} />}
+      {activeModule === 'user_list' && <UserListView theme={theme} />}
+      {activeModule === 'role_requests' && <RoleRequestsView theme={theme} />}
+      
+      {activeModule !== 'overview' && activeModule !== 'courses_review' && activeModule !== 'student_feedback' && activeModule !== 'project_board' && activeModule !== 'contract_status' && activeModule !== 'escrow_alerts' && activeModule !== 'user_list' && activeModule !== 'role_requests' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full py-20 opacity-20 text-center">
+          <Box size={64} className="mb-6" />
+          <div className="text-xl font-black uppercase tracking-[0.5em]">{activeModule} Module</div>
+          <div className="text-sm mt-2">Section content coming soon...</div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -415,73 +480,6 @@ export default function ManagerDashboard() {
       </div>
 
       <ManagerDashboardContent activeModule={activeModule} theme={theme} />
-    </div>
-  );
-}
-
-function ManagerOverview({ theme }: any) {
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[{l:'To Publish',v:'7',s:'courses waiting',c:'#ef9f27'},{l:'Open Projects',v:'87',s:'↑ +12 this week',c:theme.accent},{l:'Active Contracts',v:'34',s:'$148k total',c:'#378add'},{l:'Review Reports',v:'3',s:'require action',c:'#e24b4a'}].map((m, i) => (
-          <div key={i} className="bg-[#111] border border-[#2a2a2a] rounded-lg p-4 space-y-2 shadow-xl">
-            <div className="text-[11px] text-[#888] font-medium uppercase tracking-wider">{m.l}</div>
-            <div className="text-2xl font-semibold text-white">{m.v}</div>
-            <div className="text-[11px] font-medium" style={{ color: m.c }}>{m.s}</div>
-          </div>
-        ))}
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-[#111] border border-[#2a2a2a] rounded-xl p-6">
-          <div className="text-[13px] font-medium mb-6 text-white">Pending Course Publications</div>
-          <table className="w-full text-left">
-            <thead>
-              <tr className="text-[11px] text-[#555] uppercase border-b border-[#2a2a2a]"><th className="pb-3">Title</th><th className="pb-3">Author</th><th className="pb-3"></th></tr>
-            </thead>
-            <tbody className="divide-y divide-[#2a2a2a]">
-              {[1,2,3].map(i => (
-                <tr key={i} className="hover:bg-white/[0.01]">
-                  <td className="py-4 text-xs font-bold text-[#e8e6df]">Mastering Houdini FX Vol.{i}</td>
-                  <td className="py-4 text-xs text-[#888]">S. Chen</td>
-                  <td className="py-4 text-right"><button className="px-3 py-1.5 bg-[#1d9e75] text-white rounded text-[10px] font-black uppercase">Publish</button></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="bg-[#111] border border-[#2a2a2a] rounded-xl p-6 text-center flex flex-col items-center justify-center opacity-40">
-          <PieChart size={48} className="mb-4 text-[#1d9e75]" />
-          <div className="text-sm font-bold uppercase tracking-widest">Analytics Pulse Coming Soon</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CoursesReview({ theme }: any) {
-  return (
-    <div className="space-y-6">
-      <div className="bg-[#111] border border-[#2a2a2a] rounded-xl overflow-hidden shadow-2xl">
-        <div className="p-6 border-b border-[#2a2a2a] bg-black/20 flex items-center justify-between">
-          <div className="text-[11px] font-black uppercase tracking-widest">Course Verification Queue</div>
-          <span className="text-[10px] font-bold text-white/40">7 courses awaiting review</span>
-        </div>
-        <table className="w-full text-left">
-          <thead>
-            <tr className="bg-black/20 text-[9px] font-black text-[#555] uppercase tracking-widest"><th className="px-8 py-4">Course Title</th><th className="px-8 py-4">Lecturer</th><th className="px-8 py-4">Category</th><th className="px-8 py-4 text-right">Actions</th></tr>
-          </thead>
-          <tbody className="divide-y divide-[#2a2a2a]">
-            {[1,2,3,4,5].map(i => (
-              <tr key={i} className="hover:bg-white/[0.01]">
-                <td className="px-8 py-5 text-xs font-bold text-white">Advanced Character Rigging Course {i}</td>
-                <td className="px-8 py-5 text-xs text-[#888]">Alex Rivera</td>
-                <td className="px-8 py-5"><span className="px-2 py-0.5 bg-white/5 text-white/40 text-[9px] font-black uppercase rounded-full">3D Animation</span></td>
-                <td className="px-8 py-5 text-right flex justify-end gap-2"><button className="size-8 rounded-lg bg-[#1d9e75]/10 text-[#1d9e75] flex items-center justify-center"><CheckCircle size={14} /></button><button className="size-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center"><XCircle size={14} /></button><button className="size-8 rounded-lg bg-white/5 text-white/40 flex items-center justify-center"><Eye size={14} /></button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }
