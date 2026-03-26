@@ -19,8 +19,8 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { academyService, Course, Lesson, Review } from '../services/academyService';
-import { auth } from '../firebase';
-import { useAuthState } from 'react-firebase-hooks/auth';
+
+
 import Preloader from '../components/Preloader';
 
 export default function CourseDetail() {

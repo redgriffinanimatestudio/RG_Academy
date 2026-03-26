@@ -7,7 +7,7 @@ const router = Router();
 // Dev backdoor
 router.post('/dev/auth', authController.devLogin);
 
-// Firebase sync
+// Secure sync
 router.post('/sync', authController.syncUser);
 
 // Current user

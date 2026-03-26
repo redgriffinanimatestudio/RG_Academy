@@ -1,52 +1,27 @@
 import { Request, Response, NextFunction } from 'express';
+import logger from '../utils/logger.js';
 
-export class AppError extends Error {
-  statusCode: number;
-  isOperational: boolean;
+export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+  // Логируем полную ошибку для разработчика
+  console.error('--- SERVER ERROR ---');
+  console.error('Path:', req.path);
+  console.error('Message:', err.message);
+  console.error('Stack:', err.stack);
+  console.error('--------------------');
 
-  constructor(message: string, statusCode: number) {
-    super(message);
-    this.statusCode = statusCode;
-    this.isOperational = true;
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
 
-export const errorHandler = (
-  err: Error | AppError,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  console.error('Error:', err);
-
-  if (err instanceof AppError) {
-    return res.status(err.statusCode).json({
-      success: false,
-      error: err.message
-    });
-  }
-
-  // Prisma errors
-  if (err.name === 'PrismaClientKnownRequestError') {
-    return res.status(400).json({
-      success: false,
-      error: 'Database operation failed'
-    });
-  }
-
-  // Default error
-  return res.status(500).json({
+  res.status(status).json({
     success: false,
-    error: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
-      : err.message
+    error: message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
   });
 };
 
 export const notFound = (req: Request, res: Response) => {
   res.status(404).json({
     success: false,
-    error: `Route ${req.originalUrl} not found`
+    message: `Route ${req.originalUrl} not found`
   });
 };

@@ -105,7 +105,7 @@ const resources = {
       welcome_back: 'WELCOME |BACK.|',
       sign_in_desc: 'Sign in to access your dashboard and continue your creative journey.',
       continue_google: 'Continue with Google',
-      secure_auth: 'Secure Authentication by Firebase',
+      secure_auth: 'Secure Authentication by Secure',
       global_community: 'Global Community',
       connect_creatives: 'CONNECT WITH CREATIVES.',
       community_desc: 'Join discussions, share your work, and grow with the world\'s most talented digital artists.',

@@ -5,6 +5,7 @@ import networkingRoutes from './networking';
 import adminRoutes from './admin';
 import authRoutes from './auth';
 import notificationRoutes from './notifications';
+import chatRoutes from './chat';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use('/v1/studio', studioRoutes); // /api/v1/studio/projects, etc.
 router.use('/v1/studio', networkingRoutes); // /api/v1/studio/profiles, etc.
 router.use('/v1/admin', adminRoutes);  // /api/v1/admin/stats, etc.
 router.use('/notifications', notificationRoutes); // /api/notifications/:userId
+router.use('/chat', chatRoutes);               // /api/chat/rooms, etc.
 
 export default router;

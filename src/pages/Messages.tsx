@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase';
+import { useAuth } from '../context/AuthContext';
 import { chatService, ChatRoom, ChatMessage } from '../services/chatService';
 import { userService, UserProfile } from '../services/userService';
 import { Send, Search, User, MoreVertical, Phone, Video, Info, Hash, MessageSquare, Plus } from 'lucide-react';
@@ -11,7 +10,7 @@ import Preloader from '../components/Preloader';
 
 export default function Messages() {
   const { t } = useTranslation();
-  const [user, loading] = useAuthState(auth);
+  const { profile: user, loading } = useAuth();
   const { lang } = useParams();
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
@@ -28,16 +27,19 @@ export default function Messages() {
   useEffect(() => {
     if (!user) return;
 
-    const unsubscribe = chatService.subscribeToChatRooms(user.uid, async (updatedRooms) => {
+    const fetchRooms = async () => {
+      const updatedRooms = await chatService.getChatRooms(user.uid);
       setRooms(updatedRooms);
       
       const allParticipantIds = Array.from(new Set(updatedRooms.flatMap(r => r.participants)));
       const profiles = await userService.getUsers(allParticipantIds);
       const profileMap = profiles.reduce((acc, p) => ({ ...acc, [p.uid]: p }), {});
       setParticipants(prev => ({ ...prev, ...profileMap }));
-    });
+    };
 
-    return () => unsubscribe();
+    fetchRooms();
+    const interval = setInterval(fetchRooms, 10000); // Polling as fallback for sockets
+    return () => clearInterval(interval);
   }, [user]);
 
   const filteredRooms = rooms.filter(room => {
@@ -50,11 +52,15 @@ export default function Messages() {
   useEffect(() => {
     if (!activeRoomId) return;
 
-    const unsubscribe = chatService.subscribeToMessages(activeRoomId, (updatedMessages) => {
-      setMessages(updatedMessages);
-    });
+    const fetchMessages = () => {
+      chatService.subscribeToMessages(activeRoomId, (updatedMessages) => {
+        setMessages(updatedMessages);
+      });
+    };
 
-    return () => unsubscribe();
+    fetchMessages();
+    const interval = setInterval(fetchMessages, 5000);
+    return () => clearInterval(interval);
   }, [activeRoomId]);
 
   useEffect(() => {
@@ -97,7 +103,7 @@ export default function Messages() {
 
   if (loading) return <Preloader message="Loading Messages..." size="lg" />;
 
-  if (!user) return <Navigate to={`/login/${lang || 'eng'}`} />;
+  if (!user) return <Navigate to={`/${lang || 'eng'}/login`} />;
 
   const activeRoom = rooms.find(r => r.id === activeRoomId);
   const otherParticipant = activeRoom?.participants.find(p => p !== user.uid);
@@ -156,7 +162,7 @@ export default function Messages() {
                       {partner?.displayName || t('loading')}
                     </h4>
                     <span className="text-[8px] font-black text-white/20 uppercase tracking-widest">
-                      {room.updatedAt?.toDate ? room.updatedAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                      {room.updatedAt ? new Date(room.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                     </span>
                   </div>
                   <p className="text-[10px] text-white/40 truncate font-medium">
@@ -229,7 +235,7 @@ export default function Messages() {
                         {msg.text}
                       </div>
                       <span className="text-[8px] font-black uppercase tracking-widest text-white/20 px-1">
-                        {msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : t('sending')}
+                        {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : t('sending')}
                       </span>
                     </div>
                   </motion.div>

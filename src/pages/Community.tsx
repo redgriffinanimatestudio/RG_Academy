@@ -25,7 +25,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { networkingService, FeedEvent, SearchIndex } from '../services/networkingService';
 import { userService } from '../services/userService';
-import { auth } from '../firebase';
+
 
 interface Alert {
   id: string;

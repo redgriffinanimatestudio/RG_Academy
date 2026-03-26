@@ -3,7 +3,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence } from 'framer-motion';
 import { networkingService, FeedEvent, SearchIndex } from '../../services/networkingService';
-import { auth } from '../../firebase';
+
 
 // Modular Community Components
 import CommunityHeader from '../../components/community/CommunityHeader';

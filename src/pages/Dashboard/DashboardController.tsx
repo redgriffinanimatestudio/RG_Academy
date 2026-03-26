@@ -19,8 +19,14 @@ export default function DashboardController() {
 
   useEffect(() => {
     if (profile) {
-      const unsubscribe = dashboardService.subscribeToUserData(profile.uid, setUserData);
-      return () => unsubscribe();
+      dashboardService.getUserData(profile.uid).then(setUserData);
+      
+      // Polling for updates every 10 seconds
+      const interval = setInterval(() => {
+        dashboardService.getUserData(profile.uid).then(setUserData);
+      }, 10000);
+      
+      return () => clearInterval(interval);
     }
   }, [profile]);
 

@@ -21,8 +21,8 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { academyService, Course, Lesson, Enrollment } from '../services/academyService';
-import { auth } from '../firebase';
-import { useAuthState } from 'react-firebase-hooks/auth';
+
+
 import Preloader from '../components/Preloader';
 
 export default function Learn() {

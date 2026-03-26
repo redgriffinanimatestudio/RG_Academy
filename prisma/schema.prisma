@@ -259,3 +259,23 @@ model Report {
   status      String   @default("pending") // pending, resolved, dismissed
   createdAt   DateTime @default(now())
 }
+
+model ChatRoom {
+  id           String    @id @default(cuid())
+  type         String    @default("direct") // direct, project, group
+  refId        String?   // optional projectId or groupId
+  participants String    @default("[]") // JSON array of user IDs
+  lastMessage  String?
+  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime  @default(now())
+  messages     Message[]
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  roomId     String
+  room       ChatRoom @relation(fields: [roomId], references: [id])
+  senderId   String
+  text       String
+  createdAt  DateTime @default(now())
+}

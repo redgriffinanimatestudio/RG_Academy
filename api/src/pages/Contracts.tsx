@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase';
+
+
 import { studioService, Contract } from '../services/studioService';
 import { userService, UserProfile } from '../services/userService';
 import { FileText, CheckCircle, Clock, AlertCircle, DollarSign, ChevronRight, User, Briefcase, Calendar } from 'lucide-react';
@@ -11,7 +11,7 @@ import Preloader from '../components/Preloader';
 
 export default function Contracts() {
   const { t } = useTranslation();
-  const [user, loading] = useAuthState(auth);
+  const { user: user, loading: loading } = useAuth();
   const { lang } = useParams();
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);

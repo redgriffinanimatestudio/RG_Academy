@@ -56,7 +56,7 @@ const API_ENDPOINTS = [
   { 
     tag: 'Auth & Profile', 
     endpoints: [
-      { method: 'POST', path: '/api/auth/sync', desc: 'Sync Firebase user with DB', body: '{\n  "uid": "abc...",\n  "email": "user@example.com",\n  "displayName": "John Doe",\n  "photoURL": "..."\n}' },
+      { method: 'POST', path: '/api/auth/sync', desc: 'Sync Secure user with DB', body: '{\n  "uid": "abc...",\n  "email": "user@example.com",\n  "displayName": "John Doe",\n  "photoURL": "..."\n}' },
       { method: 'GET', path: '/api/auth/me', desc: 'Get current session profile' },
       { method: 'GET', path: '/api/auth/users/:id', desc: 'Get public user data' },
       { method: 'POST', path: '/api/auth/dev/auth', desc: 'Developer backdoor login', body: '{\n  "login": "admin",\n  "password": "admin"\n}' }

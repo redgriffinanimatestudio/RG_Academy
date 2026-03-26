@@ -1,6 +1,3 @@
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, serverTimestamp, addDoc, onSnapshot, orderBy } from 'firebase/firestore';
-import { db } from '../firebase';
-
 export interface Notification {
   id: string;
   userId: string;
@@ -9,42 +6,49 @@ export interface Notification {
   type: string;
   read: boolean;
   createdAt: any;
+  link?: string;
 }
+
+const API_URL = '/api/notifications';
 
 export const notificationService = {
   async getNotifications(userId: string): Promise<Notification[]> {
-    const q = query(
-      collection(db, 'notifications'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    );
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notification));
+    const response = await fetch(`${API_URL}/${userId}`);
+    if (!response.ok) return [];
+    const res = await response.json();
+    return res.data.map((n: any) => ({
+      ...n,
+      read: n.isRead // mapping db isRead to read
+    }));
   },
 
   subscribeToNotifications(userId: string, callback: (notifications: Notification[]) => void) {
-    const q = query(
-      collection(db, 'notifications'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
-    );
-    return onSnapshot(q, (snapshot) => {
-      const notifications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notification));
-      callback(notifications);
-    });
+    // Basic implementation for now: fetch once
+    this.getNotifications(userId).then(callback);
+    
+    // Return dummy unsubscribe
+    return () => {};
   },
 
   async markAsRead(notificationId: string): Promise<void> {
-    const docRef = doc(db, 'notifications', notificationId);
-    await updateDoc(docRef, { read: true });
+    const token = localStorage.getItem('rg_token');
+    await fetch(`${API_URL}/${notificationId}/read`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
   },
 
   async sendNotification(notification: Omit<Notification, 'id' | 'createdAt' | 'read'>): Promise<string> {
-    const docRef = await addDoc(collection(db, 'notifications'), {
-      ...notification,
-      read: false,
-      createdAt: serverTimestamp(),
+    const token = localStorage.getItem('rg_token');
+    const response = await fetch(`${API_URL}`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(notification)
     });
-    return docRef.id;
+    const res = await response.json();
+    return res.data.id;
   }
 };

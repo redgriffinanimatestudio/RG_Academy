@@ -53,8 +53,8 @@ import {
 } from 'lucide-react';
 import { adminService } from '../services/adminService';
 import { userService, UserProfile } from '../services/userService';
-import { auth } from '../firebase';
-import { useAuthState } from 'react-firebase-hooks/auth';
+
+
 
 export function ChiefManagerDashboardContent({ activeModule, theme }: any) {
   return (
@@ -604,7 +604,7 @@ function QueueView({ theme }: any) {
 
 export default function ChiefManagerDashboard() {
   const { lang } = useParams();
-  const [user, loading] = useAuthState(auth);
+  const { user: user, loading: loading } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [searchParams] = useSearchParams();
   const activeModule = searchParams.get('view') || 'overview';

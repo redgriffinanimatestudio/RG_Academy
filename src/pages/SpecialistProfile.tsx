@@ -41,7 +41,7 @@ type ProfileTab = 'about' | 'portfolio' | 'experience' | 'education' | 'reviews'
 export default function SpecialistProfile() {
   const { id, lang } = useParams();
   const { t } = useTranslation();
-  const { user: firebaseUser, profile: currentUserProfile, loading: authLoading } = useAuth();
+  const { user, profile: currentUserProfile, loading: authLoading } = useAuth();
   const alert = useAlert();
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,14 +52,14 @@ export default function SpecialistProfile() {
   const [isValidating, setIsValidating] = useState(false);
 
   const handleStartChat = async () => {
-    if (!firebaseUser || !id) {
+    if (!user || !id) {
       alert.showError('Please login to send messages');
       return;
     }
 
     try {
       setIsValidating(true);
-      const token = await firebaseUser.getIdToken();
+      const token = localStorage.getItem("rg_token");
       const validation = await networkingService.validateChatAccess(id, token);
 
       if (!validation.canMessage) {

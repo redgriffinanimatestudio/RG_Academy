@@ -1,6 +1,3 @@
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where, serverTimestamp, addDoc, onSnapshot, orderBy, limit } from 'firebase/firestore';
-import { db } from '../firebase';
-
 export interface ChatRoom {
   id: string;
   participants: string[];
@@ -16,62 +13,59 @@ export interface ChatMessage {
   createdAt: any;
 }
 
+const API_URL = '/api/chat';
+
 export const chatService = {
   async getChatRooms(userId: string): Promise<ChatRoom[]> {
-    const q = query(
-      collection(db, 'chatRooms'),
-      where('participants', 'array-contains', userId),
-      orderBy('updatedAt', 'desc')
-    );
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatRoom));
+    const token = localStorage.getItem('rg_token');
+    const response = await fetch(`${API_URL}/rooms`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) return [];
+    const res = await response.json();
+    return res.data || [];
   },
 
   async createChatRoom(participants: string[], type: 'direct' | 'project' | 'group'): Promise<string> {
-    const docRef = await addDoc(collection(db, 'chatRooms'), {
-      participants,
-      type,
-      updatedAt: serverTimestamp(),
+    const token = localStorage.getItem('rg_token');
+    const response = await fetch(`${API_URL}/rooms`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ participants, type }),
     });
-    return docRef.id;
+    const res = await response.json();
+    return res.data.id;
   },
 
   async sendMessage(roomId: string, senderId: string, text: string): Promise<void> {
-    const messageRef = collection(db, `chatRooms/${roomId}/messages`);
-    await addDoc(messageRef, {
-      senderId,
-      text,
-      createdAt: serverTimestamp(),
-    });
-    
-    const roomRef = doc(db, 'chatRooms', roomId);
-    await updateDoc(roomRef, {
-      lastMessage: text,
-      updatedAt: serverTimestamp(),
+    const token = localStorage.getItem('rg_token');
+    await fetch(`${API_URL}/rooms/${roomId}/messages`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ text }),
     });
   },
 
   subscribeToMessages(roomId: string, callback: (messages: ChatMessage[]) => void) {
-    const q = query(
-      collection(db, `chatRooms/${roomId}/messages`),
-      orderBy('createdAt', 'asc'),
-      limit(100)
-    );
-    return onSnapshot(q, (snapshot) => {
-      const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage));
-      callback(messages);
-    });
+    // Basic implementation: fetch once
+    const token = localStorage.getItem('rg_token');
+    fetch(`${API_URL}/rooms/${roomId}/messages`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(res => callback(res.data || []));
+    
+    return () => {}; // Dummy unsubscribe
   },
 
   subscribeToChatRooms(userId: string, callback: (rooms: ChatRoom[]) => void) {
-    const q = query(
-      collection(db, 'chatRooms'),
-      where('participants', 'array-contains', userId),
-      orderBy('updatedAt', 'desc')
-    );
-    return onSnapshot(q, (snapshot) => {
-      const rooms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatRoom));
-      callback(rooms);
-    });
+    this.getChatRooms(userId).then(callback);
+    return () => {}; // Dummy unsubscribe
   }
 };

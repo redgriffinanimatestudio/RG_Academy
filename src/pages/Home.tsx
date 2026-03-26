@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GraduationCap, Briefcase, Play, Check, Globe, Users, LayoutDashboard } from 'lucide-react';
-import { Link, useParams, useLocation } from 'react-router-dom';
+import { Link, useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { signInWithGoogle } from '../firebase';
-import OAuthConsent from '../components/OAuthConsent';
 import { useAuth } from '../context/AuthContext';
 
 const HERO_SLIDES = [
@@ -28,23 +26,14 @@ const Home: React.FC = () => {
   const { t } = useTranslation();
   const { lang } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, profile } = useAuth();
   const isStudio = location.pathname.includes('/studio/');
   const modePrefix = isStudio ? '/studio' : '/aca';
-  const [showConsent, setShowConsent] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const handleSocialLogin = () => {
-    setShowConsent(true);
-  };
-
-  const handleAcceptConsent = async () => {
-    setShowConsent(false);
-    try {
-      await signInWithGoogle();
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
+  const handleLoginRedirect = () => {
+    navigate(`/${lang || 'eng'}/login`);
   };
 
   const getDashboardLink = () => {
@@ -134,7 +123,7 @@ const Home: React.FC = () => {
                 </Link>
               ) : (
                 <button 
-                  onClick={handleSocialLogin}
+                  onClick={handleLoginRedirect}
                   className="flex items-center gap-3 bg-white text-bg-dark px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-neutral-100 transition-all shadow-2xl active:scale-95"
                 >
                   <img src="https://www.google.com/favicon.ico" alt="" className="w-4 h-4" />
@@ -280,10 +269,10 @@ const Home: React.FC = () => {
               </Link>
             ) : (
               <button 
-                onClick={handleSocialLogin}
+                onClick={handleLoginRedirect}
                 className="bg-white text-bg-dark px-12 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-neutral-100 transition-all w-full sm:w-auto flex items-center justify-center gap-4 shadow-2xl shadow-white/5"
               >
-                <img src="https://www.google.com/favicon.ico" alt="" className="w-5 h-5" />
+                <img src="https://www.google.com/favicon.ico" alt="" className="w-5 h-4" />
                 {t('continue_google')}
               </button>
             )}
@@ -299,12 +288,6 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-
-      <OAuthConsent 
-        isOpen={showConsent} 
-        onClose={() => setShowConsent(false)} 
-        onAccept={handleAcceptConsent}
-      />
     </div>
   );
 };

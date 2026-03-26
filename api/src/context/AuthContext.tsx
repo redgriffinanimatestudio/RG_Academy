@@ -1,6 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase';
 import { userService, UserProfile, UserRole } from '../services/userService';
 
 interface AuthContextType {
@@ -16,9 +14,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [fbUser, fbLoading] = useAuthState(auth);
-  
-  // IMMEDIATELY initialize profile from localStorage for Dev Access to avoid flickering
   const [profile, setProfile] = useState<UserProfile | null>(() => {
     const devStored = localStorage.getItem('rg_dev_user');
     if (devStored) {
@@ -48,83 +43,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   });
 
-  const [profileLoading, setProfileLoading] = useState(true);
-
-  const fetchProfileFromBackend = async (uid: string) => {
-    try {
-      const response = await fetch('/api/me', {
-        headers: { 'Authorization': `Bearer ${uid}` }
-      });
-      
-      if (response.ok) {
-        const dbRes = await response.json();
-        const dbUser = dbRes.data;
-        
-        let finalRoles: UserRole[] = dbUser.role === 'admin' || dbUser.email === 'super@redgriffin.academy' 
-          ? ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client']
-          : [dbUser.role || 'student'];
-
-        const mappedProfile: UserProfile = {
-          uid: dbUser.remoteId || dbUser.id,
-          email: dbUser.email,
-          displayName: dbUser.displayName,
-          photoURL: dbUser.photoURL,
-          roles: finalRoles,
-          createdAt: dbUser.createdAt,
-        };
-
-        setProfile(mappedProfile);
-        
-        const savedRole = localStorage.getItem(`rg_active_role_${mappedProfile.uid}`) as UserRole;
-        setActiveRoleState(savedRole && finalRoles.includes(savedRole) ? savedRole : finalRoles[0]);
-      }
-    } catch (err) {
-      console.error("Backend fetch error:", err);
-    }
-  };
-
-  useEffect(() => {
-    const initAuth = async () => {
-      // 1. If already set by initial state (Dev Access), just stop loading
-      if (localStorage.getItem('rg_dev_user')) {
-        setProfileLoading(false);
-        return;
-      }
-
-      // 2. Handle Firebase Auth
-      if (!fbLoading) {
-        if (fbUser) {
-          await fetchProfileFromBackend(fbUser.uid);
-        } else {
-          setProfile(null);
-          setActiveRoleState(null);
-        }
-        setProfileLoading(false);
-      }
-    };
-
-    initAuth();
-  }, [fbUser, fbLoading]);
-
-  // Safety timer
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (profileLoading) setProfileLoading(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [profileLoading]);
+  const [loading, setLoading] = useState(false);
 
   const refreshProfile = async () => {
-    if (fbUser) await fetchProfileFromBackend(fbUser.uid);
+    // Already loaded from localStorage in this version
   };
 
   const logout = async () => {
     const currentLang = window.location.pathname.split('/')[1] || 'eng';
-    const uid = profile?.uid;
     localStorage.removeItem('rg_dev_user');
     localStorage.removeItem('rg_auth_active');
-    if (uid) localStorage.removeItem(`rg_active_role_${uid}`);
-    await auth.signOut();
+    setProfile(null);
+    setActiveRoleState(null);
     window.location.href = `/${currentLang}`;
   };
 
@@ -137,9 +67,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider value={{ 
-      user: fbUser, 
+      user: profile, 
       profile, 
-      loading: profileLoading, 
+      loading, 
       activeRole, 
       setActiveRole,
       refreshProfile,

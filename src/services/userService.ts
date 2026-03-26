@@ -1,6 +1,3 @@
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db, auth } from '../firebase';
-
 export type UserRole = 
   | 'student' 
   | 'lecturer' 
@@ -26,38 +23,51 @@ export interface UserProfile {
   isAdmin?: boolean;
 }
 
+const API_URL = '/api';
+
 export const userService = {
   async getProfile(uid: string): Promise<UserProfile | null> {
-    const docRef = doc(db, 'users', uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      return docSnap.data() as UserProfile;
+    const response = await fetch(`${API_URL}/users/${uid}`);
+    if (!response.ok) return null;
+    const dbRes = await response.json();
+    const dbUser = dbRes.data;
+    
+    let roles: UserRole[] = [];
+    try {
+      roles = dbUser.roles ? JSON.parse(dbUser.roles) : [dbUser.role || 'student'];
+    } catch(e) {
+      roles = [dbUser.role || 'student'];
     }
-    return null;
+
+    return {
+      uid: dbUser.id,
+      email: dbUser.email,
+      displayName: dbUser.displayName,
+      photoURL: dbUser.photoURL,
+      roles: roles,
+      createdAt: dbUser.createdAt,
+    };
   },
 
   async createProfile(uid: string, email: string, displayName: string | null, photoURL: string | null): Promise<void> {
-    const docRef = doc(db, 'users', uid);
-    const profile: UserProfile = {
-      uid,
-      email,
-      displayName,
-      photoURL,
-      roles: ['student'], // Default roles
-      createdAt: serverTimestamp(),
-    };
-    await setDoc(docRef, profile);
+    // Usually handled by backend sync, but if needed:
+    await fetch(`${API_URL}/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ remoteId: uid, email, displayName, photoURL })
+    });
   },
 
   async updateProfile(uid: string, data: Partial<UserProfile>): Promise<void> {
-    const docRef = doc(db, 'users', uid);
-    await updateDoc(docRef, data);
-  },
-
-  async getCurrentUserProfile(): Promise<UserProfile | null> {
-    const user = auth.currentUser;
-    if (!user) return null;
-    return this.getProfile(user.uid);
+    const token = localStorage.getItem('rg_token');
+    await fetch(`${API_URL}/users/${uid}`, {
+      method: 'PATCH',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(data)
+    });
   },
 
   async getUsers(uids: string[]): Promise<UserProfile[]> {

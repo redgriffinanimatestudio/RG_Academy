@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase';
+import { useAuth } from '../context/AuthContext';
 import { studioService, Contract } from '../services/studioService';
 import { userService, UserProfile } from '../services/userService';
 import { FileText, CheckCircle, Clock, AlertCircle, DollarSign, ChevronRight, User, Briefcase, Calendar } from 'lucide-react';
@@ -11,7 +10,7 @@ import Preloader from '../components/Preloader';
 
 export default function Contracts() {
   const { t } = useTranslation();
-  const [user, loading] = useAuthState(auth);
+  const { profile: user, loading } = useAuth();
   const { lang } = useParams();
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
@@ -31,8 +30,8 @@ export default function Contracts() {
         
         // Combine and sort by date
         const allContracts = [...clientContracts, ...executorContracts].sort((a, b) => {
-          const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
-          const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
+          const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+          const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
           return dateB.getTime() - dateA.getTime();
         });
 
@@ -53,7 +52,7 @@ export default function Contracts() {
 
   if (loading) return <Preloader message="Loading Contracts..." size="lg" />;
 
-  if (!user) return <Navigate to={`/login/${lang || 'eng'}`} />;
+  if (!user) return <Navigate to={`/${lang || 'eng'}/login`} />;
 
   const getStatusColor = (status: Contract['status']) => {
     switch (status) {
@@ -191,7 +190,7 @@ export default function Contracts() {
                   <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-1">
                     <span className="text-[8px] font-black uppercase tracking-widest text-white/20">{t('created_at')}</span>
                     <p className="text-lg font-black text-white">
-                      {selectedContract.createdAt?.toDate ? selectedContract.createdAt.toDate().toLocaleDateString() : 'N/A'}
+                      {selectedContract.createdAt ? new Date(selectedContract.createdAt).toLocaleDateString() : 'N/A'}
                     </p>
                   </div>
                 </div>

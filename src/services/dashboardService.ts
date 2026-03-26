@@ -1,16 +1,3 @@
-import { 
-  collection, 
-  query, 
-  where, 
-  onSnapshot, 
-  orderBy, 
-  limit,
-  doc,
-  getDoc,
-  updateDoc
-} from 'firebase/firestore';
-import { db } from '../firebase';
-
 export interface DashboardStats {
   totalUsers?: number;
   activeProjects?: number;
@@ -19,46 +6,52 @@ export interface DashboardStats {
   progress?: number;
 }
 
+const API_URL = '/api';
+
 export const dashboardService = {
-  // Listen to user-specific dashboard data
-  subscribeToUserData: (userId: string, callback: (data: any) => void) => {
-    const userDoc = doc(db, 'users', userId);
-    return onSnapshot(userDoc, (snapshot) => {
-      if (snapshot.exists()) {
-        callback(snapshot.data());
-      }
+  // Get user-specific dashboard data
+  async getUserData(userId: string): Promise<any> {
+    const token = localStorage.getItem('rg_token');
+    const response = await fetch(`${API_URL}/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
     });
+    if (!response.ok) return null;
+    const res = await response.json();
+    return res.data;
   },
 
-  // Listen to active projects (for Client/Executor)
-  subscribeToProjects: (userId: string, role: string, callback: (projects: any[]) => void) => {
+  // Get active projects (for Client/Executor)
+  async getProjects(userId: string, role: string): Promise<any[]> {
+    const response = await fetch(`${API_URL}/v1/studio/projects`);
+    if (!response.ok) return [];
+    const res = await response.json();
+    const projects = res.data || [];
+    
     const field = role === 'client' ? 'clientId' : 'executorId';
-    const q = query(
-      collection(db, 'projects'),
-      where(field, '==', userId),
-      orderBy('updatedAt', 'desc'),
-      limit(10)
-    );
-
-    return onSnapshot(q, (snapshot) => {
-      const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      callback(projects);
-    });
+    return projects.filter((p: any) => p[field] === userId);
   },
 
-  // Admin: Listen to system-wide stats
-  subscribeToSystemStats: (callback: (stats: DashboardStats) => void) => {
-    const statsDoc = doc(db, 'system', 'stats');
-    return onSnapshot(statsDoc, (snapshot) => {
-      if (snapshot.exists()) {
-        callback(snapshot.data() as DashboardStats);
-      }
+  // Admin: Get system-wide stats
+  async getSystemStats(): Promise<DashboardStats> {
+    const token = localStorage.getItem('rg_token');
+    const response = await fetch(`${API_URL}/v1/admin/stats`, {
+      headers: { 'Authorization': `Bearer ${token}` }
     });
+    if (!response.ok) return {};
+    const res = await response.json();
+    return res.data as DashboardStats;
   },
 
   // Update user role (switch identity)
   async updateActiveRole(userId: string, role: string) {
-    const userRef = doc(db, 'users', userId);
-    await updateDoc(userRef, { activeRole: role });
+    const token = localStorage.getItem('rg_token');
+    await fetch(`${API_URL}/v1/admin/users/${userId}/role`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ role })
+    });
   }
 };

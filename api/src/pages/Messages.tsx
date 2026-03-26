@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase';
+
+
 import { chatService, ChatRoom, ChatMessage } from '../services/chatService';
 import { userService, UserProfile } from '../services/userService';
 import { Send, Search, User, MoreVertical, Phone, Video, Info, Hash, MessageSquare } from 'lucide-react';
@@ -11,7 +11,7 @@ import Preloader from '../components/Preloader';
 
 export default function Messages() {
   const { t } = useTranslation();
-  const [user, loading] = useAuthState(auth);
+  const { user: user, loading: loading } = useAuth();
   const { lang } = useParams();
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);

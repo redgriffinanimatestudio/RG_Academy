@@ -1,17 +1,10 @@
 import { useEffect } from 'react';
-import { 
-  collection, 
-  query, 
-  where, 
-  onSnapshot, 
-  orderBy, 
-  limit, 
-  or,
-  Timestamp 
-} from 'firebase/firestore';
-import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { usePlatform } from '../context/PlatformContext';
+import { academyService } from './academyService';
+import { studioService } from './studioService';
+import { notificationService } from './notificationService';
+import { dashboardService } from './dashboardService';
 
 export function useSyncManager() {
   const { profile } = useAuth();
@@ -31,58 +24,50 @@ export function useSyncManager() {
     }
 
     const uid = profile.uid;
-    const unsubscribers: (() => void)[] = [];
 
-    // 1. Enrollments Subscription
-    const enrollmentsQuery = query(
-      collection(db, 'enrollments'),
-      where('userId', '==', uid)
-    );
-    unsubscribers.push(onSnapshot(enrollmentsQuery, (snapshot) => {
-      const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setData(prev => ({ ...prev, enrollments: docs }));
-    }, (error) => console.error("Sync Error [Enrollments]:", error)));
+    const fetchData = async () => {
+      try {
+        const [enrollments, notifications] = await Promise.all([
+          academyService.getUserEnrollments(uid),
+          notificationService.getNotifications(uid)
+        ]);
 
-    // 2. Contracts Subscription (Client OR Executor)
-    const contractsQuery = query(
-      collection(db, 'contracts'),
-      or(where('clientId', '==', uid), where('executorId', '==', uid))
-    );
-    unsubscribers.push(onSnapshot(contractsQuery, (snapshot) => {
-      const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setData(prev => ({ ...prev, contracts: docs }));
-    }, (error) => console.error("Sync Error [Contracts]:", error)));
+        // Studio data needs role
+        // For simplicity, we fetch all projects and contracts related to user
+        const projects = await dashboardService.getProjects(uid, 'client'); // client side
+        const executorProjects = await dashboardService.getProjects(uid, 'executor'); // executor side
+        const allProjects = [...projects, ...executorProjects];
+        
+        // Remove duplicates if any
+        const uniqueProjects = Array.from(new Map(allProjects.map(p => [p.id, p])).values());
 
-    // 3. Projects Subscription (Client OR Executor)
-    const projectsQuery = query(
-      collection(db, 'projects'),
-      or(where('clientId', '==', uid), where('executorId', '==', uid))
-    );
-    unsubscribers.push(onSnapshot(projectsQuery, (snapshot) => {
-      const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setData(prev => ({ ...prev, projects: docs }));
-    }, (error) => console.error("Sync Error [Projects]:", error)));
+        setData(prev => ({ 
+          ...prev, 
+          enrollments, 
+          notifications,
+          projects: uniqueProjects
+        }));
+      } catch (err) {
+        console.error("Sync Error:", err);
+      }
+    };
 
-    // 4. Notifications Subscription
-    const notificationsQuery = query(
-      collection(db, 'notifications'),
-      where('userId', '==', uid),
-      orderBy('createdAt', 'desc'),
-      limit(20)
-    );
-    unsubscribers.push(onSnapshot(notificationsQuery, (snapshot) => {
-      const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setData(prev => ({ ...prev, notifications: docs }));
-    }, (error) => console.error("Sync Error [Notifications]:", error)));
+    fetchData();
+    
+    // Set up polling for notifications every 30 seconds as a simple "real-time" alternative
+    const interval = setInterval(async () => {
+      const notifications = await notificationService.getNotifications(uid);
+      setData(prev => ({ ...prev, notifications }));
+    }, 30000);
 
-    // 5. Offline State Handler
+    // Offline State Handler
     const handleOffline = () => setData(prev => ({ ...prev, isOffline: !navigator.onLine }));
     window.addEventListener('online', handleOffline);
     window.addEventListener('offline', handleOffline);
 
-    // Cleanup ALL listeners
+    // Cleanup
     return () => {
-      unsubscribers.forEach(unsub => unsub());
+      clearInterval(interval);
       window.removeEventListener('online', handleOffline);
       window.removeEventListener('offline', handleOffline);
     };

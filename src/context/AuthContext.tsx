@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase';
-import { userService, UserProfile, UserRole } from '../services/userService';
+import { authService } from '../services/authService';
+import { UserProfile, UserRole } from '../services/userService';
 
 interface AuthContextType {
   user: any;
@@ -11,6 +10,7 @@ interface AuthContextType {
   setActiveRole: (role: UserRole) => void;
   refreshProfile: () => Promise<void>;
   logout: () => Promise<void>;
+  login: (login: string, pass: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,148 +20,75 @@ const ALL_ROLES: UserRole[] = [
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [fbUser, fbLoading] = useAuthState(auth);
-  
-  const [profile, setProfile] = useState<UserProfile | null>(() => {
-    const devStored = localStorage.getItem('rg_dev_user');
-    if (devStored) {
-      try {
-        const dev = JSON.parse(devStored);
-        return {
-          uid: dev.id,
-          email: dev.email,
-          displayName: dev.displayName,
-          photoURL: dev.photoURL || null,
-          roles: ALL_ROLES,
-          createdAt: new Date(),
-          isAdmin: true
-        };
-      } catch (e) { return null; }
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [activeRole, setActiveRoleState] = useState<UserRole | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const mapProfile = (dbUser: any): UserProfile => {
+    const SUPER_ADMIN_EMAIL = 'super@redgriffin.academy';
+    const isSuperAdmin = dbUser.email === SUPER_ADMIN_EMAIL;
+    
+    let finalRoles: UserRole[] = [];
+    if (isSuperAdmin) {
+      finalRoles = ALL_ROLES;
+    } else {
+      finalRoles = [dbUser.role || 'student'];
     }
-    return null;
-  });
 
-  const [activeRole, setActiveRoleState] = useState<UserRole | null>(() => {
-    const devStored = localStorage.getItem('rg_dev_user');
-    if (devStored) {
-      try {
-        const dev = JSON.parse(devStored);
-        return (localStorage.getItem(`rg_active_role_${dev.id}`) as UserRole) || 'admin';
-      } catch (e) { return null; }
-    }
-    return null;
-  });
+    return {
+      uid: dbUser.id,
+      email: dbUser.email,
+      displayName: dbUser.displayName,
+      photoURL: dbUser.photoURL,
+      roles: finalRoles,
+      createdAt: dbUser.createdAt,
+      isAdmin: isSuperAdmin || dbUser.role === 'admin'
+    };
+  };
 
-  const [profileLoading, setProfileLoading] = useState(true);
-
-  const fetchProfileFromBackend = async (uid: string) => {
+  const initAuth = async () => {
     try {
-      const response = await fetch('/api/me', {
-        headers: { 'Authorization': `Bearer ${uid}` }
-      });
-      
-      if (response.ok) {
-        const dbRes = await response.json();
-        const dbUser = dbRes.data;
-        
-        // Role Hierarchy and Super Admin Logic from the Matrix
-        const SUPER_ADMIN_EMAIL = 'redgriffinanimatestudio@gmail.com';
-        const isSuperAdmin = dbUser.email === SUPER_ADMIN_EMAIL;
-        const role = isSuperAdmin ? 'admin' : (dbUser.role || 'student');
-        
-        // Admins and Chief Managers get everything
-        const isAdmin = role === 'admin' || role === 'chief_manager' || isSuperAdmin;
-        
-        let finalRoles: UserRole[] = [];
-        if (isAdmin) {
-          finalRoles = ALL_ROLES;
-        } else {
-          // Add hierarchy roles
-          if (role === 'manager') finalRoles.push('manager', 'moderator');
-          else if (role === 'moderator') finalRoles.push('moderator');
-          
-          // Add independent roles from profile roles array
-          if (dbUser.roles && Array.isArray(dbUser.roles)) {
-            dbUser.roles.forEach((r: UserRole) => {
-              if (!finalRoles.includes(r)) finalRoles.push(r);
-            });
-          } else if (dbUser.role) {
-            if (!finalRoles.includes(dbUser.role)) finalRoles.push(dbUser.role);
-          }
-          
-          // Default role if none
-          if (finalRoles.length === 0) finalRoles.push('student');
-        }
-
-        const mappedProfile: UserProfile = {
-          uid: dbUser.remoteId || dbUser.id,
-          email: dbUser.email,
-          displayName: dbUser.displayName,
-          photoURL: dbUser.photoURL,
-          roles: finalRoles,
-          createdAt: dbUser.createdAt,
-          isAdmin: isAdmin
-        };
-
+      const user = await authService.getCurrentUser();
+      if (user) {
+        const mappedProfile = mapProfile(user);
         setProfile(mappedProfile);
         
         const savedRole = localStorage.getItem(`rg_active_role_${mappedProfile.uid}`) as UserRole;
-        setActiveRoleState(savedRole && finalRoles.includes(savedRole) ? savedRole : finalRoles[0]);
+        setActiveRoleState(savedRole && mappedProfile.roles.includes(savedRole) ? savedRole : mappedProfile.roles[0]);
       } else {
-        const firestoreProfile = await userService.getProfile(uid);
-        if (firestoreProfile) {
-          const isAdmin = firestoreProfile.roles?.includes('admin') || firestoreProfile.email === 'super@redgriffin.academy';
-          let finalRoles = isAdmin ? ALL_ROLES : (firestoreProfile.roles || ['student']);
-          
-          const mappedProfile: UserProfile = {
-            ...firestoreProfile,
-            roles: finalRoles as UserRole[],
-            isAdmin: isAdmin
-          };
-          
-          setProfile(mappedProfile);
-          const savedRole = localStorage.getItem(`rg_active_role_${mappedProfile.uid}`) as UserRole;
-          setActiveRoleState(savedRole && finalRoles.includes(savedRole) ? savedRole : finalRoles[0]);
-        }
+        setProfile(null);
+        setActiveRoleState(null);
       }
     } catch (err) {
       console.error("Auth initialization error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const initAuth = async () => {
-      if (localStorage.getItem('rg_dev_user')) {
-        setProfileLoading(false);
-        return;
-      }
-
-      if (!fbLoading) {
-        if (fbUser) {
-          await fetchProfileFromBackend(fbUser.uid);
-        } else {
-          setProfile(null);
-          setActiveRoleState(null);
-        }
-        setProfileLoading(false);
-      }
-    };
-
     initAuth();
-  }, [fbUser, fbLoading]);
+  }, []);
 
   const refreshProfile = async () => {
-    if (fbUser) await fetchProfileFromBackend(fbUser.uid);
+    await initAuth();
   };
 
   const logout = async () => {
-    const currentLang = window.location.pathname.split('/')[1] || 'eng';
-    const uid = profile?.uid;
-    localStorage.removeItem('rg_dev_user');
-    localStorage.removeItem('rg_auth_active');
-    if (uid) localStorage.removeItem(`rg_active_role_${uid}`);
-    await auth.signOut();
-    window.location.href = `/${currentLang}`;
+    await authService.logout();
+    setProfile(null);
+    setActiveRoleState(null);
+    window.location.href = '/';
+  };
+
+  const login = async (loginStr: string, pass: string) => {
+    setLoading(true);
+    try {
+      await authService.login(loginStr, pass);
+      await initAuth();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const setActiveRole = (role: UserRole) => {
@@ -173,13 +100,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider value={{ 
-      user: fbUser, 
+      user: profile, // using profile as the user object for simplicity
       profile, 
-      loading: profileLoading, 
+      loading, 
       activeRole, 
       setActiveRole,
       refreshProfile,
-      logout
+      logout,
+      login
     }}>
       {children}
     </AuthContext.Provider>

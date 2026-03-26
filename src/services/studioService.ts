@@ -77,6 +77,19 @@ export const studioService = {
     return response.json();
   },
 
+  async updateProjectStatus(projectId: string, status: string): Promise<void> {
+    const token = localStorage.getItem('rg_token');
+    const response = await fetch(`${API_BASE}/projects/${projectId}/status`, {
+      method: 'PATCH',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ status }),
+    });
+    if (!response.ok) throw new Error('Failed to update project status');
+  },
+
   // --- Contracts Module ---
   async getContracts(userId: string, role: 'client' | 'executor'): Promise<Contract[]> {
     const response = await fetch(`${API_BASE}/contracts?userId=${userId}&role=${role}`);

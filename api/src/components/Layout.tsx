@@ -33,7 +33,7 @@ import {
   LifeBuoy,
   DollarSign
 } from 'lucide-react';
-import { auth } from '../firebase';
+
 import { useAuth } from '../context/AuthContext';
 import { notificationService, Notification } from '../services/notificationService';
 import { useAlert } from './Alert';

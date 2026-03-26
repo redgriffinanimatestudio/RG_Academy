@@ -9,8 +9,7 @@ import {
   Clock
 } from 'lucide-react';
 import { usePlatform } from '../../context/PlatformContext';
-import { db } from '../../firebase';
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { studioService } from '../../services/studioService';
 
 const COLUMNS = [
   { id: 'open', title: 'To Do', color: 'text-white/40' },
@@ -20,16 +19,17 @@ const COLUMNS = [
 ];
 
 export default function KanbanBoard() {
-  const { data } = usePlatform();
+  const { data, setData } = usePlatform();
   const projects = data.projects || [];
 
   const updateProjectStatus = async (projectId: string, newStatus: string) => {
     try {
-      const projectRef = doc(db, 'projects', projectId);
-      await updateDoc(projectRef, { 
-        status: newStatus,
-        updatedAt: serverTimestamp()
-      });
+      await studioService.updateProjectStatus(projectId, newStatus);
+      // Optimistic update
+      setData(prev => ({
+        ...prev,
+        projects: prev.projects.map(p => p.id === projectId ? { ...p, status: newStatus } : p)
+      }));
     } catch (error) {
       console.error("Failed to update status:", error);
     }

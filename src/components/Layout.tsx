@@ -5,6 +5,7 @@ import {
   GraduationCap, Briefcase, Users, Bell, MessageSquare, LayoutDashboard, Shield, Box, Video, UserPlus, Cpu, Zap, Target, LifeBuoy, DollarSign, Settings
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { usePlatform } from '../context/PlatformContext';
 import { notificationService, Notification } from '../services/notificationService';
 import { useTranslation } from 'react-i18next';
 
@@ -55,19 +56,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
 
+  const { data: platformData } = usePlatform();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({ academy: true, dashboards: true });
 
   const [showBanner, setShowBanner] = useState(true);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-
-  useEffect(() => {
-    if (profile) {
-      const unsubscribe = notificationService.subscribeToNotifications(profile.uid, setNotifications);
-      return () => unsubscribe();
-    }
-  }, [profile]);
+  const notifications = platformData.notifications || [];
 
   const unreadCount = notifications.filter(n => !n.read).length;
   const path = location.pathname.toLowerCase();
