@@ -1,33 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GraduationCap, Search, Filter, PlayCircle, Star, Users, ChevronRight, Video, Plus, BarChart3, TrendingUp, BookOpen, Clock } from 'lucide-react';
+import { GraduationCap, Search, Filter, PlayCircle, Star, Users, ChevronRight, Video, Plus, BarChart3, TrendingUp, BookOpen, Clock, ShieldCheck, DollarSign } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useParams } from 'react-router-dom';
 import { academyService, Course } from '../services/academyService';
 import Preloader from '../components/Preloader';
 import { useAuth } from '../context/AuthContext';
+import { useSynergyData } from '../hooks/useSynergyData';
 
-const HERO_SLIDES = [
-  {
-    title: 'Elevate your',
-    accent: 'Digital Art',
-    desc: 'Join 42k+ artists mastering character design, environment art, and VFX.',
-    image: 'https://picsum.photos/seed/aca-hero1/1920/1080',
-    tag: 'Trending'
-  },
-  {
-    title: 'Master real-time',
-    accent: 'Rendering',
-    desc: 'Unlock the full potential of Unreal Engine 5.4 with our expert-led workshops.',
-    image: 'https://picsum.photos/seed/aca-hero2/1920/1080',
-    tag: 'New Workshop'
-  }
-];
+// --- SUB-COMPONENTS ---
+const SynergySection = ({ data, loading, activeRole }: any) => {
+  if (loading) return <div className="h-48 bg-white/5 animate-pulse rounded-[2.5rem]" />;
+  if (!data) return null;
+
+  const Icon = activeRole === 'lecturer' ? Video : (activeRole === 'student' ? BookOpen : ShieldCheck);
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="p-1 border border-primary/20 bg-primary/5 rounded-2xl sm:rounded-[2.5rem] backdrop-blur-xl mb-12 overflow-hidden relative group"
+    >
+      <div className="p-6 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="flex items-center gap-6">
+          <div className="size-16 sm:size-20 rounded-2xl bg-primary/20 flex items-center justify-center text-primary border border-primary/20 shadow-lg shadow-primary/10 shrink-0">
+            <Icon size={32} />
+          </div>
+          <div>
+            <div className="flex items-center gap-3">
+              <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white italic">
+                {activeRole === 'lecturer' ? 'Lecturer' : (activeRole === 'student' ? 'Learning' : 'Member')} <span className="text-primary">Hub</span>
+              </h3>
+              <span className="px-2 py-0.5 bg-primary text-bg-dark text-[8px] font-black uppercase tracking-widest rounded shadow-lg shadow-primary/20">Synergy Active</span>
+            </div>
+            <p className="text-[10px] sm:text-[11px] text-white/40 font-bold uppercase tracking-widest mt-1">
+              {data.primary?.course?.title || data.primary?.title || 'Manage your activities and growth'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-8 sm:gap-12 w-full md:w-auto px-4 md:px-0">
+          <div className="text-center md:text-left">
+            <p className="text-[10px] font-black uppercase tracking-widest text-white/20 mb-1">{data.label}</p>
+            <p className="text-2xl font-black text-white italic">{data.count}</p>
+          </div>
+          <div className="text-center md:text-left">
+            <p className="text-[10px] font-black uppercase tracking-widest text-white/20 mb-1">{data.extraLabel}</p>
+            <p className="text-2xl font-black text-white italic">{data.extra}</p>
+          </div>
+          {data.revenue !== undefined && (
+            <div className="text-center md:text-left">
+              <p className="text-[10px] font-black uppercase tracking-widest text-primary/40 mb-1">Revenue</p>
+              <p className="text-2xl font-black text-primary italic">${data.revenue}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 export default function Academy() {
   const { t } = useTranslation();
   const { lang } = useParams();
-  const { profile } = useAuth();
+  const { profile, activeRole } = useAuth();
+  const { data: synergyData, loading: synergyLoading } = useSynergyData();
+  
   const [courses, setCourses] = useState<Course[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,16 +74,10 @@ export default function Academy() {
   const [showFilters, setShowFilters] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const userRoles = profile?.roles || [];
-  const isLecturer = userRoles.includes('lecturer') || userRoles.includes('admin');
-  const isStudent = userRoles.includes('student');
-  const hasSynergySL = isLecturer && isStudent;
-  
-  // Advanced Filter States
+  // Filter States
   const [filters, setFilters] = useState({
     level: 'all',
-    priceRange: [0, 200],
-    duration: 'all',
+    priceRange: [0, 1000],
     sortBy: 'popular'
   });
 
@@ -90,38 +122,38 @@ export default function Academy() {
   }
 
   return (
-    <div className="space-y-16 py-8">
+    <div className="space-y-12 sm:space-y-16 py-4 sm:py-8">
       {/* 1. Lecturer Synergy Block (Bible: le/sl) */}
       {isLecturer && (
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-1 border border-indigo-500/20 bg-indigo-500/5 rounded-[2.5rem] backdrop-blur-xl mb-12 overflow-hidden"
+          className="p-1 border border-indigo-500/20 bg-indigo-500/5 rounded-2xl sm:rounded-[2.5rem] backdrop-blur-xl mb-8 sm:mb-12 overflow-hidden"
         >
-          <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="flex items-center gap-6">
-              <div className="size-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 border border-indigo-500/20 shadow-lg shadow-indigo-500/10">
-                <Video size={32} />
+          <div className="p-4 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className="size-12 sm:size-16 rounded-xl sm:rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 border border-indigo-500/20 shadow-lg shadow-indigo-500/10 shrink-0">
+                <Video size={24} className="sm:w-8 sm:h-8" />
               </div>
-              <div>
-                <div className="flex items-center gap-3">
-                  <h3 className="text-xl font-black uppercase tracking-tight text-white">Creator Hub</h3>
-                  {hasSynergySL && <span className="px-2 py-0.5 bg-indigo-500 text-white text-[8px] font-black uppercase tracking-widest rounded shadow-lg shadow-indigo-500/20">Synergy Active</span>}
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <h3 className="text-sm sm:text-xl font-black uppercase tracking-tight text-white truncate">Creator Hub</h3>
+                  {hasSynergySL && <span className="px-2 py-0.5 bg-indigo-500 text-white text-[7px] sm:text-[8px] font-black uppercase tracking-widest rounded shadow-lg shadow-indigo-500/20">Synergy Active</span>}
                 </div>
-                <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1">
+                <p className="text-[9px] sm:text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1 truncate">
                   {hasSynergySL ? 'Видит студентов — и сам является студентом' : 'Manage your workshops, students and revenue stream'}
                 </p>
               </div>
             </div>
             
-            <div className="flex flex-wrap justify-center gap-4">
-              <button className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white">
-                <Plus size={14} /> New Workshop
+            <div className="flex flex-wrap justify-center md:justify-end gap-3 sm:gap-4 w-full md:w-auto">
+              <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white">
+                <Plus size={14} /> <span className="sm:inline">New Workshop</span>
               </button>
-              <button className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white">
-                <BarChart3 size={14} /> Analytics
+              <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white">
+                <BarChart3 size={14} /> <span className="sm:inline">Analytics</span>
               </button>
-              <button className="flex items-center gap-2 px-6 py-3 bg-indigo-500 text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-indigo-500/20">
+              <button className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-indigo-500 text-bg-dark rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-indigo-500/20">
                 My Creations
               </button>
             </div>
@@ -131,33 +163,33 @@ export default function Academy() {
 
       {/* 2. Student Progress Synergy Block */}
       {isStudent && (
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 p-10 rounded-[3rem] bg-[#0a0a0a] border border-white/5 space-y-8 relative overflow-hidden group">
-            <div className="flex items-center justify-between relative z-10">
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="lg:col-span-2 p-6 sm:p-10 rounded-2xl sm:rounded-[3rem] bg-[#0a0a0a] border border-white/5 space-y-6 sm:space-y-8 relative overflow-hidden group">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between relative z-10 gap-4">
               <div>
-                <h3 className="text-xl font-black uppercase tracking-tight text-white italic">Keep Learning.</h3>
-                <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest mt-1">Your last active workshop session</p>
+                <h3 className="text-lg sm:text-xl font-black uppercase tracking-tight text-white italic">Keep Learning.</h3>
+                <p className="text-[9px] sm:text-[10px] text-white/20 font-bold uppercase tracking-widest mt-1">Your last active workshop session</p>
               </div>
-              <div className="flex items-center gap-2 text-primary font-black text-2xl tracking-tighter">
-                84<span className="text-[10px] uppercase text-white/20 ml-1 mt-2 tracking-widest">% done</span>
+              <div className="flex items-center gap-2 text-primary font-black text-xl sm:text-2xl tracking-tighter">
+                84<span className="text-[9px] sm:text-[10px] uppercase text-white/20 ml-1 mt-1 sm:mt-2 tracking-widest">% done</span>
               </div>
             </div>
             
             <div className="space-y-4 relative z-10">
-              <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
-                <div className="size-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/10"><BookOpen size={24} /></div>
-                <div className="flex-1">
-                  <div className="text-xs font-black text-white uppercase tracking-tight">UE5.4: Advanced Niagara Dynamics</div>
-                  <div className="text-[9px] text-white/40 uppercase font-bold mt-1">Lesson 14: Fluid Particle Manipulation</div>
+              <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/5">
+                <div className="size-12 sm:size-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/10 shrink-0"><BookOpen size={20} className="sm:w-6 sm:h-6" /></div>
+                <div className="flex-1 text-center sm:text-left min-w-0">
+                  <div className="text-[11px] sm:text-xs font-black text-white uppercase tracking-tight truncate">UE5.4: Advanced Niagara Dynamics</div>
+                  <div className="text-[8px] sm:text-[9px] text-white/40 uppercase font-bold mt-1 truncate">Lesson 14: Fluid Particle Manipulation</div>
                 </div>
-                <button className="px-6 py-2.5 bg-primary text-bg-dark rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all">Resume</button>
+                <button className="w-full sm:w-auto px-6 py-2.5 bg-primary text-bg-dark rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all">Resume</button>
               </div>
             </div>
             <div className="absolute -bottom-20 -right-20 size-64 bg-primary/5 blur-[100px] rounded-full group-hover:bg-primary/10 transition-colors" />
           </div>
 
-          <div className="p-10 rounded-[3rem] bg-white/[0.02] border border-white/5 space-y-6">
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-white/20">Learning Stats</h4>
+          <div className="p-6 sm:p-10 rounded-2xl sm:rounded-[3rem] bg-white/[0.02] border border-white/5 space-y-6">
+            <h4 className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-white/20">Learning Stats</h4>
             <div className="space-y-4">
               {[
                 { l: 'Workshops', v: '12', i: GraduationCap },
@@ -165,8 +197,8 @@ export default function Academy() {
                 { l: 'Certificates', v: '4', i: TrendingUp }
               ].map((stat, i) => (
                 <div key={i} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-white/40"><stat.i size={14} /><span className="text-[9px] font-black uppercase tracking-widest">{stat.l}</span></div>
-                  <span className="text-xs font-black text-white uppercase">{stat.v}</span>
+                  <div className="flex items-center gap-3 text-white/40"><stat.i size={14} /><span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest">{stat.l}</span></div>
+                  <span className="text-[11px] sm:text-xs font-black text-white uppercase">{stat.v}</span>
                 </div>
               ))}
             </div>
@@ -175,7 +207,7 @@ export default function Academy() {
       )}
 
       {/* Academy Premium Hero Slider */}
-      <section className="relative h-[450px] rounded-[3rem] overflow-hidden group shadow-2xl shadow-primary/5 border border-white/5">
+      <section className="relative h-[350px] sm:h-[450px] rounded-2xl sm:rounded-[3rem] overflow-hidden group shadow-2xl shadow-primary/5 border border-white/5">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -190,14 +222,14 @@ export default function Academy() {
           </motion.div>
         </AnimatePresence>
 
-        <div className="absolute inset-0 p-12 flex flex-col justify-end space-y-6">
-          <div className="max-w-2xl space-y-4">
+        <div className="absolute inset-0 p-6 sm:p-12 flex flex-col justify-end space-y-4 sm:space-y-6">
+          <div className="max-w-2xl space-y-3 sm:space-y-4">
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-3"
             >
-              <span className="px-2 py-0.5 bg-primary text-bg-dark text-[8px] font-black uppercase tracking-widest rounded">
+              <span className="px-2 py-0.5 bg-primary text-bg-dark text-[7px] sm:text-[8px] font-black uppercase tracking-widest rounded">
                 {HERO_SLIDES[currentSlide].tag}
               </span>
               <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Specialist Workshop</span>

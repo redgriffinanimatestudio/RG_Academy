@@ -7,7 +7,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   activeRole: UserRole | null;
-  setActiveRole: (role: UserRole) => void;
+  setActiveRole: (role: UserRole) => Promise<void>;
   refreshProfile: () => Promise<void>;
   logout: () => Promise<void>;
   login: (login: string, pass: string) => Promise<void>;
@@ -15,34 +15,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const ALL_ROLES: UserRole[] = [
-  'admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client'
-];
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeRole, setActiveRoleState] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
 
   const mapProfile = (dbUser: any): UserProfile => {
-    const SUPER_ADMIN_EMAIL = 'super@redgriffin.academy';
-    const isSuperAdmin = dbUser.email === SUPER_ADMIN_EMAIL;
-    
-    let finalRoles: UserRole[] = [];
-    if (isSuperAdmin) {
-      finalRoles = ALL_ROLES;
-    } else {
-      finalRoles = [dbUser.role || 'student'];
-    }
-
+    // dbUser now comes with roles as array from backend (after parsing JSON)
     return {
+      id: dbUser.id,
       uid: dbUser.id,
       email: dbUser.email,
       displayName: dbUser.displayName,
       photoURL: dbUser.photoURL,
-      roles: finalRoles,
-      createdAt: dbUser.createdAt,
-      isAdmin: isSuperAdmin || dbUser.role === 'admin'
+      role: dbUser.role, // Current active role in DB
+      primaryRole: dbUser.primaryRole,
+      roles: dbUser.roles || ['student'],
+      isAdmin: dbUser.isAdmin,
+      isStudent: dbUser.isStudent,
+      isLecturer: dbUser.isLecturer,
+      isClient: dbUser.isClient,
+      isExecutor: dbUser.isExecutor,
+      createdAt: dbUser.createdAt
     };
   };
 
@@ -52,9 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (user) {
         const mappedProfile = mapProfile(user);
         setProfile(mappedProfile);
-        
-        const savedRole = localStorage.getItem(`rg_active_role_${mappedProfile.uid}`) as UserRole;
-        setActiveRoleState(savedRole && mappedProfile.roles.includes(savedRole) ? savedRole : mappedProfile.roles[0]);
+        setActiveRoleState(mappedProfile.role as UserRole);
       } else {
         setProfile(null);
         setActiveRoleState(null);
@@ -91,10 +83,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const setActiveRole = (role: UserRole) => {
-    if (profile?.roles.includes(role)) {
-      setActiveRoleState(role);
-      localStorage.setItem(`rg_active_role_${profile.uid}`, role);
+  const setActiveRole = async (role: UserRole) => {
+    if (!profile || activeRole === role) return;
+    
+    try {
+      console.log(`[AUTH] Requesting role switch to: ${role}`);
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/switch-role', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ role })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          console.log(`[AUTH] Role switched successfully to: ${role}`);
+          setActiveRoleState(role);
+          // Глубокое обновление профиля для синхронизации всех флагов
+          setProfile(prev => prev ? { ...prev, role } : null);
+        } else {
+          console.error(`[AUTH] Server rejected role switch: ${result.error}`);
+        }
+      } else {
+        const errorData = await response.json();
+        console.error(`[AUTH] Failed to switch role: ${response.status}`, errorData);
+      }
+    } catch (err) {
+      console.error("[AUTH] Critical error during role switch:", err);
     }
   };
 

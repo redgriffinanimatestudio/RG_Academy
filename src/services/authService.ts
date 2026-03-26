@@ -24,7 +24,7 @@ export const authService = {
     const { data } = await response.json();
     
     // Сохраняем токен и данные
-    localStorage.setItem('rg_token', data.token);
+    localStorage.setItem('auth_token', data.token);
     localStorage.setItem('rg_user', JSON.stringify(data.user));
     localStorage.setItem('rg_auth_active', 'true');
     
@@ -32,7 +32,7 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
-    localStorage.removeItem('rg_token');
+    localStorage.removeItem('auth_token');
     localStorage.removeItem('rg_user');
     localStorage.removeItem('rg_auth_active');
     localStorage.removeItem('rg_dev_user');
@@ -63,6 +63,6 @@ export const authService = {
   },
 
   getToken(): string | null {
-    return localStorage.getItem('rg_token');
+    return localStorage.getItem('auth_token');
   }
 };

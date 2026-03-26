@@ -10,10 +10,6 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Messages from './pages/Messages';
 import Dashboard from './pages/Dashboard/DashboardController';
-import AdminDashboard from './pages/AdminDashboard';
-import ChiefManagerDashboard from './pages/ChiefManagerDashboard';
-import ManagerDashboard from './pages/ManagerDashboard';
-import StaffDashboard from './pages/StaffDashboard';
 import TopicPage from './pages/TopicPage';
 import ServicePage from './pages/ServicePage';
 import CommunityTopic from './pages/CommunityTopic';
@@ -72,17 +68,15 @@ export default function App() {
             <Route path="/:lang/dev" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
             <Route path="/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
             
-            {/* Specific Dashboards */}
-            <Route path="/:lang/admin" element={<LanguageWrapper><Layout><AdminDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/:lang/chief-manager" element={<LanguageWrapper><Layout><ChiefManagerDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/:lang/manager" element={<LanguageWrapper><Layout><ManagerDashboard /></Layout></LanguageWrapper>} />
-            
-            {/* Staff Routes */}
-            <Route path="/:lang/staff" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/:lang/moderator" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/:lang/hr" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/:lang/finance" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/:lang/support" element={<LanguageWrapper><Layout><StaffDashboard /></Layout></LanguageWrapper>} />
+            {/* Redirect legacy specific routes to unified dashboard */}
+            <Route path="/:lang/admin" element={<Navigate to="/:lang/dashboard" replace />} />
+            <Route path="/:lang/chief-manager" element={<Navigate to="/:lang/dashboard" replace />} />
+            <Route path="/:lang/manager" element={<Navigate to="/:lang/dashboard" replace />} />
+            <Route path="/:lang/staff" element={<Navigate to="/:lang/dashboard" replace />} />
+            <Route path="/:lang/moderator" element={<Navigate to="/:lang/dashboard" replace />} />
+            <Route path="/:lang/hr" element={<Navigate to="/:lang/dashboard" replace />} />
+            <Route path="/:lang/finance" element={<Navigate to="/:lang/dashboard" replace />} />
+            <Route path="/:lang/support" element={<Navigate to="/:lang/dashboard" replace />} />
 
             {/* Academy Routes */}
             <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />

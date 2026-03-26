@@ -563,7 +563,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </AnimatePresence>
       </nav>
 
-      <main className="mx-auto max-w-[1600px] px-4 py-12 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-[1920px] px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row gap-8">
           {(isAcademy || isStudio || isCommunity || isDashboardPage) && (
             <div className="hidden md:block relative shrink-0 overflow-visible">

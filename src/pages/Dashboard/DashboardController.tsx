@@ -18,17 +18,27 @@ export default function DashboardController() {
   const [userData, setUserData] = useState<any>(null);
 
   useEffect(() => {
-    if (profile) {
-      dashboardService.getUserData(profile.uid).then(setUserData);
-      
-      // Polling for updates every 10 seconds
-      const interval = setInterval(() => {
-        dashboardService.getUserData(profile.uid).then(setUserData);
-      }, 10000);
-      
-      return () => clearInterval(interval);
-    }
-  }, [profile]);
+    if (!profile) return;
+
+    const fetchData = async () => {
+      try {
+        if (activeRole === 'admin') {
+          const stats = await dashboardService.getSystemStats();
+          setUserData({ stats });
+        } else {
+          const data = await dashboardService.getUserData(profile.id);
+          setUserData(data);
+        }
+      } catch (err) {
+        console.error("Dashboard fetch error:", err);
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 30000); // 30s instead of 10s for better performance
+    
+    return () => clearInterval(interval);
+  }, [profile, activeRole]);
 
   const DashboardView = useMemo(() => {
     if (!profile || !activeRole) return null;
@@ -53,7 +63,7 @@ export default function DashboardController() {
   return (
     <div className="min-h-screen bg-transparent transition-all duration-300">
       {/* Dynamic Content Wrapper: fluid padding and scaling */}
-      <div className="mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8 xl:px-10 py-4 sm:py-8 lg:py-12">
+      <div className="mx-auto w-full max-w-[1920px] px-4 sm:px-6 lg:px-8 xl:px-10 py-4 sm:py-8 lg:py-12">
         
         {/* Identity Switcher - Horizontal Scroll on Mobile */}
         <div className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-10 overflow-x-auto no-scrollbar pb-2 sm:pb-0">

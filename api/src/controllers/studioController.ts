@@ -3,8 +3,60 @@ import prisma from '../utils/prisma';
 import { success, error, paginate } from '../utils/response';
 import { AuthRequest } from '../middleware/auth';
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Project:
+ *       type: object
+ *       properties:
+ *         id: { type: string }
+ *         slug: { type: string }
+ *         title: { type: string }
+ *         description: { type: string }
+ *         clientId: { type: string }
+ *         executorId: { type: string }
+ *         budget: { type: number }
+ *         status: { type: string }
+ *         urgency: { type: string }
+ *         tags: { type: array, items: { type: string } }
+ *     Application:
+ *       type: object
+ *       properties:
+ *         id: { type: string }
+ *         projectId: { type: string }
+ *         executorId: { type: string }
+ *         coverLetter: { type: string }
+ *         bid: { type: number }
+ *         status: { type: string }
+ *     Contract:
+ *       type: object
+ *       properties:
+ *         id: { type: string }
+ *         projectId: { type: string }
+ *         amount: { type: number }
+ *         status: { type: string }
+ *         milestones: { type: array, items: { type: object } }
+ */
+
 export const studioController = {
-  // --- PROJECTS ---
+  /**
+   * @swagger
+   * /api/v1/projects:
+   *   get:
+   *     summary: List all studio projects
+   *     tags: [Studio]
+   *     parameters:
+   *       - in: query
+   *         name: status
+   *         schema: { type: string }
+   *       - in: query
+   *         name: urgency
+   *         schema: { type: string }
+   *     responses:
+   *       200:
+   *         description: Paginated list of projects
+   */
   async getProjects(req: Request, res: Response) {
     try {
       const { status, urgency, page = '1', limit = '10', search } = req.query;
@@ -37,15 +89,31 @@ export const studioController = {
         prisma.project.count({ where })
       ]);
 
-      return paginate(res, projects.map(p => ({
-        ...p,
-        tags: JSON.parse(p.tags || '[]')
-      })), total, pageNum, limitNum);
+      return paginate(res, projects.map(p => {
+        let tags = [];
+        try { tags = JSON.parse(p.tags || '[]'); } catch(e) {}
+        return { ...p, tags };
+      }), total, pageNum, limitNum);
     } catch (e) {
-      return error(res, 'Failed to fetch projects');
+      return error(res, 'Database error while fetching projects');
     }
   },
 
+  /**
+   * @swagger
+   * /api/v1/projects/{slug}:
+   *   get:
+   *     summary: Get project details by slug
+   *     tags: [Studio]
+   *     parameters:
+   *       - in: path
+   *         name: slug
+   *         required: true
+   *         schema: { type: string }
+   *     responses:
+   *       200:
+   *         description: Project with applications and tasks
+   */
   async getProjectBySlug(req: Request, res: Response) {
     try {
       const { slug } = req.params;
@@ -65,9 +133,12 @@ export const studioController = {
 
       if (!project) return error(res, 'Project not found', 404);
 
-      return success(res, { ...project, tags: JSON.parse(project.tags || '[]') });
+      let tags = [];
+      try { tags = JSON.parse(project.tags || '[]'); } catch(e) {}
+
+      return success(res, { ...project, tags });
     } catch (e) {
-      return error(res, 'Failed to fetch project');
+      return error(res, 'Database error while fetching project');
     }
   },
 
@@ -407,6 +478,73 @@ export const studioController = {
       return success(res, task);
     } catch (e) {
       return error(res, 'Failed to update task');
+    }
+  },
+
+  async releaseMilestone(req: AuthRequest, res: Response) {
+    try {
+      const { contractId, index } = req.params;
+      const clientId = req.user!.id;
+
+      const contract = await prisma.contract.findUnique({
+        where: { id: contractId },
+        include: { project: true }
+      });
+
+      if (!contract || (contract.clientId !== clientId && !req.user!.roles?.includes('admin'))) {
+        return error(res, 'Contract not found or access denied', 403);
+      }
+
+      const milestones = JSON.parse(contract.milestones || '[]');
+      const idx = parseInt(index);
+
+      if (!milestones[idx]) return error(res, 'Milestone not found', 404);
+      if (milestones[idx].status === 'released') return error(res, 'Milestone already released', 400);
+
+      milestones[idx].status = 'released';
+      
+      await prisma.transaction.create({
+        data: {
+          userId: contract.executorId,
+          amount: milestones[idx].amount,
+          type: 'payment',
+          status: 'completed',
+          refId: contract.id,
+          description: `Milestone release: ${milestones[idx].title} for project ${contract.project.title}`
+        }
+      });
+
+      const isLastMilestone = milestones.every((m: any) => m.status === 'released');
+      
+      const updatedContract = await prisma.contract.update({
+        where: { id: contractId },
+        data: { 
+          milestones: JSON.stringify(milestones),
+          status: isLastMilestone ? 'completed' : 'active'
+        }
+      });
+
+      if (isLastMilestone) {
+        await prisma.project.update({
+          where: { id: contract.projectId },
+          data: { status: 'completed' }
+        });
+
+        await prisma.achievement.create({
+          data: {
+            userId: contract.executorId,
+            type: 'project_done',
+            title: 'Project Master',
+            description: `Successfully completed project: ${contract.project.title}`,
+            icon: 'award'
+          }
+        });
+      }
+
+      return success(res, { ...updatedContract, milestones });
+    } catch (e) {
+      console.error('[STUDIO] Release milestone error:', e);
+      return error(res, 'Failed to release milestone');
     }
   }
 };

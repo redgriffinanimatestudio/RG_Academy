@@ -61,33 +61,33 @@ export default function Navbar({
 
   return (
     <nav className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-colors duration-500 ${navClass}`}>
-      <div className="mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 lg:h-20 items-center justify-between gap-4 lg:gap-8">
-          <div className="flex items-center gap-3 sm:gap-6">
-            <button onClick={onOpenMobileMenu} className={`lg:hidden p-2 bg-white/5 rounded-lg transition-colors ${modeColor}`}>
+      <div className="mx-auto px-2 sm:px-6 lg:px-8">
+        <div className="flex h-14 sm:h-16 lg:h-20 items-center justify-between gap-2 sm:gap-4 lg:gap-8">
+          <div className="flex items-center gap-2 sm:gap-6">
+            <button onClick={onOpenMobileMenu} className={`lg:hidden p-1.5 sm:p-2 bg-white/5 rounded-lg transition-colors ${modeColor}`}>
               <Menu size={20} />
             </button>
-            <Link to={`${modePrefix}/${currentLangCode}`} className="flex items-center gap-3 group">
-              <img src="/logo-web.png" alt="RG" className="h-7 sm:h-8 lg:h-10 w-auto object-contain" />
-              <div className="flex flex-col hidden sm:flex lg:hidden xl:flex">
-                <span className="text-xs lg:text-base font-black tracking-tighter text-white uppercase">Red Griffin</span>
-                <span className={`text-[6px] lg:text-[8px] font-bold tracking-[0.3em] ${modeColor} uppercase mt-1`}>{t('creative_ecosystem')}</span> 
+            <Link to={`${modePrefix}/${currentLangCode}`} className="flex items-center gap-2 sm:gap-3 group shrink-0">
+              <img src="/logo-web.png" alt="RG" className="h-6 sm:h-8 lg:h-10 w-auto object-contain" />
+              <div className="flex flex-col hidden xs:flex lg:hidden xl:flex">
+                <span className="text-[10px] sm:text-xs lg:text-base font-black tracking-tighter text-white uppercase leading-none">Red Griffin</span>
+                <span className={`text-[5px] sm:text-[6px] lg:text-[8px] font-bold tracking-[0.3em] ${modeColor} uppercase mt-0.5 sm:mt-1`}>{t('creative_ecosystem')}</span> 
               </div>
             </Link>
           </div>
 
-          {/* Desktop Links */}
-          <div className="hidden lg:flex items-center gap-6 h-full">
-            <Link to={`/aca/${currentLangCode}`} className={`text-[10px] lg:text-[11px] font-black uppercase tracking-widest ${isAcademy ? 'text-primary' : 'text-white/60'}`}>{t('academy')}</Link>
-            <Link to={`/studio/${currentLangCode}`} className={`text-[10px] lg:text-[11px] font-black uppercase tracking-widest ${isStudio ? 'text-primary-hover' : 'text-white/60'}`}>{t('studio')}</Link>
-            <Link to={`${modePrefix}/${currentLangCode}/community`} className={`text-[10px] lg:text-[11px] font-black uppercase tracking-widest ${isCommunity ? 'text-primary' : 'text-white/60'}`}>{t('community')}</Link>
+          {/* Desktop Links - Adjusted for tablets */}
+          <div className="hidden md:flex lg:flex items-center gap-4 lg:gap-6 h-full">
+            <Link to={`/aca/${currentLangCode}`} className={`text-[9px] lg:text-[11px] font-black uppercase tracking-widest transition-colors ${isAcademy ? 'text-primary' : 'text-white/60 hover:text-white'}`}>{t('academy')}</Link>
+            <Link to={`/studio/${currentLangCode}`} className={`text-[9px] lg:text-[11px] font-black uppercase tracking-widest transition-colors ${isStudio ? 'text-primary-hover' : 'text-white/60 hover:text-white'}`}>{t('studio')}</Link>
+            <Link to={`${modePrefix}/${currentLangCode}/community`} className={`text-[9px] lg:text-[11px] font-black uppercase tracking-widest transition-colors ${isCommunity ? 'text-primary' : 'text-white/60 hover:text-white'}`}>{t('community')}</Link>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-3">
-            {/* Language Switcher */}
-            <div className="relative hidden xs:block">
-              <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)} className={`p-2 transition-colors flex items-center gap-2 font-black text-[10px] uppercase ${modeColor}`}>
-                <Globe size={18} /><span className="hidden sm:inline">{currentLang.code}</span>
+          <div className="flex items-center gap-1 sm:gap-3">
+            {/* Language Switcher - Smaller on mobile */}
+            <div className="relative hidden sm:block">
+              <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)} className={`p-2 transition-colors flex items-center gap-2 font-black text-[9px] sm:text-[10px] uppercase ${modeColor}`}>
+                <Globe size={16} sm:size={18} /><span className="hidden md:inline">{currentLang.code}</span>
               </button>
               <AnimatePresence>
                 {isLangMenuOpen && (

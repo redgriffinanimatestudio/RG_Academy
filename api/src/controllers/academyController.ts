@@ -3,24 +3,85 @@ import prisma from '../utils/prisma';
 import { success, error, paginate } from '../utils/response';
 import { AuthRequest } from '../middleware/auth';
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Category:
+ *       type: object
+ *       properties:
+ *         id: { type: string }
+ *         name: { type: string }
+ *         type: { type: string }
+ *         order: { type: integer }
+ *         subcategories: { type: array, items: { type: object } }
+ *     Course:
+ *       type: object
+ *       properties:
+ *         id: { type: string }
+ *         slug: { type: string }
+ *         title: { type: string }
+ *         description: { type: string }
+ *         price: { type: number }
+ *         level: { type: string }
+ *         status: { type: string }
+ *         tags: { type: array, items: { type: string } }
+ *         studentsCount: { type: integer }
+ *         reviewsCount: { type: integer }
+ */
+
 export const academyController = {
-  // --- CATEGORIES ---
+  /**
+   * @swagger
+   * /api/categories:
+   *   get:
+   *     summary: Get all academy categories
+   *     tags: [Academy]
+   *     responses:
+   *       200:
+   *         description: List of categories
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items: { $ref: '#/components/schemas/Category' }
+   */
   async getCategories(req: Request, res: Response) {
     try {
       const categories = await prisma.category.findMany({
         orderBy: { order: 'asc' },
         include: { _count: { select: { courses: true } } }
       });
-      return success(res, categories.map(c => ({
-        ...c,
-        subcategories: JSON.parse(c.subcategories || '[]')
-      })));
+      return success(res, categories.map(c => {
+        let subcategories = [];
+        try { subcategories = JSON.parse(c.subcategories || '[]'); } catch(e) {}
+        return { ...c, subcategories };
+      }));
     } catch (e) {
-      return error(res, 'Failed to fetch categories');
+      return error(res, 'Database error while fetching categories');
     }
   },
 
-  // --- COURSES ---
+  /**
+   * @swagger
+   * /api/courses:
+   *   get:
+   *     summary: Get all courses with filters
+   *     tags: [Academy]
+   *     parameters:
+   *       - in: query
+   *         name: category
+   *         schema: { type: string }
+   *       - in: query
+   *         name: level
+   *         schema: { type: string }
+   *       - in: query
+   *         name: status
+   *         schema: { type: string, default: 'published' }
+   *     responses:
+   *       200:
+   *         description: Paginated list of courses
+   */
   async getCourses(req: Request, res: Response) {
     try {
       const { category, level, status = 'published', page = '1', limit = '12', search } = req.query;
@@ -50,17 +111,38 @@ export const academyController = {
         prisma.course.count({ where })
       ]);
 
-      return paginate(res, courses.map(c => ({
-        ...c,
-        tags: JSON.parse(c.tags || '[]'),
-        studentsCount: c._count.enrollments,
-        reviewsCount: c._count.reviews
-      })), total, pageNum, limitNum);
+      return paginate(res, courses.map(c => {
+        let tags = [];
+        try { tags = JSON.parse(c.tags || '[]'); } catch(e) {}
+        return {
+          ...c,
+          tags,
+          studentsCount: c._count.enrollments,
+          reviewsCount: c._count.reviews
+        };
+      }), total, pageNum, limitNum);
     } catch (e) {
-      return error(res, 'Failed to fetch courses');
+      return error(res, 'Database error while fetching courses');
     }
   },
 
+  /**
+   * @swagger
+   * /api/courses/{slug}:
+   *   get:
+   *     summary: Get course details by slug
+   *     tags: [Academy]
+   *     parameters:
+   *       - in: path
+   *         name: slug
+   *         required: true
+   *         schema: { type: string }
+   *     responses:
+   *       200:
+   *         description: Course object with lessons and reviews
+   *       404:
+   *         description: Course not found
+   */
   async getCourseBySlug(req: Request, res: Response) {
     try {
       const { slug } = req.params;
@@ -81,9 +163,12 @@ export const academyController = {
 
       if (!course) return error(res, 'Course not found', 404);
 
+      let tags = [];
+      try { tags = JSON.parse(course.tags || '[]'); } catch(e) {}
+
       return success(res, {
         ...course,
-        tags: JSON.parse(course.tags || '[]'),
+        tags,
         studentsCount: course._count.enrollments,
         reviewsCount: course._count.reviews
       });
@@ -92,6 +177,30 @@ export const academyController = {
     }
   },
 
+  /**
+   * @swagger
+   * /api/courses:
+   *   post:
+   *     summary: Create a new course (Lecturer only)
+   *     tags: [Academy]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required: [title, categoryId]
+   *             properties:
+   *               title: { type: string }
+   *               description: { type: string }
+   *               categoryId: { type: string }
+   *               price: { type: number }
+   *     responses:
+   *       201:
+   *         description: Course created
+   */
   async createCourse(req: AuthRequest, res: Response) {
     try {
       const { title, description, categoryId, price, thumbnail, level, tags } = req.body;

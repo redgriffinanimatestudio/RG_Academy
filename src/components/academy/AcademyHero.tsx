@@ -22,7 +22,7 @@ export default function AcademyHero() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   return (
-    <section className="relative h-[450px] rounded-[3rem] overflow-hidden group shadow-2xl shadow-primary/5 border border-white/5">
+    <section className="relative h-[350px] sm:h-[450px] rounded-[2rem] sm:rounded-[3rem] overflow-hidden group shadow-2xl shadow-primary/5 border border-white/5 mx-2 sm:mx-0">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
@@ -37,24 +37,24 @@ export default function AcademyHero() {
         </motion.div>
       </AnimatePresence>
 
-      <div className="absolute inset-0 p-12 flex flex-col justify-end space-y-6">
-        <div className="max-w-2xl space-y-4">
+      <div className="absolute inset-0 p-6 sm:p-12 flex flex-col justify-end space-y-4 sm:space-y-6">
+        <div className="max-w-2xl space-y-2 sm:space-y-4">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3"
+            className="flex items-center gap-2 sm:gap-3"
           >
-            <span className="px-2 py-0.5 bg-primary text-bg-dark text-[8px] font-black uppercase tracking-widest rounded">
+            <span className="px-1.5 sm:px-2 py-0.5 bg-primary text-bg-dark text-[7px] sm:text-[8px] font-black uppercase tracking-widest rounded">
               {HERO_SLIDES[currentSlide].tag}
             </span>
-            <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Specialist Workshop</span>
+            <span className="text-[8px] sm:text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Specialist Workshop</span>
           </motion.div>
           
           <motion.h1 
             key={`h1-${currentSlide}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl font-black tracking-tighter text-white leading-none uppercase"
+            className="text-3xl sm:text-5xl font-black tracking-tighter text-white leading-none uppercase"
           >
             {HERO_SLIDES[currentSlide].title} <br />
             <span className="text-primary italic">{HERO_SLIDES[currentSlide].accent}.</span>
@@ -63,7 +63,7 @@ export default function AcademyHero() {
             key={`p-${currentSlide}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-lg text-white/60 font-medium max-w-lg"
+            className="text-sm sm:text-lg text-white/60 font-medium max-w-lg line-clamp-2 sm:line-clamp-none"
           >
             {HERO_SLIDES[currentSlide].desc}
           </motion.p>

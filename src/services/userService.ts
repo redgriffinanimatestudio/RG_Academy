@@ -12,15 +12,22 @@ export type UserRole =
   | 'support';
 
 export interface UserProfile {
+  id: string;
   uid: string;
   email: string;
   displayName: string | null;
   photoURL: string | null;
-  roles: UserRole[];
+  role: string; // Current active role
+  primaryRole: string; // Original primary role
+  roles: UserRole[]; // List of all available roles
+  isStudent: boolean;
+  isLecturer: boolean;
+  isClient: boolean;
+  isExecutor: boolean;
+  isAdmin: boolean;
   bio?: string;
   createdAt: any;
   updatedAt?: any;
-  isAdmin?: boolean;
 }
 
 const API_URL = '/api';
@@ -29,37 +36,12 @@ export const userService = {
   async getProfile(uid: string): Promise<UserProfile | null> {
     const response = await fetch(`${API_URL}/users/${uid}`);
     if (!response.ok) return null;
-    const dbRes = await response.json();
-    const dbUser = dbRes.data;
-    
-    let roles: UserRole[] = [];
-    try {
-      roles = dbUser.roles ? JSON.parse(dbUser.roles) : [dbUser.role || 'student'];
-    } catch(e) {
-      roles = [dbUser.role || 'student'];
-    }
-
-    return {
-      uid: dbUser.id,
-      email: dbUser.email,
-      displayName: dbUser.displayName,
-      photoURL: dbUser.photoURL,
-      roles: roles,
-      createdAt: dbUser.createdAt,
-    };
-  },
-
-  async createProfile(uid: string, email: string, displayName: string | null, photoURL: string | null): Promise<void> {
-    // Usually handled by backend sync, but if needed:
-    await fetch(`${API_URL}/sync`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ remoteId: uid, email, displayName, photoURL })
-    });
+    const result = await response.json();
+    return result.success ? result.data : null;
   },
 
   async updateProfile(uid: string, data: Partial<UserProfile>): Promise<void> {
-    const token = localStorage.getItem('rg_token');
+    const token = localStorage.getItem('auth_token');
     await fetch(`${API_URL}/users/${uid}`, {
       method: 'PATCH',
       headers: { 
@@ -68,14 +50,5 @@ export const userService = {
       },
       body: JSON.stringify(data)
     });
-  },
-
-  async getUsers(uids: string[]): Promise<UserProfile[]> {
-    const profiles: UserProfile[] = [];
-    for (const uid of uids) {
-      const profile = await this.getProfile(uid);
-      if (profile) profiles.push(profile);
-    }
-    return profiles;
   }
 };

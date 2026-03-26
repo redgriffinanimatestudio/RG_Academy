@@ -123,35 +123,35 @@ export default function Studio() {
   };
 
   return (
-    <div className="space-y-12 py-8">
+    <div className="space-y-12 sm:space-y-16 py-4 sm:py-8">
       {/* 1. Client + Executor Synergy Header (Bible: ce synergy) */}
       {hasSynergyCE && (
         <motion.div 
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-1 border border-sky-500/20 bg-sky-500/5 rounded-[2.5rem] backdrop-blur-xl mb-12 overflow-hidden"
+          className="p-1 border border-sky-500/20 bg-sky-500/5 rounded-2xl sm:rounded-[2.5rem] backdrop-blur-xl mb-8 sm:mb-12 overflow-hidden"
         >
-          <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="flex items-center gap-6">
-              <div className="size-16 rounded-2xl bg-sky-500/20 flex items-center justify-center text-sky-400 border border-sky-500/20 shadow-lg shadow-sky-500/10">
-                <Layers size={32} />
+          <div className="p-4 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className="size-12 sm:size-16 rounded-xl sm:rounded-2xl bg-sky-500/20 flex items-center justify-center text-sky-400 border border-sky-500/20 shadow-lg shadow-sky-500/10 shrink-0">
+                <Layers size={24} className="sm:w-8 sm:h-8" />
               </div>
-              <div>
-                <div className="flex items-center gap-3">
-                  <h3 className="text-xl font-black uppercase tracking-tight text-white italic">Subcontracting Hub</h3>
-                  <span className="px-2 py-0.5 bg-sky-500 text-bg-dark text-[8px] font-black uppercase tracking-widest rounded shadow-lg shadow-sky-500/20">Production Synergy</span>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <h3 className="text-sm sm:text-xl font-black uppercase tracking-tight text-white italic truncate">Subcontracting Hub</h3>
+                  <span className="px-2 py-0.5 bg-sky-500 text-bg-dark text-[7px] sm:text-[8px] font-black uppercase tracking-widest rounded shadow-lg shadow-sky-500/20">Production Synergy</span>
                 </div>
-                <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1 italic">
+                <p className="text-[9px] sm:text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1 italic truncate">
                   "Может нанимать других и сам браться за работу — идеальный баланс субподряда"
                 </p>
               </div>
             </div>
             
-            <div className="flex flex-wrap justify-center gap-4">
-              <button className="flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white">
-                <Sparkles size={14} className="text-sky-400" /> Delegate Tasks
+            <div className="flex flex-wrap justify-center md:justify-end gap-3 sm:gap-4 w-full md:w-auto">
+              <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white">
+                <Sparkles size={14} className="text-sky-400" /> <span className="sm:inline">Delegate Tasks</span>
               </button>
-              <button className="flex items-center gap-2 px-6 py-3 bg-sky-500 text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-sky-500/20">
+              <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-sky-500 text-bg-dark rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-sky-500/20">
                 Master Dashboard
               </button>
             </div>
@@ -159,58 +159,58 @@ export default function Studio() {
         </motion.div>
       )}
 
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-primary font-black uppercase tracking-[0.3em] text-[10px]">
+      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 sm:gap-12">
+        <div className="space-y-4 sm:space-y-6 text-center lg:text-left">
+          <div className="flex items-center justify-center lg:justify-start gap-2 text-primary font-black uppercase tracking-[0.3em] text-[10px]">
             <Briefcase size={14} />
             {t('studio_collab')}
           </div>
-          <h1 className="text-6xl font-black tracking-tighter text-white leading-none uppercase">
+          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tighter text-white leading-none uppercase">
             {t('build_impossible').split('.')[0]} <br />
             <span className="text-primary italic">{t('build_impossible').split('.')[1] || 'IMPOSSIBLE.'}</span>
           </h1>
-          <p className="text-lg text-white/40 max-w-xl font-medium">
+          <p className="text-sm sm:text-lg text-white/40 max-w-xl font-medium mx-auto lg:mx-0">
             {t('studio_desc')}
           </p>
         </div>
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-4">
-            <div className="p-1 bg-white/5 rounded-2xl border border-white/5 flex">
+        <div className="flex flex-col gap-4 w-full lg:w-auto">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="p-1 bg-white/5 rounded-2xl border border-white/5 flex flex-1">
               <button 
                 onClick={() => setActiveTab('browse')}
-                className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'browse' ? 'bg-primary text-bg-dark shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                className={`flex-1 px-4 sm:px-6 py-3 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'browse' ? 'bg-primary text-bg-dark shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
               >
                 Browse Projects
               </button>
               <button 
                 onClick={() => setActiveTab('manage')}
-                className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'manage' ? 'bg-primary text-bg-dark shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                className={`flex-1 px-4 sm:px-6 py-3 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'manage' ? 'bg-primary text-bg-dark shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
               >
                 My Projects
               </button>
             </div>
             {isClient && (
-              <button className="criativo-btn flex items-center gap-3">
+              <button className="criativo-btn flex items-center justify-center gap-3 w-full sm:w-auto !py-4 !rounded-2xl">
                 <Plus size={18} />
-                {t('post_project')}
+                <span className="text-[10px]">{t('post_project')}</span>
               </button>
             )}
           </div>
           
-          <div className="flex gap-4">
-            <div className="relative flex-1 min-w-[300px]">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={20} />
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
               <input
                 type="text"
                 placeholder="Search projects..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium text-white placeholder:text-white/20"
+                className="w-full pl-12 pr-4 py-4 bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium text-white placeholder:text-white/20 outline-none"
               />
             </div>
             <button 
               onClick={() => setShowFilters(!showFilters)}
-              className={`px-6 rounded-2xl flex items-center gap-3 font-black uppercase tracking-widest text-[10px] transition-all border ${showFilters ? 'bg-primary text-bg-dark border-primary' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
+              className={`px-6 py-4 rounded-2xl flex items-center justify-center gap-3 font-black uppercase tracking-widest text-[10px] transition-all border ${showFilters ? 'bg-primary text-bg-dark border-primary' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
             >
               <Filter size={18} />
               {t('filters')}
@@ -299,27 +299,29 @@ export default function Studio() {
       </AnimatePresence>
 
       {activeTab === 'manage' ? (
-        <div className="space-y-12">
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-black uppercase tracking-tight text-white">Project Management</h2>
+        <div className="space-y-8 sm:space-y-12">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">Project Management</h2>
             <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Filter by:</span>
-              <select className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white outline-none cursor-pointer appearance-none">
+              <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-white/20">Filter by:</span>
+              <select className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-white outline-none cursor-pointer appearance-none">
                 <option className="bg-bg-card text-white">Active Projects</option>
                 <option className="bg-bg-card text-white">Completed</option>
               </select>
             </div>
           </div>
-          <KanbanBoard />
+          <div className="overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+            <KanbanBoard />
+          </div>
         </div>
       ) : (
-        <div className="space-y-12">
-          <section className="space-y-6">
+        <div className="space-y-12 sm:space-y-16">
+          <section className="space-y-6 sm:space-y-8">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-black tracking-tight text-white uppercase">{t('active_projects')}</h2>
-              <button className="text-xs font-black uppercase tracking-widest text-primary hover:text-primary-hover transition-colors">{t('view_all')}</button>
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase">{t('active_projects')}</h2>
+              <button className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-primary hover:text-primary-hover transition-colors">{t('view_all')}</button>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
               {filteredProjects.map((project) => (
                 <motion.div
                   key={project.id}
@@ -327,21 +329,21 @@ export default function Studio() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   whileHover={{ y: -4 }}
-                  className="criativo-card space-y-6 rounded-[2rem]"
+                  className="criativo-card space-y-4 sm:space-y-6 rounded-[2rem] p-6 sm:p-8"
                 >
-                  <div className="flex justify-between items-start">
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-black text-2xl tracking-tight text-white uppercase">{project.title}</h3>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-black text-xl sm:text-2xl tracking-tight text-white uppercase">{project.title}</h3>
                         {project.urgency === 'urgent' && (
-                          <span className="px-2 py-0.5 bg-primary text-bg-dark text-[8px] font-black uppercase tracking-widest rounded-md flex items-center gap-1">
+                          <span className="px-2 py-0.5 bg-primary text-bg-dark text-[7px] sm:text-[8px] font-black uppercase tracking-widest rounded-md flex items-center gap-1">
                             <Zap size={8} fill="currentColor" /> {t('urgent')}
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-white/40 font-medium">{t('posted_by')} <span className="text-white">{project.client}</span></p>
+                      <p className="text-xs sm:text-sm text-white/40 font-medium">{t('posted_by')} <span className="text-white">{project.client}</span></p>
                     </div>
-                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                    <span className={`px-4 py-1.5 rounded-full text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${
                       project.status === 'open' ? 'bg-primary/10 text-primary' : 'bg-white/5 text-white/40'
                     }`}>
                       {t(project.status)}
@@ -350,23 +352,23 @@ export default function Studio() {
                   
                   <div className="flex flex-wrap gap-2">
                     {project.tags.map(tag => (
-                      <span key={tag} className="px-3 py-1 rounded-lg bg-white/5 text-[10px] font-black uppercase tracking-widest text-white/40">
+                      <span key={tag} className="px-3 py-1 rounded-lg bg-white/5 text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-white/40">
                         {tag}
                       </span>
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                  <div className="flex items-center justify-between pt-4 sm:pt-6 border-t border-white/5">
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{t('budget_range')}</span>
-                      <span className="text-lg font-black text-white">${project.budget.toLocaleString()}</span>
+                      <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-white/20">{t('budget_range')}</span>
+                      <span className="text-base sm:text-lg font-black text-white">${project.budget.toLocaleString()}</span>
                     </div>
                     <button 
                       onClick={() => {
                         setSelectedProject(project);
                         setShowApplyModal(true);
                       }}
-                      className="flex items-center gap-2 bg-white/5 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-white hover:bg-primary hover:text-bg-dark transition-all border border-white/5"
+                      className="flex items-center gap-2 bg-white/5 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest text-white hover:bg-primary hover:text-bg-dark transition-all border border-white/5"
                     >
                       {t('view_details')} <ChevronRight size={14} />
                     </button>

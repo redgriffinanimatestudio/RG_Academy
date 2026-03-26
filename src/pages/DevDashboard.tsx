@@ -182,7 +182,7 @@ const DevDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-300 font-sans pt-24 pb-20">
       {/* Master Header */}
-      <div className="max-w-[1600px] mx-auto px-8 mb-12">
+      <div className="max-w-[1920px] mx-auto px-8 mb-12">
         <div className="flex items-center justify-between bg-indigo-500/10 border border-indigo-500/20 rounded-[2rem] p-8 relative overflow-hidden">
           <div className="relative z-10 space-y-2">
             <div className="flex items-center gap-3 text-indigo-400 font-black uppercase tracking-[0.4em] text-[10px]">
@@ -229,7 +229,7 @@ const DevDashboard: React.FC = () => {
       </div>
 
       {/* Main Navigation Tabs */}
-      <div className="max-w-[1600px] mx-auto px-8 mb-8">
+      <div className="max-w-[1920px] mx-auto px-8 mb-8">
         <div className="flex items-center gap-2 border-b border-white/5">
           {[
             { id: 'matrix', label: 'Roles Matrix', icon: Layers },
@@ -254,7 +254,7 @@ const DevDashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-8">
+      <div className="max-w-[1920px] mx-auto px-8">
         <AnimatePresence mode="wait">
           {/* ROLES MATRIX VIEW */}
           {activeTab === 'matrix' && (

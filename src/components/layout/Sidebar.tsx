@@ -30,20 +30,13 @@ export default function Sidebar({
   const { t } = useTranslation();
 
   return (
-    <div className="hidden md:block relative shrink-0 overflow-visible">
-      <button 
-        onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
-        className="absolute -right-4 top-10 z-[150] size-9 rounded-full border-2 border-primary/40 bg-[#0a0a0a] flex items-center justify-center hover:scale-110 hover:border-primary transition-all shadow-[0_0_30px_rgba(0,0,0,0.9)] group"
-      >
-        {isSidebarCollapsed ? <ChevronRight size={18} className="text-primary" /> : <ChevronLeft size={18} className="text-primary" />}
-      </button>
-
+    <div className="hidden md:block relative shrink-0 z-[40]">
       <motion.aside 
         initial={false} 
-        animate={{ width: isSidebarCollapsed ? 80 : 288 }} 
-        className="sticky top-32 h-[calc(100vh-10rem)] overflow-y-auto no-scrollbar border-r border-white/5 pr-4"
+        animate={{ width: isSidebarCollapsed ? 70 : 260 }} 
+        className="sticky top-24 sm:top-28 lg:top-32 h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar border-r border-white/5 pr-2 sm:pr-4"
       >
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           <div className="space-y-2">
             {sidebarCategories.map((cat) => {
               const isCatActive = activeCatName === cat.name;
@@ -52,13 +45,13 @@ export default function Sidebar({
                 <div key={cat.name} className="space-y-1">
                   <button 
                     onClick={() => { if (isSidebarCollapsed) setIsSidebarCollapsed(false); handleSetCategory(cat); }} 
-                    className={`w-full text-left p-3 rounded-xl border transition-all flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-between'} ${isCatActive ? (isStudio ? 'bg-primary-hover/10 border-primary-hover/20 text-white' : 'bg-primary/10 border-primary/20 text-white') : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white'}`}
+                    className={`w-full text-left p-2.5 sm:p-3 rounded-xl border transition-all flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-between'} ${isCatActive ? (isStudio ? 'bg-primary-hover/10 border-primary-hover/20 text-white' : 'bg-primary/10 border-primary/20 text-white') : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white'}`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <Icon size={16} className={isCatActive ? modeColor : 'opacity-40'} />
-                      {!isSidebarCollapsed && <span className="text-[10px] font-black uppercase tracking-widest">{t(cat.name)}</span>}
+                      {!isSidebarCollapsed && <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest truncate max-w-[140px]">{t(cat.name)}</span>}
                     </div>
-                    {!isSidebarCollapsed && <ChevronDown size={12} className={`transition-transform duration-300 ${isCatActive ? 'rotate-180 opacity-100' : 'opacity-20'}`} />}
+                    {!isSidebarCollapsed && <ChevronDown size={12} className={`transition-transform duration-300 shrink-0 ${isCatActive ? 'rotate-180 opacity-100' : 'opacity-20'}`} />}
                   </button>
                   
                   <AnimatePresence initial={false}>

@@ -43,7 +43,7 @@ const COMMUNITY_CATEGORIES = [
 
 const DASHBOARD_MENUS: Record<string, any[]> = {
   student: [{ name: 'learning_dashboard', icon: GraduationCap, subcategories: [{ name: 'my_progress' }] }],
-  admin: [{ name: 'core_management', icon: Shield, subcategories: [{ name: 'dashboard' }] }],
+  admin: [{ name: 'master_control', icon: Shield, subcategories: [{ name: 'overview' }, { name: 'users' }, { name: 'projects' }, { name: 'security' }] }],
   chief_manager: [{ name: 'strategic_hub', icon: Target, subcategories: [{ name: 'overview' }] }],
   manager: [{ name: 'operational_overview', icon: LayoutDashboard, subcategories: [{ name: 'overview' }] }]
 };
@@ -58,7 +58,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const { data: platformData } = usePlatform();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(window.innerWidth < 1200);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1200) setIsSidebarCollapsed(true);
+      else setIsSidebarCollapsed(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({ academy: true, dashboards: true });
 
   const [showBanner, setShowBanner] = useState(true);
@@ -135,19 +144,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         currentLangCode={lang || 'eng'} LANGUAGES={LANGUAGES}
       />
 
-      <main className="mx-auto max-w-[1600px] px-4 py-12 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row gap-8">
+      <main className="mx-auto max-w-[1920px] px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-12">
+        <div className="flex flex-col md:flex-row gap-4 sm:gap-6 lg:gap-8">
           {(isAcademy || isStudio || isCommunity || isDashboardPage) && (
-            <Sidebar 
-              sidebarCategories={sidebarCategories} activeCatName={activeCatName} activeSubName={activeSubName}
-              isSidebarCollapsed={isSidebarCollapsed} setIsSidebarCollapsed={setIsSidebarCollapsed}
-              handleSetCategory={handleSetCategory} handleSetSub={handleSetSub}
-              modeColor={modeColor} isStudio={isStudio}
-            />
+            <div className="hidden md:block shrink-0">
+              <Sidebar 
+                sidebarCategories={sidebarCategories} activeCatName={activeCatName} activeSubName={activeSubName}
+                isSidebarCollapsed={isSidebarCollapsed} setIsSidebarCollapsed={setIsSidebarCollapsed}
+                handleSetCategory={handleSetCategory} handleSetSub={handleSetSub}
+                modeColor={modeColor} isStudio={isStudio}
+              />
+            </div>
           )}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 w-full overflow-hidden px-1 sm:px-0">
             <ErrorBoundary>
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>{children}</motion.div>
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }} 
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full"
+              >
+                {children}
+              </motion.div>
             </ErrorBoundary>
           </div>
         </div>

@@ -58,53 +58,55 @@ export const studioService = {
     const params = new URLSearchParams(filters as any);
     const response = await fetch(`${API_BASE}/projects?${params.toString()}`);
     if (!response.ok) throw new Error('Failed to fetch projects');
-    return response.json();
+    const result = await response.json();
+    return result.success ? result.data : [];
   },
 
   async getProject(slug: string): Promise<Project | null> {
     const response = await fetch(`${API_BASE}/projects/${slug}`);
     if (!response.ok) return null;
-    return response.json();
+    const result = await response.json();
+    return result.success ? result.data : null;
   },
 
   async createProject(project: Partial<Project>): Promise<Project> {
+    const token = localStorage.getItem('auth_token');
     const response = await fetch(`${API_BASE}/projects`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(project),
-    });
-    if (!response.ok) throw new Error('Failed to create project');
-    return response.json();
-  },
-
-  async updateProjectStatus(projectId: string, status: string): Promise<void> {
-    const token = localStorage.getItem('rg_token');
-    const response = await fetch(`${API_BASE}/projects/${projectId}/status`, {
-      method: 'PATCH',
       headers: { 
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(project),
     });
-    if (!response.ok) throw new Error('Failed to update project status');
+    if (!response.ok) throw new Error('Failed to create project');
+    const result = await response.json();
+    return result.data;
   },
 
   // --- Contracts Module ---
   async getContracts(userId: string, role: 'client' | 'executor'): Promise<Contract[]> {
-    const response = await fetch(`${API_BASE}/contracts?userId=${userId}&role=${role}`);
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`${API_BASE}/contracts?userId=${userId}&role=${role}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
     if (!response.ok) throw new Error('Failed to fetch contracts');
-    return response.json();
+    const result = await response.json();
+    return result.success ? result.data : [];
   },
 
-  async updateContractMilestone(contractId: string, milestoneIdx: number, status: string): Promise<Contract> {
-    const response = await fetch(`${API_BASE}/contracts/${contractId}/milestones/${milestoneIdx}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
+  async releaseMilestone(contractId: string, index: number): Promise<Contract> {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`${API_BASE}/contracts/${contractId}/milestones/${index}/release`, {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     });
-    if (!response.ok) throw new Error('Failed to update milestone');
-    return response.json();
+    if (!response.ok) throw new Error('Failed to release milestone');
+    const result = await response.json();
+    return result.data;
   },
 
   // --- Services Module ---
@@ -112,16 +114,7 @@ export const studioService = {
     const params = new URLSearchParams(category ? { category } : {});
     const response = await fetch(`${API_BASE}/services?${params.toString()}`);
     if (!response.ok) throw new Error('Failed to fetch services');
-    return response.json();
-  },
-
-  async createService(service: Partial<Service>): Promise<Service> {
-    const response = await fetch(`${API_BASE}/services`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(service),
-    });
-    if (!response.ok) throw new Error('Failed to create service');
-    return response.json();
+    const result = await response.json();
+    return result.success ? result.data : [];
   }
 };

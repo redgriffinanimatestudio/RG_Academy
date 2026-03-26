@@ -81,7 +81,7 @@ const Home: React.FC = () => {
               key={`h1-${currentSlide}`}
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.85] uppercase"
+              className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.85] uppercase"
             >
               {HERO_SLIDES[currentSlide].title} <br />
               <span className="text-primary italic">{HERO_SLIDES[currentSlide].accent}.</span>
@@ -92,7 +92,7 @@ const Home: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-lg md:text-xl text-white/50 max-w-xl font-medium leading-relaxed"
+              className="text-base sm:text-lg md:text-xl text-white/50 max-w-xl font-medium leading-relaxed"
             >
               {HERO_SLIDES[currentSlide].desc}
             </motion.p>
@@ -101,22 +101,22 @@ const Home: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="flex flex-wrap items-center gap-6 pt-4"
+              className="flex flex-col sm:flex-row items-start sm:items-center gap-6 pt-4"
             >
               <Link to={`${HERO_SLIDES[currentSlide].link}/${lang || 'eng'}`} className="flex items-center gap-4 group">
-                <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center transition-transform group-hover:scale-110 shadow-xl shadow-primary/20">
-                  <Play size={24} className="text-bg-dark fill-current ml-1" />
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary flex items-center justify-center transition-transform group-hover:scale-110 shadow-xl shadow-primary/20">
+                  <Play size={20} className="text-bg-dark fill-current ml-1 sm:size-24" />
                 </div>
                 <div className="text-left">
-                  <div className="text-[10px] font-black uppercase tracking-widest text-white/40">{t('about_us')}</div>
-                  <div className="text-sm font-black uppercase tracking-widest text-white group-hover:text-primary transition-colors">Start Experience</div>
+                  <div className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-white/40">{t('about_us')}</div>
+                  <div className="text-xs sm:text-sm font-black uppercase tracking-widest text-white group-hover:text-primary transition-colors">Start Experience</div>
                 </div>
               </Link>
 
               {user ? (
                 <Link 
                   to={getDashboardLink()}
-                  className="flex items-center gap-3 bg-primary text-bg-dark px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-2xl shadow-primary/20 active:scale-95"
+                  className="w-full sm:w-auto flex items-center justify-center gap-3 bg-primary text-bg-dark px-6 sm:px-10 py-4 sm:py-5 rounded-2xl font-black uppercase tracking-widest text-[9px] sm:text-[10px] hover:scale-105 transition-all shadow-2xl shadow-primary/20 active:scale-95"
                 >
                   <LayoutDashboard size={16} />
                   {t('my_dashboard')}
@@ -124,7 +124,7 @@ const Home: React.FC = () => {
               ) : (
                 <button 
                   onClick={handleLoginRedirect}
-                  className="flex items-center gap-3 bg-white text-bg-dark px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-neutral-100 transition-all shadow-2xl active:scale-95"
+                  className="w-full sm:w-auto flex items-center justify-center gap-3 bg-white text-bg-dark px-6 sm:px-10 py-4 sm:py-5 rounded-2xl font-black uppercase tracking-widest text-[9px] sm:text-[10px] hover:bg-neutral-100 transition-all shadow-2xl active:scale-95"
                 >
                   <img src="https://www.google.com/favicon.ico" alt="" className="w-4 h-4" />
                   {t('join_ecosystem')}
@@ -135,7 +135,7 @@ const Home: React.FC = () => {
         </div>
 
         {/* Slider Navigation */}
-        <div className="absolute bottom-12 right-12 flex items-center gap-4">
+        <div className="absolute bottom-6 right-6 sm:bottom-12 sm:right-12 flex items-center gap-4 scale-75 sm:scale-100">
           <div className="flex gap-2">
             {HERO_SLIDES.map((_, i) => (
               <button 

@@ -22,6 +22,7 @@ router.post('/services', authMiddleware, studioController.createService);
 router.get('/contracts', authMiddleware, studioController.getContracts);
 router.post('/contracts', authMiddleware, studioController.createContract);
 router.patch('/contracts/:contractId', authMiddleware, studioController.updateContract);
+router.post('/contracts/:contractId/milestones/:index/release', authMiddleware, studioController.releaseMilestone);
 
 // Tasks
 router.get('/projects/:projectId/tasks', studioController.getTasks);
