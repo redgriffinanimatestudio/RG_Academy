@@ -108,5 +108,36 @@ export const hrController = {
     } catch (e) {
       return error(res, 'Failed to update application status');
     }
+  },
+
+  /**
+   * Get High-Fidelity HR Summary (Talent Matrix)
+   */
+  async getSummary(req: AuthRequest, res: any) {
+    try {
+      const [openings, applicants, activeLearners] = await Promise.all([
+        (prisma as any).jobOpening.count({ where: { status: 'open' } }),
+        (prisma as any).jobApplication.count(),
+        prisma.user.count({ where: { isStudent: true } })
+      ]);
+
+      const talentFunnels = await (prisma as any).jobApplication.groupBy({
+        by: ['status'],
+        _count: { id: true }
+      });
+
+      return success(res, {
+        stats: {
+          totalOpenings: openings,
+          totalApplicants: applicants,
+          activeTalentPool: activeLearners,
+          recruitmentHealth: 92 // High-fidelity mock
+        },
+        funnels: talentFunnels.map((f: any) => ({ name: f.status, value: f._count.id }))
+      });
+    } catch (e) {
+      console.error(e);
+      return error(res, 'HR Summary failed');
+    }
   }
 };

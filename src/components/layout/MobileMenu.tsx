@@ -147,7 +147,7 @@ export default function MobileMenu({
                     </div>
                     <div className="flex flex-col min-w-0 flex-1">
                       <span className="text-xs font-black text-white uppercase truncate">{profile.displayName}</span>
-                      <span className="text-[10px] font-black text-white/60">$ {profile.balance || '0.00'}</span>
+                      <span className="text-[10px] font-black text-primary/80 tracking-widest mt-0.5">$ {profile.balance || '0.00'}</span>
                     </div>
                     <button onClick={() => { logout(); onClose(); }} className="size-10 flex items-center justify-center text-rose-500 bg-rose-500/10 rounded-xl active:scale-90 transition-transform"><LogOut size={18} /></button>
                   </div>
@@ -160,7 +160,7 @@ export default function MobileMenu({
                   </div>
                 </div>
               ) : (
-                <Link to={`/aca/${currentLangCode}/login`} onClick={onClose} className={`flex items-center justify-center gap-3 w-full py-5 ${modeBg} text-bg-dark text-xs font-black uppercase tracking-widest rounded-2xl shadow-xl active:scale-95 transition-all`}><LogIn size={18} /> {t('join_ecosystem')}</Link>
+                <Link to={`/aca/${currentLangCode}/login`} onClick={onClose} className={`flex items-center justify-center gap-3 w-full py-5 ${modeBg} text-bg-dark text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all`}><LogIn size={18} /> {t('join_ecosystem')}</Link>
               )}
             </div>
           </motion.div>

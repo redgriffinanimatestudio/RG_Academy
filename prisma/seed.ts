@@ -37,10 +37,14 @@ async function main() {
       displayName: 'System Architect',
       role: 'admin',
       primaryRole: 'admin',
-      roles: JSON.stringify(['admin', 'student', 'lecturer']),
+      roles: JSON.stringify(['admin', 'student', 'lecturer', 'agency', 'hr', 'finance', 'support']),
       isAdmin: true,
       isStudent: true,
       isLecturer: true,
+      isAgency: true,
+      isHr: true,
+      isFinance: true,
+      isSupport: true,
       source: 'local',
       profile: {
         create: {

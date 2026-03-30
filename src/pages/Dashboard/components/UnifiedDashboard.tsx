@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
-import { Shield, DollarSign, Briefcase, GraduationCap, Zap, Box, Rocket, UserPlus, LifeBuoy } from 'lucide-react';
+import { Shield, DollarSign, Briefcase, GraduationCap, Zap, Box, Rocket, UserPlus, LifeBuoy, Activity, ChevronRight } from 'lucide-react';
 import { adminService } from '../../../services/adminService';
 import StatCard from './StatCard';
 import HelpModal from '../../../components/support/HelpModal';
+import ActivityFeed from '../../../components/dashboard/ActivityFeed';
+import BalanceDisplay from '../../../components/dashboard/BalanceDisplay';
+import HRDashboard from './Roles/HRDashboard';
 
 interface UnifiedDashboardProps {
   roles: string[];
@@ -21,6 +24,7 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ roles, activeRole, 
   const isE = activeRole === 'executor';
   const isC = activeRole === 'client';
   const isS = activeRole === 'student';
+  const isHR = activeRole === 'hr';
   const isStaff = ['manager', 'chief_manager', 'moderator', 'hr', 'finance', 'support'].includes(activeRole || '');
 
   const [staffStats, setStaffStats] = useState<any>(null);
@@ -28,9 +32,7 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ roles, activeRole, 
   const [helpOpen, setHelpOpen] = useState(false);
 
   const fetchStaffStats = async () => {
-    // Only fetch full ecosystem stats if Admin. Roles like HR/Finance should use their own endpoints (Phase 16)
     if (!isAdmin) {
-      // Provide simulated domain stats for staff
       setStaffStats({
         users: 1240,
         totalRevenue: 45000,
@@ -56,8 +58,9 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ roles, activeRole, 
   }, [isAdmin, activeRole]);
 
   return (
-    <div className="space-y-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-20">
+      {/* 📊 TELEMETRY STRIP */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {isAdmin && (
           <>
             <Link to="/dashboard?perspective=finance" className="block transform hover:scale-[1.02] transition-all">
@@ -108,68 +111,108 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ roles, activeRole, 
 
       <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} user={user} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {(isC || isE || isAdmin) && (
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] p-8 space-y-8 shadow-2xl relative overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="lg:col-span-8 space-y-8">
+          {/* 💎 HR TALENT MATRIX HUB */}
+          {isHR && <HRDashboard view={''} accent={''} user={user} lang={lang} />}
+
+          {/* 💰 VAULT STATUS */}
+          {!isHR && <BalanceDisplay />}
+
+          {/* 🛠️ PRODUCTION PIPELINE MONITOR */}
+          {(isC || isE || isAdmin) && (
+            <div className="glass-industrial border border-white/5 rounded-[3.5rem] p-10 space-y-10 shadow-2xl relative overflow-hidden group matrix-grid-bg">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors duration-1000" />
+              
               <div className="flex items-center justify-between relative z-10">
-                <div>
-                  <h3 className="text-xl font-black uppercase tracking-tight text-white flex items-center gap-3">
-                    <Box size={20} className="text-primary" /> Studio Production Hub
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-black uppercase tracking-tight text-white flex items-center gap-4 italic text-glow">
+                    <Box size={24} className="text-primary animate-pulse" /> Studio Production Hub
                   </h3>
-                  <p className="text-[9px] font-black uppercase text-white/20 tracking-widest mt-1">Management of active studio pipelines</p>
+                  <div className="flex items-center gap-3">
+                    <div className="size-2 rounded-full bg-primary shadow-[0_0_8px_#00ff9d]" />
+                    <p className="text-[10px] font-black uppercase text-white/40 tracking-[0.3em] font-mono">Live Sync: Industrial-Pipeline-v4</p>
+                  </div>
                 </div>
-                {(isC || isAdmin) && <span className="px-3 py-1 bg-primary/10 border border-primary/20 text-primary text-[8px] font-black uppercase rounded-lg tracking-widest">Global Escrow Monitor</span>}
+                {(isC || isAdmin) && (
+                  <div className="px-5 py-2 glass-premium border border-primary/20 text-primary text-[9px] font-black uppercase rounded-xl tracking-[0.2em] shadow-lg shadow-primary/10">
+                    Global Escrow Monitor
+                  </div>
+                )}
               </div>
 
-              <div className="grid gap-4 relative z-10">
+              <div className="grid gap-5 relative z-10">
                 {[
                   { name: "Nebula CGI Sequence", role: "Client", status: "Reviewing", p: 85, c: '#ef9f27' },
                   { name: "Character Rigging Pack", role: "Executor", status: "In Production", p: 42, c: '#e24b4a' }
                 ].map((p, i) => (
-                  <div key={i} className="p-6 bg-white/[0.02] border border-white/5 rounded-[2rem] flex items-center justify-between group hover:border-white/10 transition-all">
-                    <div className="flex items-center gap-6">
-                      <div className="size-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/20 group-hover:text-white transition-colors">
-                        <Rocket size={20} style={{ color: p.c }} />
+                  <div key={i} className="p-8 bg-white/[0.03] border border-white/5 rounded-[2.5rem] flex items-center justify-between group/p hover:bg-white/[0.06] hover:border-white/10 transition-all duration-500 card-glow">
+                    <div className="flex items-center gap-8">
+                      <div className="size-16 rounded-2xl bg-white/5 flex items-center justify-center text-white/20 group-hover/p:scale-110 transition-transform duration-500 shadow-xl border border-white/5">
+                        <Rocket size={24} style={{ color: p.c }} className="drop-shadow-[0_0_10px_currentColor]" />
                       </div>
-                      <div>
-                        <div className="text-sm font-black text-white uppercase tracking-tight">{p.name}</div>
-                        <div className="flex items-center gap-3 mt-1">
-                          <span className="text-[9px] font-black uppercase" style={{ color: p.c }}>{p.role}</span>
-                          <span className="size-1 rounded-full bg-white/10" />
-                          <span className="text-[9px] text-white/40 font-bold uppercase">{p.status}</span>
+                      <div className="space-y-1">
+                        <div className="text-base font-black text-white uppercase tracking-tight group-hover/p:text-primary transition-colors">{p.name}</div>
+                        <div className="flex items-center gap-4">
+                          <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2" style={{ color: p.c }}>
+                            <div className="size-1 rounded-full" style={{ backgroundColor: p.c }} /> {p.role}
+                          </span>
+                          <span className="text-[10px] text-white/20 font-black uppercase tracking-[0.2em]">{p.status}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="w-32 h-1 bg-white/5 rounded-full overflow-hidden">
-                      <motion.div initial={{ width: 0 }} animate={{ width: `${p.p}%` }} className="h-full" style={{ background: p.c }} />
+                    <div className="flex flex-col items-end gap-3">
+                      <div className="text-right text-[11px] font-black font-mono text-white/40">{p.p}% SYNC</div>
+                      <div className="w-40 h-2 bg-white/5 rounded-full overflow-hidden p-[2px]">
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${p.p}%` }} className="h-full rounded-full shadow-[0_0_10px_currentColor]" style={{ background: p.c, color: p.c }} transition={{ duration: 1.5, delay: 0.2 * i }} />
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full -mr-20 -mt-20" />
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="space-y-8">
+          {/* 🎓 LEARNING PIPELINE PREVIEW */}
           {(isS || isAdmin) && (
-            <div className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] p-8 space-y-6 shadow-2xl">
-              <h3 className="text-xs font-black uppercase tracking-widest text-white/40 flex items-center gap-2">
-                <GraduationCap size={14} className="text-primary" /> Learning Pipeline
+            <div className="glass-industrial border border-white/5 rounded-[3.5rem] p-10 space-y-8 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform duration-1000">
+                <GraduationCap size={160} />
+              </div>
+              
+              <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white/40 flex items-center gap-3 relative z-10">
+                <div className="size-1.5 bg-primary rounded-full animate-ping" />
+                Learning Pipeline
               </h3>
-              <div className="space-y-4">
-                <div className="p-5 bg-white/[0.02] border border-white/5 rounded-2xl space-y-4">
-                  <div className="flex justify-between items-start">
-                    <div className="text-[10px] font-black text-white uppercase tracking-tight">Next Lesson</div>
-                    <span className="text-[8px] font-black px-2 py-0.5 bg-primary/20 text-primary rounded-md uppercase">UE5 Master</span>
+              
+              <div className="space-y-6 relative z-10">
+                <div className="p-10 bg-white/[0.03] border border-white/5 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-8 card-glow">
+                  <div className="space-y-4 text-center md:text-left">
+                    <div className="flex items-center justify-center md:justify-start gap-4">
+                      <div className="px-3 py-1 glass-premium rounded-lg text-[9px] font-black text-white/40 uppercase tracking-widest border border-white/5">
+                        Next Lesson
+                      </div>
+                      <span className="text-[9px] font-black px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-lg uppercase tracking-widest">
+                        LMS NODE
+                      </span>
+                    </div>
+                    <h4 className="text-2xl lg:text-3xl font-black text-white uppercase tracking-tight leading-tight italic">
+                      Advanced Particle Simulation for Environment VFX
+                    </h4>
                   </div>
-                  <div className="text-xs font-bold text-white/80 leading-tight">Advanced Particle Simulation for Environment VFX</div>
-                  <Link to={`/learn/${lang}/unreal-engine-masterclass`} className="block w-full py-3 bg-primary text-bg-dark rounded-xl text-[9px] font-black uppercase tracking-widest hover:brightness-110 transition-all text-center">Resume Learning</Link>
+                  
+                  <Link to={`/learn/${lang}/unreal-engine-masterclass`} className="flex items-center justify-center gap-4 px-10 py-6 bg-primary text-bg-dark rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20 shrink-0">
+                    <Rocket size={20} /> Resume <ChevronRight size={18} />
+                  </Link>
                 </div>
               </div>
             </div>
           )}
+        </div>
+
+        {/* 📡 LIVE TELEMETRY SIDEBAR */}
+        <div className="lg:col-span-4">
+          <ActivityFeed />
         </div>
       </div>
     </div>

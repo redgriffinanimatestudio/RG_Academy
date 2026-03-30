@@ -1,34 +1,89 @@
 import apiClient from './apiClient';
 
+/**
+ * HR Service V2.2 (Industrial Protocol)
+ * Synchronized for Talent Matrix & Legacy Staff Nodes
+ */
+export interface HRSummary {
+  stats: {
+    totalOpenings: number;
+    totalApplicants: number;
+    activeTalentPool: number;
+    recruitmentHealth: number;
+  };
+  funnels: { name: string; value: number }[];
+}
+
 export const hrService = {
-  async getOpenings(status = 'open'): Promise<any> {
-    const response = await apiClient.get('/v1/hr/openings', {
-      params: { status }
-    });
-    return response.data.success ? response.data.data : [];
+  /**
+   * Fetch all industrial job openings
+   */
+  async getOpenings(): Promise<any[]> {
+    try {
+      const { data } = await apiClient.get('/v1/hr/openings');
+      return data.success ? data.data : (data || []);
+    } catch (e) {
+      console.error('[HR Service] Openings fetch failed:', e);
+      return [];
+    }
   },
 
-  async createOpening(data: any): Promise<any> {
-    const response = await apiClient.post('/v1/hr/openings', data);
-    return response.data.success ? response.data.data : null;
+  /**
+   * Create a new industrial job opening
+   */
+  async createOpening(payload: any): Promise<any> {
+    try {
+      const { data } = await apiClient.post('/v1/hr/openings', payload);
+      return data.success ? data.data : data;
+    } catch (e) {
+      console.error('[HR Service] Create opening failed:', e);
+      throw e;
+    }
   },
 
-  async getApplicants(openingId?: string): Promise<any> {
-    const response = await apiClient.get('/v1/hr/applicants', {
-      params: { openingId }
-    });
-    return response.data.success ? response.data.data : [];
+  /**
+   * Fetch high-fidelity HR telemetry (Talent Matrix V2)
+   */
+  async getSummary(): Promise<HRSummary> {
+    try {
+      const { data } = await apiClient.get('/v1/hr/summary');
+      return data.success ? data.data : data;
+    } catch (e) {
+      console.error('[HR Service] Summary fetch failed:', e);
+      throw e;
+    }
   },
 
-  async submitApplication(data: { openingId: string; coverLetter: string; resumeUrl?: string }): Promise<any> {
-    const response = await apiClient.post('/v1/hr/apply', data);
-    return response.data.success ? response.data.data : null;
+  /**
+   * Fetch interactive candidate list
+   */
+  async getApplicants(openingId?: string): Promise<any[]> {
+    try {
+      const { data } = await apiClient.get(`/v1/hr/applicants${openingId ? `?openingId=${openingId}` : ''}`);
+      return data.success ? data.data : data;
+    } catch (e) {
+      console.error('[HR Service] Applicants fetch failed:', e);
+      throw e;
+    }
   },
 
+  /**
+   * Update candidate status in real-time
+   */
+  async updateStatus(appId: string, status: string): Promise<any> {
+    try {
+      const { data } = await apiClient.patch(`/v1/hr/applicants/${appId}/status`, { status });
+      return data.success ? data.data : data;
+    } catch (e) {
+      console.error('[HR Service] Status update failed:', e);
+      throw e;
+    }
+  },
+
+  /**
+   * Legacy Alias for updateStatus
+   */
   async updateApplicantStatus(appId: string, status: string): Promise<any> {
-    const response = await apiClient.patch(`/v1/hr/applicants/${appId}/status`, {
-      status
-    });
-    return response.data.success ? response.data.data : null;
+    return this.updateStatus(appId, status);
   }
 };

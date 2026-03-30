@@ -72,5 +72,9 @@ router.post('/tasks', authMiddleware, studioController.createTask);
 router.patch('/tasks/:taskId', authMiddleware, studioController.updateTask);
 router.get('/tasks/my', authMiddleware, studioController.getMyTasks);
 
+// Phase 18: Executor Hub Bridge
+router.get('/executor/summary', authMiddleware, studioController.getExecutorSummary);
+router.post('/executor/sync-academy', authMiddleware, studioController.syncAcademyPortfolio);
+
 export default router;
 

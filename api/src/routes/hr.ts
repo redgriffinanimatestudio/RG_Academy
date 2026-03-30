@@ -12,6 +12,7 @@ router.post('/apply', authMiddleware, hrController.submitApplication);
 router.use(authMiddleware);
 router.use(checkRole(['hr', 'admin']));
 
+router.get('/summary', hrController.getSummary);
 router.post('/openings', hrController.createOpening);
 router.get('/applicants', hrController.getApplicants);
 router.patch('/applicants/:appId/status', hrController.updateStatus);

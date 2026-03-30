@@ -17,6 +17,7 @@ export interface AuthRequest extends Request {
     isHr: boolean;
     isFinance: boolean;
     isSupport: boolean;
+    isAgency: boolean;
     isAdmin: boolean;
   };
 }
@@ -56,6 +57,7 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
       isExecutor: user.isExecutor,
       isHr: user.isHr,
       isFinance: user.isFinance,
+      isAgency: user.isAgency,
       isSupport: user.isSupport,
       isAdmin: user.isAdmin
     };

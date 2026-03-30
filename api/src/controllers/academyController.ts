@@ -1,7 +1,6 @@
-import { Request, Response } from 'express';
-import prisma from '../utils/prisma.js';
 import { success, error, paginate } from '../utils/response.js';
 import { AuthRequest, requireAdmin, requireLecturer } from '../middleware/auth.js';
+import { notifyUser } from '../utils/socket.js';
 import { ACADEMIC_TREE } from '../config/academic.js';
 import { 
   CourseCreateInputSchema, 
@@ -327,6 +326,14 @@ export const academyController = {
           completedAt: completed ? new Date() : null
         }
       });
+
+      // Phase 17: Notify dashboard for real-time sync
+      notifyUser(req.user!.id, 'STUDENT_PROGRESS_UPDATE', { 
+        lessonId, 
+        completed,
+        timestamp: new Date().toISOString()
+      });
+
       return success(res, analytics);
     } catch (e) {
       return error(res, 'Analytics sync failed');
@@ -382,6 +389,13 @@ export const academyController = {
         where: { id: enrollmentId, userId: req.user!.id },
         data: { progress, completedLessons: JSON.stringify(completedLessons || []) }
       });
+
+      // Phase 17: Notify dashboard for real-time sync
+      notifyUser(req.user!.id, 'STUDENT_PROGRESS_UPDATE', { 
+        progress,
+        syncAt: new Date().toISOString()
+      });
+
       return success(res, enrollment);
     } catch (e) {
       return error(res, 'Update failed');

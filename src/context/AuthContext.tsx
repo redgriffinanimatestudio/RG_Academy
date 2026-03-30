@@ -45,6 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isExecutor: dbUser.isExecutor,
       isHr: dbUser.isHr,
       isFinance: dbUser.isFinance,
+      isAgency: dbUser.isAgency,
       isSupport: dbUser.isSupport,
       balance: dbUser.balance || 0, // Phase 6.2 Financial Bridge
       createdAt: dbUser.createdAt

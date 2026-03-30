@@ -175,8 +175,10 @@ export default function Navbar({
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-2 sm:gap-6">
-                <Link to={`/aca/${currentLangCode}/login`} className="px-6 py-3 bg-primary text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 transition-all shadow-xl shadow-primary/20">Join Ecosystem</Link>
+              <div className="hidden md:flex items-center gap-2 sm:gap-6">
+                <Link to={`/aca/${currentLangCode}/login`} className="px-6 py-3 bg-primary text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20">
+                  Join Ecosystem
+                </Link>
               </div>
             )}
           </div>

@@ -14,9 +14,12 @@ import synergyRoutes from './synergy';
 import reviewRoutes from './review';
 import aiRoutes from './ai';
 import searchRoutes from './search';
+import agencyRoutes from './agency';
 
 import { authController } from '../controllers/authController';
 import { authMiddleware } from '../middleware/auth';
+
+import dashboardRoutes from './dashboard';
 
 const router = Router();
 
@@ -48,6 +51,8 @@ router.use('/v1/synergy', synergyRoutes); // /api/v1/synergy/recommendations, et
 router.use('/v1/review', reviewRoutes);   // /api/v1/review/sessions, etc.
 router.use('/v1/ai', aiRoutes);           // /api/v1/ai/trajectory, etc.
 router.use('/v1/search', searchRoutes);   // /api/v1/search/universal, etc.
+router.use('/v1/agency', agencyRoutes);   // /api/v1/agency/summary, etc.
+router.use('/v1/dashboard', dashboardRoutes); // /api/v1/dashboard/student/summary, etc.
 router.use('/notifications', notificationRoutes); 
 router.use('/chat', chatRoutes);
 

@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Preloader from '../../components/Preloader';
 import { dashboardService } from '../../services/dashboardService';
 
@@ -10,12 +10,34 @@ import StudentDashboard from './roles/StudentDashboard';
 import ManagerDashboard from './roles/ManagerDashboard';
 import ExecutorDashboard from './roles/ExecutorDashboard';
 import ClientDashboard from './roles/ClientDashboard';
+import HRDashboard from './roles/HRDashboard';
+import FinanceDashboard from './roles/FinanceDashboard';
+import SupportDashboard from './roles/SupportDashboard';
+import AgencyDashboard from './roles/AgencyDashboard';
 
 export default function DashboardController() {
   const { profile, activeRole, setActiveRole, loading } = useAuth();
   const { lang } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const perspective = searchParams.get('perspective');
+  
   const [userData, setUserData] = useState<any>(null);
+
+  // Phase 18: URL Perspective Synchronization
+  useEffect(() => {
+    if (!profile || !perspective) return;
+    
+    // Industrial Oversight: Admins can force any perspective
+    const effectiveRoles = profile.isAdmin 
+      ? [...new Set([...profile.roles, 'agency', 'hr', 'finance', 'support'])]
+      : profile.roles;
+
+    if (perspective !== activeRole && effectiveRoles.includes(perspective)) {
+      console.log(`[Dashboard] Syncing state to URL perspective: ${perspective}`);
+      setActiveRole(perspective as any);
+    }
+  }, [perspective, profile, activeRole]);
 
   useEffect(() => {
     if (!profile) return;
@@ -25,6 +47,9 @@ export default function DashboardController() {
         if (activeRole === 'admin') {
           const stats = await dashboardService.getSystemStats();
           setUserData({ stats });
+        } else if (activeRole === 'student') {
+          const data = await dashboardService.getStudentSummary();
+          setUserData(data);
         } else {
           const data = await dashboardService.getUserData(profile.id);
           setUserData(data);
@@ -45,12 +70,16 @@ export default function DashboardController() {
 
     switch (activeRole) {
       case 'admin': return <AdminDashboard stats={userData?.stats} />;
-      case 'student': return <StudentDashboard data={userData} />;
+      case 'student': return <StudentDashboard data={userData} user={profile} lang={lang} accent="primary" view="student" />;
       case 'manager':
       case 'chief_manager': return <ManagerDashboard />;
-      case 'executor': return <ExecutorDashboard />;
+      case 'executor': return <ExecutorDashboard user={profile} />;
       case 'client': return <ClientDashboard />;
-      default: return <StudentDashboard data={userData} />;
+      case 'hr': return <HRDashboard />;
+      case 'finance': return <FinanceDashboard />;
+      case 'support': return <SupportDashboard />;
+      case 'agency': return <AgencyDashboard />;
+      default: return <StudentDashboard data={userData} user={profile} lang={lang} accent="primary" view="student" />;
     }
   }, [profile, activeRole, userData]);
 
@@ -68,7 +97,10 @@ export default function DashboardController() {
         {/* Identity Switcher - Horizontal Scroll on Mobile */}
         <div className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-10 overflow-x-auto no-scrollbar pb-2 sm:pb-0">
           <div className="flex p-1 bg-white/5 border border-white/5 rounded-2xl shrink-0">
-            {profile.roles.map(role => (
+            {(profile.isAdmin 
+              ? [...new Set([...profile.roles, 'agency', 'hr', 'finance', 'support'])]
+              : profile.roles
+            ).map(role => (
               <button
                 key={role}
                 onClick={() => setActiveRole(role as any)}

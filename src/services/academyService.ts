@@ -22,6 +22,8 @@ export interface Course {
     slug: string;
   };
   level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  lod?: number;
+  softwareStack?: { name: string; version?: string }[];
   tags: string[];
   status: 'draft' | 'published' | 'archived';
   createdAt: string;

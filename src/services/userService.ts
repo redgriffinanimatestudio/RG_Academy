@@ -12,6 +12,7 @@ export type UserRole =
   | 'chief_manager'
   | 'hr'
   | 'finance'
+  | 'agency'
   | 'support';
 
 export interface UserProfile {

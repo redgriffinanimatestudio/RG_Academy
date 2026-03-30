@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { GraduationCap, Box, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -20,9 +20,10 @@ import { LANGUAGES, ACADEMY_CATEGORIES, STUDIO_CATEGORIES } from './layout/Layou
 import { useLayoutMetadata } from './layout/useLayoutMetadata';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { profile, activeRole, loading: authLoading } = useAuth();
+  const { profile, activeRole, setActiveRole, loading: authLoading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { lang } = useParams();
   const { t } = useTranslation();
 
@@ -39,6 +40,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const handleResize = () => {
       if (window.innerWidth < 1200) setIsSidebarCollapsed(true);
       else setIsSidebarCollapsed(false);
+
+      // Close mobile menu if resized to desktop
+      if (window.innerWidth >= 1024) {
+        setIsMobileMenuOpen(false);
+      }
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -62,10 +68,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [sidebarCategories]);
 
   const handleSetCategory = (cat: any) => setActiveCatName(cat.name);
-  const handleSetSub = (sub: any, parentCat: any) => {
+  const handleSetSub = async (sub: any, parentCat: any) => {
     setActiveSubName(sub.name);
+    
     if (parentCat.isDashboard) {
       const viewParam = sub.subcategories ? sub.subcategories[0].name.toLowerCase() : sub.name.toLowerCase();
+      
+      // Phase 18: Industrial Role Switch Integration
+      if (sub.isPerspective && sub.perspectiveRole && sub.perspectiveRole !== activeRole) {
+        console.log(`[Layout] Hub triggering perspective shift: ${sub.perspectiveRole}`);
+        await setActiveRole(sub.perspectiveRole as any);
+      }
+
       const roleParam = sub.isPerspective ? `&perspective=${sub.perspectiveRole}` : '';
       navigate(`${location.pathname}?view=${viewParam}${roleParam}`);
     } else {

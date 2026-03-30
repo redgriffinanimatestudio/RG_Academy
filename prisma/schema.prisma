@@ -33,7 +33,10 @@ model User {
   isHr         Boolean      @default(false)
   isFinance    Boolean      @default(false)
   isSupport    Boolean      @default(false)
+  isAgency     Boolean      @default(false)
   isAdmin      Boolean      @default(false) // Special platform admin
+  
+  agencyId     String?      // Reference to managing Agency
   
   remoteId     String?      @unique
   source       String       @default("local")
@@ -111,12 +114,29 @@ model Transaction {
   @@index([refId])
 }
 
+model Certificate {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  courseId     String
+  course       Course    @relation(fields: [courseId], references: [id])
+  title        String
+  issuer       String    @default("Red Griffin Academy")
+  grade        Float?
+  credentialId String    @unique @default(cuid())
+  qrCode       String?   // Verification link or image URL
+  issuedAt     DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+  @@index([userId])
+  @@index([courseId])
+}
+
 model Notification {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  type      String   // info, success, warning, error, contract, report
-  title     String
+  type        String   // info, success, warning, error, contract, report
+  title       String
   message   String
   link      String?  // Optional redirect URL
   isRead    Boolean  @default(false)
@@ -448,6 +468,7 @@ model Enrollment {
   cohort           Cohort?   @relation(fields: [cohortId], references: [id])
   progress         Int       @default(0)
   status           String    @default("active")
+  grade            Float?    // Final course grade (Phase 17)
   completedLessons String    @default("[]")
   enrolledAt       DateTime  @default(now())
   completedAt      DateTime?
