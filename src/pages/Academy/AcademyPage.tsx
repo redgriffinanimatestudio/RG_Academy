@@ -11,6 +11,7 @@ import AcademyStats from '../../components/academy/AcademyStats';
 import AcademyFilters from '../../components/academy/AcademyFilters';
 import CourseCard from '../../components/academy/CourseCard';
 import BecomeMentor from '../../components/academy/BecomeMentor';
+import CurrentOpenings from '../../components/academy/CurrentOpenings';
 
 export default function AcademyPage() {
   const { lang } = useParams();
@@ -99,6 +100,8 @@ export default function AcademyPage() {
           ))}
         </AnimatePresence>
       </div>
+
+      <CurrentOpenings />
 
       <BecomeMentor />
     </div>

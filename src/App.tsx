@@ -9,7 +9,7 @@ import Community from './pages/Community/CommunityPage';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Messages from './pages/Messages';
-import Dashboard from './pages/Dashboard/DashboardController';
+import Dashboard from './pages/Dashboard';
 import TopicPage from './pages/TopicPage';
 import ServicePage from './pages/ServicePage';
 import CommunityTopic from './pages/CommunityTopic';
@@ -17,14 +17,18 @@ import SpecialistProfile from './pages/SpecialistProfile';
 import Contracts from './pages/Contracts';
 import InfoPage from './pages/InfoPage';
 import DevDashboard from './pages/DevDashboard';
+import TrajectoryPage from './pages/Trajectory';
+import AssetReview from './pages/AssetReview';
+import Finance from './pages/Finance';
 import { AlertProvider } from './components/Alert';
+import GlobalSearchOverlay from './components/search/GlobalSearchOverlay';
 import { AuthProvider } from './context/AuthContext';
 import { PlatformProvider } from './context/PlatformContext';
 import { useSyncManager } from './services/syncManager';
 import { useTranslation } from 'react-i18next';
 import './i18n';
 
-const LANGUAGES = ['eng', 'ru', 'tr', 'az'];
+const LANGUAGES = ['eng', 'ru', 'tr', 'az', 'es', 'fr', 'de', 'it'];
 
 function SyncHandler({ children }: { children: React.ReactNode }) {
   useSyncManager();
@@ -53,6 +57,11 @@ function LanguageWrapper({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function RedirectWithLang({ to }: { to: string }) {
+  const { lang } = useParams();
+  return <Navigate to={`/${lang || 'eng'}${to}`} replace />;
+}
+
 export default function App() {
   return (
     <Router>
@@ -60,23 +69,24 @@ export default function App() {
         <PlatformProvider>
           <SyncHandler>
             <AlertProvider>
+              <GlobalSearchOverlay />
               <Routes>
                 <Route path="/" element={<Navigate to="/eng" replace />} />
-                {/* ... rest of the routes ... */}
-            {/* Main Routes */}
-            <Route path="/:lang" element={<LanguageWrapper><Layout><Home /></Layout></LanguageWrapper>} />
-            <Route path="/:lang/dev" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
-            <Route path="/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
-            
-            {/* Redirect legacy specific routes to unified dashboard */}
-            <Route path="/:lang/admin" element={<Navigate to="/:lang/dashboard" replace />} />
-            <Route path="/:lang/chief-manager" element={<Navigate to="/:lang/dashboard" replace />} />
-            <Route path="/:lang/manager" element={<Navigate to="/:lang/dashboard" replace />} />
-            <Route path="/:lang/staff" element={<Navigate to="/:lang/dashboard" replace />} />
-            <Route path="/:lang/moderator" element={<Navigate to="/:lang/dashboard" replace />} />
-            <Route path="/:lang/hr" element={<Navigate to="/:lang/dashboard" replace />} />
-            <Route path="/:lang/finance" element={<Navigate to="/:lang/dashboard" replace />} />
-            <Route path="/:lang/support" element={<Navigate to="/:lang/dashboard" replace />} />
+                {/* Main Routes */}
+                <Route path="/:lang" element={<LanguageWrapper><Layout><Home /></Layout></LanguageWrapper>} />
+                <Route path="/:lang/dev" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
+                <Route path="/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
+                <Route path="/:lang/finance" element={<LanguageWrapper><Layout><Finance /></Layout></LanguageWrapper>} />
+                
+                {/* Redirect legacy specific routes to unified dashboard */}
+                <Route path="/:lang/admin" element={<RedirectWithLang to="/dashboard" />} />
+                <Route path="/:lang/chief-manager" element={<RedirectWithLang to="/dashboard" />} />
+                <Route path="/:lang/manager" element={<RedirectWithLang to="/dashboard" />} />
+                <Route path="/:lang/staff" element={<RedirectWithLang to="/dashboard" />} />
+                <Route path="/:lang/moderator" element={<RedirectWithLang to="/dashboard" />} />
+                <Route path="/:lang/hr" element={<RedirectWithLang to="/dashboard" />} />
+                <Route path="/:lang/finance" element={<RedirectWithLang to="/dashboard" />} />
+                <Route path="/:lang/support" element={<RedirectWithLang to="/dashboard" />} />
 
             {/* Academy Routes */}
             <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />
@@ -94,13 +104,19 @@ export default function App() {
             <Route path="/studio/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/messages" element={<LanguageWrapper><Layout><Messages /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
+            <Route path="/studio/:lang/finance" element={<LanguageWrapper><Layout><Finance /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/profile/:id" element={<LanguageWrapper><Layout><SpecialistProfile /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
+            <Route path="/studio/:lang/trajectory" element={<LanguageWrapper><Layout><TrajectoryPage /></Layout></LanguageWrapper>} />
 
             {/* Other */}
             <Route path="/learn/:lang/:slug" element={<LanguageWrapper><Learn /></LanguageWrapper>} />
             <Route path="/:lang/privacy" element={<LanguageWrapper><Layout><InfoPage /></Layout></LanguageWrapper>} />
             <Route path="/:lang/terms" element={<LanguageWrapper><Layout><InfoPage /></Layout></LanguageWrapper>} />
+            
+            {/* Review Terminal */}
+            <Route path="/review/:lang/:projectId" element={<LanguageWrapper><AssetReview /></LanguageWrapper>} />
+            <Route path="/review/:lang/:projectId/:taskId" element={<LanguageWrapper><AssetReview /></LanguageWrapper>} />
             
             <Route path="*" element={<Navigate to="/eng" replace />} />
           </Routes>

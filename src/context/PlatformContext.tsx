@@ -5,6 +5,7 @@ interface PlatformData {
   contracts: any[];
   projects: any[];
   notifications: any[];
+  cart: any[];
   stats: any;
   isOffline: boolean;
 }
@@ -22,6 +23,7 @@ export function PlatformProvider({ children }: { children: React.ReactNode }) {
     contracts: [],
     projects: [],
     notifications: [],
+    cart: [],
     stats: {},
     isOffline: false
   });

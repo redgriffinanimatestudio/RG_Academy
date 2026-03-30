@@ -11,6 +11,7 @@ import swaggerJsdoc from "swagger-jsdoc";
 import routes from "./api/src/routes/index";
 import { errorHandler } from "./api/src/middleware/errorHandler";
 import { initSocket } from "./api/src/utils/socket";
+import rateLimit from "express-rate-limit";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,6 +33,20 @@ const swaggerOptions = {
         description: 'Development server',
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
   apis: ['./api/src/routes/*.ts', './api/src/controllers/*.ts'], // Scan for JSDoc comments
 };
@@ -39,21 +54,41 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 async function startServer() {
+  console.log("🛠️ Starting RG Academy Server (Step 1: INIT)...");
   const app = express();
   const server = createServer(app);
   const io = new SocketIOServer(server, {
     cors: { origin: true, credentials: true }
   });
 
+  console.log("🛠️ Initializing Socket.io...");
   initSocket(io);
 
-  app.use(cors({ origin: true, credentials: true }));
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: process.env.NODE_ENV === 'production' ? 100 : 2000, // 20x increase for dev
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests, please try again later.' }
+  });
+
+  const corsOptions = {
+    origin: [process.env.APP_URL || 'http://localhost:3000', 'http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  };
+
+  app.use(cors(corsOptions));
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true }));
+  app.use('/api', limiter);
 
+  console.log("🛠️ Registering routes...");
   // --- API ROUTES ---
   app.use('/api', routes);
 
+  console.log("🛠️ Registering Swagger UI...");
   // Swagger UI
   app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
   app.get('/api/docs.json', (req, res) => {

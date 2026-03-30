@@ -1,0 +1,20 @@
+[
+  {
+    "id": "fs_user_001",
+    "email": "vfx_lead@rg.academy",
+    "displayName": "Alex Nebula",
+    "photoURL": "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+    "roles": ["lecturer", "executor"],
+    "bio": "CGI & VFX Supervisor with 10 years experience",
+    "location": "Baku, Azerbaijan",
+    "createdAt": { "_seconds": 1711497600 }
+  },
+  {
+    "id": "fs_user_002",
+    "email": "student_01@rg.academy",
+    "displayName": "Ivan Student",
+    "roles": ["student"],
+    "bio": "Aspiring Unreal Engine artist",
+    "createdAt": { "_seconds": 1711501200 }
+  }
+]

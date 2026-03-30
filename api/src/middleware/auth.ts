@@ -1,125 +1,135 @@
 import { Request, Response, NextFunction } from 'express';
+import { verifyToken } from '../utils/auth.js';
 import prisma from '../utils/prisma.js';
+import { error } from '../utils/response.js';
 
 export interface AuthRequest extends Request {
   user?: {
     id: string;
     email: string;
     role: string;
-    roles?: string[];
+    roles: string[];
+    // Role Flags for RBAC Bridge
+    isStudent: boolean;
+    isLecturer: boolean;
+    isClient: boolean;
+    isExecutor: boolean;
+    isHr: boolean;
+    isFinance: boolean;
+    isSupport: boolean;
+    isAdmin: boolean;
   };
 }
 
 export const authMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return error(res, 'Authorization header missing or malformed', 401);
+  }
+
+  const token = authHeader.split(' ')[1];
+  const decoded: any = verifyToken(token);
+
+  if (!decoded) {
+    return error(res, 'Invalid or expired token', 401);
+  }
+
   try {
-    const authHeader = req.headers.authorization;
-    
-    if (!authHeader?.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'No token provided' });
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id }
+    });
+
+    if (!user) {
+      return error(res, 'User no longer exists', 401);
     }
 
-    const token = authHeader.substring(7);
-    const SUPER_ADMIN_EMAIL = 'super@redgriffin.academy';
-    
-    let user;
-
-    // 1. Проверяем, не системный ли это токен
-    if (token.startsWith('DEV_TOKEN_')) {
-      const userId = token.replace('DEV_TOKEN_', '');
-      user = await prisma.user.findUnique({
-        where: { id: userId },
-        include: { profile: true }
-      });
-    } else {
-      // 2. Ищем по remoteId или email (для совместимости)
-      user = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { remoteId: token },
-            { email: token.includes('@') ? token : '____none____' }
-          ]
-        },
-        include: { profile: true }
-      });
-    }
-
-    // 3. Обработка Superadmin (даже если пользователя нет в БД, создаем виртуального для отказоустойчивости)
-    const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL || token === 'DEV_TOKEN_SUPER_ADMIN';
-
-    if (!user && !isSuperAdmin) {
-      return res.status(401).json({ error: 'User not found or invalid token' });
-    }
-
-    // 4. Мапинг ролей
-    const ALL_ROLES = ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client'];
-    
-    let finalRoles: string[] = [];
-    if (isSuperAdmin || user?.role === 'admin') {
-      finalRoles = ALL_ROLES;
-    } else {
-      try {
-        finalRoles = user?.roles ? JSON.parse(user.roles) : [user?.role || 'student'];
-      } catch (e) {
-        finalRoles = [user?.role || 'student'];
-      }
-    }
-
+    // Attach user info with deep RBAC flags to request
     req.user = {
-      id: user?.id || 'super-admin-id',
-      email: user?.email || SUPER_ADMIN_EMAIL,
-      role: isSuperAdmin ? 'admin' : (user?.role || 'student'),
-      roles: finalRoles
+      id: user.id,
+      email: user.email || '',
+      role: user.role,
+      roles: JSON.parse(user.roles || '["student"]'),
+      isStudent: user.isStudent,
+      isLecturer: user.isLecturer,
+      isClient: user.isClient,
+      isExecutor: user.isExecutor,
+      isHr: user.isHr,
+      isFinance: user.isFinance,
+      isSupport: user.isSupport,
+      isAdmin: user.isAdmin
     };
 
     next();
-  } catch (error) {
-    console.error('Auth middleware error:', error);
-    return res.status(500).json({ error: 'Internal Server Error during authentication' });
+  } catch (e) {
+    return error(res, 'Authentication internal error', 500);
   }
 };
 
-export const optionalAuth = async (req: AuthRequest, res: Response, next: NextFunction) => {
-  try {
-    const authHeader = req.headers.authorization;
-    if (authHeader?.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      const userId = token.replace('DEV_TOKEN_', '');
-      
-      const user = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { id: userId },
-            { remoteId: token },
-            { email: token.includes('@') ? token : '____none____' }
-          ]
-        }
-      });
-      
-      if (user) {
-        req.user = { 
-          id: user.id, 
-          email: user.email || '', 
-          role: user.role,
-          roles: user.roles ? JSON.parse(user.roles) : [user.role]
-        };
-      }
-    }
-    next();
-  } catch {
-    next();
-  }
-};
-
-export const requireRole = (...roles: string[]) => {
+export const checkRole = (allowedRoles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (!req.user) return res.status(401).json({ error: 'Authentication required' });
-    const userRoles = req.user.roles || [req.user.role];
-    const hasRole = roles.some(role => userRoles.includes(role));
-    if (!hasRole) return res.status(403).json({ error: 'Insufficient permissions' });
+    if (!req.user) return error(res, 'Unauthorized', 401);
+
+    // Admin has super-access across all roles
+    if (req.user.isAdmin) return next();
+
+    // Check against active role and broad permissions
+    const hasRole = allowedRoles.includes(req.user.role);
+    
+    if (!hasRole) {
+      return error(res, `Forbidden: Requires one of [${allowedRoles.join(', ')}] roles`, 403);
+    }
+    
     next();
   };
 };
 
-export const requireAdmin = requireRole('admin', 'chief_manager');
-export const requireModerator = requireRole('admin', 'chief_manager', 'manager', 'moderator');
-export const requireStaff = requireRole('admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support');
+// Specialized RBAC Middlewares for Phase 2 readiness
+export const requireLecturer = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user) return error(res, 'Unauthorized', 401);
+  if (!req.user.isAdmin && !req.user.isLecturer) {
+    return error(res, 'Forbidden: Lecturer access required', 403);
+  }
+  next();
+};
+
+export const requireClient = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user) return error(res, 'Unauthorized', 401);
+  if (!req.user.isAdmin && !req.user.isClient) {
+    return error(res, 'Forbidden: Client access required', 403);
+  }
+  next();
+};
+
+export const requireExecutor = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user) return error(res, 'Unauthorized', 401);
+  if (!req.user.isAdmin && !req.user.isExecutor) {
+    return error(res, 'Forbidden: Executor access required', 403);
+  }
+  next();
+};
+
+export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user || !req.user.isAdmin) {
+    return error(res, 'Forbidden: Admin access required', 403);
+  }
+  next();
+};
+
+export const requireStaff = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user) return error(res, 'Unauthorized', 401);
+  const isStaff = req.user.isAdmin || req.user.isHr || req.user.isFinance || req.user.isSupport;
+  if (!isStaff) {
+    return error(res, 'Forbidden: Staff access required', 403);
+  }
+  next();
+};
+
+export const requireModerator = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user) return error(res, 'Unauthorized', 401);
+  const isModerator = req.user.isAdmin || req.user.roles.includes('moderator') || req.user.roles.includes('manager');
+  if (!isModerator) {
+    return error(res, 'Forbidden: Moderator access required', 403);
+  }
+  next();
+};

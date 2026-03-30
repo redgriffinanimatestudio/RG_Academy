@@ -50,7 +50,9 @@ export default function Footer({ modePrefix, modeColor, modeBg, currentLang, onO
             >
               <div className="flex items-center gap-3">
                 <Globe size={16} className={modeColor} />
-                <span className="text-[10px] font-black uppercase tracking-widest">{currentLang.name}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">
+                  {currentLang?.name || 'Language'}
+                </span>
               </div>
               <ChevronRight size={14} className="opacity-40" />
             </button>

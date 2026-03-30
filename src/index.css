@@ -49,6 +49,29 @@
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-emerald-400;
   }
 
+  .glass-panel {
+    backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(10, 10, 10, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .glass-industrial {
+    backdrop-filter: blur(40px) saturate(200%);
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.6), rgba(5, 5, 5, 0.8));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
+  }
+
+  .neon-glow {
+    box-shadow: 0 0 20px rgba(255, 54, 54, 0.2);
+    border-color: rgba(255, 54, 54, 0.4) !important;
+  }
+
+  .neon-glow-white {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2) !important;
+  }
+
   @keyframes pulse-border {
     0% { box-shadow: 0 0 0 0 rgba(0, 245, 212, 0.4); }
     70% { box-shadow: 0 0 0 10px rgba(0, 245, 212, 0); }

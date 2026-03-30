@@ -1,56 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { studioService, Contract } from '../services/studioService';
-import { userService, UserProfile } from '../services/userService';
-import { FileText, CheckCircle, Clock, AlertCircle, DollarSign, ChevronRight, User, Briefcase, Calendar } from 'lucide-react';
+import { Contract } from '../services/studioService';
+import { FileText, CheckCircle, Clock, AlertCircle, DollarSign, User, Briefcase } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import Preloader from '../components/Preloader';
+import { useContractManager } from '../hooks/useContractManager';
 
 export default function Contracts() {
   const { t } = useTranslation();
-  const { profile: user, loading } = useAuth();
+  const { profile: user, loading: authLoading } = useAuth();
   const { lang } = useParams();
-  const [contracts, setContracts] = useState<Contract[]>([]);
-  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
-  const [partners, setPartners] = useState<Record<string, UserProfile>>({});
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  
+  const { 
+    contracts, 
+    selectedContract, 
+    setSelectedContract, 
+    partners, 
+    loading: contractsLoading 
+  } = useContractManager(user);
 
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchData = async () => {
-      const profile = await userService.getProfile(user.uid);
-      setUserProfile(profile);
-
-      if (profile) {
-        const clientContracts = profile.roles.includes('client') ? await studioService.getContracts(user.uid, 'client') : [];
-        const executorContracts = profile.roles.includes('executor') ? await studioService.getContracts(user.uid, 'executor') : [];
-        
-        // Combine and sort by date
-        const allContracts = [...clientContracts, ...executorContracts].sort((a, b) => {
-          const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
-          const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
-          return dateB.getTime() - dateA.getTime();
-        });
-
-        // Remove duplicates
-        const uniqueContracts = Array.from(new Map(allContracts.map(c => [c.id, c])).values());
-        setContracts(uniqueContracts);
-
-        // Fetch partner profiles
-        const partnerIds = Array.from(new Set(uniqueContracts.map(c => c.clientId === user.uid ? c.executorId : c.clientId)));
-        const profiles = await userService.getUsers(partnerIds);
-        const profileMap = profiles.reduce((acc, p) => ({ ...acc, [p.uid]: p }), {});
-        setPartners(profileMap);
-      }
-    };
-
-    fetchData();
-  }, [user]);
-
-  if (loading) return <Preloader message="Loading Contracts..." size="lg" />;
+  if (authLoading || (contractsLoading && contracts.length === 0)) {
+    return <Preloader message="Syncing Contracts..." size="lg" />;
+  }
 
   if (!user) return <Navigate to={`/${lang || 'eng'}/login`} />;
 
@@ -89,7 +62,8 @@ export default function Contracts() {
           
           <div className="space-y-4">
             {contracts.map((contract) => {
-              const isClient = contract.clientId === user.uid;
+              const currentUid = user.id || user.uid;
+              const isClient = contract.clientId === currentUid;
               const partnerId = isClient ? contract.executorId : contract.clientId;
               const partner = partners[partnerId];
               
@@ -143,7 +117,7 @@ export default function Contracts() {
               );
             })}
 
-            {contracts.length === 0 && (
+            {contracts.length === 0 && !contractsLoading && (
               <div className="p-12 text-center bg-white/5 rounded-3xl border border-dashed border-white/10">
                 <FileText size={32} className="mx-auto text-white/10 mb-4" />
                 <p className="text-[10px] text-white/20 font-black uppercase tracking-widest">{t('no_contracts')}</p>
@@ -223,7 +197,7 @@ export default function Contracts() {
                   </div>
                 </div>
 
-                {selectedContract.clientId === user.uid && selectedContract.status === 'active' && (
+                {selectedContract.clientId === (user.id || user.uid) && selectedContract.status === 'active' && (
                   <div className="pt-4 border-t border-white/5">
                     <button className="w-full py-4 bg-emerald-500 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-emerald-600 transition-all shadow-xl shadow-emerald-500/10 flex items-center justify-center gap-2">
                       <DollarSign size={18} />

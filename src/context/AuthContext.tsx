@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/authService';
 import { UserProfile, UserRole } from '../services/userService';
+import apiClient from '../services/apiClient';
 
 interface AuthContextType {
   user: any;
@@ -11,6 +12,8 @@ interface AuthContextType {
   refreshProfile: () => Promise<void>;
   logout: () => Promise<void>;
   login: (login: string, pass: string) => Promise<void>;
+  register: (data: any) => Promise<void>;
+  socialAuth: (data: any) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,33 +24,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const mapProfile = (dbUser: any): UserProfile => {
+    console.log("[AUTH] Mapping DB User to Profile:", dbUser);
     // dbUser now comes with roles as array from backend (after parsing JSON)
-    return {
-      id: dbUser.id,
-      uid: dbUser.id,
+    const profile = {
+      id: dbUser.id || dbUser.uid,
+      uid: dbUser.id || dbUser.uid,
       email: dbUser.email,
       displayName: dbUser.displayName,
       photoURL: dbUser.photoURL,
       role: dbUser.role, // Current active role in DB
       primaryRole: dbUser.primaryRole,
-      roles: dbUser.roles || ['student'],
+      roles: (() => {
+        if (Array.isArray(dbUser.roles)) return dbUser.roles;
+        try { return JSON.parse(dbUser.roles || '["student"]'); } catch { return [dbUser.role || 'student']; }
+      })(),
       isAdmin: dbUser.isAdmin,
       isStudent: dbUser.isStudent,
       isLecturer: dbUser.isLecturer,
       isClient: dbUser.isClient,
       isExecutor: dbUser.isExecutor,
+      isHr: dbUser.isHr,
+      isFinance: dbUser.isFinance,
+      isSupport: dbUser.isSupport,
+      balance: dbUser.balance || 0, // Phase 6.2 Financial Bridge
       createdAt: dbUser.createdAt
     };
+    console.log("[AUTH] Mapped Profile:", profile);
+    return profile;
   };
 
   const initAuth = async () => {
     try {
-      const user = await authService.getCurrentUser();
-      if (user) {
+      console.log("[AUTH] Initializing Auth...");
+      const response = await authService.getCurrentUser();
+      console.log("[AUTH] Get Current User Response:", response);
+      // Handle response wrapper { success: true, data: user }
+      const user = response?.success ? response.data : response;
+      
+      if (user && (user.id || user.uid)) {
+        console.log("[AUTH] Valid User Found:", user);
         const mappedProfile = mapProfile(user);
         setProfile(mappedProfile);
         setActiveRoleState(mappedProfile.role as UserRole);
       } else {
+        console.log("[AUTH] No Valid User Found or Session Expired");
         setProfile(null);
         setActiveRoleState(null);
       }
@@ -83,34 +103,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const register = async (data: any) => {
+    setLoading(true);
+    try {
+      const result = await authService.register(data);
+      if (result && result.user) {
+        const mappedProfile = mapProfile(result.user);
+        setProfile(mappedProfile);
+        setActiveRoleState(mappedProfile.role as UserRole);
+      } else {
+        await initAuth();
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const socialAuth = async (data: any) => {
+    setLoading(true);
+    try {
+      const result = await authService.socialAuth(data);
+      if (result && result.user) {
+        const mappedProfile = mapProfile(result.user);
+        setProfile(mappedProfile);
+        setActiveRoleState(mappedProfile.role as UserRole);
+      } else {
+        await initAuth();
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const setActiveRole = async (role: UserRole) => {
     if (!profile || activeRole === role) return;
     
     try {
       console.log(`[AUTH] Requesting role switch to: ${role}`);
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch('/api/switch-role', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ role })
-      });
+      const { data: result } = await apiClient.post('/switch-role', { role });
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          console.log(`[AUTH] Role switched successfully to: ${role}`);
-          setActiveRoleState(role);
-          // Глубокое обновление профиля для синхронизации всех флагов
-          setProfile(prev => prev ? { ...prev, role } : null);
-        } else {
-          console.error(`[AUTH] Server rejected role switch: ${result.error}`);
-        }
+      if (result.success) {
+        console.log(`[AUTH] Role switched successfully to: ${role}`);
+        setActiveRoleState(role);
+        // Deep refresh of the profile to sync all flags (isAdmin, isStudent, etc.)
+        setProfile(prev => prev ? { ...prev, ...result.data, role } : null);
       } else {
-        const errorData = await response.json();
-        console.error(`[AUTH] Failed to switch role: ${response.status}`, errorData);
+        console.error(`[AUTH] Server rejected role switch: ${result.error}`);
       }
     } catch (err) {
       console.error("[AUTH] Critical error during role switch:", err);
@@ -126,7 +164,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setActiveRole,
       refreshProfile,
       logout,
-      login
+      login,
+      register,
+      socialAuth
     }}>
       {children}
     </AuthContext.Provider>

@@ -1,4 +1,7 @@
-const API_BASE = '/api/v1/studio';
+import apiClient from './apiClient';
+import { MIGRATION_CONFIG } from '../config/migration';
+
+const API_V1 = '/v1/studio';
 
 export interface Profile {
   id: string;
@@ -57,81 +60,157 @@ export interface SearchIndex {
 export const networkingService = {
   // --- Profiles Module ---
   async getProfile(userId: string): Promise<Profile> {
-    const response = await fetch(`${API_BASE}/profiles/${userId}`);
+    const fetchFromPostgres = async () => {
+      const { data } = await apiClient.get(`${API_V1}/profiles/${userId}`);
+      return data.success ? data.data : data;
+    };
+
+    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+      try {
+        return await fetchFromPostgres();
+      } catch (err) {
+        console.error('[Migration] Profile Read failed:', err);
+        if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;
+      }
+    }
+
+    // Legacy Fallback
+    const response = await fetch(`${API_V1}/profiles/${userId}`);
     if (!response.ok) throw new Error('Failed to fetch profile');
     return response.json();
   },
 
   async updateProfile(profileData: Partial<Profile> & { userId: string }): Promise<Profile> {
-    const response = await fetch(`${API_BASE}/profiles`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(profileData),
-    });
-    if (!response.ok) throw new Error('Failed to update profile');
-    return response.json();
+    const updateInPostgres = async () => {
+      const { data } = await apiClient.post(`${API_V1}/profiles`, profileData);
+      return data.success ? data.data : data;
+    };
+
+    const updateInLegacy = async () => {
+      const response = await fetch(`${API_V1}/profiles`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileData),
+      });
+      if (!response.ok) throw new Error('Failed to update profile');
+      return response.json();
+    };
+
+    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+      try {
+        const updated = await updateInPostgres();
+        if (MIGRATION_CONFIG.DUAL_WRITE) {
+          updateInLegacy().catch(e => console.error('[Migration] Dual-Write Profile failed:', e));
+        }
+        return updated;
+      } catch (err) {
+        if (MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) return await updateInLegacy();
+        throw err;
+      }
+    }
+
+    return await updateInLegacy();
   },
 
   // --- Connections Module ---
   async follow(followerId: string, followingId: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/connections`, {
+    const actionInPostgres = () => apiClient.post(`${API_V1}/connections`, { followerId, followingId });
+    const actionInLegacy = () => fetch(`${API_V1}/connections`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ followerId, followingId }),
     });
+
+    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+      try {
+        await actionInPostgres();
+        if (MIGRATION_CONFIG.DUAL_WRITE) {
+          actionInLegacy().catch(e => console.error('[Migration] Dual-Write Follow failed:', e));
+        }
+        return;
+      } catch (err) {
+        if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;
+      }
+    }
+
+    const response = await actionInLegacy();
     if (!response.ok) throw new Error('Failed to follow user');
   },
 
   async unfollow(followerId: string, followingId: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/connections`, {
+    const actionInPostgres = () => apiClient.delete(`${API_V1}/connections`, { data: { followerId, followingId } });
+    const actionInLegacy = () => fetch(`${API_V1}/connections`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ followerId, followingId }),
     });
+
+    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+      try {
+        await actionInPostgres();
+        if (MIGRATION_CONFIG.DUAL_WRITE) {
+          actionInLegacy().catch(e => console.error('[Migration] Dual-Write Unfollow failed:', e));
+        }
+        return;
+      } catch (err) {
+        if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;
+      }
+    }
+
+    const response = await actionInLegacy();
     if (!response.ok) throw new Error('Failed to unfollow user');
   },
 
   async getActivityFeed(userId: string): Promise<FeedEvent[]> {
-    const response = await fetch(`${API_BASE}/feed/${userId}`);
-    if (!response.ok) throw new Error('Failed to fetch feed');
-    return response.json();
+    try {
+      const { data } = await apiClient.get(`${API_V1}/feed/${userId}`);
+      return data.success ? data.data : data;
+    } catch (err) {
+      const response = await fetch(`${API_V1}/feed/${userId}`);
+      if (!response.ok) throw new Error('Failed to fetch feed');
+      return response.json();
+    }
   },
 
   async getFollowing(userId: string): Promise<string[]> {
-    // This is a stub, usually should be an API call
-    return [];
+    return []; // Placeholder
   },
 
   // --- Discovery Module ---
   async searchProfiles(query: string, skill?: string): Promise<any[]> {
-    const params = new URLSearchParams({ query, ...(skill ? { skill } : {}) });
-    const response = await fetch(`${API_BASE}/discovery/search?${params.toString()}`);
-    if (!response.ok) throw new Error('Failed to search profiles');
+    const params = { query, skill };
+    
+    const searchFromPostgres = async () => {
+      const { data } = await apiClient.get(`${API_V1}/discovery/search`, { params });
+      return data.success ? data.data : data;
+    };
 
-    const result = await response.json();
-    // Backend returns paginated response: { success: true, data: [...], pagination: {...} }
-    if (Array.isArray(result.data)) {
-      return result.data;
+    try {
+      const result = await searchFromPostgres();
+      return Array.isArray(result) ? result : (result.data || []);
+    } catch (err) {
+      const urlParams = new URLSearchParams({ query, ...(skill ? { skill } : {}) });
+      const response = await fetch(`${API_V1}/discovery/search?${urlParams.toString()}`);
+      if (!response.ok) throw new Error('Failed to search profiles');
+      const result = await response.json();
+      return result.data || result;
     }
-
-    // Fallback for old payload shapes
-    if (Array.isArray(result)) {
-      return result;
-    }
-
-    return [];
   },
 
   async getRecommendations(userId: string): Promise<SearchIndex[]> {
-    // This is a stub, usually should be an API call
-    return [];
+    return []; // Placeholder
   },
 
   async validateChatAccess(targetUserId: string, token: string): Promise<{ canMessage: boolean; error?: string; code?: string }> {
-    const response = await fetch(`${API_BASE}/validate/chat/${targetUserId}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const result = await response.json();
-    return result.data || result;
+    try {
+      const { data } = await apiClient.get(`/v1/studio/validate/chat/${targetUserId}`);
+      return data.success ? data.data : data;
+    } catch (err) {
+      const response = await fetch(`${API_BASE}/validate/chat/${targetUserId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const result = await response.json();
+      return result.data || result;
+    }
   }
 };

@@ -18,72 +18,73 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { academyService, Course, Lesson, Review } from '../services/academyService';
-
-
+import { academyService, Course, Lesson } from '../services/academyService';
+import { useAuth } from '../context/AuthContext';
 import Preloader from '../components/Preloader';
+import EnrollmentStepper from '../components/academy/enrollment/EnrollmentStepper';
 
 export default function CourseDetail() {
   const { t } = useTranslation();
   const { slug, lang } = useParams();
   const navigate = useNavigate();
-  const [user] = useAuthState(auth);
+  const { profile: user, loading: authLoading } = useAuth();
   
   const [course, setCourse] = useState<Course | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [pageLoading, setPageLoading] = useState(true); 
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [showEnrollModal, setShowEnrollModal] = useState(false);
 
   useEffect(() => {
-    loadCourseData();
-  }, [slug, user]);
-
-  const loadCourseData = async () => {
-    if (!slug) return;
-    setLoading(true);
-    try {
-      const courseData = await academyService.getCourseBySlug(slug);
-      if (courseData) {
-        setCourse(courseData);
-        const [lessonsData, reviewsData, enrollment] = await Promise.all([
-          academyService.getLessons(courseData.id),
-          academyService.getReviews(courseData.id),
-          user ? academyService.getEnrollment(user.uid, courseData.id) : Promise.resolve(null)
-        ]);
-        setLessons(lessonsData);
-        setReviews(reviewsData);
-        setIsEnrolled(!!enrollment);
+    async function loadCourseData() {
+      if (!slug) return;
+      setPageLoading(true);
+      try {
+        const courseData = await academyService.getCourseBySlug(slug);
+        if (courseData) {
+          setCourse(courseData);
+          const lessonsData = await academyService.getLessons(courseData.slug);
+          setLessons(lessonsData);
+          
+          if (user?.id) {
+            const enrollments = await academyService.getUserEnrollments(user.id);
+            const enrolled = enrollments.some((e: any) => e.courseId === courseData.id);
+            setIsEnrolled(enrolled);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading course:", error);
+      } finally {
+        setPageLoading(false);
       }
-    } catch (error) {
-      console.error("Error loading course:", error);
-    } finally {
-      setLoading(false);
     }
-  };
 
-  const handleEnroll = async () => {
+    if (!authLoading) {
+      loadCourseData();
+    }
+  }, [slug, user?.id, authLoading]);
+
+  const handleEnrollClick = () => {
     if (!user) {
-      navigate(`/login/${lang || 'eng'}`);
+      navigate(`/aca/${lang || 'eng'}/login`);
       return;
     }
-    if (!course) return;
-    
-    try {
-      await academyService.enrollInCourse(user.uid, course.id);
-      setIsEnrolled(true);
-      navigate(`/learn/${lang || 'eng'}/${course.slug}`);
-    } catch (error) {
-      console.error("Enrollment failed:", error);
-    }
+    setShowEnrollModal(true);
   };
 
-  if (loading) return <Preloader message="Loading Course..." size="lg" className="min-h-screen bg-bg-dark" />;
+  const handleEnrollSuccess = () => {
+    setIsEnrolled(true);
+    setShowEnrollModal(false);
+    navigate(`/learn/${lang || 'eng'}/${course?.slug}`);
+  };
+
+  if (authLoading || pageLoading) return <Preloader message="Loading Course..." size="lg" className="min-h-screen bg-[#050505]" />;
 
   if (!course) return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-bg-dark space-y-6">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#050505] space-y-6">
       <h2 className="text-2xl font-black text-white uppercase">Course Not Found</h2>
-      <Link to={`/aca/${lang}`} className="criativo-btn flex items-center gap-2">
+      <Link to={`/aca/${lang}`} className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black uppercase flex items-center gap-2">
         <ArrowLeft size={18} /> Back to Academy
       </Link>
     </div>
@@ -92,7 +93,6 @@ export default function CourseDetail() {
   return (
     <div className="py-8 space-y-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-12">
           <div className="space-y-6">
             <div className="flex items-center gap-2 text-primary font-black uppercase tracking-[0.3em] text-[10px]">
@@ -129,7 +129,6 @@ export default function CourseDetail() {
             </div>
           </div>
 
-          {/* Video Preview */}
           <div className="aspect-video rounded-[2.5rem] bg-zinc-900 border border-white/5 overflow-hidden relative group cursor-pointer">
             <img src={course.thumbnail} alt="Preview" className="w-full h-full object-cover opacity-50 transition-transform duration-700 group-hover:scale-105" />
             <div className="absolute inset-0 flex items-center justify-center">
@@ -139,7 +138,6 @@ export default function CourseDetail() {
             </div>
           </div>
 
-          {/* Curriculum */}
           <div className="space-y-8">
             <h2 className="text-3xl font-black uppercase tracking-tight text-white">Course Curriculum</h2>
             <div className="space-y-4">
@@ -150,7 +148,7 @@ export default function CourseDetail() {
                     <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{lessons.length} Lessons</span>
                   </div>
                   <div className="space-y-3">
-                    {lessons.map((lesson, lIdx) => (
+                    {lessons.map((lesson) => (
                       <div key={lesson.id} className="flex items-center justify-between p-4 rounded-xl bg-black/40 border border-white/5">
                         <div className="flex items-center gap-4">
                           <div className="size-8 bg-white/5 rounded-lg flex items-center justify-center text-white/20">
@@ -171,12 +169,11 @@ export default function CourseDetail() {
             </div>
           </div>
 
-          {/* Requirements & Target Audience */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="p-10 rounded-[2.5rem] bg-white/5 border border-white/5 space-y-6">
               <h3 className="text-xl font-black uppercase tracking-tight text-white">Requirements</h3>
               <ul className="space-y-3">
-                {['Autodesk Maya 2024+', 'Basic understanding of 3D space', 'Wacom tablet recommended'].map((req, i) => (
+                {['Industry Standard Software', 'Basic understanding of 3D space', 'Passion for creation'].map((req, i) => (
                   <li key={i} className="flex items-center gap-3 text-white/60 text-sm font-medium">
                     <div className="size-1.5 rounded-full bg-primary" />
                     {req}
@@ -187,7 +184,7 @@ export default function CourseDetail() {
             <div className="p-10 rounded-[2.5rem] bg-white/5 border border-white/5 space-y-6">
               <h3 className="text-xl font-black uppercase tracking-tight text-white">Who is this for?</h3>
               <ul className="space-y-3">
-                {['Aspiring Character Technical Directors', '3D Animators wanting to rig', 'Game Dev students'].map((target, i) => (
+                {['Aspiring CGI Artists', 'Game Designers', 'Creative Professionals'].map((target, i) => (
                   <li key={i} className="flex items-center gap-3 text-white/60 text-sm font-medium">
                     <div className="size-1.5 rounded-full bg-primary" />
                     {target}
@@ -197,14 +194,12 @@ export default function CourseDetail() {
             </div>
           </div>
 
-          {/* FAQ Section */}
           <div className="space-y-8">
             <h2 className="text-3xl font-black uppercase tracking-tight text-white">Frequently Asked Questions</h2>
             <div className="space-y-4">
               {[
                 { q: "Is this course live or recorded?", a: "All lessons are pre-recorded high-quality videos that you can watch at your own pace." },
-                { q: "Do I get a certificate?", a: "Yes! Upon completing 100% of the lessons and quizzes, you will receive a verified blockchain certificate." },
-                { q: "Can I ask questions to the mentor?", a: "Absolutely. Our Community Q&A section is active, and Elena personally reviews student submissions weekly." }
+                { q: "Do I get a certificate?", a: "Yes! Upon completing 100% of the lessons, you will receive a verified certificate." }
               ].map((faq, i) => (
                 <details key={i} className="group p-6 rounded-3xl bg-white/5 border border-white/5 cursor-pointer">
                   <summary className="flex items-center justify-between font-black uppercase tracking-tight text-sm list-none">
@@ -216,47 +211,8 @@ export default function CourseDetail() {
               ))}
             </div>
           </div>
-
-          {/* Reviews Section */}
-          <div className="space-y-8">
-            <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-black uppercase tracking-tight text-white">Student Reviews</h2>
-              <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/5">
-                <Star size={16} className="text-primary" fill="currentColor" />
-                <span className="text-sm font-black text-white">4.9/5.0</span>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {reviews.length > 0 ? (
-                reviews.map((review) => (
-                  <div key={review.id} className="p-6 rounded-3xl bg-white/5 border border-white/5 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} size={12} className={i < review.rating ? 'text-primary' : 'text-white/10'} fill="currentColor" />
-                        ))}
-                      </div>
-                      <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Mar 2026</span>
-                    </div>
-                    <p className="text-sm text-white/60 leading-relaxed italic">"{review.comment}"</p>
-                    <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                      <div className="size-6 rounded-full bg-white/10" />
-                      <span className="text-[10px] font-black text-white uppercase tracking-widest">Student Artist</span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-full p-12 text-center bg-white/5 rounded-3xl border border-white/5">
-                  <MessageCircle size={32} className="mx-auto text-white/10 mb-4" />
-                  <p className="text-white/20 font-black uppercase tracking-widest text-xs">No reviews yet for this workshop.</p>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
 
-        {/* Sidebar Card */}
         <div className="lg:col-span-1">
           <div className="sticky top-28 p-8 rounded-[2.5rem] bg-white text-bg-dark space-y-8 shadow-2xl shadow-primary/10 border border-bg-dark/5">
             <div className="space-y-2">
@@ -277,16 +233,22 @@ export default function CourseDetail() {
                 </button>
               ) : (
                 <button 
-                  onClick={handleEnroll}
+                  onClick={handleEnrollClick}
                   className="w-full py-5 bg-bg-dark text-white rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-black transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl"
                 >
                   {course.price === 0 ? 'Start Learning' : 'Enroll Now'}
                 </button>
               )}
-              <p className="text-center text-[8px] font-black opacity-40 uppercase tracking-widest">
-                {course.price === 0 ? 'Open Source Workshop' : '30-Day Money-Back Guarantee'}
-              </p>
             </div>
+
+            {showEnrollModal && course && (
+              <EnrollmentStepper 
+                course={course} 
+                onSuccess={handleEnrollSuccess} 
+                onClose={() => setShowEnrollModal(false)}
+                accent="#fff" // Primary accent
+              />
+            )}
 
             <div className="pt-8 border-t border-bg-dark/5 space-y-4">
               <p className="text-[10px] font-black uppercase tracking-widest opacity-40">This course includes:</p>
@@ -295,7 +257,6 @@ export default function CourseDetail() {
                   { icon: Clock, label: 'Lifetime Access' },
                   { icon: BarChart, label: t(course.level) + ' Level' },
                   { icon: Users, label: 'Community Support' },
-                  { icon: Globe, label: 'EN / RU Content' },
                   { icon: Award, label: 'Certificate of completion' },
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center gap-3">
@@ -303,18 +264,6 @@ export default function CourseDetail() {
                     <span className="text-sm font-bold opacity-80">{item.label}</span>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-bg-dark/5 space-y-4 border border-bg-dark/5">
-              <div className="flex items-center gap-3">
-                <Shield size={20} className="text-emerald-600" />
-                <span className="text-xs font-black uppercase tracking-tight">Secure Platform</span>
-              </div>
-              <div className="flex gap-2 opacity-20 grayscale">
-                <div className="h-6 w-10 bg-bg-dark rounded" />
-                <div className="h-6 w-10 bg-bg-dark rounded" />
-                <div className="h-6 w-10 bg-bg-dark rounded" />
               </div>
             </div>
           </div>

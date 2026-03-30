@@ -1,79 +1,150 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { userService, UserProfile, UserRole } from '../services/userService';
+import { authService } from '../services/authService';
+import { UserProfile, UserRole } from '../services/userService';
 
 interface AuthContextType {
   user: any;
   profile: UserProfile | null;
   loading: boolean;
   activeRole: UserRole | null;
-  setActiveRole: (role: UserRole) => void;
+  setActiveRole: (role: UserRole) => Promise<void>;
   refreshProfile: () => Promise<void>;
   logout: () => Promise<void>;
+  login: (login: string, pass: string) => Promise<void>;
+  register: (data: any) => Promise<void>;
+  socialAuth: (data: any) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [profile, setProfile] = useState<UserProfile | null>(() => {
-    const devStored = localStorage.getItem('rg_dev_user');
-    if (devStored) {
-      try {
-        const dev = JSON.parse(devStored);
-        return {
-          uid: dev.id,
-          email: dev.email,
-          displayName: dev.displayName,
-          photoURL: dev.photoURL || null,
-          roles: ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support', 'student', 'lecturer', 'executor', 'client'],
-          createdAt: new Date()
-        };
-      } catch (e) { return null; }
-    }
-    return null;
-  });
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [activeRole, setActiveRoleState] = useState<UserRole | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const [activeRole, setActiveRoleState] = useState<UserRole | null>(() => {
-    const devStored = localStorage.getItem('rg_dev_user');
-    if (devStored) {
-      try {
-        const dev = JSON.parse(devStored);
-        return (localStorage.getItem(`rg_active_role_${dev.id}`) as UserRole) || 'admin';
-      } catch (e) { return null; }
-    }
-    return null;
-  });
+  const mapProfile = (dbUser: any): UserProfile => {
+    return {
+      id: dbUser.id || dbUser.uid,
+      uid: dbUser.id || dbUser.uid,
+      email: dbUser.email,
+      displayName: dbUser.displayName,
+      photoURL: dbUser.photoURL,
+      role: dbUser.role,
+      primaryRole: dbUser.primaryRole,
+      roles: dbUser.roles || ['student'],
+      isAdmin: dbUser.isAdmin,
+      isStudent: dbUser.isStudent,
+      isLecturer: dbUser.isLecturer,
+      isClient: dbUser.isClient,
+      isExecutor: dbUser.isExecutor,
+      profileData: dbUser.profile || {},
+      createdAt: dbUser.createdAt
+    };
+  };
 
-  const [loading, setLoading] = useState(false);
+  const initAuth = async () => {
+    try {
+      const response = await authService.getCurrentUser();
+      const user = response?.success ? response.data : response;
+      
+      if (user && (user.id || user.uid)) {
+        const mappedProfile = mapProfile(user);
+        setProfile(mappedProfile);
+        setActiveRoleState(mappedProfile.role as UserRole);
+      } else {
+        setProfile(null);
+        setActiveRoleState(null);
+      }
+    } catch (err) {
+      console.error("Auth initialization error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    initAuth();
+  }, []);
 
   const refreshProfile = async () => {
-    // Already loaded from localStorage in this version
+    await initAuth();
   };
 
   const logout = async () => {
-    const currentLang = window.location.pathname.split('/')[1] || 'eng';
-    localStorage.removeItem('rg_dev_user');
-    localStorage.removeItem('rg_auth_active');
+    await authService.logout();
     setProfile(null);
     setActiveRoleState(null);
-    window.location.href = `/${currentLang}`;
+    window.location.href = '/';
   };
 
-  const setActiveRole = (role: UserRole) => {
-    if (profile?.roles.includes(role)) {
-      setActiveRoleState(role);
-      localStorage.setItem(`rg_active_role_${profile.uid}`, role);
+  const login = async (loginStr: string, pass: string) => {
+    setLoading(true);
+    try {
+      await authService.login(loginStr, pass);
+      await initAuth();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (data: any) => {
+    setLoading(true);
+    try {
+      await authService.register(data);
+      await initAuth();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const socialAuth = async (data: any) => {
+    setLoading(true);
+    try {
+      await authService.socialAuth(data);
+      await initAuth();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setActiveRole = async (role: UserRole) => {
+    if (!profile || activeRole === role) return;
+    
+    try {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/switch-role', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ role })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setActiveRoleState(role);
+          setProfile(prev => prev ? { ...prev, role } : null);
+        }
+      }
+    } catch (err) {
+      console.error("[AUTH] Critical error during role switch:", err);
     }
   };
 
   return (
     <AuthContext.Provider value={{ 
-      user: profile, 
+      user: profile,
       profile, 
       loading, 
       activeRole, 
       setActiveRole,
       refreshProfile,
-      logout
+      logout,
+      login,
+      register,
+      socialAuth
     }}>
       {children}
     </AuthContext.Provider>

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -32,6 +33,7 @@ async function main() {
   const admin = await prisma.user.create({
     data: {
       email: 'admin@redgriffin.academy',
+      password: bcrypt.hashSync('admin', 10),
       displayName: 'System Architect',
       role: 'admin',
       primaryRole: 'admin',
@@ -53,6 +55,7 @@ async function main() {
   const lecturer = await prisma.user.create({
     data: {
       email: 'lecturer@example.com',
+      password: bcrypt.hashSync('admin', 10),
       displayName: 'Alex Rivers',
       role: 'lecturer',
       primaryRole: 'lecturer',
@@ -71,6 +74,7 @@ async function main() {
   const student = await prisma.user.create({
     data: {
       email: 'student@example.com',
+      password: bcrypt.hashSync('admin', 10),
       displayName: 'New Artist',
       role: 'student',
       primaryRole: 'student',
@@ -89,6 +93,7 @@ async function main() {
   const chiefManager = await prisma.user.create({
     data: {
       email: 'chief@redgriffin.academy',
+      password: bcrypt.hashSync('admin', 10),
       displayName: 'Elena Vance',
       role: 'chief_manager',
       primaryRole: 'chief_manager',
@@ -108,6 +113,7 @@ async function main() {
   const manager = await prisma.user.create({
     data: {
       email: 'manager@redgriffin.academy',
+      password: bcrypt.hashSync('admin', 10),
       displayName: 'Marcus Aurelius',
       role: 'manager',
       primaryRole: 'manager',
@@ -125,6 +131,7 @@ async function main() {
   const moderator = await prisma.user.create({
     data: {
       email: 'moderator@redgriffin.academy',
+      password: bcrypt.hashSync('admin', 10),
       displayName: 'Sarah Connor',
       role: 'moderator',
       primaryRole: 'moderator',
@@ -141,6 +148,7 @@ async function main() {
   const hr = await prisma.user.create({
     data: {
       email: 'hr@redgriffin.academy',
+      password: bcrypt.hashSync('admin', 10),
       displayName: 'Miranda Lawson',
       role: 'hr',
       primaryRole: 'hr',
@@ -157,6 +165,7 @@ async function main() {
   const finance = await prisma.user.create({
     data: {
       email: 'finance@redgriffin.academy',
+      password: bcrypt.hashSync('admin', 10),
       displayName: 'Garrus Vakarian',
       role: 'finance',
       primaryRole: 'finance',
@@ -173,6 +182,7 @@ async function main() {
   const support = await prisma.user.create({
     data: {
       email: 'support@redgriffin.academy',
+      password: bcrypt.hashSync('admin', 10),
       displayName: 'Tali Zorah',
       role: 'support',
       primaryRole: 'support',
@@ -189,6 +199,7 @@ async function main() {
   const client = await prisma.user.create({
     data: {
       email: 'client@example.com',
+      password: bcrypt.hashSync('admin', 10),
       displayName: 'Cyberdyne Systems',
       role: 'client',
       primaryRole: 'client',
@@ -206,6 +217,7 @@ async function main() {
   const executor = await prisma.user.create({
     data: {
       email: 'executor@example.com',
+      password: bcrypt.hashSync('admin', 10),
       displayName: 'Solid Snake',
       role: 'executor',
       primaryRole: 'executor',
@@ -283,18 +295,33 @@ async function main() {
       lecturerId: admin.id,
       lecturerName: admin.displayName || 'Admin',
       price: 199.99,
-      thumbnail: 'https://images.unsplash.com/photo-1616440835904-715057537c4f?q=80&w=1000',
+      thumbnail: 'https://images.unsplash.com/photo-1620121692029-d088224efc74?auto=format&fit=crop&q=80',
       level: 'intermediate',
       status: 'published',
       tags: JSON.stringify(['UE5', 'Rendering', 'Gamedev']),
       categoryId: cat3d.id,
-      lessons: {
-        create: [
-          { title: 'Introduction to Interface', content: '...', videoUrl: '...', type: 'video', duration: '15m', order: 1, isFree: true },
-          { title: 'Nanite and Lumen', content: '...', videoUrl: '...', type: 'video', duration: '45m', order: 2 }
-        ]
-      }
     }
+  });
+
+  // 5.1 MODULES & LESSONS (Industrial Hierarchy)
+  const m1 = await prisma.module.create({
+    data: { courseId: course.id, title: 'I: Neural Foundations & UI', order: 1 }
+  });
+  const m2 = await prisma.module.create({
+    data: { courseId: course.id, title: 'II: Nanite & Lumen Architecture', order: 2 }
+  });
+  const m3 = await prisma.module.create({
+    data: { courseId: course.id, title: 'III: Cinematic Rendering & Path Tracing', order: 3 }
+  });
+
+  await prisma.lesson.createMany({
+    data: [
+      { courseId: course.id, moduleId: m1.id, title: 'Session 01: Ecosystem Initialization', content: '<p>Standardizing the Unreal Engine workspace for industrial VFX production.</p>', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', type: 'video', duration: '12m', order: 1, isFree: true },
+      { courseId: course.id, moduleId: m1.id, title: 'Session 02: Folder Hierarchy & Naming Protocols', content: '<p>Ensuring cross-departmental compatibility.</p>', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', type: 'video', duration: '18m', order: 2 },
+      { courseId: course.id, moduleId: m2.id, title: 'Session 03: Virtualized Geometry Logic', content: '<p>Mastering Nanite for high-poly cinematic assets.</p>', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', type: 'video', duration: '45m', order: 3 },
+      { courseId: course.id, moduleId: m2.id, title: 'Session 04: Real-time Global Illumination (Lumen)', content: '<p>Calibrating infinite bounce lighting.</p>', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', type: 'video', duration: '35m', order: 4 },
+      { courseId: course.id, moduleId: m3.id, title: 'Session 05: Movie Render Queue Configuration', content: '<p>Exporting industrial-grade EXR sequences.</p>', videoUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', type: 'video', duration: '50m', order: 5 },
+    ]
   });
 
   // 6. PROJECTS (STUDIO)

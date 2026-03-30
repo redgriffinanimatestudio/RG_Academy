@@ -2,34 +2,52 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator zod {
+  provider = "zod-prisma-types"
+  output   = "../api/src/schemas/generated"
+}
+
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
   id           String       @id @default(cuid())
   email        String?      @unique
+  phone        String?      @unique
   displayName  String?
   photoURL     String?
+  password     String?
   
   // Role Logic from BIBLE
-  role         String       @default("student") // Current active/primary role
-  primaryRole  String       @default("student") // Permanent primary role
-  roles        String       @default("[\"student\"]") // JSON array for backward compatibility
+  role         String       @default("user") // Current active/primary role (Onboarding Entry)
+  primaryRole  String       @default("user") // Permanent primary role
+  roles        String       @default("[\"user\"]") // JSON array for backward compatibility
   
   // Role Flags for fast queries
-  isStudent    Boolean      @default(true)
+  isStudent    Boolean      @default(false)
   isLecturer   Boolean      @default(false)
   isClient     Boolean      @default(false)
   isExecutor   Boolean      @default(false)
+  isHr         Boolean      @default(false)
+  isFinance    Boolean      @default(false)
+  isSupport    Boolean      @default(false)
   isAdmin      Boolean      @default(false) // Special platform admin
   
   remoteId     String?      @unique
   source       String       @default("local")
   lastSyncedAt DateTime?
+  balance      Float        @default(0) // Financial Bridge Ledger balance
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+  
+  @@index([role])
+  @@index([isAdmin])
+  @@index([isStudent])
+  @@index([isLecturer])
+  @@index([isClient])
+  @@index([isExecutor])
   
   // Relations
   profile      Profile?
@@ -51,6 +69,17 @@ model User {
   assignedTasks     Task[]        @relation("AssignedTasks")
   notifications     Notification[]
   transactions      Transaction[]
+  jobApplications   JobApplication[] @relation("UserJobApplications")
+  annotations       Annotation[]
+
+  // LMS Relations
+  submissions   Submission[]
+  gradesGiven   Grade[]       @relation("ReviewerGrades")
+  attendances   Attendance[]
+  partners      Partner?      @relation(fields: [partnerId], references: [id])
+  partnerId     String?
+  trajectories  UserTrajectory[]
+  simulations   AISimulation[]
 }
 
 model Achievement {
@@ -75,6 +104,11 @@ model Transaction {
   refId       String?  // Optional contractId or courseId
   description String?
   createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([refId])
 }
 
 model Notification {
@@ -90,21 +124,65 @@ model Notification {
 }
 
 model Profile {
-  id        String          @id @default(cuid())
-  userId    String          @unique
-  bio       String?
-  avatar    String?
-  location  String?
-  updatedAt DateTime        @updatedAt
-  portfolio PortfolioItem[]
-  user      User            @relation(fields: [userId], references: [id])
-  skills    Skill[]         @relation("ProfileToSkill")
+  id              String          @id @default(cuid())
+  userId          String          @unique
+  bio             String?
+  avatar          String?
+  location        String?
+
+  // --- Student Fields ---
+  experienceLevel String?
+  primarySoftware String?
+  learningGoal    String?
+  portfolioUrl    String?
+
+  // --- Executor Fields ---
+  specialization  String?
+  artStationUrl   String?
+  availability    String?
+  hourlyRate      Float?
+  aiReadiness     Float           @default(0.0) // Matrix Verified readiness (0-100)
+
+  // --- Client Fields ---
+  clientType      String?
+  companyName     String?
+  companyWebsite  String?
+  industry        String?
+
+  // --- Privacy & Regional Compliance ---
+  country         String?
+  citizenship     String?
+  
+  // --- Professional Specs ---
+  linkedInUrl     String?
+  telegramHandle  String?
+
+  // --- Extended Profile (Phase 5.2) ---
+  gender          String?   // male | female | other
+  dateOfBirth     DateTime?
+  ageCategory     String?   // child | teen | adult
+
+  updatedAt       DateTime        @updatedAt
+  portfolio       PortfolioItem[]
+  user            User            @relation(fields: [userId], references: [id])
+  skills          ProfileSkill[]  // Refactored to include proficiency
+}
+
+model ProfileSkill {
+  id          String   @id @default(cuid())
+  profileId   String
+  skillId     String
+  proficiency Int      @default(1) // 1-10 level (Phase 6)
+  profile     Profile  @relation(fields: [profileId], references: [id])
+  skill       Skill    @relation(fields: [skillId], references: [id])
+
+  @@unique([profileId, skillId])
 }
 
 model Skill {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  profiles Profile[] @relation("ProfileToSkill")
+  id       String         @id @default(cuid())
+  name     String         @unique
+  profiles ProfileSkill[]
 }
 
 model Connection {
@@ -152,12 +230,19 @@ model Project {
   status       String        @default("open")
   urgency      String        @default("normal")
   budget       Float         @default(0)
-  tags         String        @default("[]")
-  applications Application[]
+  tags            String        @default("[]")
+  applications    Application[]
+  reviewSessions  ReviewSession[]
   contracts    Contract[]
   tasks        Task[]
+  requiredSkills String        @default("[]") // JSON: [{skill: "Maya", level: 5}]
+  maturityLevel String        @default("junior") // junior, middle, senior, lead
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+
+  @@index([slug])
+  @@index([clientId])
+  @@index([status])
 }
 
 model Service {
@@ -181,6 +266,9 @@ model Application {
   executor    User     @relation(fields: [executorId], references: [id])
   coverLetter String
   bid         Float
+  days        Int      @default(7)
+  milestones  String   @default("[]") // Proposed milestones
+  matchScore  Int      @default(0)    // Skill match % (Phase 6)
   status      String   @default("pending")
   createdAt   DateTime @default(now())
 }
@@ -197,6 +285,18 @@ model Contract {
   currency    String   @default("USD")
   status      String   @default("pending")
   milestones  String   @default("[]")
+  escrow      Escrow?
+  createdAt   DateTime @default(now())
+}
+
+model Escrow {
+  id          String   @id @default(cuid())
+  contractId  String   @unique
+  contract    Contract @relation(fields: [contractId], references: [id])
+  amount      Float
+  status      String   @default("locked") // locked, partially_released, released, refunded
+  isTaxVerified Boolean @default(false)
+  updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())
 }
 
@@ -210,16 +310,76 @@ model Task {
   status     String    @default("todo")
   priority   String    @default("medium")
   deadline   DateTime?
+  reviewSession ReviewSession?
   createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model ReviewSession {
+  id          String       @id @default(cuid())
+  taskId      String?      @unique
+  task        Task?        @relation(fields: [taskId], references: [id])
+  projectId   String
+  project     Project      @relation(fields: [projectId], references: [id])
+  mediaUrl    String       // URL to the asset being reviewed
+  mediaType   String       // image, video
+  annotations Annotation[]
+  status      String       @default("active") // active, closed
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Annotation {
+  id          String        @id @default(cuid())
+  sessionId   String
+  session     ReviewSession @relation(fields: [sessionId], references: [id])
+  authorId    String
+  author      User          @relation(fields: [authorId], references: [id])
+  type        String        // point, rect, draw
+  data        String        // JSON: {x, y, text, etc}
+  timestamp   Float?        // For video frames
+  createdAt   DateTime      @default(now())
+}
+
+model Department {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  icon        String?
+  programs    Program[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Program {
+  id           String    @id @default(cuid())
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  title        String
+  slug         String    @unique
+  type         String    // comprehensive, standard, express, specialization, support
+  description  String?
+  levels       String    @default("[]") // JSON array of levels [A, B, C, D]
+  courses      Course[]
+  cohorts      Cohort[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Category {
   id            String    @id @default(cuid())
   name          String
-  type          String
-  order         Int
-  subcategories String
+  slug          String    @unique @default(cuid())
+  description   String?
+  icon          String?   
+  accentColor   String?   
+  type          String    
+  order         Int       @default(0)
+  subcategories String    @default("[]") 
   courses       Course[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Course {
@@ -242,9 +402,26 @@ model Course {
   createdAt      DateTime     @default(now())
   categoryId     String
   category       Category     @relation(fields: [categoryId], references: [id])
+  programId      String?
+  program        Program?     @relation(fields: [programId], references: [id])
   enrollments    Enrollment[]
+  lod            Int          @default(100) // Level of Development (100-500)
+  softwareStack  String       @default("[]") // JSON: [{name: "Revit", version: "2024"}]
+  modules        Module[]
   lessons        Lesson[]
   reviews        Review[]
+  assignments    Assignment[]
+  schedules      Schedule[]
+}
+
+model Module {
+  id        String   @id @default(cuid())
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  title     String
+  order     Int
+  lessons   Lesson[]
+  createdAt DateTime @default(now())
 }
 
 model Lesson {
@@ -259,19 +436,34 @@ model Lesson {
   isFree       Boolean   @default(false)
   createdAt    DateTime  @default(now())
   course       Course    @relation(fields: [courseId], references: [id])
+  moduleId     String?
+  module       Module?   @relation(fields: [moduleId], references: [id])
 }
 
 model Enrollment {
   id               String    @id @default(cuid())
   userId           String
   courseId         String
+  cohortId         String?
+  cohort           Cohort?   @relation(fields: [cohortId], references: [id])
   progress         Int       @default(0)
   status           String    @default("active")
   completedLessons String    @default("[]")
   enrolledAt       DateTime  @default(now())
   completedAt      DateTime?
-  course           Course    @relation(fields: [courseId], references: [id])
-  user             User      @relation(fields: [userId], references: [id])
+  course           Course              @relation(fields: [courseId], references: [id])
+  user             User                @relation(fields: [userId], references: [id])
+  analytics        EnrollmentAnalytics[]
+}
+
+model EnrollmentAnalytics {
+  id           String     @id @default(cuid())
+  enrollmentId String
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id])
+  lessonId     String
+  watchTime    Int        @default(0) // Seconds
+  completedAt  DateTime?
+  lastSyncAt   DateTime   @default(now())
 }
 
 model Review {
@@ -284,6 +476,127 @@ model Review {
   createdAt    DateTime  @default(now())
   user         User      @relation(fields: [userId], references: [id])
   course       Course    @relation(fields: [courseId], references: [id])
+}
+
+model Assignment {
+  id          String       @id @default(cuid())
+  courseId    String
+  course      Course       @relation(fields: [courseId], references: [id])
+  title       String
+  description String
+  deadline    DateTime?
+  maxScore    Float        @default(100)
+  rubricId    String?
+  rubric      Rubric?      @relation(fields: [rubricId], references: [id])
+  submissions Submission[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Submission {
+  id           String   @id @default(cuid())
+  assignmentId String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id])
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  contentUrl   String
+  status       String   @default("pending") // pending, reviewed, redo
+  grades       Grade[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Rubric {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  criteria    Criteria[]
+  assignments Assignment[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Criteria {
+  id          String   @id @default(cuid())
+  rubricId    String
+  rubric      Rubric   @relation(fields: [rubricId], references: [id])
+  name        String
+  description String?
+  maxScore    Float
+  weight      Float    @default(1.0)
+}
+
+model Grade {
+  id             String     @id @default(cuid())
+  submissionId   String
+  submission     Submission @relation(fields: [submissionId], references: [id])
+  reviewerId     String
+  reviewer       User       @relation("ReviewerGrades", fields: [reviewerId], references: [id])
+  score          Float
+  feedback       String?
+  criteriaScores String     @default("{}") // JSON mapping criteriaId to score
+  createdAt      DateTime   @default(now())
+}
+
+model Cohort {
+  id          String       @id @default(cuid())
+  programId   String
+  program     Program      @relation(fields: [programId], references: [id])
+  name        String
+  startDate   DateTime
+  endDate     DateTime?
+  status      String       @default("upcoming") // upcoming, active, finished
+  enrollments Enrollment[]
+  schedules   Schedule[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Schedule {
+  id        String   @id @default(cuid())
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  cohortId  String?
+  cohort    Cohort?  @relation(fields: [cohortId], references: [id])
+  title     String
+  startTime DateTime
+  endTime   DateTime
+  location  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Attendance {
+  id         String   @id @default(cuid())
+  scheduleId String
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  status     String   @default("present") // present, absent, late
+  createdAt  DateTime @default(now())
+}
+
+model Partner {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  industry    String?
+  website     String?
+  logo        String?
+  users       User[]
+  vacancies   Vacancy[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Vacancy {
+  id          String   @id @default(cuid())
+  partnerId   String
+  partner     Partner  @relation(fields: [partnerId], references: [id])
+  title       String
+  description String
+  status      String   @default("open")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Report {
@@ -315,4 +628,79 @@ model Message {
   senderId   String
   text       String
   createdAt  DateTime @default(now())
+}
+
+model JobOpening {
+  id           String           @id @default(cuid())
+  title        String
+  department   String           // CG, VFX, AI, etc.
+  description  String
+  requirements String           @default("[]") // JSON array
+  salaryRange  String?
+  status       String           @default("open") // open, closed, filled
+  applications JobApplication[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+model JobApplication {
+  id         String     @id @default(cuid())
+  userId     String
+  user       User       @relation("UserJobApplications", fields: [userId], references: [id])
+  openingId  String
+  opening    JobOpening @relation(fields: [openingId], references: [id])
+  coverLetter String
+  resumeUrl  String?
+  status     String     @default("pending") // pending, reviewed, hired, rejected
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model SystemMetric {
+  id          String   @id @default(cuid())
+  type        String   // cpu, memory, latency, node_sync
+  value       Float
+  nodeId      String   @default("master-01")
+  status      String   @default("nominal") // nominal, warning, critical
+  timestamp   DateTime @default(now())
+}
+
+model AIBase {
+  id        String   @id @default(cuid())
+  key       String   @unique // CareerCounselor, HollywoodShark, CodeReviewer
+  prompt    String
+  role      String?
+  updatedAt DateTime @updatedAt
+}
+
+model CareerPath {
+  id          String           @id @default(cuid())
+  title       String
+  description String
+  skills      String           @default("[]") // JSON: [{skill: "Maya", target: 8}]
+  steps       String           @default("[]") // JSON: [{id: 1, title: "Lighting Master", tasks: []}]
+  trajectories UserTrajectory[]
+}
+
+model UserTrajectory {
+  id              String     @id @default(cuid())
+  userId          String
+  user            User       @relation(fields: [userId], references: [id])
+  pathId          String
+  path            CareerPath @relation(fields: [pathId], references: [id])
+  currentStep     Int        @default(0)
+  stepsCompleted  String     @default("[]") // JSON array of step IDs
+  aiFeedback      String?
+  updatedAt       DateTime   @updatedAt
+}
+
+model AISimulation {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // handshake, technical, review
+  persona   String   // shark, mentor, neutral
+  history   String   @default("[]") // JSON message history
+  status    String   @default("active") // active, closed, passed, failed
+  createdAt DateTime @default(now())
 }

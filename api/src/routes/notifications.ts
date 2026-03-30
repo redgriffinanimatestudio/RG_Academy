@@ -1,6 +1,8 @@
 import { Router } from 'express';
-import { notificationController } from '../controllers/notificationController';
-import { authMiddleware } from '../middleware/auth';
+import { notificationController } from '../controllers/notificationController.js';
+import { authMiddleware } from '../middleware/auth.js';
+import { validate } from '../middleware/validate.js';
+import { CreateNotificationSchema } from '../utils/validation.js';
 
 const router = Router();
 
@@ -13,7 +15,7 @@ router.patch('/:id/read', notificationController.markAsRead);
 router.post('/mark-all-read', authMiddleware, notificationController.markAllAsRead);
 
 // Admin: create notification
-router.post('/', authMiddleware, notificationController.createNotification);
+router.post('/', authMiddleware, validate(CreateNotificationSchema), notificationController.createNotification);
 router.delete('/:id', authMiddleware, notificationController.deleteNotification);
 
 export default router;

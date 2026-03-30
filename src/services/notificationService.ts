@@ -1,54 +1,55 @@
+import apiClient from './apiClient';
+import { MIGRATION_CONFIG } from '../config/migration';
+
 export interface Notification {
   id: string;
   userId: string;
   title: string;
   message: string;
-  type: string;
-  read: boolean;
+  type: string; // info, success, warning, error
+  isRead: boolean;
   createdAt: any;
   link?: string;
 }
 
-const API_URL = '/api/notifications';
+const API_BASE = '/notifications';
 
 export const notificationService = {
+  // 1. Get Notifications (High-Fidelity Unified Read)
   async getNotifications(userId: string): Promise<Notification[]> {
-    const response = await fetch(`${API_URL}/${userId}`);
-    if (!response.ok) return [];
-    const res = await response.json();
-    return res.data.map((n: any) => ({
-      ...n,
-      read: n.isRead // mapping db isRead to read
-    }));
+    try {
+      const { data } = await apiClient.get(`${API_BASE}`);
+      return data.success ? data.data : (Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error('[Finance Hub] Notifications Read failed:', e);
+      return [];
+    }
   },
 
+  // 2. Subscription (Polling fallback)
   subscribeToNotifications(userId: string, callback: (notifications: Notification[]) => void) {
-    // Basic implementation for now: fetch once
     this.getNotifications(userId).then(callback);
-    
-    // Return dummy unsubscribe
-    return () => {};
+    const interval = setInterval(() => this.getNotifications(userId).then(callback), 10000);
+    return () => clearInterval(interval);
   },
 
+  // 3. Mark as Read
   async markAsRead(notificationId: string): Promise<void> {
-    const token = localStorage.getItem('rg_token');
-    await fetch(`${API_URL}/${notificationId}/read`, {
-      method: 'PATCH',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    try {
+      await apiClient.patch(`${API_BASE}/${notificationId}/read`);
+    } catch (err) {
+      console.error('[Finance Hub] MarkRead failed:', err);
+    }
   },
 
-  async sendNotification(notification: Omit<Notification, 'id' | 'createdAt' | 'read'>): Promise<string> {
-    const token = localStorage.getItem('rg_token');
-    const response = await fetch(`${API_URL}`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(notification)
-    });
-    const res = await response.json();
-    return res.data.id;
+  // 4. Send Notification
+  async sendNotification(notification: Omit<Notification, 'id' | 'createdAt' | 'isRead'>): Promise<string> {
+    try {
+      const { data } = await apiClient.post(`${API_BASE}`, notification);
+      return data.data.id;
+    } catch (err) {
+      console.error('[Finance Hub] Send Notification failed:', err);
+      throw err;
+    }
   }
 };

@@ -3,9 +3,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Menu, X, Globe, Bell, MessageSquare, User, LayoutDashboard, Shield, LogOut, ChevronDown 
+  Menu, X, Globe, Bell, MessageSquare, User, LayoutDashboard, Shield, LogOut, ChevronDown, ShoppingCart 
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { usePlatform } from '../../context/PlatformContext';
 
 interface NavbarProps {
   isStudio: boolean;
@@ -19,18 +20,14 @@ interface NavbarProps {
   onOpenMobileMenu: () => void;
 }
 
-const LANGUAGES = [
-  { code: 'eng', name: 'English', flag: '🇺🇸' },
-  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
-  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
-  { code: 'az', name: 'Azərbaycan', flag: '🇦🇿' }
-];
+import { LANGUAGES } from './Layout.constants';
 
 export default function Navbar({ 
   isStudio, isAcademy, isCommunity, isDashboardPage, 
   modePrefix, modeColor, modeBg, unreadCount, onOpenMobileMenu 
 }: NavbarProps) {
   const { profile, activeRole, setActiveRole, logout } = useAuth();
+  const { data: platformData } = usePlatform();
   const { t } = useTranslation();
   const { lang } = useParams();
   const navigate = useNavigate();
@@ -40,14 +37,25 @@ export default function Navbar({
   const currentLangCode = lang || 'eng';
   const currentLang = LANGUAGES.find(l => l.code === currentLangCode) || LANGUAGES[0];
 
+  const cartCount = platformData?.cart?.length || 0;
+
   const changeLanguage = (newLang: string) => {
-    const pathParts = window.location.pathname.split('/');
-    if (['aca', 'studio', 'community', 'dashboard'].includes(pathParts[1])) {
-      pathParts[2] = newLang;
-    } else if (LANGUAGES.some(l => l.code === pathParts[1])) {
-      pathParts[1] = newLang;
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const modes = ['aca', 'studio', 'community', 'dashboard', 'dev'];
+    
+    if (modes.includes(pathParts[0])) {
+      if (pathParts[1] && LANGUAGES.some(l => l.code === pathParts[1])) {
+        pathParts[1] = newLang;
+      } else {
+        pathParts.splice(1, 0, newLang);
+      }
+    } else if (LANGUAGES.some(l => l.code === pathParts[0])) {
+      pathParts[0] = newLang;
+    } else {
+      pathParts.unshift(newLang);
     }
-    navigate(pathParts.join('/'));
+    
+    navigate('/' + pathParts.join('/'));
     setIsLangMenuOpen(false);
   };
 
@@ -76,7 +84,6 @@ export default function Navbar({
             </Link>
           </div>
 
-          {/* Desktop Links - Adjusted for tablets */}
           <div className="hidden md:flex lg:flex items-center gap-4 lg:gap-6 h-full">
             <Link to={`/aca/${currentLangCode}`} className={`text-[9px] lg:text-[11px] font-black uppercase tracking-widest transition-colors ${isAcademy ? 'text-primary' : 'text-white/60 hover:text-white'}`}>{t('academy')}</Link>
             <Link to={`/studio/${currentLangCode}`} className={`text-[9px] lg:text-[11px] font-black uppercase tracking-widest transition-colors ${isStudio ? 'text-primary-hover' : 'text-white/60 hover:text-white'}`}>{t('studio')}</Link>
@@ -84,17 +91,16 @@ export default function Navbar({
           </div>
 
           <div className="flex items-center gap-1 sm:gap-3">
-            {/* Language Switcher - Smaller on mobile */}
             <div className="relative hidden sm:block">
               <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)} className={`p-2 transition-colors flex items-center gap-2 font-black text-[9px] sm:text-[10px] uppercase ${modeColor}`}>
                 <Globe size={16} sm:size={18} /><span className="hidden md:inline">{currentLang.code}</span>
               </button>
               <AnimatePresence>
                 {isLangMenuOpen && (
-                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className={`absolute right-0 mt-4 w-40 border rounded-2xl shadow-2xl py-2 z-50 overflow-hidden ${cardClass}`}>
+                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className={`absolute right-0 mt-4 w-44 border rounded-2xl shadow-2xl py-2 z-50 overflow-hidden ${cardClass}`}>
                     {LANGUAGES.map((l) => (
                       <button key={l.code} onClick={() => changeLanguage(l.code)} className={`w-full text-left px-6 py-3 text-[10px] font-black uppercase flex items-center justify-between transition-all ${currentLang.code === l.code ? 'text-primary bg-white/5' : 'text-white/40 hover:text-white hover:bg-white/5'}`}>
-                        {l.name}
+                        <span className="flex items-center gap-3"><span>{l.flag}</span> {l.name}</span>
                       </button>
                     ))}
                   </motion.div>
@@ -102,9 +108,20 @@ export default function Navbar({
               </AnimatePresence>
             </div>
 
-            {/* User Profile / Auth */}
             {profile ? (
               <div className="flex items-center gap-1 sm:gap-2">
+                <button 
+                  onClick={() => navigate(`/${currentLangCode}/cart`)} 
+                  className="p-1.5 sm:p-2 text-white/40 hover:text-primary transition-colors relative group"
+                >
+                  <ShoppingCart size={18} />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 size-4 bg-rose-500 rounded-full flex items-center justify-center text-[8px] font-black text-white border-2 border-[#050505] group-hover:scale-110 transition-transform">
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
+
                 <button className="p-1.5 sm:p-2 text-white/40 hover:text-primary transition-colors relative">
                   <Bell size={18} />
                   {unreadCount > 0 && <span className={`absolute top-1.5 right-1.5 size-1.5 sm:size-2 rounded-full border-2 ${isStudio ? 'bg-primary-hover border-[#1e1e24]' : 'bg-primary border-[#050505]'}`} />}
@@ -129,14 +146,17 @@ export default function Navbar({
                           <p className="text-white/40 uppercase mt-1">{profile.email}</p>
                         </div>
                         <div className="py-2">
-                          <Link to={`/${isStudio ? 'studio' : 'aca'}/${currentLangCode}/profile/${profile.uid}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 flex items-center gap-3"><User size={14} /> {t('my_profile')}</Link>
-                          {profile?.isAdmin && (
-                            <button onClick={() => { setActiveRole('admin'); setIsUserMenuOpen(false); navigate(`/${currentLangCode}/admin`); }} className="w-full text-left px-6 py-3 text-[10px] font-black uppercase text-red-500 hover:bg-red-500/10 flex items-center gap-3 border-t border-white/5 mt-2 pt-4">
-                              <Shield size={14} /> Master Control Engine
-                            </button>
+                          {profile?.uid && (
+                            <Link to={`/${isStudio ? 'studio' : 'aca'}/${currentLangCode}/profile/${profile.uid}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 flex items-center gap-3"><User size={14} /> {t('my_profile')}</Link>
                           )}
                           <Link to={`/${currentLangCode}/dashboard`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 flex items-center gap-3"><LayoutDashboard size={14} /> {t('my_dashboard')}</Link>
-                          <div className="px-6 py-2 border-t border-white/5 mt-2">
+                          
+                          <div className="px-6 py-4 bg-white/[0.03] border-y border-white/5 my-2">
+                            <p className="text-[8px] font-black text-white/20 uppercase mb-2">Vault Balance</p>
+                            <p className="text-lg font-black text-white">$ {profile.balance || '0.00'}</p>
+                          </div>
+
+                          <div className="px-6 py-2">
                             <p className="text-[8px] font-black text-white/20 uppercase mb-2">Switch identity</p>
                             {profile.roles.map(r => (
                               <button key={r} onClick={() => { setActiveRole(r as any); setIsUserMenuOpen(false); navigate(getDashboardLinkForRole(r)); }} className={`w-full text-left px-3 py-2 rounded-lg text-[9px] font-black uppercase flex items-center gap-2 ${activeRole === r ? 'text-primary bg-primary/10' : 'text-white/40 hover:bg-white/5'}`}>
@@ -156,7 +176,7 @@ export default function Navbar({
               </div>
             ) : (
               <div className="flex items-center gap-2 sm:gap-6">
-                <Link to={`/aca/${currentLangCode}/login`} className="criativo-btn !px-4 sm:!px-8 !py-2 sm:!py-3 !text-[10px] shadow-xl shadow-primary/20 whitespace-nowrap !rounded-xl">Join System</Link>
+                <Link to={`/aca/${currentLangCode}/login`} className="px-6 py-3 bg-primary text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 transition-all shadow-xl shadow-primary/20">Join Ecosystem</Link>
               </div>
             )}
           </div>

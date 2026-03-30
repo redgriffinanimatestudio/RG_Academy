@@ -1,0 +1,10 @@
+{
+  "name": "rg-academy-mcp-server",
+  "version": "1.0.0",
+  "description": "Local MCP server for high-efficiency repository indexing and context retrieval.",
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.0"
+  }
+}

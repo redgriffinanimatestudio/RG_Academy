@@ -75,5 +75,97 @@ export const adminService = {
 
   isAdmin(roles: UserRole[]): boolean {
     return roles.some(role => ['admin', 'manager', 'moderator', 'chief_manager'].includes(role));
+  },
+
+  async getStats(): Promise<any> {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch('/api/v1/admin/stats', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch admin stats');
+    const res = await response.json();
+    return res.success ? res.data : null;
+  },
+
+  async getUsers(page = 1, search = '', role = ''): Promise<any> {
+    const token = localStorage.getItem('auth_token');
+    const url = `/api/v1/admin/users?page=${page}&search=${search}&role=${role}`;
+    const response = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch users');
+    const res = await response.json();
+    return res.success ? { users: res.data, total: res.meta.total } : null;
+  },
+
+  async updateUserRole(userId: string, role: string, roles: string[]): Promise<any> {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`/api/v1/admin/users/${userId}/role`, {
+      method: 'PATCH',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ role, roles })
+    });
+    if (!response.ok) throw new Error('Failed to update user role');
+    const res = await response.json();
+    return res.success ? res.data : null;
+  },
+
+  async createUser(data: any): Promise<any> {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch('/api/v1/admin/users', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to create user');
+    const res = await response.json();
+    return res.success ? res.data : null;
+  },
+
+  async updateUser(userId: string, data: any): Promise<any> {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`/api/v1/admin/users/${userId}`, {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to update user');
+    const res = await response.json();
+    return res.success ? res.data : null;
+  },
+
+  async getCourses(page = 1, status = ''): Promise<any> {
+    const token = localStorage.getItem('auth_token');
+    const url = `/api/v1/admin/courses?page=${page}&status=${status}`;
+    const response = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch courses');
+    const res = await response.json();
+    return res.success ? { courses: res.data, total: res.meta.total } : null;
+  },
+
+  async updateCourseStatus(courseId: string, status: string): Promise<any> {
+    const token = localStorage.getItem('auth_token');
+    const response = await fetch(`/api/v1/admin/courses/${courseId}/status`, {
+      method: 'PATCH',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ status })
+    });
+    if (!response.ok) throw new Error('Failed to update course status');
+    const res = await response.json();
+    return res.success ? res.data : null;
   }
 };

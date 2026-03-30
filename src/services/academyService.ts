@@ -1,3 +1,6 @@
+import apiClient from './apiClient';
+import { MIGRATION_CONFIG } from '../config/migration';
+
 export interface Course {
   id: string;
   title: string;
@@ -35,43 +38,113 @@ export interface Lesson {
   order: number;
   isFree: boolean;
   createdAt: string;
+  moduleId?: string;
 }
 
-const API_URL = '/api/v1/academy';
+export interface Module {
+  id: string;
+  courseId: string;
+  title: string;
+  order: number;
+  lessons: Lesson[];
+}
+
+const API_V1 = '/v1/academy';
+
+// Shadow Logging для верификации миграции
+const shadowLog = (feature: string, postgresData: any, legacyData: any) => {
+  if (MIGRATION_CONFIG.LOG_DIFFS) {
+    const isDifferent = JSON.stringify(postgresData) !== JSON.stringify(legacyData);
+    if (isDifferent) {
+      console.warn(`[Migration Diff] ${feature} mismatch!`, { postgres: postgresData, legacy: legacyData });
+    }
+  }
+};
 
 export const academyService = {
+  // 1. Получение курсов с поддержкой пагинации и фильтрации
   async getCourses(filters?: { status?: string, category?: string, level?: string, search?: string, page?: number, limit?: number }): Promise<Course[]> {
-    const params = new URLSearchParams();
-    if (filters?.category) params.append('category', filters.category);
-    if (filters?.level) params.append('level', filters.level);
-    if (filters?.search) params.append('search', filters.search);
-    if (filters?.page) params.append('page', String(filters.page));
-    if (filters?.limit) params.append('limit', String(filters.limit));
+    const fetchFromPostgres = async () => {
+      const { data } = await apiClient.get(`${API_V1}/courses`, { params: filters });
+      return data.success ? data.data : [];
+    };
 
-    const response = await fetch(`${API_URL}/courses?${params.toString()}`);
-    if (!response.ok) throw new Error('Failed to fetch courses');
+    const fetchFromLegacy = async () => {
+      const params = new URLSearchParams(filters as any);
+      const response = await fetch(`/api/v1/academy/courses?${params.toString()}`);
+      const result = await response.json();
+      return result.success ? result.data : [];
+    };
 
-    const result = await response.json();
-    return result.success ? result.data : [];
+    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+      try {
+        const pgData = await fetchFromPostgres();
+        // В фоновом режиме проверяем Shadow Log (опционально для отладки)
+        if (MIGRATION_CONFIG.LOG_DIFFS) fetchFromLegacy().then(legacy => shadowLog('getCourses', pgData, legacy));
+        return pgData;
+      } catch (err) {
+        console.error('[Migration] Academy Read failed, falling back:', err);
+        if (MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) return await fetchFromLegacy();
+        throw err;
+      }
+    }
+
+    return await fetchFromLegacy();
   },
 
+  // 2. Получение курса по Slug
   async getCourseBySlug(slug: string): Promise<Course | null> {
-    const response = await fetch(`${API_URL}/courses/${slug}`);
-    if (!response.ok) return null;
+    const fetchFromPostgres = async () => {
+      const { data } = await apiClient.get(`${API_V1}/courses/${slug}`);
+      return data.success ? data.data : null;
+    };
+
+    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+      try {
+        return await fetchFromPostgres();
+      } catch (err) {
+        if (MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) {
+          const response = await fetch(`/api/v1/academy/courses/${slug}`);
+          const result = await response.json();
+          return result.success ? result.data : null;
+        }
+        throw err;
+      }
+    }
+
+    const response = await fetch(`/api/v1/academy/courses/${slug}`);
     const result = await response.json();
     return result.success ? result.data : null;
   },
 
+  // 3. Уроки
   async getLessons(courseIdOrSlug: string): Promise<Lesson[]> {
-    const response = await fetch(`${API_URL}/courses/${courseIdOrSlug}`);
-    if (!response.ok) return [];
-    const result = await response.json();
-    return result.success ? (result.data.lessons || []) : [];
+    try {
+      const { data } = await apiClient.get(`${API_V1}/courses/${courseIdOrSlug}`);
+      return data.success ? (data.data.lessons || []) : [];
+    } catch (err) {
+      // Старая логика в качестве запасного варианта
+      const response = await fetch(`/api/v1/academy/courses/${courseIdOrSlug}`);
+      const result = await response.json();
+      return result.success ? (result.data.lessons || []) : [];
+    }
   },
 
+  // 4. Запись на курс (Write Operation)
   async enrollInCourse(courseId: string): Promise<void> {
+    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+      try {
+        await apiClient.post(`${API_V1}/enroll`, { courseId });
+        if (!MIGRATION_CONFIG.DUAL_WRITE) return;
+      } catch (err) {
+        console.error('[Migration] Postgres Enroll failed:', err);
+        if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;
+      }
+    }
+
+    // Legacy Enroll (Dual-Write)
     const token = localStorage.getItem('auth_token');
-    const response = await fetch(`${API_URL}/enroll`, {
+    await fetch(`/api/v1/academy/enroll`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -79,24 +152,56 @@ export const academyService = {
       },
       body: JSON.stringify({ courseId })
     });
-    if (!response.ok) throw new Error('Failed to enroll');
   },
 
   async getCategories(): Promise<any[]> {
-    const response = await fetch(`${API_URL}/categories`);
-    if (!response.ok) throw new Error('Failed to fetch categories');
-
-    const result = await response.json();
-    return result.success ? result.data : [];
+    const { data } = await apiClient.get(`${API_V1}/categories`);
+    return data.success ? data.data : [];
   },
 
   async getUserEnrollments(userId: string): Promise<any[]> {
-    const token = localStorage.getItem('auth_token');
-    const response = await fetch(`/api/users/${userId}/enrollments`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+    const { data } = await apiClient.get(`/users/${userId}/enrollments`);
+    return data.success ? data.data : [];
+  },
+
+  async updateCourseStatus(courseId: string, status: string): Promise<Course> {
+    const { data } = await apiClient.patch(`${API_V1}/courses/${courseId}/status`, { status });
+    return data.data;
+  },
+
+  async getStudentProgress(): Promise<any> {
+    const { data } = await apiClient.get(`${API_V1}/progress`);
+    return data.success ? data.data : null;
+  },
+
+  // 5. Lesson Progress & Analytics
+  async updateLessonProgress(userId: string, courseId: string, lessonId: string, completed: boolean): Promise<any> {
+    const { data } = await apiClient.post(`${API_V1}/courses/${courseId}/lessons/${lessonId}/progress`, { 
+      userId, 
+      completed 
     });
-    if (!response.ok) throw new Error('Failed to fetch enrollments');
-    const result = await response.json();
-    return result.success ? result.data : [];
+    return data.success ? data.data : null;
+  },
+
+  async savePlaybackPosition(enrollmentId: string, lessonId: string, seconds: number): Promise<void> {
+    await apiClient.post(`/enrollments/${enrollmentId}/analytics/sync`, {
+      lessonId,
+      seconds: Math.floor(seconds)
+    });
+  },
+
+  async getPlaybackPosition(enrollmentId: string, lessonId: string): Promise<number> {
+    try {
+      const { data } = await apiClient.get(`/enrollments/${enrollmentId}/analytics/${lessonId}`);
+      return data.success ? data.data.watchTime : 0;
+    } catch (err) {
+      return 0;
+    }
+  },
+
+  // 6. Hierarchical Fetch
+  async getCourseCurriculum(courseSlug: string): Promise<Module[]> {
+    const { data } = await apiClient.get(`${API_V1}/courses/${courseSlug}/curriculum`);
+    return data.success ? data.data : [];
   }
 };

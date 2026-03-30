@@ -34,8 +34,15 @@ export default function CourseCard({ course, lang }: CourseCardProps) {
               <PlayCircle size={32} fill="currentColor" />
             </div>
           </div>
-          <div className="absolute top-4 left-4 px-3 py-1 bg-black/80 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest rounded-lg">
-            {course.categoryId}
+          <div className="absolute top-4 left-4 flex gap-2">
+            <div className="px-3 py-1 bg-black/80 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-widest rounded-lg border border-white/10">
+              {course.category?.name || course.categoryId}
+            </div>
+            {course.lod && (
+              <div className="px-3 py-1 bg-primary text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-lg shadow-lg">
+                LOD {course.lod}
+              </div>
+            )}
           </div>
         </div>
         
@@ -66,6 +73,16 @@ export default function CourseCard({ course, lang }: CourseCardProps) {
               <span className="text-white">{t(course.level)}</span>
             </div>
           </div>
+
+          {course.softwareStack && course.softwareStack.length > 0 && (
+            <div className="flex flex-wrap gap-2 pt-2">
+              {course.softwareStack.slice(0, 3).map((sw, i) => (
+                <div key={i} className="px-2 py-1 bg-white/5 rounded-md text-[8px] font-black uppercase tracking-tighter text-white/40 border border-white/5">
+                  {sw.name} {sw.version}
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="flex items-center justify-between pt-4 border-t border-white/5">
             <div className="flex flex-col">

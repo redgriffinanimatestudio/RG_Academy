@@ -1,14 +1,17 @@
 import { Router } from 'express';
 import { adminController } from '../controllers/adminController';
-import { authMiddleware, requireAdmin, requireModerator, requireStaff } from '../middleware/auth';
+import { authMiddleware, requireAdmin, requireModerator, requireStaff } from '../middleware/auth.js';
 
 const router = Router();
 
 // Dashboard
 router.get('/stats', authMiddleware, requireStaff, adminController.getStats);
+router.get('/ecosystem-stats', authMiddleware, requireAdmin, adminController.getEcosystemStats);
 
 // User Management
 router.get('/users', authMiddleware, requireStaff, adminController.getUsers);
+router.post('/users', authMiddleware, requireAdmin, adminController.createUser);
+router.put('/users/:userId', authMiddleware, requireAdmin, adminController.updateUser);
 router.patch('/users/:userId/role', authMiddleware, requireAdmin, adminController.updateUserRole);
 
 // Moderation

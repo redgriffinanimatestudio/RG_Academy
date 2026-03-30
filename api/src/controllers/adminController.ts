@@ -39,6 +39,16 @@ export const adminController = {
         select: { id: true, displayName: true, email: true, createdAt: true }
       });
 
+      // Role distribution
+      const roles = ['student', 'lecturer', 'client', 'executor', 'admin', 'manager', 'moderator'];
+      const roleCounts = await Promise.all(
+        roles.map(async (r) => ({
+          label: r.charAt(0).toUpperCase() + r.slice(1),
+          val: await prisma.user.count({ where: { role: r } }),
+          c: r === 'admin' ? '#ef4444' : r === 'lecturer' ? '#1d9e75' : r === 'student' ? '#378add' : '#888'
+        }))
+      );
+
       return success(res, {
         users: usersCount,
         courses: coursesCount,
@@ -48,10 +58,61 @@ export const adminController = {
         pendingReports: reportsCount,
         unreadNotifications: notificationsCount,
         totalRevenue,
-        recentUsers
+        recentUsers,
+        roleDistribution: roleCounts
       });
     } catch (e) {
       return error(res, 'Failed to fetch stats');
+    }
+  },
+
+  /**
+   * Comprehensive Ecosystem Analytics (Phase 3)
+   */
+  async getEcosystemStats(req: AuthRequest, res: Response) {
+    try {
+      const [
+        academyStats,
+        studioStats,
+        synergyStats
+      ] = await Promise.all([
+        // Academy: Active students & courses
+        prisma.enrollment.aggregate({
+          _count: true,
+          _avg: { progress: true }
+        }),
+        // Studio: Project volume & bids
+        prisma.project.aggregate({
+          where: { status: 'open' },
+          _count: true,
+          _sum: { budget: true }
+        }),
+        // Synergy: Users with both roles
+        prisma.user.count({
+          where: { 
+            AND: [
+              { isStudent: true },
+              { isClient: true }
+            ]
+          }
+        })
+      ]);
+
+      return success(res, {
+        academy: {
+          totalEnrollments: academyStats._count,
+          avgProgress: Math.round(academyStats._avg.progress || 0)
+        },
+        studio: {
+          activeProjects: studioStats._count,
+          totalBudgetVolume: studioStats._sum.budget || 0
+        },
+        synergy: {
+          crossDomainUsers: synergyStats
+        }
+      });
+    } catch (e) {
+      return error(res, 'Failed to fetch ecosystem analytics');
     }
   },
 
@@ -97,6 +158,15 @@ export const adminController = {
       if (role) dataToUpdate.role = role;
       if (roles && Array.isArray(roles)) {
         dataToUpdate.roles = JSON.stringify(roles);
+        // Sync flags
+        dataToUpdate.isAdmin = roles.includes('admin');
+        dataToUpdate.isStudent = roles.includes('student') || roles.includes('admin');
+        dataToUpdate.isLecturer = roles.includes('lecturer');
+        dataToUpdate.isClient = roles.includes('client');
+        dataToUpdate.isExecutor = roles.includes('executor');
+        dataToUpdate.isHr = roles.includes('hr') || roles.includes('admin');
+        dataToUpdate.isFinance = roles.includes('finance') || roles.includes('admin');
+        dataToUpdate.isSupport = roles.includes('support') || roles.includes('admin');
       }
 
       const user = await prisma.user.update({
@@ -107,6 +177,54 @@ export const adminController = {
       return success(res, user);
     } catch (e) {
       return error(res, 'Failed to update user role');
+    }
+  },
+
+  async createUser(req: AuthRequest, res: Response) {
+    try {
+      const { email, displayName, role, roles } = req.body;
+      
+      const rolesArray = roles || [role || 'student'];
+      const user = await prisma.user.create({
+        data: {
+          email,
+          displayName,
+          role: role || 'student',
+          primaryRole: role || 'student',
+          roles: JSON.stringify(rolesArray),
+          isAdmin: rolesArray.includes('admin'),
+          isStudent: rolesArray.includes('student') || rolesArray.includes('admin'),
+          isLecturer: rolesArray.includes('lecturer'),
+          isClient: rolesArray.includes('client'),
+          isExecutor: rolesArray.includes('executor'),
+          isHr: rolesArray.includes('hr') || rolesArray.includes('admin'),
+          isFinance: rolesArray.includes('finance') || rolesArray.includes('admin'),
+          isSupport: rolesArray.includes('support') || rolesArray.includes('admin'),
+          source: 'admin_created',
+          profile: { create: { bio: 'Entity manually provisioned by Admin' } }
+        }
+      });
+      
+      return success(res, user, 201);
+    } catch (e) {
+      if (e.code === 'P2002') return error(res, 'Email already exists', 409);
+      return error(res, 'Failed to create user');
+    }
+  },
+
+  async updateUser(req: AuthRequest, res: Response) {
+    try {
+      const { userId } = req.params;
+      const { displayName, email } = req.body;
+      
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: { displayName, email }
+      });
+      
+      return success(res, user);
+    } catch (e) {
+      return error(res, 'Failed to update user profile');
     }
   },
 

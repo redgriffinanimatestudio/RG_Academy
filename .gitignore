@@ -1,10 +1,27 @@
 node_modules/
 build/
-dist/
 coverage/
 .DS_Store
 *.log
 .env*
 !.env.example
 
+# --- Prisma ---
 /src/generated/prisma
+/prisma/*.db
+/prisma/*.db-journal
+
+# --- Hostinger Deployment ---
+# If using Hostinger's Git Import (Connect with GitHub):
+# You usually need to UNCOMMENT 'dist/' below if you have a CI/CD build.
+# Otherwise, KEEP it commented to push your local 'dist/' to GitHub.
+# dist/
+.next/
+out/
+.vercel
+/hostinger-deploy.zip
+/RG_Academy_HOSTINGER_DEPLOY.zip
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

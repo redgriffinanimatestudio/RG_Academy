@@ -1,28 +1,14 @@
 import { Request, Response } from 'express';
-import prisma from '../utils/prisma';
-import { success, error } from '../utils/response';
-import { AuthRequest } from '../middleware/auth';
-import { getSocket } from '../utils/socket';
+import prisma from '../utils/prisma.js';
+import { success, error } from '../utils/response.js';
+import { AuthRequest } from '../middleware/auth.js';
+import { getSocket } from '../utils/socket.js';
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     ChatRoom:
- *       type: object
- *       properties:
- *         id: { type: string }
- *         participants: { type: array, items: { type: string } }
- *         type: { type: string }
- *         lastMessage: { type: string }
- *     Message:
- *       type: object
- *       properties:
- *         id: { type: string }
- *         roomId: { type: string }
- *         senderId: { type: string }
- *         text: { type: string }
- *         createdAt: { type: string, format: date-time }
+ * tags:
+ *   name: Chat
+ *   description: Real-time messaging system
  */
 
 export const chatController = {
@@ -30,88 +16,53 @@ export const chatController = {
    * @swagger
    * /api/chat/rooms:
    *   get:
-   *     summary: Get user's chat rooms
+   *     summary: Get all chat rooms for user
    *     tags: [Chat]
-   *     responses:
-   *       200:
-   *         description: List of chat rooms
+   *     security:
+   *       - bearerAuth: []
    */
   async getRooms(req: AuthRequest, res: Response) {
     try {
-      const userId = req.user!.id;
       const rooms = await prisma.chatRoom.findMany({
+        where: { participants: { contains: req.user!.id } },
         orderBy: { updatedAt: 'desc' }
       });
-
-      const userRooms = rooms.filter(room => {
-        try {
-          const participants = JSON.parse(room.participants || '[]');
-          return Array.isArray(participants) && participants.includes(userId);
-        } catch(e) { return false; }
-      }).map(room => ({
-        ...room,
-        participants: JSON.parse(room.participants)
-      }));
-
-      return success(res, userRooms);
+      return success(res, rooms.map(r => ({ ...r, participants: JSON.parse(r.participants || '[]') })));
     } catch (e) {
-      return error(res, 'Database error while fetching rooms');
+      return error(res, 'Database error');
     }
   },
 
   /**
    * @swagger
-   * /api/chat/rooms:
-   *   post:
-   *     summary: Create a chat room
+   * /api/chat/rooms/{roomId}/messages:
+   *   get:
+   *     summary: Get messages for a room
    *     tags: [Chat]
-   *     responses:
-   *       201:
-   *         description: Room created
+   *     security:
+   *       - bearerAuth: []
    */
-  async createRoom(req: AuthRequest, res: Response) {
+  async getMessages(req: AuthRequest, res: Response) {
     try {
-      const { participants, type, refId } = req.body;
-      const userId = req.user!.id;
-
-      let roomParticipants = Array.isArray(participants) ? participants : [];
-      if (!roomParticipants.includes(userId)) {
-        roomParticipants.push(userId);
-      }
-
-      const room = await prisma.chatRoom.create({
-        data: {
-          participants: JSON.stringify(roomParticipants),
-          type: type || 'direct',
-          refId
-        }
+      const messages = await prisma.message.findMany({
+        where: { roomId: req.params.roomId },
+        orderBy: { createdAt: 'asc' }
       });
-
-      return success(res, { ...room, participants: roomParticipants }, 201);
+      return success(res, messages);
     } catch (e) {
-      return error(res, 'Failed to create room');
+      return error(res, 'Database error');
     }
   },
 
-  async getMessages(req: AuthRequest, res: Response) {
+  async createRoom(req: AuthRequest, res: Response) {
     try {
-      const { roomId } = req.params;
-      const senderId = req.user!.id;
-
-      // Check access
-      const room = await prisma.chatRoom.findUnique({ where: { id: roomId } });
-      if (!room || !JSON.parse(room.participants).includes(senderId)) {
-        return error(res, 'Access denied', 403);
-      }
-
-      const messages = await prisma.message.findMany({
-        where: { roomId },
-        orderBy: { createdAt: 'asc' }
+      const { type, refId, participants } = req.body;
+      const room = await prisma.chatRoom.create({
+        data: { type, refId, participants: JSON.stringify(participants || [req.user!.id]) }
       });
-
-      return success(res, messages);
+      return success(res, room, 201);
     } catch (e) {
-      return error(res, 'Failed to fetch messages');
+      return error(res, 'Failed to create room');
     }
   },
 
@@ -119,36 +70,44 @@ export const chatController = {
     try {
       const { roomId } = req.params;
       const { text } = req.body;
-      const senderId = req.user!.id;
-
-      // Check access
-      const room = await prisma.chatRoom.findUnique({ where: { id: roomId } });
-      if (!room || !JSON.parse(room.participants).includes(senderId)) {
-        return error(res, 'Access denied', 403);
-      }
-
+      
       const message = await prisma.message.create({
-        data: {
-          roomId,
-          senderId,
-          text
-        }
+        data: { roomId, senderId: req.user!.id, text }
       });
 
+      // Update room last message
       await prisma.chatRoom.update({
         where: { id: roomId },
-        data: {
-          lastMessage: text,
-          updatedAt: new Date()
-        }
+        data: { lastMessage: text, updatedAt: new Date() }
       });
 
-      // Emit via Socket.IO
+      // Real-time broadcast
       try {
         const io = getSocket();
-        io.to(`room-${roomId}`).emit('new-message', message);
+        io.to(`room_${roomId}`).emit('new_message', message);
+
+        // Also create a persistent notification for the recipient(s)
+        const room = await prisma.chatRoom.findUnique({ where: { id: roomId } });
+        if (room) {
+          const participants = JSON.parse(room.participants || '[]');
+          const recipients = participants.filter((p: string) => p !== req.user!.id);
+          
+          for (const recipientId of recipients) {
+            await prisma.notification.create({
+              data: {
+                userId: recipientId,
+                type: 'info',
+                title: 'New Message',
+                message: text.length > 50 ? text.substring(0, 47) + '...' : text,
+                link: `/aca/eng/messages`
+              }
+            });
+            // Emit count update to specific user
+            io.to(`user_${recipientId}`).emit('unread_count_update');
+          }
+        }
       } catch (err) {
-        console.warn('Socket emit failed:', err.message);
+        console.warn('[Socket.IO]: Could not broadcast message/notification');
       }
 
       return success(res, message, 201);

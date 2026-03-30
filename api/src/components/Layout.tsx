@@ -40,6 +40,7 @@ import { useAlert } from './Alert';
 import AIAssistant from './AIAssistant';
 import ErrorBoundary from './ErrorBoundary';
 import { useTranslation } from 'react-i18next';
+import { ACADEMIC_TREE, Department, Chair } from '../config/academic';
 
 const LANGUAGES = [
   { code: 'eng', name: 'English', flag: '🇺🇸' },
@@ -48,32 +49,7 @@ const LANGUAGES = [
   { code: 'az', name: 'Azərbaycan', flag: '🇦🇿' }
 ];
 
-const ACADEMY_CATEGORIES = [
-  {
-    name: 'modeling_3d',
-    icon: Box,
-    subcategories: [
-      { name: 'char_modeling', topics: ['Anatomy for Artists', 'Stylized Characters', 'Realistic Humans', 'Creature Sculpting', 'Retopology'] },
-      { name: 'env_art', topics: ['Modular Environments', 'Foliage & Nature', 'World Building', 'Photogrammetry', 'Interior Design'] }
-    ]
-  },
-  {
-    name: 'animation',
-    icon: Play,
-    subcategories: [
-      { name: 'animation_3d', topics: ['Body Mechanics', 'Acting for Animation', 'Creature Animation', 'Facial Animation', 'Lip Sync'] },
-      { name: 'animation_2d', topics: ['Traditional 2D', 'Toon Boom Harmony', 'Spine 2D', 'Motion Graphics', 'Storyboarding'] }
-    ]
-  },
-  {
-    name: 'vfx_compositing',
-    icon: Sparkles,
-    subcategories: [
-      { name: 'visual_effects', topics: ['Houdini Dynamics', 'Niagara VFX', 'Fluid Simulation', 'Destruction FX', 'Particle Systems'] }
-    ]
-  }
-];
-
+const ACADEMY_CATEGORIES = ACADEMIC_TREE;
 const STUDIO_CATEGORIES = [
   {
     name: 'prod_services',
@@ -126,50 +102,50 @@ const COMMUNITY_CATEGORIES = [
 
 const DASHBOARD_MENUS: Record<string, any[]> = {
   student: [
-    { name: 'learning_dashboard', icon: GraduationCap, subcategories: [{ name: 'my_progress' }, { name: 'academy_calendar' }] },
-    { name: 'student_finance', icon: Zap, subcategories: [{ name: 'purchases' }] }
+    { nameKey: 'learning_dashboard', icon: GraduationCap, chairs: [{ nameKey: 'my_progress' }, { nameKey: 'academy_calendar' }] },
+    { nameKey: 'student_finance', icon: Zap, chairs: [{ nameKey: 'purchases' }] }
   ],
   lecturer: [
-    { name: 'instructor_hub', icon: Video, subcategories: [{ name: 'content_mgmt' }, { name: 'student_engagement' }] },
-    { name: 'lecturer_wallet', icon: Zap, subcategories: [{ name: 'financials' }] }
+    { nameKey: 'instructor_hub', icon: Video, chairs: [{ nameKey: 'content_mgmt' }, { nameKey: 'student_engagement' }] },
+    { nameKey: 'lecturer_wallet', icon: Zap, chairs: [{ nameKey: 'financials' }] }
   ],
   executor: [
-    { name: 'pro_workspace', icon: Briefcase, subcategories: [{ name: 'job_pipeline' }, { name: 'pro_profile' }] },
-    { name: 'business_ops', icon: Users, subcategories: [{ name: 'networking' }, { name: 'finances' }] }
+    { nameKey: 'pro_workspace', icon: Briefcase, chairs: [{ nameKey: 'job_pipeline' }, { nameKey: 'pro_profile' }] },
+    { nameKey: 'business_ops', icon: Users, chairs: [{ nameKey: 'networking' }, { nameKey: 'finances' }] }
   ],
   client: [
-    { name: 'client_workspace', icon: Box, subcategories: [{ name: 'project_mgmt' }, { name: 'talent_acquisition' }] },
-    { name: 'client_billing', icon: Settings, subcategories: [{ name: 'finances' }] }
+    { nameKey: 'client_workspace', icon: Box, chairs: [{ nameKey: 'project_mgmt' }, { nameKey: 'talent_acquisition' }] },
+    { nameKey: 'client_billing', icon: Settings, chairs: [{ nameKey: 'finances' }] }
   ],
   admin: [
-    { name: 'core_management', icon: Shield, subcategories: [{ name: 'dashboard' }] },
-    { name: 'user_operations', icon: Users, subcategories: [{ name: 'users' }, { name: 'rbac' }, { name: 'profile' }] },
-    { name: 'platform_content', icon: Box, subcategories: [{ name: 'create' }, { name: 'detail' }] },
-    { name: 'communications', icon: MessageSquare, subcategories: [{ name: 'chat' }] },
-    { name: 'system_health', icon: Cpu, subcategories: [{ name: 'settings' }] }
+    { nameKey: 'core_management', icon: Shield, chairs: [{ nameKey: 'dashboard' }] },
+    { nameKey: 'user_operations', icon: Users, chairs: [{ nameKey: 'users' }, { nameKey: 'rbac' }, { nameKey: 'profile' }] },
+    { nameKey: 'platform_content', icon: Box, chairs: [{ nameKey: 'create' }, { nameKey: 'detail' }] },
+    { nameKey: 'communications', icon: MessageSquare, chairs: [{ nameKey: 'chat' }] },
+    { nameKey: 'system_health', icon: Cpu, chairs: [{ nameKey: 'settings' }] }
   ],
   chief_manager: [
-    { name: 'strategic_hub', icon: Target, subcategories: [{ name: 'dashboard' }, { name: 'kpi_metrics' }, { name: 'growth' }] },
-    { name: 'team_mgmt', icon: Users, subcategories: [{ name: 'staff_list' }, { name: 'performance' }] },
-    { name: 'ops_mgmt', icon: Briefcase, subcategories: [{ name: 'all_contracts' }, { name: 'legal' }] }
+    { nameKey: 'strategic_hub', icon: Target, chairs: [{ nameKey: 'dashboard' }, { nameKey: 'kpi_metrics' }, { nameKey: 'growth' }] },
+    { nameKey: 'team_mgmt', icon: Users, chairs: [{ nameKey: 'staff_list' }, { nameKey: 'performance' }] },
+    { nameKey: 'ops_mgmt', icon: Briefcase, chairs: [{ nameKey: 'all_contracts' }, { nameKey: 'legal' }] }
   ],
   manager: [
-    { name: 'operational_overview', icon: LayoutDashboard, subcategories: [{ name: 'overview' }] },
-    { name: 'academy_ops', icon: GraduationCap, subcategories: [{ name: 'courses_review' }, { name: 'student_feedback' }] },
-    { name: 'studio_ops', icon: Box, subcategories: [{ name: 'project_board' }, { name: 'contract_status' }, { name: 'escrow_alerts' }] },
-    { name: 'user_management', icon: Users, subcategories: [{ name: 'user_list' }, { name: 'role_requests' }] }
+    { nameKey: 'operational_overview', icon: LayoutDashboard, chairs: [{ nameKey: 'overview' }] },
+    { nameKey: 'academy_ops', icon: GraduationCap, chairs: [{ nameKey: 'courses_review' }, { nameKey: 'student_feedback' }] },
+    { nameKey: 'studio_ops', icon: Box, chairs: [{ nameKey: 'project_board' }, { nameKey: 'contract_status' }, { nameKey: 'escrow_alerts' }] },
+    { nameKey: 'user_management', icon: Users, chairs: [{ nameKey: 'user_list' }, { nameKey: 'role_requests' }] }
   ],
-  moderator: [{ name: 'content_moderation', icon: Shield, subcategories: [{ name: 'dashboard' }, { name: 'reported_reviews' }, { name: 'flagged_posts' }, { name: 'banned_keywords' }] }],
-  hr: [{ name: 'talent_mgmt', icon: Users, subcategories: [{ name: 'dashboard' }, { name: 'job_openings' }, { name: 'applications' }, { name: 'interview_schedule' }] }],
-  finance: [{ name: 'financial_ops', icon: DollarSign, subcategories: [{ name: 'dashboard' }, { name: 'payment_queue' }, { name: 'revenue_share' }, { name: 'tax_compliance' }] }],
-  support: [{ name: 'help_desk', icon: LifeBuoy, subcategories: [{ name: 'dashboard' }, { name: 'open_tickets' }, { name: 'base_knowledge' }, { name: 'user_search' }] }]
+  moderator: [{ nameKey: 'content_moderation', icon: Shield, chairs: [{ nameKey: 'dashboard' }, { nameKey: 'reported_reviews' }, { nameKey: 'flagged_posts' }, { nameKey: 'banned_keywords' }] }],
+  hr: [{ nameKey: 'talent_mgmt', icon: Users, chairs: [{ nameKey: 'dashboard' }, { nameKey: 'job_openings' }, { nameKey: 'applications' }, { nameKey: 'interview_schedule' }] }],
+  finance: [{ nameKey: 'financial_ops', icon: DollarSign, chairs: [{ nameKey: 'dashboard' }, { nameKey: 'payment_queue' }, { nameKey: 'revenue_share' }, { nameKey: 'tax_compliance' }] }],
+  support: [{ nameKey: 'help_desk', icon: LifeBuoy, chairs: [{ nameKey: 'dashboard' }, { nameKey: 'open_tickets' }, { nameKey: 'base_knowledge' }, { nameKey: 'user_search' }] }]
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { profile, activeRole, setActiveRole, loading: authLoading, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const { lang } = useParams();
+  const { lang, role } = useParams();
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -195,13 +171,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const path = location.pathname.toLowerCase();
   const isDashboardPage = path.includes('/dashboard') || 
-                          path.includes('/admin') || 
-                          path.includes('/chief-manager') || 
-                          path.includes('/manager') || 
-                          path.includes('/moderator') || 
-                          path.includes('/hr') || 
-                          path.includes('/finance') || 
-                          path.includes('/support');
+                          ['admin', 'chief-manager', 'manager', 'moderator', 'hr', 'finance', 'support'].some(r => path.includes(`/${r}/`));
 
   const isProfile = path.includes('/profile/');
   const isCommunity = (path.includes('/community') || path.includes('/messages') || path.includes('/contracts')) && !isDashboardPage && !isProfile;
@@ -218,59 +188,113 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     if (!effectiveRole || !DASHBOARD_MENUS[effectiveRole]) return null;
 
     return {
-      name: 'my_dashboard',
+      id: 'my_dashboard',
+      nameKey: 'my_dashboard',
       icon: LayoutDashboard,
       isDashboard: true,
-      subcategories: DASHBOARD_MENUS[effectiveRole]
+      chairs: DASHBOARD_MENUS[effectiveRole]
     };
   }, [profile, activeRole]);
 
-  // Combined sidebar categories
-  const sidebarCategories = React.useMemo(() => {
-    if (!profile) return baseCategories;
-    return dashboardCategory ? [dashboardCategory, ...baseCategories] : baseCategories;
-  }, [profile, dashboardCategory, baseCategories]);
+  // Sync activeRole from URL if in professional route
+  useEffect(() => {
+    if (role) {
+      const validRoles = ['admin', 'chief-manager', 'manager', 'moderator', 'hr', 'finance', 'support'];
+      if (validRoles.includes(role)) {
+        const formattedRole = role.replace('-', '_');
+        // Admin or superadmin can always switch to any professional role via URL
+        const hasPermission = profile?.roles.includes(formattedRole) || profile?.isAdmin;
+        
+        if (activeRole !== formattedRole && hasPermission) {
+          setActiveRole(formattedRole as any);
+        }
+      }
+    }
+  }, [role, profile, activeRole, setActiveRole]);
 
-  // Sync sidebar state with URL 'view' parameter
-  const [activeCatName, setActiveCatName] = useState(sidebarCategories[0]?.name);
-  const [activeSubName, setActiveSubName] = useState(sidebarCategories[0]?.subcategories[0]?.name);
+  // Combined sidebar categories: Flat array of category objects
+  const sidebarCategories = React.useMemo(() => {
+    const base = ACADEMY_CATEGORIES as any[];
+    if (!profile || !dashboardCategory) return base;
+    
+    // Flatten roles like 'admin' or 'manager' that have multiple core categories
+    const dashItems = (dashboardCategory.chairs || []).map((c: any) => ({ 
+      ...c, 
+      isDashboard: true,
+      // Ensure we use the dashboard category icon if category doesn't have one
+      icon: c.icon || dashboardCategory.icon 
+    }));
+    
+    return [...dashItems, ...base];
+  }, [profile, dashboardCategory]);
+
+  // Sync sidebar state with URL 'view' parameter and activeRole
+  const [activeCatName, setActiveCatName] = useState(sidebarCategories?.[0]?.nameKey || sidebarCategories?.[0]?.name);
+  const [activeSubName, setActiveSubName] = useState(sidebarCategories?.[0]?.chairs?.[0]?.nameKey || sidebarCategories?.[0]?.subcategories?.[0]?.name);
+
+  // Force reset sidebar state when role changes to avoid "stuck" menus
+  useEffect(() => {
+    if (isDashboardPage && dashboardCategory && (dashboardCategory.chairs || []).length > 0) {
+      const firstCat = dashboardCategory.chairs[0];
+      setActiveCatName(firstCat.nameKey || firstCat.name);
+      const firstSub = (firstCat.chairs || firstCat.subcategories || [])[0];
+      if (firstSub) {
+        setActiveSubName(firstSub.nameKey || firstSub.name);
+      }
+    }
+  }, [activeRole, isDashboardPage, dashboardCategory]);
 
   useEffect(() => {
     if (isDashboardPage && dashboardCategory) {
-      setActiveCatName('my_dashboard');
       const currentView = searchParams.get('view') || 'dashboard';
 
-      dashboardCategory.subcategories.forEach((cat: any) => {
-        const sub = cat.subcategories.find((s: any) =>
-          s.name.toLowerCase().replace(/ /g, '_') === currentView
+      let viewFound = false;
+      (dashboardCategory.chairs || []).forEach((cat: any) => {
+        const sub = (cat.chairs || cat.subcategories || []).find((s: any) =>
+          (s.nameKey || s.name).toLowerCase().replace(/ /g, '_') === currentView
         );
         if (sub) {
-          setActiveSubName(sub.name);
+          setActiveCatName(cat.nameKey || cat.name);
+          setActiveSubName(sub.nameKey || sub.name);
+          viewFound = true;
         }
       });
-    } else if (!activeCatName || activeCatName === 'my_dashboard') {
-      setActiveCatName(baseCategories[0]?.name);
-      setActiveSubName(baseCategories[0]?.subcategories[0]?.name);
-    }
-  }, [location.search, isDashboardPage, dashboardCategory, baseCategories]);
 
-  const activeCategory = sidebarCategories.find(c => c.name === activeCatName) || sidebarCategories[0];
+      // If view is invalid for this role, reset to first category/subcategory
+      if (!viewFound && (dashboardCategory.chairs || []).length > 0) {
+        const firstCat = dashboardCategory.chairs[0];
+        setActiveCatName(firstCat.nameKey || firstCat.name);
+        const firstSub = (firstCat.chairs || firstCat.subcategories || [])[0];
+        if (firstSub) {
+          setActiveSubName(firstSub.nameKey || firstSub.name);
+        }
+      }
+    } else if (!activeCatName || (sidebarCategories.length > 0 && !sidebarCategories.some(c => (c.nameKey || c.name) === activeCatName))) {
+      const firstCat = baseCategories[0] as any;
+      setActiveCatName(firstCat?.nameKey || firstCat?.name);
+      setActiveSubName(firstCat?.chairs?.[0]?.nameKey || firstCat?.subcategories?.[0]?.name);
+    }
+  }, [location.search, isDashboardPage, dashboardCategory, baseCategories, activeRole, sidebarCategories]);
+
+  const activeCategory = sidebarCategories.find(c => (c.nameKey || c.name) === activeCatName) || sidebarCategories[0];
 
   const handleSetCategory = (cat: any) => {
-    setActiveCatName(cat.name);
+    setActiveCatName(cat.nameKey || cat.name);
     if (!cat.isDashboard) {
-      setActiveSubName(cat.subcategories[0]?.name);
+      const firstSub = (cat.chairs || cat.subcategories || [])[0];
+      setActiveSubName(firstSub?.nameKey || firstSub?.name);
     }
   };
 
   const handleSetSub = (sub: any, parentCat: any) => {
-    setActiveSubName(sub.name);
+    const subName = sub.nameKey || sub.name;
+    setActiveSubName(subName);
     if (parentCat.isDashboard) {
-      const viewSlug = sub.name.toLowerCase().replace(/ /g, '_');
+      const viewSlug = subName.toLowerCase().replace(/ /g, '_');
       navigate(`${location.pathname}?view=${viewSlug}`);
     } else {
       const mode = isStudio ? 'studio' : 'aca';
-      navigate(`/${mode}/${lang || 'eng'}/topic/${sub.name}`);
+      navigate(`/${mode}/${lang || 'eng'}/topic/${sub.slug || subName}`);
     }
   };
 
@@ -366,26 +390,51 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         initial={{ opacity: 0, y: 10 }} 
                         animate={{ opacity: 1, y: 0 }} 
                         exit={{ opacity: 0, y: 10 }} 
-                        className={`absolute left-0 top-full w-[600px] border rounded-b-2xl shadow-2xl p-8 grid grid-cols-2 gap-8 z-[100] ${cardClass}`}
+                        className={`absolute left-0 top-full w-screen max-w-[1000px] border rounded-b-3xl shadow-2xl p-8 z-[100] ${cardClass}`}
                       >
-                        {item.categories.map((cat: any) => (
-                          <div key={cat.name} className="space-y-4">
-                            <h4 className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${item.id === 'studio' ? 'text-primary-hover' : 'text-primary'}`}>
-                              <cat.icon size={14} /> {t(cat.name)}
-                            </h4>
-                            <div className="flex flex-col gap-2">
-                              {cat.subcategories.map((sub: any) => (
-                                <button 
-                                  key={sub.name} 
-                                  onClick={() => { handleSetSub(sub, cat); setActiveMegaMenu(null); }}
-                                  className="text-left text-xs font-bold text-white/40 hover:text-white transition-colors"
-                                >
-                                  • {t(sub.name)}
-                                </button>
-                              ))}
-                            </div>
+                        <div className="grid grid-cols-4 gap-8">
+                          <div className="col-span-3 grid grid-cols-3 gap-8">
+                            {item.categories.map((cat: any) => {
+                              const catNameKey = cat.nameKey || cat.name;
+                              const chairsList = cat.chairs || cat.subcategories || [];
+                              return (
+                                <div key={cat.id || catNameKey} className="space-y-4 group/cat">
+                                  <h4 className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors ${item.id === 'studio' ? 'text-primary-hover group-hover/cat:text-white' : 'text-primary group-hover/cat:text-white'}`}>
+                                    <cat.icon size={14} /> {t(catNameKey)}
+                                  </h4>
+                                  <div className="flex flex-col gap-2 border-l border-white/5 pl-4 ml-1.5">
+                                    {chairsList.map((chair: any) => (
+                                      <button 
+                                        key={chair.id || chair.nameKey || chair.name} 
+                                        onClick={() => { handleSetSub(chair, cat); setActiveMegaMenu(null); }}
+                                        className="text-left text-xs font-bold text-white/40 hover:text-white hover:translate-x-1 transition-all"
+                                      >
+                                        • {t(chair.nameKey || chair.name)}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
-                        ))}
+                          
+                          {/* FEATURED CARD */}
+                          <div className="col-span-1 border-l border-white/10 pl-8 flex flex-col justify-between">
+                            <div className="space-y-4">
+                              <h4 className="text-[10px] font-black uppercase tracking-widest text-white/20">Featured Track</h4>
+                              <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 group/card">
+                                <img src="/featured_academy_track.png" alt="Featured" className="w-full h-full object-cover transition-transform group-hover/card:scale-110" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-4">
+                                  <p className="text-[10px] font-bold text-white leading-tight uppercase">Master Professional VFX <br /><span className={modeColor}>Pipeline 2026</span></p>
+                                </div>
+                              </div>
+                              <p className="text-[9px] text-white/40 leading-relaxed uppercase font-medium">Join our most advanced track led by industry veterans from Wētā and ILM.</p>
+                            </div>
+                            <button className={`w-full py-3 rounded-lg border text-[10px] font-black uppercase tracking-widest transition-all ${isStudio ? 'border-primary-hover/20 bg-primary-hover/10 text-primary-hover hover:bg-primary-hover hover:text-white' : 'border-primary/20 bg-primary/10 text-primary hover:bg-primary hover:text-white'}`}>
+                              Apply Now
+                            </button>
+                          </div>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -453,28 +502,45 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                           </div>
                           
                           <div className="py-2">
-                            <Link to={`${modePrefix}/${lang || 'eng'}/profile/${profile.uid}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"><User size={14} /> {t('my_profile')}</Link>  
-                            <Link to={`${isStudio ? '/studio' : '/aca'}/${lang || 'eng'}/dashboard`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"><LayoutDashboard size={14} /> {t('my_dashboard')}</Link>
+                            <Link to={`/${isStudio ? 'studio' : 'aca'}/${lang || 'eng'}/profile/${profile.uid}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"><User size={14} /> {t('my_profile')}</Link>  
+                            <Link 
+                              to={['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support'].includes(activeRole || '') 
+                                ? `/${(activeRole || '').replace('_', '-')}/${lang || 'eng'}` 
+                                : `/aca/${lang || 'eng'}/dashboard`
+                              } 
+                              onClick={() => setIsUserMenuOpen(false)} 
+                              className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 transition-all flex items-center gap-3"
+                            >
+                              <LayoutDashboard size={14} /> {t('my_dashboard')}
+                            </Link>
 
                             <div className="px-6 py-2 border-t border-white/5 mt-2">
                               <p className="text-[8px] font-black text-white/20 uppercase tracking-widest mb-2">Switch identity</p>
-                              {profile.roles.map(r => (
-                                <button
-                                  key={r}
-                                  onClick={() => {
-                                    setActiveRole(r as any);
-                                    setIsUserMenuOpen(false);
-                                    const targetPath = ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support'].includes(r) 
-                                      ? `/${r.replace('_', '-')}/${lang || 'eng'}` 
-                                      : `/${isStudio ? 'studio' : 'aca'}/${lang || 'eng'}/dashboard`;
-                                    navigate(targetPath);
-                                  }}
-                                  className={`w-full text-left px-3 py-2 rounded-lg text-[9px] font-black uppercase transition-all flex items-center gap-2 ${activeRole === r ? 'text-primary bg-primary/10' : 'text-white/40 hover:bg-white/5'}`}
-                                >
-                                  <div className={`size-1.5 rounded-full ${activeRole === r ? 'bg-primary' : 'bg-white/10'}`} />
-                                  {r.replace('_', ' ')}
-                                </button>
-                              ))}
+                              {(() => {
+                                const availableRoles = [...(profile?.roles || [])];
+                                if (profile?.isAdmin) {
+                                  ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support'].forEach(r => {
+                                    if (!availableRoles.includes(r)) availableRoles.push(r);
+                                  });
+                                }
+                                return availableRoles.map(r => (
+                                  <button
+                                    key={r}
+                                    onClick={() => {
+                                      setActiveRole(r as any);
+                                      setIsUserMenuOpen(false);
+                                      const targetPath = ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support'].includes(r) 
+                                        ? `/${r.replace('_', '-')}/${lang || 'eng'}` 
+                                        : `/${isStudio ? 'studio' : 'aca'}/${lang || 'eng'}/dashboard`;
+                                      navigate(targetPath);
+                                    }}
+                                    className={`w-full text-left px-3 py-2 rounded-lg text-[9px] font-black uppercase transition-all flex items-center gap-2 ${activeRole === r ? (isStudio ? 'text-primary-hover bg-primary-hover/10' : 'text-primary bg-primary/10') : 'text-white/40 hover:bg-white/5'}`}
+                                  >
+                                    <div className={`size-1.5 rounded-full ${activeRole === r ? (isStudio ? 'bg-primary-hover' : 'bg-primary') : 'bg-white/10'}`} />
+                                    {t(r)}
+                                  </button>
+                                ));
+                              })()}
                             </div>
 
                             <div className="h-[1px] bg-white/5 my-2 mx-6" />
@@ -535,11 +601,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </nav>
                   <div className="pt-8 border-t border-white/5 space-y-6">
                     {sidebarCategories.map(cat => (
-                      <div key={cat.name} className="space-y-3">
-                        <div className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-white/60"><cat.icon size={14} className={modeColor} /> {t(cat.name)}</div>
+                      <div key={cat.id || cat.nameKey || cat.name} className="space-y-3">
+                        <div className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-white/60"><cat.icon size={14} className={modeColor} /> {t(cat.nameKey || cat.name)}</div>
                         <div className="grid grid-cols-1 gap-2 pl-6">
-                          {cat.subcategories.map((sub: any) => (
-                            <button key={sub.name} onClick={() => { handleSetSub(sub, cat); setIsMobileMenuOpen(false); }} className="text-left text-[10px] font-bold text-white/30 hover:text-white uppercase">• {t(sub.name)}</button>
+                          {cat.chairs.map((chair: any) => (
+                            <button key={chair.id || chair.nameKey} onClick={() => { handleSetSub(chair, cat); setIsMobileMenuOpen(false); }} className="text-left text-[10px] font-bold text-white/30 hover:text-white uppercase">• {t(chair.nameKey)}</button>
                           ))}
                         </div>
                       </div>
@@ -574,20 +640,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <div className="space-y-8">
                   <div className="space-y-2">
                     {sidebarCategories.map((cat) => {
-                      const isCatActive = activeCatName === cat.name;
+                      const catName = cat.nameKey || cat.name;
+                      const isCatActive = activeCatName === catName;
                       const Icon = cat.icon;
                       return (
-                        <div key={cat.name} className="space-y-1">
+                        <div key={cat.id || catName} className="space-y-1">
                           <button onClick={() => { if (isSidebarCollapsed) setIsSidebarCollapsed(false); handleSetCategory(cat); }} className={`w-full text-left p-3 rounded-xl border transition-all flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-between'} ${isCatActive ? (isStudio ? 'bg-primary-hover/10 border-primary-hover/20 text-white' : 'bg-primary/10 border-primary/20 text-white') : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white'}`}>
-                            <div className="flex items-center gap-3"><Icon size={16} className={isCatActive ? modeColor : 'opacity-40'} />{!isSidebarCollapsed && <span className="text-[10px] font-black uppercase tracking-widest">{t(cat.name)}</span>}</div>
+                            <div className="flex items-center gap-3"><Icon size={16} className={isCatActive ? modeColor : 'opacity-40'} />{!isSidebarCollapsed && <span className="text-[10px] font-black uppercase tracking-widest">{t(catName)}</span>}</div>
                             {!isSidebarCollapsed && <ChevronDown size={12} className={`transition-transform duration-300 ${isCatActive ? 'rotate-180 opacity-100' : 'opacity-20'}`} />}
                           </button>
                           <AnimatePresence initial={false}>
                             {isCatActive && !isSidebarCollapsed && (
                               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden ml-3 pl-3 border-l border-white/5 space-y-1 mt-1">
-                                {cat.subcategories.map((sub: any) => (
-                                  <button key={sub.name} onClick={() => handleSetSub(sub, cat)} className={`w-full text-left px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-between ${activeSubName === sub.name ? (isStudio ? 'text-primary-hover' : 'text-primary') : 'text-white/30 hover:text-white/60'}`}>
-                                    {t(sub.name)}<div className={`size-1 rounded-full ${activeSubName === sub.name ? (isStudio ? 'bg-primary-hover' : 'bg-primary') : 'bg-white/10'}`} />
+                                {cat.chairs.map((chair: any) => (
+                                  <button key={chair.id || chair.nameKey} onClick={() => handleSetSub(chair, cat)} className={`w-full text-left px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-between ${activeSubName === chair.nameKey ? (isStudio ? 'text-primary-hover' : 'text-primary') : 'text-white/30 hover:text-white/60'}`}>
+                                    {t(chair.nameKey)}<div className={`size-1 rounded-full ${activeSubName === chair.nameKey ? (isStudio ? 'bg-primary-hover' : 'bg-primary') : 'bg-white/10'}`} />
                                   </button>
                                 ))}
                               </motion.div>

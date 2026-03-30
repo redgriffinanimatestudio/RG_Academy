@@ -23,7 +23,12 @@ export function useSyncManager() {
       return;
     }
 
-    const uid = profile.uid;
+    const uid = profile.id || profile.uid; // Support both PG 'id' and legacy 'uid'
+
+    if (!uid) {
+      console.warn("[SyncManager] Profile exists but UID is missing", profile);
+      return;
+    }
 
     const fetchData = async () => {
       try {

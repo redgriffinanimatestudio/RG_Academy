@@ -1,117 +1,37 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { chatService, ChatRoom, ChatMessage } from '../services/chatService';
-import { userService, UserProfile } from '../services/userService';
-import { Send, Search, User, MoreVertical, Phone, Video, Info, Hash, MessageSquare, Plus } from 'lucide-react';
+import { Send, Search, User, MoreVertical, Phone, Video, Info, MessageSquare, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import Preloader from '../components/Preloader';
+import { useChatManager } from './Messages/useChatManager';
 
 export default function Messages() {
   const { t } = useTranslation();
-  const { profile: user, loading } = useAuth();
+  const { profile: user, loading: authLoading } = useAuth();
   const { lang } = useParams();
-  const [rooms, setRooms] = useState<ChatRoom[]>([]);
-  const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [participants, setParticipants] = useState<Record<string, UserProfile>>({});
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const {
+    filteredRooms, activeRoomId, setActiveRoomId,
+    messages, messagesEndRef, newMessage, setNewMessage,
+    participants, showNewChat, setShowNewChat,
+    searchUserQuery, setSearchUserQuery, roomSearchQuery, setRoomSearchQuery,
+    searchResults, handleCreateRoom, handleSendMessage
+  } = useChatManager(user);
 
-  const [showNewChat, setShowNewChat] = useState(false);
-  const [searchUserQuery, setSearchUserQuery] = useState('');
-  const [roomSearchQuery, setRoomSearchQuery] = useState('');
-  const [searchResults, setSearchUserResults] = useState<UserProfile[]>([]);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchRooms = async () => {
-      const updatedRooms = await chatService.getChatRooms(user.uid);
-      setRooms(updatedRooms);
-      
-      const allParticipantIds = Array.from(new Set(updatedRooms.flatMap(r => r.participants)));
-      const profiles = await userService.getUsers(allParticipantIds);
-      const profileMap = profiles.reduce((acc, p) => ({ ...acc, [p.uid]: p }), {});
-      setParticipants(prev => ({ ...prev, ...profileMap }));
-    };
-
-    fetchRooms();
-    const interval = setInterval(fetchRooms, 10000); // Polling as fallback for sockets
-    return () => clearInterval(interval);
-  }, [user]);
-
-  const filteredRooms = rooms.filter(room => {
-    const partnerId = room.participants.find(p => p !== user?.uid);
-    const partner = partnerId ? participants[partnerId] : null;
-    return partner?.displayName?.toLowerCase().includes(roomSearchQuery.toLowerCase()) || 
-           room.lastMessage?.toLowerCase().includes(roomSearchQuery.toLowerCase());
-  });
-
-  useEffect(() => {
-    if (!activeRoomId) return;
-
-    const fetchMessages = () => {
-      chatService.subscribeToMessages(activeRoomId, (updatedMessages) => {
-        setMessages(updatedMessages);
-      });
-    };
-
-    fetchMessages();
-    const interval = setInterval(fetchMessages, 5000);
-    return () => clearInterval(interval);
-  }, [activeRoomId]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  useEffect(() => {
-    if (searchUserQuery.length > 2) {
-      userService.getUsers(['1', '2', '3']).then(results => {
-        setSearchUserResults(results.filter(u => u.displayName?.toLowerCase().includes(searchUserQuery.toLowerCase())));
-      });
-    } else {
-      setSearchUserResults([]);
-    }
-  }, [searchUserQuery]);
-
-  const handleCreateRoom = async (partnerId: string) => {
-    if (!user) return;
-    try {
-      const roomId = await chatService.createChatRoom([user.uid, partnerId], 'direct');
-      setActiveRoomId(roomId);
-      setShowNewChat(false);
-      setSearchUserQuery('');
-    } catch (error) {
-      console.error('Error creating room:', error);
-    }
-  };
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !activeRoomId || !newMessage.trim()) return;
-
-    try {
-      await chatService.sendMessage(activeRoomId, user.uid, newMessage.trim());
-      setNewMessage('');
-    } catch (error) {
-      console.error('Error sending message:', error);
-    }
-  };
-
-  if (loading) return <Preloader message="Loading Messages..." size="lg" />;
+  if (authLoading) return <Preloader message="Loading Messages..." size="lg" />;
 
   if (!user) return <Navigate to={`/${lang || 'eng'}/login`} />;
 
-  const activeRoom = rooms.find(r => r.id === activeRoomId);
-  const otherParticipant = activeRoom?.participants.find(p => p !== user.uid);
-  const activeChatPartner = otherParticipant ? participants[otherParticipant] : null;
+  const uid = user.id || user.uid;
+  const activeRoom = filteredRooms.find(r => r.id === activeRoomId);
+  const otherParticipantId = activeRoom?.participants.find(p => p !== uid);
+  const activeChatPartner = otherParticipantId ? participants[otherParticipantId] : null;
 
   return (
     <div className="h-[calc(100vh-12rem)] flex bg-bg-card rounded-[2.5rem] border border-white/5 overflow-hidden relative">
-      {/* Sidebar */}
+      {/* Sidebar - Room List */}
       <div className="w-80 border-r border-white/5 flex flex-col bg-black/20">
         <div className="p-6 border-b border-white/5">
           <div className="flex items-center justify-between mb-6">
@@ -137,7 +57,7 @@ export default function Messages() {
 
         <div className="flex-1 overflow-y-auto no-scrollbar">
           {filteredRooms.map((room) => {
-            const partnerId = room.participants.find(p => p !== user.uid);
+            const partnerId = room.participants.find(p => p !== uid);
             const partner = partnerId ? participants[partnerId] : null;
             
             return (
@@ -211,7 +131,7 @@ export default function Messages() {
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
               {messages.map((msg) => {
-                const isMe = msg.senderId === user.uid;
+                const isMe = msg.senderId === uid;
                 const sender = participants[msg.senderId];
                 
                 return (
@@ -315,8 +235,8 @@ export default function Messages() {
                 <div className="space-y-2 max-h-60 overflow-y-auto no-scrollbar">
                   {searchResults.map((u) => (
                     <button 
-                      key={u.uid}
-                      onClick={() => handleCreateRoom(u.uid)}
+                      key={u.id || u.uid}
+                      onClick={() => handleCreateRoom(u.id || u.uid)}
                       className="w-full p-4 flex items-center gap-4 rounded-2xl bg-white/5 hover:bg-primary hover:text-bg-dark transition-all group"
                     >
                       <div className="size-10 rounded-xl bg-white/10 overflow-hidden">
