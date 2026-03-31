@@ -97,27 +97,32 @@ async function startServer() {
   });
 
   // --- MODE SELECTION ---
-  if (process.env.SKIP_VITE === "true") {
-    console.log("🛠️  BACKEND ONLY MODE (SKIP_VITE=true)");
-    app.get('/', (req, res) => {
-      res.json({ 
-        status: "API Online", 
-        docs: `http://localhost:${PORT}/api/docs`,
-        version: "2.6.0"
-      });
-    });
-  } else if (process.env.NODE_ENV === "production") {
-    const distPath = path.resolve(__dirname, 'dist');
+  // --- PRODUCTION & SERVING MODE ---
+  const distPath = path.resolve(__dirname, 'dist');
+  const isProduction = process.env.NODE_ENV === "production";
+  const skipVite = process.env.SKIP_VITE === "true";
+
+  if (isProduction || skipVite) {
     if (fs.existsSync(distPath)) {
       console.log("📦 PRODUCTION MODE: Serving static files from dist/");
       app.use(express.static(distPath));
       app.get('*', (req, res) => {
-        res.sendFile(path.join(distPath, 'index.html'));
+        // Only fallback to index.html if it's not an API call
+        if (!req.path.startsWith('/api')) {
+          res.sendFile(path.join(distPath, 'index.html'));
+        } else {
+          res.status(404).json({ error: 'API endpoint not found' });
+        }
       });
     } else {
-      console.warn("⚠️  PRODUCTION MODE: dist/ folder not found! Falling back to API mode.");
+      console.warn("⚠️  PRODUCTION MODE: dist/ folder not found! Serving API status.");
       app.get('/', (req, res) => {
-        res.json({ error: "Production build missing. Run npm run build first." });
+        res.json({ 
+          status: "API Online", 
+          docs: `http://localhost:${PORT}/api/docs`,
+          version: "2.6.0",
+          note: "Production build missing. Run npm run build."
+        });
       });
     }
   } else {

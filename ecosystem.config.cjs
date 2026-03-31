@@ -2,8 +2,7 @@ module.exports = {
   apps: [
     {
       name: "rg-academy",
-      script: "./server.ts",
-      interpreter: "node_modules/.bin/tsx",
+      script: "./index.js",
       env: {
         NODE_ENV: "production",
         PORT: 3000,

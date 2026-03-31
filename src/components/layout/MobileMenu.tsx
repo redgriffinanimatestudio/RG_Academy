@@ -153,7 +153,7 @@ export default function MobileMenu({
                   </div>
                   
                   <div className="grid grid-cols-2 gap-3">
-                    <button onClick={() => { navigate(`/${currentLangCode}/dashboard`); onClose(); }} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 text-[9px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors"><Shield size={14} /> Dashboard</button>
+                    <button onClick={() => { navigate(`${modePrefix}/${currentLangCode}/dashboard`); onClose(); }} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 text-[9px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors"><Shield size={14} /> Dashboard</button>
                     <button onClick={() => { navigate(`/${currentLangCode}/cart`); onClose(); }} className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 text-[9px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors relative">
                       <ShoppingCart size={14} /> {t('price')} {cartCount > 0 && <span className="absolute top-1 right-2 size-1.5 bg-rose-500 rounded-full" />}
                     </button>

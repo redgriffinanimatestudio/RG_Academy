@@ -7,7 +7,9 @@ import StatCard from './StatCard';
 import HelpModal from '../../../components/support/HelpModal';
 import ActivityFeed from '../../../components/dashboard/ActivityFeed';
 import BalanceDisplay from '../../../components/dashboard/BalanceDisplay';
-import HRDashboard from './Roles/HRDashboard';
+import HRDashboard from '../roles/HRDashboard';
+import FinanceDashboard from '../roles/FinanceDashboard';
+import SupportDashboard from '../roles/SupportDashboard';
 
 interface UnifiedDashboardProps {
   roles: string[];
@@ -25,7 +27,12 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ roles, activeRole, 
   const isC = activeRole === 'client';
   const isS = activeRole === 'student';
   const isHR = activeRole === 'hr';
+  const isFinance = activeRole === 'finance';
+  const isSupport = activeRole === 'support';
   const isStaff = ['manager', 'chief_manager', 'moderator', 'hr', 'finance', 'support'].includes(activeRole || '');
+
+  const [searchParams] = useSearchParams();
+  const currentView = searchParams.get('view') || 'overview';
 
   const [staffStats, setStaffStats] = useState<any>(null);
   const [statsLoading, setStatsLoading] = useState(false);
@@ -114,10 +121,16 @@ const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ roles, activeRole, 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-8">
           {/* 💎 HR TALENT MATRIX HUB */}
-          {isHR && <HRDashboard view={''} accent={''} user={user} lang={lang} />}
+          {isHR && <HRDashboard view={currentView} accent={''} user={user} lang={lang} />}
 
-          {/* 💰 VAULT STATUS */}
-          {!isHR && <BalanceDisplay />}
+          {/* 💰 FINANCE TREASURY HUB */}
+          {isFinance && <FinanceDashboard view={currentView} user={user} lang={lang} />}
+
+          {/* 🛠️ SUPPORT INCIDENT HUB */}
+          {isSupport && <SupportDashboard view={currentView} user={user} lang={lang} />}
+
+          {/* 💰 VAULT STATUS (Shared for others) */}
+          {(!isHR && !isFinance && !isSupport) && <BalanceDisplay />}
 
           {/* 🛠️ PRODUCTION PIPELINE MONITOR */}
           {(isC || isE || isAdmin) && (

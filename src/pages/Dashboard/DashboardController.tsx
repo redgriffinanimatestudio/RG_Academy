@@ -14,6 +14,10 @@ import HRDashboard from './roles/HRDashboard';
 import FinanceDashboard from './roles/FinanceDashboard';
 import SupportDashboard from './roles/SupportDashboard';
 import AgencyDashboard from './roles/AgencyDashboard';
+import ModeratorDashboard from './roles/ModeratorDashboard';
+import LecturerDashboard from './roles/LecturerDashboard';
+import RoleGuard from './components/RoleGuard';
+import PerspectiveBar from './components/PerspectiveBar';
 
 export default function DashboardController() {
   const { profile, activeRole, setActiveRole, loading } = useAuth();
@@ -21,6 +25,7 @@ export default function DashboardController() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const perspective = searchParams.get('perspective');
+  const activeView = searchParams.get('view') || 'overview';
   
   const [userData, setUserData] = useState<any>(null);
 
@@ -30,7 +35,7 @@ export default function DashboardController() {
     
     // Industrial Oversight: Admins can force any perspective
     const effectiveRoles = profile.isAdmin 
-      ? [...new Set([...profile.roles, 'agency', 'hr', 'finance', 'support'])]
+      ? [...new Set([...profile.roles, 'agency', 'hr', 'finance', 'support', 'manager', 'moderator', 'chief_manager'])]
       : profile.roles;
 
     if (perspective !== activeRole && effectiveRoles.includes(perspective)) {
@@ -68,20 +73,41 @@ export default function DashboardController() {
   const DashboardView = useMemo(() => {
     if (!profile || !activeRole) return null;
 
+    const commonProps = {
+      view: activeView,
+      user: profile,
+      lang: lang,
+      accent: 'primary'
+    };
+
     switch (activeRole) {
-      case 'admin': return <AdminDashboard stats={userData?.stats} />;
-      case 'student': return <StudentDashboard data={userData} user={profile} lang={lang} accent="primary" view="student" />;
+      case 'admin': 
+        return <RoleGuard allowedRoles={['admin']}><AdminDashboard stats={userData?.stats} activeRole={activeRole} setActiveRole={setActiveRole} /></RoleGuard>;
+      case 'student': 
+        return <RoleGuard allowedRoles={['student']}><StudentDashboard data={userData} {...commonProps} /></RoleGuard>;
+      case 'lecturer': 
+        return <RoleGuard allowedRoles={['lecturer']}><LecturerDashboard {...commonProps} /></RoleGuard>;
       case 'manager':
-      case 'chief_manager': return <ManagerDashboard />;
-      case 'executor': return <ExecutorDashboard user={profile} />;
-      case 'client': return <ClientDashboard />;
-      case 'hr': return <HRDashboard />;
-      case 'finance': return <FinanceDashboard />;
-      case 'support': return <SupportDashboard />;
-      case 'agency': return <AgencyDashboard />;
-      default: return <StudentDashboard data={userData} user={profile} lang={lang} accent="primary" view="student" />;
+      case 'chief_manager': 
+        return <RoleGuard allowedRoles={['manager', 'chief_manager']}><ManagerDashboard {...commonProps} /></RoleGuard>;
+      case 'executor': 
+        return <RoleGuard allowedRoles={['executor']}><ExecutorDashboard {...commonProps} /></RoleGuard>;
+      case 'client': 
+        return <RoleGuard allowedRoles={['client']}><ClientDashboard {...commonProps} /></RoleGuard>;
+      case 'hr': 
+        return <RoleGuard allowedRoles={['hr']}><HRDashboard {...commonProps} /></RoleGuard>;
+      case 'finance': 
+        return <RoleGuard allowedRoles={['finance']}><FinanceDashboard {...commonProps} /></RoleGuard>;
+      case 'support': 
+        return <RoleGuard allowedRoles={['support']}><SupportDashboard {...commonProps} /></RoleGuard>;
+      case 'agency': 
+        return <RoleGuard allowedRoles={['agency']}><AgencyDashboard {...commonProps} /></RoleGuard>;
+      case 'moderator':
+        return <RoleGuard allowedRoles={['moderator']}><ModeratorDashboard {...commonProps} /></RoleGuard>;
+      default: 
+        return <StudentDashboard data={userData} {...commonProps} />;
     }
-  }, [profile, activeRole, userData]);
+  }, [profile, activeRole, userData, activeView, lang]);
 
   if (loading) return <Preloader message="Syncing with Red Griffin Ecosystem..." />;
   if (!profile) {
@@ -95,27 +121,21 @@ export default function DashboardController() {
       <div className="mx-auto w-full max-w-[1920px] px-4 sm:px-6 lg:px-8 xl:px-10 py-4 sm:py-8 lg:py-12">
         
         {/* Identity Switcher - Horizontal Scroll on Mobile */}
-        <div className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-10 overflow-x-auto no-scrollbar pb-2 sm:pb-0">
-          <div className="flex p-1 bg-white/5 border border-white/5 rounded-2xl shrink-0">
-            {(profile.isAdmin 
-              ? [...new Set([...profile.roles, 'agency', 'hr', 'finance', 'support'])]
+        <div className="mb-6 sm:mb-10 overflow-x-auto no-scrollbar pb-2 sm:pb-0">
+          <PerspectiveBar 
+            roles={profile.isAdmin 
+              ? ['admin', 'student', 'executor', 'hr', 'finance', 'support', 'agency', 'manager', 'chief_manager', 'moderator']
               : profile.roles
-            ).map(role => (
-              <button
-                key={role}
-                onClick={() => setActiveRole(role as any)}
-                className={`px-4 sm:px-6 py-2 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeRole === role ? 'bg-primary text-bg-dark shadow-lg' : 'text-white/40 hover:text-white'}`}
-              >
-                {role.replace('_', ' ')}
-              </button>
-            ))}
-          </div>
-          
-          {/* Status Indicator (Desktop only) */}
-          <div className="hidden md:flex items-center gap-2 ml-auto px-4 py-2 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
-            <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[8px] font-black uppercase text-emerald-500/60 tracking-widest">Ecosystem Sync: Active</span>
-          </div>
+            } 
+            activeRole={activeRole} 
+            onSwitch={(role) => {
+              setActiveRole(role as any);
+              // Update URL to sync perspective
+              const params = new URLSearchParams(window.location.search);
+              params.set('perspective', role);
+              navigate(`${window.location.pathname}?${params.toString()}`, { replace: true });
+            }} 
+          />
         </div>
 
         {/* Responsive Dashboard View */}

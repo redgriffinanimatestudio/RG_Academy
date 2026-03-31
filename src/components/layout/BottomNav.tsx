@@ -22,17 +22,20 @@ export default function BottomNav() {
   const currentLangCode = lang || 'eng';
   const cartCount = platformData?.cart?.length || 0;
 
-  const navItems = [
-    { icon: Home, label: 'Home', path: `/${currentLangCode}` },
-    { icon: GraduationCap, label: 'Academy', path: `/aca/${currentLangCode}` },
-    { icon: Search, label: 'Search', action: () => {
-      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, metaKey: true }));
-    }},
-    { icon: Briefcase, label: 'Studio', path: `/studio/${currentLangCode}` },
-    profile 
-      ? { icon: LayoutDashboard, label: 'Dashboard', path: `/${currentLangCode}/dashboard` }
-      : { icon: LogIn, label: 'Join', path: `/aca/${currentLangCode}/login` }
-  ];
+    const isStudio = location.pathname.includes('/studio');
+    const modePrefix = isStudio ? '/studio' : '/aca';
+  
+    const navItems = [
+      { icon: Home, label: 'Home', path: `/${currentLangCode}` },
+      { icon: GraduationCap, label: 'Academy', path: `/aca/${currentLangCode}` },
+      { icon: Search, label: 'Search', action: () => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, metaKey: true }));
+      }},
+      { icon: Briefcase, label: 'Studio', path: `/studio/${currentLangCode}` },
+      profile 
+        ? { icon: LayoutDashboard, label: 'Dashboard', path: `${modePrefix}/${currentLangCode}/dashboard` }
+        : { icon: LogIn, label: 'Join', path: `/aca/${currentLangCode}/login` }
+    ];
 
   const isActive = (path?: string) => path && location.pathname === path;
 

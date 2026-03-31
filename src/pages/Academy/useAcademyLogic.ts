@@ -19,11 +19,18 @@ export function useAcademyLogic() {
   const [showFilters, setShowFilters] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // Industrial Role-Specific Telemetry
+  const [studentProgress, setStudentProgress] = useState<any>(null);
+  const [lecturerStats, setLecturerStats] = useState<any>(null);
+
   const [filters, setFilters] = useState({
     level: 'all',
     priceRange: [0, 1000],
     sortBy: 'popular'
   });
+
+  const isLecturer = activeRole === 'lecturer' || activeRole === 'admin';
+  const isStudent = activeRole === 'student' || activeRole === 'admin';
 
   useEffect(() => {
     async function fetchData() {
@@ -35,21 +42,32 @@ export function useAcademyLogic() {
         ]);
         setCourses(fetchedCourses);
         setCategories(fetchedCategories);
+
+        // Fetch Personal Telemetry based on role
+        if (isStudent) {
+           const progress = await academyService.getStudentProgress();
+           setStudentProgress(progress);
+        }
+        if (isLecturer) {
+           const stats = await academyService.getLecturerSummary();
+           setLecturerStats(stats);
+        }
+
       } catch (error) {
-        console.error("Failed to fetch academy data:", error);
+        console.error("[Academy Logic] Data sync failure:", error);
       } finally {
         setLoading(false);
       }
     }
     fetchData();
-  }, []);
+  }, [activeRole]);
 
   const filteredCourses = useMemo(() => {
     const safeCourses = Array.isArray(courses) ? courses : [];
     return safeCourses.filter(course => {
       const matchesCategory = selectedCategory === 'all_workshops' || course.categoryId === selectedCategory;
-      const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           course.lecturerName.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = (course.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) || 
+                           (course.lecturerName?.toLowerCase() || '').includes(searchQuery.toLowerCase());
       
       const matchesLevel = filters.level === 'all' || course.level === filters.level;
       const matchesPrice = course.price <= filters.priceRange[1];
@@ -62,14 +80,11 @@ export function useAcademyLogic() {
     });
   }, [courses, selectedCategory, searchQuery, filters]);
 
-  const isLecturer = activeRole === 'lecturer';
-  const isStudent = activeRole === 'student';
-
   return {
     t, lang, profile, activeRole, synergyData, synergyLoading,
     categories, loading, selectedCategory, setSelectedCategory,
     searchQuery, setSearchQuery, showFilters, setShowFilters,
     currentSlide, setCurrentSlide, filters, setFilters,
-    filteredCourses, isLecturer, isStudent
+    filteredCourses, isLecturer, isStudent, studentProgress, lecturerStats
   };
 }

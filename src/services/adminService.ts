@@ -1,3 +1,4 @@
+import apiClient from './apiClient';
 import { UserRole } from './userService';
 
 export type Permission = 
@@ -50,6 +51,9 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   ],
   support: [
     'view_users'
+  ],
+  agency: [
+    'view_users'
   ]
 };
 
@@ -78,94 +82,46 @@ export const adminService = {
   },
 
   async getStats(): Promise<any> {
-    const token = localStorage.getItem('auth_token');
-    const response = await fetch('/api/v1/admin/stats', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!response.ok) throw new Error('Failed to fetch admin stats');
-    const res = await response.json();
-    return res.success ? res.data : null;
+    const { data } = await apiClient.get('/v1/admin/stats');
+    return data.success ? data.data : data;
   },
 
   async getUsers(page = 1, search = '', role = ''): Promise<any> {
-    const token = localStorage.getItem('auth_token');
-    const url = `/api/v1/admin/users?page=${page}&search=${search}&role=${role}`;
-    const response = await fetch(url, {
-      headers: { 'Authorization': `Bearer ${token}` }
+    const { data } = await apiClient.get(`/v1/admin/users`, {
+      params: { page, search, role }
     });
-    if (!response.ok) throw new Error('Failed to fetch users');
-    const res = await response.json();
-    return res.success ? { users: res.data, total: res.meta.total } : null;
+    return data.success ? { users: data.data, total: data.meta?.total } : data;
   },
 
   async updateUserRole(userId: string, role: string, roles: string[]): Promise<any> {
-    const token = localStorage.getItem('auth_token');
-    const response = await fetch(`/api/v1/admin/users/${userId}/role`, {
-      method: 'PATCH',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ role, roles })
-    });
-    if (!response.ok) throw new Error('Failed to update user role');
-    const res = await response.json();
-    return res.success ? res.data : null;
+    const { data } = await apiClient.patch(`/v1/admin/users/${userId}/role`, { role, roles });
+    return data.success ? data.data : data;
   },
 
-  async createUser(data: any): Promise<any> {
-    const token = localStorage.getItem('auth_token');
-    const response = await fetch('/api/v1/admin/users', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Failed to create user');
-    const res = await response.json();
-    return res.success ? res.data : null;
+  async createUser(userData: any): Promise<any> {
+    const { data } = await apiClient.post('/v1/admin/users', userData);
+    return data.success ? data.data : data;
   },
 
-  async updateUser(userId: string, data: any): Promise<any> {
-    const token = localStorage.getItem('auth_token');
-    const response = await fetch(`/api/v1/admin/users/${userId}`, {
-      method: 'PUT',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Failed to update user');
-    const res = await response.json();
-    return res.success ? res.data : null;
+  async updateUser(userId: string, userData: any): Promise<any> {
+    const { data } = await apiClient.put(`/v1/admin/users/${userId}`, userData);
+    return data.success ? data.data : data;
   },
 
   async getCourses(page = 1, status = ''): Promise<any> {
-    const token = localStorage.getItem('auth_token');
-    const url = `/api/v1/admin/courses?page=${page}&status=${status}`;
-    const response = await fetch(url, {
-      headers: { 'Authorization': `Bearer ${token}` }
+    const { data } = await apiClient.get(`/v1/admin/courses`, {
+      params: { page, status }
     });
-    if (!response.ok) throw new Error('Failed to fetch courses');
-    const res = await response.json();
-    return res.success ? { courses: res.data, total: res.meta.total } : null;
+    return data.success ? { courses: data.data, total: data.meta?.total } : data;
   },
 
   async updateCourseStatus(courseId: string, status: string): Promise<any> {
-    const token = localStorage.getItem('auth_token');
-    const response = await fetch(`/api/v1/admin/courses/${courseId}/status`, {
-      method: 'PATCH',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ status })
-    });
-    if (!response.ok) throw new Error('Failed to update course status');
-    const res = await response.json();
-    return res.success ? res.data : null;
+    const { data } = await apiClient.patch(`/v1/admin/courses/${courseId}/status`, { status });
+    return data.success ? data.data : data;
+  },
+
+  async getChiefSummary(): Promise<any> {
+    const { data } = await apiClient.get('/v1/admin/chief-summary');
+    return data.success ? data.data : data;
   }
 };

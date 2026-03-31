@@ -205,5 +205,10 @@ export const academyService = {
   async getCourseCurriculum(courseSlug: string): Promise<Module[]> {
     const { data } = await apiClient.get(`${API_V1}/courses/${courseSlug}/curriculum`);
     return data.success ? data.data : [];
+  },
+
+  async getLecturerSummary(): Promise<any> {
+    const { data } = await apiClient.get(`${API_V1}/lecturer/summary`);
+    return data.success ? data.data : null;
   }
 };

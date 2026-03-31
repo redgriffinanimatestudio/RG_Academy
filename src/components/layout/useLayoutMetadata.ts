@@ -5,7 +5,8 @@ import {
   ACADEMY_CATEGORIES, 
   STUDIO_CATEGORIES, 
   COMMUNITY_CATEGORIES, 
-  DASHBOARD_MENUS 
+  DASHBOARD_MENUS,
+  SUPERADMIN_HUB
 } from './Layout.constants';
 
 export function useLayoutMetadata(profile: any, activeRole: string | null) {
@@ -25,35 +26,24 @@ export function useLayoutMetadata(profile: any, activeRole: string | null) {
   const dashboardCategory = useMemo(() => {
     if (!profile || !activeRole) return null;
     
-    // IF ADMIN: Aggregate ALL role menus for Superadmin "All-Access" view
+    // IF ADMIN: Show the Master Superadmin Hub with all roles nested
     if (profile.isAdmin && activeRole === 'admin') {
-      const allSubmenus: any[] = [];
-      
-      // 1. Add Original Admin Menu First
-      if (DASHBOARD_MENUS['admin']) allSubmenus.push(...DASHBOARD_MENUS['admin']);
-      
-      // 2. Add "Perspective" submenus for all other roles
-      const perspectiveRoles = ['hr', 'finance', 'student', 'lecturer', 'chief_manager', 'manager', 'client', 'executor', 'support'];
-      perspectiveRoles.forEach(role => {
-        if (DASHBOARD_MENUS[role] && role !== 'admin') {
-          // Flatten subcategories and add prefix to distinguish perspectives
-          DASHBOARD_MENUS[role].forEach(menu => {
-            const roleName = role.replace('_', ' ').toUpperCase();
-            allSubmenus.push({
-              ...menu,
-              name: `${roleName}: ${menu.name.replace('_', ' ')}`,
-              isPerspective: true,
-              perspectiveRole: role
-            });
-          });
-        }
+      const hub = SUPERADMIN_HUB[0];
+      const expandedSubcategories = hub.subcategories.map(sub => {
+        const roleKey = (sub as any).role;
+        const roleMenu = DASHBOARD_MENUS[roleKey] ? DASHBOARD_MENUS[roleKey][0] : null;
+        
+        return {
+          ...sub,
+          // If we found a menu for this role, attach its subcategories for the 3rd level
+          subcategories: roleMenu ? roleMenu.subcategories : []
+        };
       });
 
       return {
-        name: 'Superadmin Hub',
-        icon: Shield,
+        ...hub,
         isDashboard: true,
-        subcategories: allSubmenus
+        subcategories: expandedSubcategories
       };
     }
 

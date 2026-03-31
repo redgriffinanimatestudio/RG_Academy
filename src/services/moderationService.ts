@@ -1,3 +1,5 @@
+import apiClient from './apiClient';
+
 export interface Report {
   id: string;
   reporterId: string;
@@ -13,28 +15,23 @@ export interface Report {
 
 export const moderationService = {
   async getReports(status?: string): Promise<Report[]> {
-    const url = status ? `/api/v1/moderation/reports?status=${status}` : '/api/v1/moderation/reports';
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch reports');
-    return response.json();
+    const { data } = await apiClient.get('/v1/moderation/reports', {
+      params: { status }
+    });
+    return data.success ? data.data : (data || []);
   },
 
   async resolveReport(id: string, status: 'resolved' | 'dismissed'): Promise<void> {
-    const response = await fetch(`/api/v1/moderation/reports/${id}/resolve`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status })
-    });
-    if (!response.ok) throw new Error('Failed to resolve report');
+    await apiClient.post(`/v1/moderation/reports/${id}/resolve`, { status });
   },
 
   async createReport(report: Omit<Report, 'id' | 'status' | 'createdAt' | 'reporter'>): Promise<Report> {
-    const response = await fetch('/api/v1/moderation/reports', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(report)
-    });
-    if (!response.ok) throw new Error('Failed to create report');
-    return response.json();
+    const { data } = await apiClient.post('/v1/moderation/reports', report);
+    return data.success ? data.data : data;
+  },
+
+  async getSystemStats(): Promise<any> {
+    const { data } = await apiClient.get('/v1/moderation/system-stats');
+    return data.success ? data.data : data;
   }
 };

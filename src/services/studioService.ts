@@ -98,5 +98,15 @@ export const studioService = {
       console.error('[Studio Service] Milestone release failed:', e);
       throw e;
     }
+  },
+
+  async getTaskDetails(taskId: string): Promise<any> {
+    try {
+      const { data } = await apiClient.get(`/v1/studio/tasks/${taskId}`);
+      return data.success ? data.data : null;
+    } catch (e) {
+      console.error('[Studio Service] Get task details failed:', e);
+      return null;
+    }
   }
 };

@@ -83,6 +83,7 @@ model User {
   partnerId     String?
   trajectories  UserTrajectory[]
   simulations   AISimulation[]
+  certificates  Certificate[]
 }
 
 model Achievement {
@@ -432,6 +433,7 @@ model Course {
   reviews        Review[]
   assignments    Assignment[]
   schedules      Schedule[]
+  certificates   Certificate[]
 }
 
 model Module {

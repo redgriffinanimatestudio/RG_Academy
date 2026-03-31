@@ -60,8 +60,7 @@ export default function Navbar({
   };
 
   const getDashboardLinkForRole = (role: string) => {
-    if (role === 'admin') return `/${currentLangCode}/admin`;
-    return `/${currentLangCode}/dashboard`;
+    return `${modePrefix}/${currentLangCode}/dashboard`;
   };
 
   const navClass = isDashboardPage ? 'bg-black/10 border-white/10' : (isStudio ? 'bg-[#030303]/10 border-primary/30' : 'bg-black/10 border-white/10');
@@ -149,7 +148,7 @@ export default function Navbar({
                           {profile?.uid && (
                             <Link to={`/${isStudio ? 'studio' : 'aca'}/${currentLangCode}/profile/${profile.uid}`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 flex items-center gap-3"><User size={14} /> {t('my_profile')}</Link>
                           )}
-                          <Link to={`/${currentLangCode}/dashboard`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 flex items-center gap-3"><LayoutDashboard size={14} /> {t('my_dashboard')}</Link>
+                          <Link to={`${modePrefix}/${currentLangCode}/dashboard`} onClick={() => setIsUserMenuOpen(false)} className="block px-6 py-3 text-[10px] font-black uppercase text-white/60 hover:text-primary hover:bg-white/5 flex items-center gap-3"><LayoutDashboard size={14} /> {t('my_dashboard')}</Link>
                           
                           <div className="px-6 py-4 bg-white/[0.03] border-y border-white/5 my-2">
                             <p className="text-[8px] font-black text-white/20 uppercase mb-2">Vault Balance</p>

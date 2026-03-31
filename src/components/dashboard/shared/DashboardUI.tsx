@@ -6,25 +6,35 @@ interface StatCardProps {
   label: string;
   value: string | number;
   icon: LucideIcon;
-  trend?: string;
+  sub?: string;
+  trend?: 'positive' | 'negative' | 'neutral' | 'stable';
   color?: string;
+  className?: string;
 }
 
-export const StatCard = ({ label, value, icon: Icon, trend, color = 'primary' }: StatCardProps) => (
+export const StatCard = ({ label, value, icon: Icon, sub, trend, color = '#378add', className = '' }: StatCardProps) => (
   <motion.div 
-    whileHover={{ y: -5 }}
-    className="p-6 rounded-3xl bg-white/5 border border-white/5 flex items-center justify-between group transition-all hover:bg-white/[0.08]"
+    whileHover={{ y: -10, scale: 1.02 }}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className={`p-10 rounded-[3rem] glass-industrial border border-white/5 space-y-4 group/stat hover:border-white/20 transition-all duration-500 shadow-2xl relative overflow-hidden ${className}`}
   >
-    <div>
-      <p className="text-[10px] font-black uppercase text-white/20 tracking-widest group-hover:text-white/40 transition-colors">{label}</p>
-      <div className="flex items-baseline gap-2 mt-1">
-        <p className="text-3xl font-black text-white">{value}</p>
-        {trend && <span className="text-[10px] font-bold text-emerald-500">{trend}</span>}
+    <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:scale-110 group-hover:rotate-12 transition-all duration-700">
+        <Icon size={120} style={{ color }} />
+    </div>
+    
+    <div className="flex items-center justify-between relative z-10">
+        <div className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 group-hover:text-white/40 transition-colors italic">{label}</div>
+        {trend === 'positive' && <div className="text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 shadow-sm shadow-emerald-500/10">↑ THRUST_LOG</div>}
+    </div>
+    
+    <div className="text-5xl font-black text-white tracking-tighter italic text-glow drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">{value}</div>
+    
+    {sub && (
+      <div className="flex items-center gap-2 text-[9px] font-bold text-white/10 uppercase tracking-widest italic pt-2 group-hover:text-white/30 transition-colors">
+          <div className="size-1.5 rounded-full animate-pulse" style={{ backgroundColor: color }} /> {sub}
       </div>
-    </div>
-    <div className={`p-4 rounded-2xl bg-${color}/10 text-${color} group-hover:scale-110 transition-transform`}>
-      <Icon size={24} />
-    </div>
+    )}
   </motion.div>
 );
 
@@ -35,10 +45,19 @@ interface SectionHeaderProps {
 }
 
 export const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) => (
-  <div className="flex items-center justify-between mb-8">
-    <header>
-      <h2 className="text-xl font-black uppercase tracking-tight text-white italic">{title}</h2>
-      {subtitle && <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mt-1">{subtitle}</p>}
+  <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
+    <header className="space-y-3">
+      <div className="flex items-center gap-3">
+        <div className="h-[1px] w-12 bg-primary" />
+        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary/60 italic">Node Overview</span>
+      </div>
+      <h2 className="text-5xl font-black uppercase tracking-tighter text-white italic leading-none lg:text-6xl">{title}</h2>
+      {subtitle && (
+        <p className="text-white/20 text-[11px] font-black uppercase tracking-[0.4em] mt-2 flex items-center gap-3 italic">
+          <div className="size-1.5 rounded-full bg-primary/40 animate-pulse" />
+          {subtitle}
+        </p>
+      )}
     </header>
     {action}
   </div>
@@ -47,15 +66,35 @@ export const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) =
 interface GlassCardProps {
   children: React.ReactNode;
   className?: string;
-  variant?: 'dark' | 'glass';
+  variant?: 'dark' | 'glass' | 'premium';
+  style?: React.CSSProperties;
+  whileHover?: any;
+  whileTap?: any;
+  onClick?: () => void;
 }
 
-export const GlassCard = ({ children, className = '', variant = 'glass' }: GlassCardProps) => (
-  <div className={`
-    p-8 rounded-[2.5rem] border border-white/5 
-    ${variant === 'dark' ? 'bg-[#0a0a0a]' : 'bg-white/[0.02]'} 
-    ${className}
-  `}>
-    {children}
-  </div>
-);
+export const GlassCard = ({ children, className = '', variant = 'glass', style, whileHover, whileTap, onClick }: GlassCardProps) => {
+  const isPremium = variant === 'premium';
+  
+  return (
+    <motion.div 
+      style={style}
+      whileHover={whileHover || (onClick ? { scale: 1.01 } : undefined)}
+      whileTap={whileTap || (onClick ? { scale: 0.98 } : undefined)}
+      onClick={onClick}
+      className={`
+        p-10 rounded-[3.5rem] border border-white/5 shadow-2xl relative overflow-hidden group
+        ${variant === 'dark' ? 'bg-[#050505]' : (variant === 'premium' ? 'glass-industrial matrix-grid-bg' : 'bg-white/[0.02]')} 
+        ${onClick ? 'cursor-pointer' : ''}
+        ${className}
+      `}
+    >
+      {isPremium && (
+        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+      )}
+      <div className="relative z-10">
+        {children}
+      </div>
+    </motion.div>
+  );
+};

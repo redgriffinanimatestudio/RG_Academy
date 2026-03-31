@@ -9,7 +9,7 @@ import Community from './pages/Community/CommunityPage';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Messages from './pages/Messages';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard/DashboardController';
 import TopicPage from './pages/TopicPage';
 import ServicePage from './pages/ServicePage';
 import CommunityTopic from './pages/CommunityTopic';

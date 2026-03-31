@@ -1,5 +1,5 @@
 import { 
-  Box, Video, UserPlus, Cpu, MessageSquare, Users, GraduationCap, Shield, Target, LayoutDashboard, Zap, DollarSign, LifeBuoy, BarChart3, Binary, Briefcase, ClipboardList, TrendingUp, Landmark, ShieldCheck, HeartPulse
+  Box, Video, UserPlus, Cpu, MessageSquare, Users, GraduationCap, Shield, Target, LayoutDashboard, Zap, DollarSign, LifeBuoy, BarChart3, Binary, Briefcase, ClipboardList, TrendingUp, Landmark, ShieldCheck, HeartPulse, Terminal, Key, Activity, Settings, Database, Filter, Globe, Layers, Lock, Monitor, Share2, Smartphone
 } from 'lucide-react';
 
 export const LANGUAGES = [
@@ -31,14 +31,140 @@ export const COMMUNITY_CATEGORIES = [
 ];
 
 export const DASHBOARD_MENUS: Record<string, any[]> = {
-  student: [{ name: 'learning_dashboard', icon: GraduationCap, subcategories: [{ name: 'my_progress' }, { name: 'my_trajectory' }, { name: 'certifications' }] }],
-  admin: [{ name: 'master_control', icon: Shield, subcategories: [{ name: 'ecosystem_stats' }, { name: 'users' }, { name: 'projects' }, { name: 'financial_hub' }, { name: 'reports' }] }],
-  chief_manager: [{ name: 'strategic_hub', icon: Target, subcategories: [{ name: 'operational_overview' }, { name: 'fleet_stats' }, { name: 'macro_reports' }] }],
-  manager: [{ name: 'operational_hub', icon: LayoutDashboard, subcategories: [{ name: 'academy_ops' }, { name: 'studio_ops' }, { name: 'content_review' }, { name: 'moderation' }] }],
-  hr: [{ name: 'talent_management', icon: UserPlus, subcategories: [{ name: 'talent_matrix' }, { name: 'recruitment_pipeline' }, { name: 'identity_verification' }] }],
-  finance: [{ name: 'treasury_control', icon: DollarSign, subcategories: [{ name: 'cash_flow' }, { name: 'escrow_management' }, { name: 'payout_logic' }, { name: 'financial_hub' }] }],
-  support: [{ name: 'user_assistance', icon: LifeBuoy, subcategories: [{ name: 'active_tickets' }, { name: 'queue_management' }, { name: 'issue_resolution' }] }],
-  lecturer: [{ name: 'instructor_node', icon: Video, subcategories: [{ name: 'my_courses' }, { name: 'student_stats' }, { name: 'curriculum_builder' }, { name: 'lecturer_wallet' }] }],
-  client: [{ name: 'project_control', icon: Box, subcategories: [{ name: 'active_briefs' }, { name: 'billing_history' }, { name: 'financial_hub' }] }],
-  executor: [{ name: 'freelance_node', icon: Zap, subcategories: [{ name: 'active_contracts' }, { name: 'portfolio_export' }, { name: 'earnings_hub' }, { name: 'financial_hub' }] }]
+  student: [{ 
+    name: 'student_learning_dashboard', 
+    icon: GraduationCap, 
+    subcategories: [
+      { name: 'learning_nexus' }, 
+      { name: 'career_trajectory' }, 
+      { name: 'certificate_vault' }, 
+      { name: 'ai_mentor_node' },
+      { name: 'workshop_archive' }
+    ] 
+  }],
+  admin: [{ 
+    name: 'master_control', 
+    icon: Shield, 
+    subcategories: [
+      { name: 'platform_telemetry' }, 
+      { name: 'user_directory' }, 
+      { name: 'global_projects' }, 
+      { name: 'financial_ledger' }, 
+      { name: 'system_logs' },
+      { name: 'security_matrix' }
+    ] 
+  }],
+  chief_manager: [{ 
+    name: 'strategic_hub', 
+    icon: Target, 
+    subcategories: [
+      { name: 'ecosystem_overview' }, 
+      { name: 'fleet_analytics' }, 
+      { name: 'macro_forecasting' },
+      { name: 'governance_node' }
+    ] 
+  }],
+  manager: [{ 
+    name: 'operational_hub', 
+    icon: LayoutDashboard, 
+    subcategories: [
+      { name: 'academy_operations' }, 
+      { name: 'studio_pipeline' }, 
+      { name: 'content_oversight' }, 
+      { name: 'moderation_matrix' },
+      { name: 'deployment_tracker' }
+    ] 
+  }],
+  hr: [{ 
+    name: 'hr_talent_management', 
+    icon: UserPlus, 
+    subcategories: [
+      { name: 'talent_matrix' }, 
+      { name: 'recruitment_pipeline' }, 
+      { name: 'identity_verification' }, 
+      { name: 'performance_nodes' },
+      { name: 'payroll_sync' }
+    ] 
+  }],
+  finance: [{ 
+    name: 'finance_treasury_control', 
+    icon: DollarSign, 
+    subcategories: [
+      { name: 'treasury_hub' }, 
+      { name: 'escrow_vaults' }, 
+      { name: 'payout_logics' }, 
+      { name: 'cash_flow_matrix' },
+      { name: 'tax_compliance' }
+    ] 
+  }],
+  support: [{ 
+    name: 'support_user_assistance', 
+    icon: LifeBuoy, 
+    subcategories: [
+      { name: 'ticket_matrix' }, 
+      { name: 'queue_management' }, 
+      { name: 'resolution_node' }, 
+      { name: 'system_health' },
+      { name: 'feedback_loop' }
+    ] 
+  }],
+  lecturer: [{ 
+    name: 'lecturer_instructor_node', 
+    icon: Video, 
+    subcategories: [
+      { name: 'curriculum_builder' }, 
+      { name: 'student_insights' }, 
+      { name: 'revenue_matrix' }, 
+      { name: 'live_stream_uplink' },
+      { name: 'feedback_nexus' }
+    ] 
+  }],
+  client: [{ 
+    name: 'client_project_control', 
+    icon: Box, 
+    subcategories: [
+      { name: 'active_briefs' }, 
+      { name: 'billing_node' }, 
+      { name: 'escrow_tracking' },
+      { name: 'project_archive' }
+    ] 
+  }],
+  executor: [{ 
+    name: 'executor_freelance_node', 
+    icon: Zap, 
+    subcategories: [
+      { name: 'active_contracts' }, 
+      { name: 'portfolio_nexus' }, 
+      { name: 'earnings_ledger' }, 
+      { name: 'skill_verification' },
+      { name: 'node_settings' }
+    ] 
+  }],
+  agency: [{
+    name: 'agency_management_hub',
+    icon: Briefcase,
+    subcategories: [
+      { name: 'talent_roster' },
+      { name: 'agency_projects' },
+      { name: 'financial_bridge' },
+      { name: 'sub_agent_nodes' }
+    ]
+  }]
 };
+
+// --- SUPERADMIN MASTER HUB ---
+export const SUPERADMIN_HUB = [
+  { name: 'superadmin_hub', icon: ShieldCheck, subcategories: [
+    { name: 'master_control', icon: Terminal, role: 'admin' },
+    { name: 'hr_talent_management', icon: UserPlus, role: 'hr' },
+    { name: 'finance_treasury_control', icon: DollarSign, role: 'finance' },
+    { name: 'student_learning_dashboard', icon: GraduationCap, role: 'student' },
+    { name: 'lecturer_instructor_node', icon: Video, role: 'lecturer' },
+    { name: 'strategic_hub', icon: Target, role: 'chief_manager' },
+    { name: 'operational_hub', icon: LayoutDashboard, role: 'manager' },
+    { name: 'client_project_control', icon: Box, role: 'client' },
+    { name: 'executor_freelance_node', icon: Zap, role: 'executor' },
+    { name: 'support_user_assistance', icon: LifeBuoy, role: 'support' },
+    { name: 'agency_hub', icon: Briefcase, role: 'agency' }
+  ]}
+];
