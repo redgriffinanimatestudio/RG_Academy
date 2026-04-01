@@ -48,12 +48,17 @@ export function useLayoutMetadata(profile: any, activeRole: string | null) {
     }
 
     if (!DASHBOARD_MENUS[activeRole]) return null;
-    return {
-      name: 'dashboards',
-      icon: LayoutDashboard,
-      isDashboard: true,
-      subcategories: DASHBOARD_MENUS[activeRole]
-    };
+    
+    // IF ROLE: Map its dashboard structure for 3rd level menu support
+    const roleHub = DASHBOARD_MENUS[activeRole][0];
+    
+    return [
+      {
+        ...roleHub,
+        isDashboard: true,
+        subcategories: roleHub.subcategories || []
+      }
+    ];
   }, [profile, activeRole]);
 
   const baseCategories = isCommunity ? COMMUNITY_CATEGORIES : (isStudio ? STUDIO_CATEGORIES : ACADEMY_CATEGORIES);

@@ -169,54 +169,74 @@ export default function MobileMenu({
                     </button>
                     <AnimatePresence initial={false}>
                       {expandedSections[section.id] && (
-                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden space-y-2 ml-4 pl-4 border-l border-white/5">
-                          {section?.categories?.map((cat: any) => (
-                            <div key={cat?.name} className="py-2">
-                              <div className="flex items-center gap-2 mb-2 opacity-40"><cat.icon size={12} /><span className="text-[9px] font-black uppercase tracking-widest">{t(cat?.name)}</span></div>
-                              <div className="grid grid-cols-1 gap-1">
-                                {cat.subcategories.map((sub: any) => {
-                                  const isSubActive = activeSubName === sub.name;
-                                  const hasDeepNested = sub.subcategories && sub.subcategories.length > 0;
-                                  
-                                  return (
-                                    <div key={sub.name} className="space-y-1">
-                                      <button
-                                        onClick={() => { handleSetSub(sub, cat); if (!hasDeepNested) onClose(); }}
-                                        className={`w-full text-left px-4 py-3 rounded-xl text-[10px] font-black uppercase flex items-center justify-between transition-all ${isSubActive ? (`${modeColor} bg-white/5 shadow-[inset_0_0_20px_rgba(255,255,255,0.02)]`) : 'text-white/30 hover:text-white/60'}`}
-                                      >
-                                        {t(sub.name)}
-                                        {hasDeepNested ? (
-                                          <ChevronDown size={14} className={`transition-transform duration-300 ${isSubActive ? 'rotate-180 opacity-100' : 'opacity-20'}`} />
-                                        ) : (
-                                          <div className={`size-1 rounded-full ${isSubActive ? (modeColor.replace('text-', 'bg-')) : 'bg-white/10'}`} />
-                                        )}
-                                      </button>
-
-                                      {/* 💎 THIRD LEVEL: Mobile Integration */}
-                                      {hasDeepNested && isSubActive && (
-                                        <motion.div
-                                          initial={{ height: 0, opacity: 0 }}
-                                          animate={{ height: 'auto', opacity: 1 }}
-                                          className="ml-4 pl-4 border-l border-white/10 space-y-2 py-2"
+                        <motion.div 
+                          initial={{ height: 0, opacity: 0 }} 
+                          animate={{ height: 'auto', opacity: 1 }} 
+                          exit={{ height: 0, opacity: 0 }} 
+                          className="overflow-hidden space-y-2 ml-4 pl-4 border-l border-white/5"
+                        >
+                          {section?.categories?.map((cat: any) => {
+                            const subItems = cat.subcategories || [];
+                            return (
+                              <div key={cat.name} className="py-2">
+                                <div className="flex items-center gap-3 mb-3 px-2">
+                                  <div className="size-6 rounded-lg bg-white/5 flex items-center justify-center">
+                                    {cat.icon ? <cat.icon size={12} className="text-primary" /> : <div className="size-1 rounded-full bg-primary" />}
+                                  </div>
+                                  <span className="text-[10px] font-black uppercase tracking-widest text-white/50">{t(cat.name)}</span>
+                                </div>
+                                <div className="grid grid-cols-1 gap-1">
+                                  {subItems.map((sub: any) => {
+                                    const isSubActive = activeSubName === sub.name;
+                                    const hasDeepNested = sub.subcategories && sub.subcategories.length > 0;
+                                    
+                                    return (
+                                      <div key={sub.name} className="space-y-1">
+                                        <button
+                                          onClick={() => { handleSetSub(sub, cat); if (!hasDeepNested) onClose(); }}
+                                          className={`w-full text-left px-4 py-3.5 rounded-xl text-[10px] font-black uppercase flex items-center justify-between transition-all ${isSubActive ? (`${modeColor} bg-white/5`) : 'text-white/30 hover:text-white/60'}`}
                                         >
-                                          {sub.subcategories.map((deep: any) => (
-                                            <button
-                                              key={deep.name}
-                                              onClick={() => onClose()}
-                                              className="w-full text-left px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-primary transition-colors flex items-center gap-3"
-                                            >
-                                              <div className="size-1 rounded-full bg-white/20" />
-                                              {t(deep.name)}
-                                            </button>
-                                          ))}
-                                        </motion.div>
-                                      )}
-                                    </div>
-                                  );
-                                })}
+                                          <div className="flex items-center gap-3">
+                                            {sub.icon && <sub.icon size={14} className={isSubActive ? modeColor : 'opacity-20'} />}
+                                            {t(sub.name)}
+                                          </div>
+                                          {hasDeepNested ? (
+                                            <ChevronDown size={14} className={`transition-transform duration-300 ${isSubActive ? 'rotate-180 opacity-100' : 'opacity-20'}`} />
+                                          ) : (
+                                            <div className={`size-1 rounded-full ${isSubActive ? (modeColor.replace('text-', 'bg-')) : 'bg-white/10'}`} />
+                                          )}
+                                        </button>
+                                        
+                                        {hasDeepNested && isSubActive && (
+                                          <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            className="ml-6 pl-4 border-l border-white/10 space-y-2 py-2"
+                                          >
+                                            {sub.subcategories.map((deep: any) => (
+                                              <button
+                                                key={deep.name}
+                                                onClick={() => { 
+                                                  const params = new URLSearchParams(location.search);
+                                                  params.set('view', deep.name.toLowerCase());
+                                                  navigate(`${location.pathname}?${params.toString()}`);
+                                                  onClose(); 
+                                                }}
+                                                className="w-full text-left px-4 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-[0.1em] text-white/20 hover:text-primary transition-colors flex items-center gap-3 group"
+                                              >
+                                                <div className="size-1.5 rounded-full bg-white/10 group-hover:bg-primary transition-colors" />
+                                                {t(deep.name)}
+                                              </button>
+                                            ))}
+                                          </motion.div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </motion.div>
                       )}
                     </AnimatePresence>

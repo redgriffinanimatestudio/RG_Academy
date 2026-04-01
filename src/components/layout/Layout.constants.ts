@@ -35,23 +35,22 @@ export const DASHBOARD_MENUS: Record<string, any[]> = {
     name: 'student_learning_dashboard', 
     icon: GraduationCap, 
     subcategories: [
-      { name: 'learning_nexus' }, 
-      { name: 'career_trajectory' }, 
-      { name: 'certificate_vault' }, 
-      { name: 'ai_mentor_node' },
-      { name: 'workshop_archive' }
+      { name: 'learning_nexus', icon: Cpu, subcategories: [{ name: 'active_nodes' }, { name: 'knowledge_archive' }] }, 
+      { name: 'career_trajectory', icon: Target, subcategories: [{ name: 'skill_tree' }, { name: 'market_sync' }] }, 
+      { name: 'certificate_vault', icon: ShieldCheck }, 
+      { name: 'ai_mentor_node', icon: Zap },
+      { name: 'workshop_archive', icon: Video }
     ] 
   }],
   admin: [{ 
     name: 'master_control', 
     icon: Shield, 
     subcategories: [
-      { name: 'platform_telemetry' }, 
-      { name: 'user_directory' }, 
-      { name: 'global_projects' }, 
-      { name: 'financial_ledger' }, 
-      { name: 'system_logs' },
-      { name: 'security_matrix' }
+      { name: 'platform_telemetry', icon: Activity, subcategories: [{ name: 'real_time_metrics' }, { name: 'history_logs' }] }, 
+      { name: 'user_directory', icon: Users, subcategories: [{ name: 'active_members' }, { name: 'access_control' }] }, 
+      { name: 'global_projects', icon: Layers }, 
+      { name: 'financial_ledger', icon: DollarSign, subcategories: [{ name: 'revenue_matrix' }, { name: 'payouts' }] },
+      { name: 'security_matrix', icon: Lock }
     ] 
   }],
   chief_manager: [{ 

@@ -448,6 +448,28 @@ const Login: React.FC = () => {
                       <button onClick={handleRegisterFinal} disabled={isLoading} className="w-full bg-red-600 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs hover:bg-red-700 transition-all flex items-center justify-center gap-3">
                         {isLoading ? <Loader2 className="animate-spin" size={20} /> : t('node_online')} <Zap size={18} />
                       </button>
+                      {error && (
+                        <motion.div 
+                          initial={{ opacity: 0, scale: 0.9, y: 10 }} 
+                          animate={{ opacity: 1, scale: 1, y: 0 }} 
+                          className="mt-6 p-8 bg-red-500/5 border border-red-500/20 rounded-[2.5rem] relative overflow-hidden group shadow-2xl shadow-red-500/10"
+                        >
+                          {/* Error Background Pulse */}
+                          <div className="absolute inset-0 bg-red-600/5 animate-pulse" />
+                          
+                          <div className="relative z-10 flex flex-col items-center text-center space-y-3">
+                            <div className="size-12 rounded-2xl bg-red-500/20 flex items-center justify-center text-red-500 mb-2 shadow-xl shadow-red-500/20">
+                              <Shield size={24} className="animate-pulse" />
+                            </div>
+                            <div className="space-y-1">
+                              <h4 className="text-[12px] font-black uppercase tracking-[0.3em] text-red-500 italic">Access Denied</h4>
+                              <p className="text-[10px] font-black uppercase tracking-widest text-white/40 leading-relaxed max-w-[280px] mx-auto">
+                                {error === 'Validation failed' ? 'PROTOCOL ERROR: Invalid Node Identification Pattern' : error}
+                              </p>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
                     </motion.div>
                   ) : (
                     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-20 text-center space-y-8">
@@ -475,8 +497,25 @@ const Login: React.FC = () => {
           </AnimatePresence>
 
           {error && (
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="mt-6 p-6 bg-red-500/5 border border-red-500/20 rounded-3xl text-red-500 text-[10px] font-black uppercase text-center flex items-center justify-center gap-3">
-               <Shield size={16} /> {error}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 10 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
+              className="mt-6 p-8 bg-red-500/5 border border-red-500/20 rounded-[2.5rem] relative overflow-hidden group shadow-2xl shadow-red-500/10"
+            >
+              {/* Error Background Pulse */}
+              <div className="absolute inset-0 bg-red-600/5 animate-pulse" />
+              
+              <div className="relative z-10 flex flex-col items-center text-center space-y-3">
+                <div className="size-12 rounded-2xl bg-red-500/20 flex items-center justify-center text-red-500 mb-2 shadow-xl shadow-red-500/20">
+                  <Shield size={24} className="animate-pulse" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-[12px] font-black uppercase tracking-[0.3em] text-red-500 italic">Access Denied</h4>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-white/40 leading-relaxed max-w-[280px] mx-auto">
+                    {error === 'Validation failed' ? 'PROTOCOL ERROR: Invalid Node Identification Pattern' : error}
+                  </p>
+                </div>
+              </div>
             </motion.div>
           )}
 
