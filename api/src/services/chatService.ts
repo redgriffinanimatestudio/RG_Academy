@@ -24,14 +24,14 @@ const API_BASE = '/chat';
 export const chatService = {
   // 1. Получение списка комнат
   async getChatRooms(userId: string): Promise<ChatRoom[]> {
-    const fetchFromPostgres = async () => {
+    const fetchFromProductionDB = async () => {
       const { data } = await apiClient.get(`${API_BASE}/rooms`);
       return data.success ? data.data : data;
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
-        return await fetchFromPostgres();
+        return await fetchFromProductionDB();
       } catch (err) {
         console.error('[Migration] ChatRooms Read failed:', err);
         if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;
@@ -50,14 +50,14 @@ export const chatService = {
 
   // 2. Создание комнаты
   async createChatRoom(participants: string[], type: 'direct' | 'project' | 'group', refId?: string): Promise<string> {
-    const createInPostgres = async () => {
+    const createInProductionDB = async () => {
       const { data } = await apiClient.post(`${API_BASE}/rooms`, { participants, type, refId });
       return data.data.id;
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
-        const newId = await createInPostgres();
+        const newId = await createInProductionDB();
         return newId;
       } catch (err) {
         if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;
@@ -79,7 +79,7 @@ export const chatService = {
 
   // 3. Отправка сообщения (Dual-Write)
   async sendMessage(roomId: string, senderId: string, text: string): Promise<void> {
-    const sendInPostgres = () => apiClient.post(`${API_BASE}/rooms/${roomId}/messages`, { text });
+    const sendInProductionDB = () => apiClient.post(`${API_BASE}/rooms/${roomId}/messages`, { text });
     
     const sendInLegacy = async () => {
       const token = localStorage.getItem('auth_token');
@@ -93,9 +93,9 @@ export const chatService = {
       });
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
-        await sendInPostgres();
+        await sendInProductionDB();
         if (MIGRATION_CONFIG.DUAL_WRITE) {
           sendInLegacy().catch(e => console.error('[Migration] Dual-Write Message failed:', e));
         }

@@ -114,7 +114,7 @@ export const academyService = {
         await apiClient.post(`${API_V1}/enroll`, { courseId });
         if (!MIGRATION_CONFIG.DUAL_WRITE) return;
       } catch (err) {
-        console.error('[Migration] Postgres Enroll failed:', err);
+        console.error('[Migration] ProductionDB Enroll failed:', err);
         if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;
       }
     }

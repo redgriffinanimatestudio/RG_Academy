@@ -60,14 +60,14 @@ export interface SearchIndex {
 export const networkingService = {
   // --- Profiles Module ---
   async getProfile(userId: string): Promise<Profile> {
-    const fetchFromPostgres = async () => {
+    const fetchFromProductionDB = async () => {
       const { data } = await apiClient.get(`${API_V1}/profiles/${userId}`);
       return data.success ? data.data : data;
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
-        return await fetchFromPostgres();
+        return await fetchFromProductionDB();
       } catch (err) {
         console.error('[Migration] Profile Read failed:', err);
         if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;
@@ -81,7 +81,7 @@ export const networkingService = {
   },
 
   async updateProfile(profileData: Partial<Profile> & { userId: string }): Promise<Profile> {
-    const updateInPostgres = async () => {
+    const updateInProductionDB = async () => {
       const { data } = await apiClient.post(`${API_V1}/profiles`, profileData);
       return data.success ? data.data : data;
     };
@@ -96,9 +96,9 @@ export const networkingService = {
       return response.json();
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
-        const updated = await updateInPostgres();
+        const updated = await updateInProductionDB();
         if (MIGRATION_CONFIG.DUAL_WRITE) {
           updateInLegacy().catch(e => console.error('[Migration] Dual-Write Profile failed:', e));
         }
@@ -114,16 +114,16 @@ export const networkingService = {
 
   // --- Connections Module ---
   async follow(followerId: string, followingId: string): Promise<void> {
-    const actionInPostgres = () => apiClient.post(`${API_V1}/connections`, { followerId, followingId });
+    const actionInProductionDB = () => apiClient.post(`${API_V1}/connections`, { followerId, followingId });
     const actionInLegacy = () => fetch(`${API_V1}/connections`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ followerId, followingId }),
     });
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
-        await actionInPostgres();
+        await actionInProductionDB();
         if (MIGRATION_CONFIG.DUAL_WRITE) {
           actionInLegacy().catch(e => console.error('[Migration] Dual-Write Follow failed:', e));
         }
@@ -138,16 +138,16 @@ export const networkingService = {
   },
 
   async unfollow(followerId: string, followingId: string): Promise<void> {
-    const actionInPostgres = () => apiClient.delete(`${API_V1}/connections`, { data: { followerId, followingId } });
+    const actionInProductionDB = () => apiClient.delete(`${API_V1}/connections`, { data: { followerId, followingId } });
     const actionInLegacy = () => fetch(`${API_V1}/connections`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ followerId, followingId }),
     });
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
-        await actionInPostgres();
+        await actionInProductionDB();
         if (MIGRATION_CONFIG.DUAL_WRITE) {
           actionInLegacy().catch(e => console.error('[Migration] Dual-Write Unfollow failed:', e));
         }
@@ -180,13 +180,13 @@ export const networkingService = {
   async searchProfiles(query: string, skill?: string): Promise<any[]> {
     const params = { query, skill };
     
-    const searchFromPostgres = async () => {
+    const searchFromProductionDB = async () => {
       const { data } = await apiClient.get(`${API_V1}/discovery/search`, { params });
       return data.success ? data.data : data;
     };
 
     try {
-      const result = await searchFromPostgres();
+      const result = await searchFromProductionDB();
       return Array.isArray(result) ? result : (result.data || []);
     } catch (err) {
       const urlParams = new URLSearchParams({ query, ...(skill ? { skill } : {}) });
@@ -206,7 +206,7 @@ export const networkingService = {
       const { data } = await apiClient.get(`/v1/studio/validate/chat/${targetUserId}`);
       return data.success ? data.data : data;
     } catch (err) {
-      const response = await fetch(`${API_BASE}/validate/chat/${targetUserId}`, {
+      const response = await fetch(`${API_V1}/validate/chat/${targetUserId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const result = await response.json();
