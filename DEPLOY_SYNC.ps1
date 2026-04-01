@@ -48,7 +48,7 @@ Write-Host "🏗️  Building Frontend..." -ForegroundColor Yellow
 npm run build
 
 Write-Host "📦 Bundling Backend..." -ForegroundColor Yellow
-$BANNER_JS = "import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+$BANNER_JS = "import { createRequire } from 'module'; const require = createRequire(import.meta.url); import { fileURLToPath } from 'url'; import path from 'path'; const __filename = fileURLToPath(import.meta.url); const __dirname = path.dirname(__filename);"
 npx esbuild server.ts --bundle --platform=node --format=esm --outfile=server-dist.js --minify --external:@prisma/client --external:".prisma/client" --external:vite "--banner:js=$BANNER_JS"
 
 # 🛡️ VERIFY BUILD INTEGRITY
