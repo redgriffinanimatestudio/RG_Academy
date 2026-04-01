@@ -20,13 +20,13 @@ $DEPLOY_ZIP = "RG_Academy_HOSTINGER_DEPLOY.zip"
 $SQL_DUMP = "local_sync.sql"
 
 Write-Host "===============================================" -ForegroundColor Cyan
-Write-Host "🦾 STARTING INDUSTRIAL DEPLOYMENT PIPELINE v2.6" -ForegroundColor Cyan
+Write-Host "🦾 STARTING INDUSTRIAL DEPLOYMENT PIPELINE v2.7" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 
 # 💾 STEP 1: GIT SYNC
 Write-Host "[1/6] 💾 Syncing Git..." -ForegroundColor Yellow
 git add .
-git commit -m "Auto-sync (Native Engine Sync): $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+git commit -m "Auto-sync (v2.7 Cache Buster): $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 git push origin HEAD
 
 # 🏗️ STEP 2: BUILD
@@ -41,7 +41,7 @@ Write-Host "[3/6] 🗄️ Exporting Database (Docker)..." -ForegroundColor Yello
 & docker exec -i $DB_CONTAINER mysqldump --no-tablespaces -u $LOCAL_DB_USER -p"$LOCAL_DB_PASS" $LOCAL_DB > $SQL_DUMP
 
 # 📦 STEP 4: PACKAGING
-Write-Host "[4/6] 📦 Creating Archive (Schema Only)..." -ForegroundColor Yellow
+Write-Host "[4/6] 📦 Creating Archive (v2.7)..." -ForegroundColor Yellow
 if (Test-Path "BUILD_TEMP") { Remove-Item -Recurse -Force "BUILD_TEMP" }
 New-Item -ItemType Directory -Path "BUILD_TEMP" | Out-Null
 Copy-Item -Recurse "dist" "BUILD_TEMP/dist"
@@ -55,8 +55,8 @@ Compress-Archive -Path "BUILD_TEMP/*" -DestinationPath $DEPLOY_ZIP -Force
 Write-Host "[5/6] 🚀 Uploading to Hostinger Base..." -ForegroundColor Yellow
 scp -P $SSH_PORT $DEPLOY_ZIP $SQL_DUMP "$($SSH_USER)@$($SSH_HOST):$($REMOTE_BASE)/"
 
-# ⚡ STEP 6: DUAL DEPLOY & REMOTE ENGINE GENERATION
-Write-Host "[6/6] ⚡ Finalizing v2.6 (Native Engine Sync)..." -ForegroundColor Yellow
+# ⚡ STEP 6: DUAL DEPLOY & CACHE BUSTING
+Write-Host "[6/6] ⚡ Finalizing v2.7 (Cache Buster Sync)..." -ForegroundColor Yellow
 
 $REMOTE_ENV_CONTENT = @"
 DATABASE_URL="mysql://${REMOTE_DB_USER}:${REMOTE_DB_PASS}@127.0.0.1:3306/${REMOTE_DB}"
@@ -73,6 +73,8 @@ cd $REMOTE_BASE
 echo "--- CLEANING OLD ASSETS ---"
 rm -rf public_html/dist nodejs/dist
 rm -f nodejs/index.js nodejs/server-dist.js nodejs/package.json
+# KILL STALE BROWSER CACHE
+rm -f public_html/sw.js public_html/manifest.json
 
 echo "--- EXTRACTING NEW BUILD ---"
 unzip -o $DEPLOY_ZIP -d nodejs/
@@ -86,8 +88,8 @@ printf '%s' '$REMOTE_ENV_CONTENT' > nodejs/.env
 
 echo "--- GENERATING NATIVE PRISMA CLIENT (LINUX) ---"
 cd nodejs
-# Ensure correct binaries for Hostinger Linux environment
-npx prisma generate || echo "Prisma generation warning. May need npm install."
+export NODE_ENV=production
+npx prisma generate || echo "Prisma generation warning."
 
 echo "--- KILLING OLD PROCESSES ---"
 pkill -u $SSH_USER node || echo "No running node processes found."
@@ -104,6 +106,7 @@ rm $DEPLOY_ZIP $SQL_DUMP
 ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" $REMOTE_COMMANDS
 
 Write-Host "===============================================" -ForegroundColor Green
-Write-Host "✅ NATIVE ENGINE SYNC v2.6 COMPLETED!" -ForegroundColor Green
+Write-Host "✅ CACHE BUSTER SYNC v2.7 COMPLETED!" -ForegroundColor Green
+Write-Host "⚠️ PLEASE PRESS CTRL+F5 IN YOUR BROWSER NOW! ⚠️" -ForegroundColor Yellow
 Write-Host "===============================================" -ForegroundColor Green
 pause
