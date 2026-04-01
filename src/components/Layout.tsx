@@ -25,7 +25,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { lang } = useParams();
+  const { lang = 'eng' } = useParams<{ lang: string }>();
+  const path = location.pathname.toLowerCase();
+  const isProfile = path.includes('/profile/');
   const { t } = useTranslation();
 
   const { data: platformData } = usePlatform();
@@ -113,9 +115,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   if (authLoading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">Initializing...</div>;
   
-  // Phase 26: Logout Session Guard (Anti-Black Screen)
-  // If session is lost and we are on a protected page, stop rendering full layout to prevent child crashes
-  if (!profile && (isDashboardPage || isProfile)) {
+  // Phase 31: Logout & API Fallback Guard (Anti-Black Screen)
+  // If session is lost and we are on a protected page, stop rendering full layout.
+  // BUT: Never block rendering if we are on the login/register/main pages (no black screen on landing).
+  const isPublicPage = path.includes('/login') || path.includes('/register') || path === `/${lang}` || path === `/${lang}/`;
+  if (!profile && (isDashboardPage || isProfile) && !isPublicPage) {
     return <div className="min-h-screen bg-[#050505] animate-pulse" />;
   }
 

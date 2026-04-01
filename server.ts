@@ -118,6 +118,17 @@ async function startServer() {
   // --- API ROUTES ---
   app.use('/api', routes);
 
+  // Phase 31: API Discovery Guard
+  app.all('/api/*', (req, res) => {
+    console.error(`[API 404] Endpoint not found: ${req.method} ${req.url} | Headers:`, JSON.stringify(req.headers, null, 2));
+    res.status(404).json({ 
+      success: false, 
+      error: 'API endpoint not found',
+      path: req.url,
+      node: 'RG_ACADEMY_INDUSTRIAL_CORE'
+    });
+  });
+
   console.log("🛠️ Registering Swagger UI...");
   // Swagger UI
   app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));

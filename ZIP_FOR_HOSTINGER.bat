@@ -8,6 +8,12 @@ if not exist "node_modules" (
     exit /b
 )
 
+:: Step 0: Clean slate
+echo [0/4] Cleaning old artifacts...
+if exist "dist" rd /s /q "dist"
+if exist "server-dist.js" del "server-dist.js"
+if exist "RG_Academy_HOSTINGER_DEPLOY.zip" del "RG_Academy_HOSTINGER_DEPLOY.zip"
+
 :: Step 1: Build the frontend
 echo [1/4] Building frontend assets (Vite)...
 call npm run build
