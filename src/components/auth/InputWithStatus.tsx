@@ -79,7 +79,7 @@ export const InputWithStatus: React.FC<InputWithStatusProps> = ({
           {status === 'success' && <CheckCircle2 size={18} className="text-emerald-500" />}
           {status === 'error' && <XCircle size={18} className="text-red-500" />}
           {status === 'warning' && <AlertCircle size={18} className="text-amber-500" />}
-          <div className={`size-2.5 rounded-full ${dotColors[status]} transition-all duration-500`} />
+          <div className={`w-3 h-3 rounded-full ${dotColors[status]} transition-all duration-500 shadow-sm`} />
         </div>
       </div>
 

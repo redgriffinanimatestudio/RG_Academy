@@ -103,12 +103,27 @@ const Login: React.FC = () => {
       setEmailStatus('loading');
       try {
         const { data } = await apiClient.post('/auth/check-email', { email: formData.email });
-        if (data.success && data.data.available) {
-          setEmailStatus('success');
-          setEmailError('');
-        } else {
-          setEmailStatus('error');
-          setEmailError('Email already registered in Grid');
+        if (data.success) {
+          const exists = !data.data.available;
+          
+          if (mode === 'register') {
+            if (!exists) {
+              setEmailStatus('success');
+              setEmailError('');
+            } else {
+              setEmailStatus('error');
+              setEmailError('Email already registered in Grid');
+            }
+          } else {
+            // LOGIN MODE: If exists, it's SUCCESS. If not, it's ERROR.
+            if (exists) {
+              setEmailStatus('success');
+              setEmailError('');
+            } else {
+              setEmailStatus('error');
+              setEmailError('Sorry, this Node ID is not in the system');
+            }
+          }
         }
       } catch (err) { 
         setEmailStatus('error'); 
@@ -116,7 +131,7 @@ const Login: React.FC = () => {
       }
     }, 800);
     return () => clearTimeout(timer);
-  }, [formData.email]);
+  }, [formData.email, mode]);
 
   // Password Strength Logic
   useEffect(() => {
@@ -226,6 +241,8 @@ const Login: React.FC = () => {
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     placeholder="ENTER NODE ID"
                     hint="Use your registered email or system-assigned node identifier."
+                    status={emailStatus}
+                    errorText={emailError}
                     icon={<User size={18} />}
                     required
                   />

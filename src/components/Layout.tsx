@@ -112,6 +112,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
 
   if (authLoading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">Initializing...</div>;
+  
+  // Phase 26: Logout Session Guard (Anti-Black Screen)
+  // If session is lost and we are on a protected page, stop rendering full layout to prevent child crashes
+  if (!profile && (isDashboardPage || isProfile)) {
+    return <div className="min-h-screen bg-[#050505] animate-pulse" />;
+  }
 
   return (
     <div className={`min-h-screen font-sans text-white transition-colors duration-500 touch-manipulation`}>

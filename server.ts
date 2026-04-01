@@ -94,7 +94,7 @@ async function startServer() {
 
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: process.env.NODE_ENV === 'production' ? 10 : 100, // Strict on prod
+    max: process.env.NODE_ENV === 'production' ? 100 : 500, // Increased for Live Identity Check
     standardHeaders: true,
     legacyHeaders: false,
     message: { error: 'Too many login attempts, please try again after 15 minutes.' }
