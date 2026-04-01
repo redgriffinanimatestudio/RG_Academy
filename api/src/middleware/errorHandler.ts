@@ -2,20 +2,28 @@ import { Request, Response, NextFunction } from 'express';
 import logger from '../utils/logger.js';
 
 export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-  // Логируем полную ошибку для разработчика
-  console.error('--- SERVER ERROR ---');
-  console.error('Path:', req.path);
-  console.error('Message:', err.message);
-  console.error('Stack:', err.stack);
-  console.error('--------------------');
-
+  const isProduction = process.env.NODE_ENV === 'production';
   const status = err.status || err.statusCode || 500;
-  const message = err.message || 'Internal Server Error';
+  
+  // Log full error details for internal audit
+  console.error(`--- [${new Date().toISOString()}] SERVER ERROR ---`);
+  console.error('Path:', req.path);
+  console.error('Status:', status);
+  console.error('Message:', err.message);
+  if (err.stack) console.error('Stack:', err.stack);
+  console.error('-------------------------------------------');
+
+  // Sanitize the message for the client in production
+  let clientMessage = err.message;
+  if (isProduction && status === 500) {
+    clientMessage = 'An internal server error occurred. Please try again later.';
+  }
 
   res.status(status).json({
     success: false,
-    error: message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    error: clientMessage,
+    // Stack is strictly for development
+    stack: !isProduction ? err.stack : undefined
   });
 };
 

@@ -12,6 +12,8 @@ import routes from "./api/src/routes/index";
 import { errorHandler } from "./api/src/middleware/errorHandler";
 import { initSocket } from "./api/src/utils/socket";
 import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+import hpp from "hpp";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -57,6 +59,19 @@ async function startServer() {
   console.log("🛠️ Starting RG Academy Server (Step 1: INIT)...");
   const app = express();
   
+  // --- SECURITY MIDDLEWARE ---
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "script-src": ["'self'", "'unsafe-inline'", "https://locize.com"],
+        "img-src": ["'self'", "data:", "https:*"],
+        "connect-src": ["'self'", "https://locize.com", "https://api.locize.com"],
+      },
+    }
+  }));
+  app.use(hpp());
+
   // Required for Hostinger/Cloudflare/Proxy environments
   app.set('trust proxy', 1);
 
@@ -70,10 +85,18 @@ async function startServer() {
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: process.env.NODE_ENV === 'production' ? 100 : 2000, // 20x increase for dev
+    max: process.env.NODE_ENV === 'production' ? 100 : 2000,
     standardHeaders: true,
     legacyHeaders: false,
     message: { error: 'Too many requests, please try again later.' }
+  });
+
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: process.env.NODE_ENV === 'production' ? 10 : 100, // Strict on prod
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many login attempts, please try again after 15 minutes.' }
   });
 
   const corsOptions = {
@@ -86,7 +109,9 @@ async function startServer() {
   app.use(cors(corsOptions));
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true }));
+  
   app.use('/api', limiter);
+  app.use('/api/auth', authLimiter);
 
   console.log("🛠️ Registering routes...");
   // --- API ROUTES ---
