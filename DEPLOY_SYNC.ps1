@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 $SSH_USER = "u315573487"
 $SSH_HOST = "145.79.26.219"
 $SSH_PORT = "65002"
-$REMOTE_PATH = "domains/rgacademy.space/public_html" 
+$REMOTE_PATH = "domains/rgacademy.space/nodejs" 
 $LOCAL_DB = "rg_academy"
 $LOCAL_DB_USER = "rg_admin"
 $LOCAL_DB_PASS = "rg_password_2026"
@@ -24,6 +24,7 @@ Write-Host "🦾 STARTING INDUSTRIAL DEPLOYMENT PIPELINE" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host "📡 Host: $SSH_HOST | Port: $SSH_PORT" -ForegroundColor White
 Write-Host "🐳 Docker Database Container: $DB_CONTAINER" -ForegroundColor White
+Write-Host "📂 Remote Path: $REMOTE_PATH" -ForegroundColor White
 
 # 💾 STEP 1: GIT SYNC & BACKUP
 Write-Host "[1/6] 💾 Syncing Git Repository..." -ForegroundColor Yellow
@@ -108,6 +109,8 @@ echo "--- GENERATING ENVIRONMENT ---"
 printf '%s' '$REMOTE_ENV_CONTENT' > .env
 echo "--- VERIFYING ENVIRONMENT ---"
 cat .env
+echo "--- TAILING LATEST LOGS ---"
+tail -n 20 console.log
 mkdir -p tmp && touch tmp/restart.txt
 "@
 
