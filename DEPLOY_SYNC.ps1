@@ -1,5 +1,5 @@
 # 🚀 RED GRIFFIN ACADEMY - INTEGRATED DEPLOY & SYNC SCRIPT (DOCKER)
-# Version: 2.11 (Hotfix: Node Path & Permissions)
+# Version: 2.14 (Production Stabilized: Final Fix)
 # ==========================================================
 
 $ErrorActionPreference = "Stop"
@@ -19,88 +19,76 @@ $REMOTE_DB_PASS = "RG_Academy_2026"
 $DEPLOY_ZIP = "RG_Academy_HOSTINGER_DEPLOY.zip"
 $SQL_DUMP = "local_sync.sql"
 
-Write-Host "===============================================" -ForegroundColor Cyan
-Write-Host "🦾 STARTING INDUSTRIAL DEPLOYMENT PIPELINE v2.11" -ForegroundColor Cyan
+$BUILD_TEMP = "BUILD_TEMP"
+
+Write-Host "`n===============================================" -ForegroundColor Cyan
+Write-Host "🦾 STARTING INDUSTRIAL DEPLOYMENT PIPELINE v2.14" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 
-# 💾 STEP 1: GIT SYNC
-Write-Host "[1/6] 💾 Syncing Git..." -ForegroundColor Yellow
+# [1/6] Syncing Git
+Write-Host "`n[1/6] 💾 Syncing Git..." -ForegroundColor Yellow
 git add .
-git commit -m "Auto-sync (v2.11 Fix): $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
-git push origin HEAD
+git commit -m "Auto-sync (v2.14 Stabilized): $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" 2>$null || $true
+git push origin main 2>$null || $true
 
-# 🏗️ STEP 2: TOTAL CLEAN & BUILD
-Write-Host "[2/6] 🏗️ Rebuilding Assets (v2.11 Hard Clean)..." -ForegroundColor Yellow
+# [2/6] Rebuild Assets
+Write-Host "[2/6] 🏗️ Rebuilding Assets (v2.14 Hard Clean)..." -ForegroundColor Yellow
+if (Test-Path "$BUILD_TEMP") { Remove-Item -Recurse -Force "$BUILD_TEMP" }
+New-Item -ItemType Directory -Path "$BUILD_TEMP" | Out-Null
 
-# Deep Clean Local Caches
-Write-Host "🧹 Purging local build artifacts..." -ForegroundColor Cyan
+Write-Host "🧹 Purging local build artifacts..."
 if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
-if (Test-Path "node_modules/.vite") { Remove-Item -Recurse -Force "node_modules/.vite" }
 if (Test-Path "server-dist.js") { Remove-Item -Force "server-dist.js" }
 
-# STEP 2.1: PRISMA FIRST
-Write-Host "💎 Generating Prisma Client..." -ForegroundColor Yellow
+Write-Host "💎 Generating Prisma Client..."
 npx prisma generate
 
-# STEP 2.2: FRONTEND & BACKEND BUILD
-Write-Host "🏗️  Building Frontend..." -ForegroundColor Yellow
+Write-Host "🏗️  Building Frontend..."
 npm run build
 
-Write-Host "📦 Bundling Backend..." -ForegroundColor Yellow
-$BANNER_JS = "import { createRequire } from 'module'; const require = createRequire(import.meta.url); import { fileURLToPath } from 'url'; import path from 'path'; const __filename = fileURLToPath(import.meta.url); const __dirname = path.dirname(__filename);"
-npx esbuild server.ts --bundle --platform=node --format=esm --outfile=server-dist.js --minify --external:@prisma/client --external:".prisma/client" --external:vite "--banner:js=$BANNER_JS"
+Write-Host "📦 Bundling Backend..."
+npx esbuild server.ts --bundle --platform=node --format=esm --outfile=server-dist.js --external:fsevents --external:canvas --external:sharp
 
-# 🛡️ VERIFY BUILD INTEGRITY
-Write-Host "🛡️ Verifying Build Integrity..." -ForegroundColor Cyan
-if (!(Test-Path "server-dist.js")) { throw "CRITICAL: server-dist.js missing!" }
+Write-Host "🛡️ Verifying Build Integrity..."
+if (-not (Test-Path "dist/index.html") -or -not (Test-Path "server-dist.js")) {
+    Write-Host "❌ Build check FAILED! Dist or server-dist.js missing." -ForegroundColor Red
+    exit 1
+}
 Write-Host "✅ Integrity Check Passed!" -ForegroundColor Green
 
-# 🗄️ STEP 3: DATABASE EXPORT
-Write-Host "[3/6] 🗄️ Exporting Database..." -ForegroundColor Yellow
-& docker exec -i $DB_CONTAINER mysqldump --no-tablespaces -u $LOCAL_DB_USER -p"$LOCAL_DB_PASS" $LOCAL_DB > $SQL_DUMP
+# [3/6] Export DB
+Write-Host "`n[3/6] 🗄️ Exporting Database..." -ForegroundColor Yellow
+if (Test-Path "$SQL_DUMP") { Remove-Item "$SQL_DUMP" }
+docker exec $DB_CONTAINER mysqldump -u$LOCAL_DB_USER -p$LOCAL_DB_PASS $LOCAL_DB > $SQL_DUMP
 
-# 📦 STEP 4: PACKAGING
-Write-Host "[4/6] 📦 Creating Archive (v2.11)..." -ForegroundColor Yellow
-if (Test-Path "BUILD_TEMP") { Remove-Item -Recurse -Force "BUILD_TEMP" }
-New-Item -ItemType Directory -Path "BUILD_TEMP" | Out-Null
-Copy-Item -Recurse "dist" "BUILD_TEMP/dist"
-Copy-Item -Recurse "prisma" "BUILD_TEMP/prisma"
-if (Test-Path "node_modules/.prisma") {
-    New-Item -ItemType Directory -Path "BUILD_TEMP/node_modules" -Force | Out-Null
-    Copy-Item -Recurse "node_modules/.prisma" "BUILD_TEMP/node_modules/.prisma"
-}
-Copy-Item "index.js", "server-dist.js", "package.json", ".env.example" "BUILD_TEMP/"
+# [4/6] Creating Archive
+Write-Host "[4/6] 📦 Creating Archive (v2.14)..." -ForegroundColor Yellow
+Copy-Item -Recurse "dist" "$BUILD_TEMP/dist"
+Copy-Item "server-dist.js" "$BUILD_TEMP/index.js"
+Copy-Item "package.json" "$BUILD_TEMP/package.json"
+if (Test-Path "prisma") { Copy-Item -Recurse "prisma" "$BUILD_TEMP/prisma" }
 
-if (Test-Path $DEPLOY_ZIP) { Remove-Item $DEPLOY_ZIP }
-Compress-Archive -Path "BUILD_TEMP/*" -DestinationPath $DEPLOY_ZIP -Force
+if (Test-Path "$DEPLOY_ZIP") { Remove-Item "$DEPLOY_ZIP" }
+Compress-Archive -Path "$BUILD_TEMP/*" -DestinationPath "$DEPLOY_ZIP"
 
-# 🚀 STEP 5: UPLOAD
+# [5/6] Upload
 Write-Host "[5/6] 🚀 Uploading to Hostinger..." -ForegroundColor Yellow
-scp -P $SSH_PORT $DEPLOY_ZIP $SQL_DUMP "$($SSH_USER)@$($SSH_HOST):$($REMOTE_BASE)/"
+scp -P $SSH_PORT "$DEPLOY_ZIP" "$SQL_DUMP" "$($SSH_USER)@$($SSH_HOST):$REMOTE_BASE/"
 
-# ⚡ STEP 6: DUAL DEPLOY & RESTART
-Write-Host "[6/6] ⚡ Finalizing v2.11 (Hotfix Sync)..." -ForegroundColor Yellow
+# [6/6] Finalize Remote
+Write-Host "[6/6] ⚡ Finalizing v2.14 (Hotfix Sync)..." -ForegroundColor Yellow
 
-$REMOTE_ENV_CONTENT = @"
-DATABASE_URL="mysql://${REMOTE_DB_USER}:${REMOTE_DB_PASS}@127.0.0.1:3306/${REMOTE_DB}"
-JWT_SECRET="Omon_Ra43213467905277"
-GEMINI_API_KEY="AIzaSyBc83wAfRuBv7nt4zoHRbuPsdmez-1sOZ0"
-PORT=3000
-APP_URL="https://rgacademy.space"
-NODE_ENV="production"
-SKIP_VITE="true"
-"@
-
+# Construction of remote commands with backtick-escaped subshells for Windows/Bash compatibility
 $REMOTE_COMMANDS = @"
 cd `$REMOTE_BASE
 
 echo "--- RESOURCE CLEANUP (PRE-DEPLOY) ---"
 # Kill existing processes first to free up 'fork' slots
 pkill -u `$SSH_USER node || true
-sleep 2
+sleep 3
 
 echo "--- FINDING NODE ---"
-# Check common Hostinger paths directly instead of using 'find' (which is resource heavy)
+# Detect node location on Hostinger safely (Check common paths explicitly)
 if [ -f "/opt/alt/node20/bin/node" ]; then
     NODE_PATH="/opt/alt/node20/bin/node"
 elif [ -f "/opt/alt/node18/bin/node" ]; then
@@ -118,16 +106,20 @@ rm -rf public_html/dist nodejs/dist
 rm -f nodejs/index.js nodejs/server-dist.js nodejs/package.json nodejs/startup_debug.log
 sleep 1
 
-echo "--- EXTRACTING v2.13 ---"
+echo "--- EXTRACTING v2.14 ---"
 unzip -o "`$DEPLOY_ZIP" -d nodejs/
 unzip -o "`$DEPLOY_ZIP" -d public_html/
-sleep 1
+sleep 2
 
 echo "--- SYNCING DB ---"
 [ -f "`$SQL_DUMP" ] && mysql -u `$REMOTE_DB_USER -p'`$REMOTE_DB_PASS' `$REMOTE_DB < `$SQL_DUMP
 
 echo "--- WRITING PRODUCTION ENV ---"
-printf '%s' '`$REMOTE_ENV_CONTENT' > nodejs/.env
+# Use temporary file to avoid complex quoting in echo
+printf '%s' "DATABASE_URL=mysql://u315573487_admin:RG_Academy_2026@145.79.26.219:3306/u315573487_db
+JWT_SECRET=super_secret_production_key_2026
+PORT=3000
+NODE_ENV=production" > nodejs/.env
 
 echo "--- SETTING PERMISSIONS ---"
 chmod +x nodejs/node_modules/.bin/prisma 2>/dev/null || true
@@ -145,15 +137,16 @@ fi
 
 echo "--- VERIFICATION ---"
 mkdir -p tmp && touch tmp/restart.txt
-[ -f server-dist.js ] && echo "✅ server-dist.js exists" || echo "❌ server-dist.js MISSING"
+[ -f index.js ] && echo "✅ index.js exists" || echo "❌ index.js MISSING"
 cd ..
 rm `$DEPLOY_ZIP `$SQL_DUMP
 "@
 
 ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" $REMOTE_COMMANDS
 
-Write-Host "===============================================" -ForegroundColor Green
-Write-Host "✅ DEPLOY v2.11 COMPLETED!" -ForegroundColor Green
+Write-Host "`n===============================================" -ForegroundColor Green
+Write-Host "✅ DEPLOY v2.14 COMPLETED!" -ForegroundColor Green
 Write-Host "🌐 Health Check: https://rgacademy.space/api/health" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Green
-pause
+
+Read-Host "`nPress Enter to continue..."
