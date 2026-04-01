@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { GraduationCap, Box, X } from 'lucide-react';
+import { GraduationCap, Box, X, LayoutDashboard } from 'lucide-react';
+
 import { useAuth } from '../context/AuthContext';
 import { usePlatform } from '../context/PlatformContext';
 import { useTranslation } from 'react-i18next';
@@ -87,10 +88,28 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const mobileSections = React.useMemo(() => [
-    { id: 'academy', label: t('academy'), path: `/aca/${lang || 'eng'}`, icon: GraduationCap, active: isAcademy, categories: ACADEMY_CATEGORIES, color: 'text-primary' },
-    { id: 'studio', label: t('studio'), path: `/studio/${lang || 'eng'}`, icon: Box, active: isStudio, categories: STUDIO_CATEGORIES, color: 'text-primary-hover' }
-  ], [lang, isAcademy, isStudio, t]);
+  const mobileSections = React.useMemo(() => {
+    const sections = [
+      { id: 'academy', label: t('academy'), path: `/aca/${lang || 'eng'}`, icon: GraduationCap, active: isAcademy, categories: ACADEMY_CATEGORIES, color: 'text-primary' },
+      { id: 'studio', label: t('studio'), path: `/studio/${lang || 'eng'}`, icon: Box, active: isStudio, categories: STUDIO_CATEGORIES, color: 'text-primary-hover' }
+    ];
+
+    if (isDashboardPage && sidebarCategories.length > 0) {
+      // Inject Dashboard sections at the top for quick access
+      sections.unshift({
+        id: 'dashboards',
+        label: t('dashboards'),
+        path: `${modePrefix}/${lang || 'eng'}/dashboard`,
+        icon: LayoutDashboard,
+        active: true,
+        categories: sidebarCategories,
+        color: modeColor
+      });
+    }
+
+    return sections;
+  }, [lang, isAcademy, isStudio, isDashboardPage, sidebarCategories, modePrefix, modeColor, t]);
+
 
   if (authLoading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">Initializing...</div>;
 

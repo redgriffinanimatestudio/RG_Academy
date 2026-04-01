@@ -159,9 +159,46 @@ export default function MobileMenu({
                             <div key={cat?.name} className="py-2">
                               <div className="flex items-center gap-2 mb-2 opacity-40"><cat.icon size={12} /><span className="text-[9px] font-black uppercase tracking-widest">{t(cat?.name)}</span></div>
                               <div className="grid grid-cols-1 gap-1">
-                                {cat?.subcategories?.map((sub: any) => (
-                                  <button key={sub?.name} onClick={() => { handleSetSub(sub, cat); onClose(); }} className={`px-3 py-2 text-[10px] font-bold uppercase text-left rounded-lg transition-colors ${activeSubName === sub?.name ? section.color : 'text-white/30 hover:text-white hover:bg-white/5'}`}>{t(sub?.name)}</button>
-                                ))}
+                                {cat.subcategories.map((sub: any) => {
+                                  const isSubActive = activeSubName === sub.name;
+                                  const hasDeepNested = sub.subcategories && sub.subcategories.length > 0;
+                                  
+                                  return (
+                                    <div key={sub.name} className="space-y-1">
+                                      <button
+                                        onClick={() => { handleSetSub(sub, cat); if (!hasDeepNested) onClose(); }}
+                                        className={`w-full text-left px-4 py-3 rounded-xl text-[10px] font-black uppercase flex items-center justify-between transition-all ${isSubActive ? (`${modeColor} bg-white/5 shadow-[inset_0_0_20px_rgba(255,255,255,0.02)]`) : 'text-white/30 hover:text-white/60'}`}
+                                      >
+                                        {t(sub.name)}
+                                        {hasDeepNested ? (
+                                          <ChevronDown size={14} className={`transition-transform duration-300 ${isSubActive ? 'rotate-180 opacity-100' : 'opacity-20'}`} />
+                                        ) : (
+                                          <div className={`size-1 rounded-full ${isSubActive ? (modeColor.replace('text-', 'bg-')) : 'bg-white/10'}`} />
+                                        )}
+                                      </button>
+
+                                      {/* 💎 THIRD LEVEL: Mobile Integration */}
+                                      {hasDeepNested && isSubActive && (
+                                        <motion.div
+                                          initial={{ height: 0, opacity: 0 }}
+                                          animate={{ height: 'auto', opacity: 1 }}
+                                          className="ml-4 pl-4 border-l border-white/10 space-y-2 py-2"
+                                        >
+                                          {sub.subcategories.map((deep: any) => (
+                                            <button
+                                              key={deep.name}
+                                              onClick={() => onClose()}
+                                              className="w-full text-left px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-primary transition-colors flex items-center gap-3"
+                                            >
+                                              <div className="size-1 rounded-full bg-white/20" />
+                                              {t(deep.name)}
+                                            </button>
+                                          ))}
+                                        </motion.div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
                           ))}
