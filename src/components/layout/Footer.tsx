@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Globe, ChevronRight } from 'lucide-react';
 
 interface FooterProps {
+  profile: any;
   modePrefix: string;
   modeColor: string;
   modeBg: string;
@@ -11,10 +12,40 @@ interface FooterProps {
   onOpenLangMenu: () => void;
 }
 
-export default function Footer({ modePrefix, modeColor, modeBg, currentLang, onOpenLangMenu }: FooterProps) {
+export default function Footer({ profile, modePrefix, modeColor, modeBg, currentLang, onOpenLangMenu }: FooterProps) {
   const { t } = useTranslation();
   const { lang } = useParams();
 
+  // 💎 Tier 2: Industrial Minimal Footer (For authenticated members)
+  if (profile) {
+    return (
+      <footer className="bg-black/40 border-t border-white/5 py-6 mt-20 backdrop-blur-xl">
+        <div className="mx-auto max-w-[1920px] px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-6">
+            <Link to={`${modePrefix}/${lang || 'eng'}`} className="flex items-center gap-3 group opacity-60 hover:opacity-100 transition-opacity">
+              <div className={`size-8 ${modeBg} rounded-lg flex items-center justify-center text-bg-dark text-xs font-black italic`}>RG</div>
+              <span className="text-[10px] font-black uppercase tracking-tighter text-white">Red Griffin Ecosystem</span>
+            </Link>
+            <div className="h-4 w-[1px] bg-white/10 hidden md:block" />
+            <div className="flex items-center gap-4 text-[9px] font-black uppercase text-white/30">
+              <span className="hover:text-primary cursor-pointer transition-colors">Nodes Status: Optimal</span>
+              <span className="hover:text-primary cursor-pointer transition-colors">Latency: 24ms</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-8 text-[9px] font-black uppercase text-white/20">
+            <p>© {new Date().getFullYear()} Red Griffin Creative Ecosystem</p>
+            <div className="flex items-center gap-4">
+              <Link to="#" className="hover:text-white transition-colors">{t('terms')}</Link>
+              <Link to="#" className="hover:text-white transition-colors">{t('legal')}</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
+  // 🏛️ Tier 1: Full Marketing Footer (For guests)
   return (
     <footer className="bg-[#050505] border-t border-white/5 pt-20 pb-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

@@ -109,10 +109,16 @@ export default function DashboardController() {
     }
   }, [profile, activeRole, userData, activeView, lang]);
 
-  if (loading) return <Preloader message="Syncing with Red Griffin Ecosystem..." />;
-  if (!profile) {
-    navigate(`/${lang || 'eng'}/login`);
-    return null;
+  // Phase 22: Safe Auth Guard & Redirect (Anti-Crash Logout)
+  useEffect(() => {
+    if (!loading && !profile) {
+      console.log(`[Dashboard] No session detected. Redirecting to login...`);
+      navigate(`/${lang || 'eng'}/login`);
+    }
+  }, [profile, loading, lang, navigate]);
+
+  if (loading || !profile) {
+    return <Preloader message="Syncing with Red Griffin Ecosystem..." />;
   }
 
   return (

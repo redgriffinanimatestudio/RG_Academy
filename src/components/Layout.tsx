@@ -143,6 +143,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {(isAcademy || isStudio || isCommunity || isDashboardPage) && (
             <div className="hidden md:block shrink-0">
               <Sidebar 
+                profile={profile}
                 sidebarCategories={sidebarCategories} activeCatName={activeCatName} activeSubName={activeSubName}
                 isSidebarCollapsed={isSidebarCollapsed} setIsSidebarCollapsed={setIsSidebarCollapsed}
                 handleSetCategory={handleSetCategory} handleSetSub={handleSetSub}
@@ -165,6 +166,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </main>
 
       <Footer 
+        profile={profile}
         modePrefix={modePrefix} modeColor={modeColor} modeBg={modeBg} 
         currentLang={LANGUAGES.find(l => l.code === (lang || 'eng')) || LANGUAGES[0]}
         onOpenLangMenu={() => {}}

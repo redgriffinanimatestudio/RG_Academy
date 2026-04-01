@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, ChevronLeft, Box } from 'lucide-react';
 
 interface SidebarProps {
+  profile: any;
   sidebarCategories: any[];
   activeCatName: string;
   activeSubName: string;
@@ -17,6 +18,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({
+  profile,
   sidebarCategories,
   activeCatName,
   activeSubName,
@@ -37,6 +39,28 @@ export default function Sidebar({
         className="sticky top-24 sm:top-28 lg:top-32 h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar border-r border-white/5 pr-2 sm:pr-4"
       >
         <div className="space-y-6 sm:space-y-8">
+          {/* 🧿 Tier 1: Contextual Discovery (Guest only) */}
+          {!profile && !isSidebarCollapsed && (
+            <div className="px-2 mb-8 animate-in fade-in slide-in-from-left duration-700">
+              <div className="p-5 rounded-3xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Box size={40} className={modeColor} />
+                </div>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">Genesis Guide</h4>
+                <p className="text-[11px] font-bold text-white mb-4 leading-relaxed">Join the Red Griffin Creative Ecosystem to unlock professional nodes.</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-[9px] font-black uppercase text-primary">
+                    <div className="size-1 rounded-full bg-primary animate-pulse" />
+                    How to start
+                  </div>
+                  <div className="flex items-center gap-2 text-[9px] font-black uppercase text-white/40 hover:text-white transition-colors cursor-pointer">
+                    <div className="size-1 rounded-full bg-white/10" />
+                    Ecosystem Map
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="space-y-2">
             {sidebarCategories.map((cat) => {
               const isCatActive = activeCatName === cat?.name;

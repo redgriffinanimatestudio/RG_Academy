@@ -56,14 +56,22 @@ export default function MobileMenu({
     <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 bg-black/60 backdrop-blur-xl z-[100] lg:hidden" />
-
+          {/* Backdrop Overlay */}
           <motion.div 
-            initial={{ x: '-100%' }} 
-            animate={{ x: 0 }} 
-            exit={{ x: '-100%' }} 
-            transition={{ type: 'spring', damping: 28, stiffness: 220 }} 
-            className={`fixed inset-y-0 left-0 w-full xs:w-[320px] sm:w-[380px] z-[101] flex flex-col bg-[#050505] border-r border-white/5 shadow-[20px_0_80px_rgba(0,0,0,0.8)]`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[90] lg:hidden"
+          />
+
+          {/* Mobile Menu Content: High-Density Industrial Hub */}
+          <motion.div 
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed top-0 left-0 w-[85%] max-w-[400px] h-dvh bg-zinc-950 border-r border-white/5 z-[100] lg:hidden flex flex-col"
           >
             <div className="p-6 flex items-center justify-between border-b border-white/5">
               <Link to="/" onClick={onClose} className="flex items-center gap-3">
