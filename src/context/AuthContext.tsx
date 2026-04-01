@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { authService } from '../services/authService';
 import { UserProfile, UserRole } from '../services/userService';
 import apiClient from '../services/apiClient';
@@ -22,6 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeRole, setActiveRoleState] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
+  const initialized = useRef(false);
 
   const mapProfile = (dbUser: any): UserProfile => {
     console.log("[AUTH] Mapping DB User to Profile:", dbUser);
@@ -80,6 +81,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
     initAuth();
   }, []);
 

@@ -110,9 +110,103 @@ export const AISimulationScalarFieldEnumSchema = z.enum(['id','userId','type','p
 
 export const SortOrderSchema = z.enum(['asc','desc']);
 
-export const QueryModeSchema = z.enum(['default','insensitive']);
-
 export const NullsOrderSchema = z.enum(['first','last']);
+
+export const UserOrderByRelevanceFieldEnumSchema = z.enum(['id','email','phone','displayName','photoURL','password','role','primaryRole','roles','agencyId','remoteId','source','partnerId']);
+
+export const AchievementOrderByRelevanceFieldEnumSchema = z.enum(['id','userId','type','title','description','icon']);
+
+export const TransactionOrderByRelevanceFieldEnumSchema = z.enum(['id','userId','currency','type','status','refId','description']);
+
+export const CertificateOrderByRelevanceFieldEnumSchema = z.enum(['id','userId','courseId','title','issuer','credentialId','qrCode']);
+
+export const NotificationOrderByRelevanceFieldEnumSchema = z.enum(['id','userId','type','title','message','link']);
+
+export const ProfileOrderByRelevanceFieldEnumSchema = z.enum(['id','userId','bio','avatar','location','experienceLevel','primarySoftware','learningGoal','portfolioUrl','specialization','artStationUrl','availability','clientType','companyName','companyWebsite','industry','country','citizenship','linkedInUrl','telegramHandle','gender','ageCategory']);
+
+export const ProfileSkillOrderByRelevanceFieldEnumSchema = z.enum(['id','profileId','skillId']);
+
+export const SkillOrderByRelevanceFieldEnumSchema = z.enum(['id','name']);
+
+export const ConnectionOrderByRelevanceFieldEnumSchema = z.enum(['id','followerId','followingId']);
+
+export const FeedEventOrderByRelevanceFieldEnumSchema = z.enum(['id','actorId','type','refId','payload']);
+
+export const PortfolioItemOrderByRelevanceFieldEnumSchema = z.enum(['id','profileId','title','description','mediaUrl','category','tags']);
+
+export const ProjectOrderByRelevanceFieldEnumSchema = z.enum(['id','title','slug','description','clientId','executorId','status','urgency','tags','requiredSkills','maturityLevel']);
+
+export const ServiceOrderByRelevanceFieldEnumSchema = z.enum(['id','title','description','executorId','category','tags']);
+
+export const ApplicationOrderByRelevanceFieldEnumSchema = z.enum(['id','projectId','executorId','coverLetter','milestones','status']);
+
+export const ContractOrderByRelevanceFieldEnumSchema = z.enum(['id','projectId','clientId','executorId','currency','status','milestones']);
+
+export const EscrowOrderByRelevanceFieldEnumSchema = z.enum(['id','contractId','status']);
+
+export const TaskOrderByRelevanceFieldEnumSchema = z.enum(['id','projectId','title','assigneeId','status','priority']);
+
+export const ReviewSessionOrderByRelevanceFieldEnumSchema = z.enum(['id','taskId','projectId','mediaUrl','mediaType','status']);
+
+export const AnnotationOrderByRelevanceFieldEnumSchema = z.enum(['id','sessionId','authorId','type','data']);
+
+export const DepartmentOrderByRelevanceFieldEnumSchema = z.enum(['id','name','slug','description','icon']);
+
+export const ProgramOrderByRelevanceFieldEnumSchema = z.enum(['id','departmentId','title','slug','type','description','levels']);
+
+export const CategoryOrderByRelevanceFieldEnumSchema = z.enum(['id','name','slug','description','icon','accentColor','type','subcategories']);
+
+export const CourseOrderByRelevanceFieldEnumSchema = z.enum(['id','slug','title','description','lecturerId','lecturerName','lecturerAvatar','thumbnail','duration','level','tags','status','categoryId','programId','softwareStack']);
+
+export const ModuleOrderByRelevanceFieldEnumSchema = z.enum(['id','courseId','title']);
+
+export const LessonOrderByRelevanceFieldEnumSchema = z.enum(['id','courseId','title','content','videoUrl','type','duration','moduleId']);
+
+export const EnrollmentOrderByRelevanceFieldEnumSchema = z.enum(['id','userId','courseId','cohortId','status','completedLessons']);
+
+export const EnrollmentAnalyticsOrderByRelevanceFieldEnumSchema = z.enum(['id','enrollmentId','lessonId']);
+
+export const ReviewOrderByRelevanceFieldEnumSchema = z.enum(['id','courseId','userId','comment']);
+
+export const AssignmentOrderByRelevanceFieldEnumSchema = z.enum(['id','courseId','title','description','rubricId']);
+
+export const SubmissionOrderByRelevanceFieldEnumSchema = z.enum(['id','assignmentId','userId','contentUrl','status']);
+
+export const RubricOrderByRelevanceFieldEnumSchema = z.enum(['id','name','description']);
+
+export const CriteriaOrderByRelevanceFieldEnumSchema = z.enum(['id','rubricId','name','description']);
+
+export const GradeOrderByRelevanceFieldEnumSchema = z.enum(['id','submissionId','reviewerId','feedback','criteriaScores']);
+
+export const CohortOrderByRelevanceFieldEnumSchema = z.enum(['id','programId','name','status']);
+
+export const ScheduleOrderByRelevanceFieldEnumSchema = z.enum(['id','courseId','cohortId','title','location']);
+
+export const AttendanceOrderByRelevanceFieldEnumSchema = z.enum(['id','scheduleId','userId','status']);
+
+export const PartnerOrderByRelevanceFieldEnumSchema = z.enum(['id','name','description','industry','website','logo']);
+
+export const VacancyOrderByRelevanceFieldEnumSchema = z.enum(['id','partnerId','title','description','status']);
+
+export const ReportOrderByRelevanceFieldEnumSchema = z.enum(['id','reporterId','targetType','targetId','reason','status']);
+
+export const ChatRoomOrderByRelevanceFieldEnumSchema = z.enum(['id','type','refId','participants','lastMessage']);
+
+export const MessageOrderByRelevanceFieldEnumSchema = z.enum(['id','roomId','senderId','text']);
+
+export const JobOpeningOrderByRelevanceFieldEnumSchema = z.enum(['id','title','department','description','requirements','salaryRange','status']);
+
+export const JobApplicationOrderByRelevanceFieldEnumSchema = z.enum(['id','userId','openingId','coverLetter','resumeUrl','status']);
+
+export const SystemMetricOrderByRelevanceFieldEnumSchema = z.enum(['id','type','nodeId','status']);
+
+export const AIBaseOrderByRelevanceFieldEnumSchema = z.enum(['id','key','prompt','role']);
+
+export const CareerPathOrderByRelevanceFieldEnumSchema = z.enum(['id','title','description','skills','steps']);
+
+export const UserTrajectoryOrderByRelevanceFieldEnumSchema = z.enum(['id','userId','pathId','stepsCompleted','aiFeedback']);
+
+export const AISimulationOrderByRelevanceFieldEnumSchema = z.enum(['id','userId','type','persona','history','status']);
 /////////////////////////////////////////
 // MODELS
 /////////////////////////////////////////
@@ -2602,6 +2696,7 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
   trajectories: z.lazy(() => UserTrajectoryOrderByRelationAggregateInputSchema).optional(),
   simulations: z.lazy(() => AISimulationOrderByRelationAggregateInputSchema).optional(),
   certificates: z.lazy(() => CertificateOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => UserOrderByRelevanceInputSchema).optional(),
 });
 
 export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> = z.union([
@@ -2815,6 +2910,7 @@ export const AchievementOrderByWithRelationInputSchema: z.ZodType<Prisma.Achieve
   icon: z.union([ z.lazy(() => SortOrderSchema), z.lazy(() => SortOrderInputSchema) ]).optional(),
   earnedAt: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => AchievementOrderByRelevanceInputSchema).optional(),
 });
 
 export const AchievementWhereUniqueInputSchema: z.ZodType<Prisma.AchievementWhereUniqueInput> = z.object({
@@ -2887,6 +2983,7 @@ export const TransactionOrderByWithRelationInputSchema: z.ZodType<Prisma.Transac
   description: z.union([ z.lazy(() => SortOrderSchema), z.lazy(() => SortOrderInputSchema) ]).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => TransactionOrderByRelevanceInputSchema).optional(),
 });
 
 export const TransactionWhereUniqueInputSchema: z.ZodType<Prisma.TransactionWhereUniqueInput> = z.object({
@@ -2971,6 +3068,7 @@ export const CertificateOrderByWithRelationInputSchema: z.ZodType<Prisma.Certifi
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   course: z.lazy(() => CourseOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => CertificateOrderByRelevanceInputSchema).optional(),
 });
 
 export const CertificateWhereUniqueInputSchema: z.ZodType<Prisma.CertificateWhereUniqueInput> = z.union([
@@ -3062,6 +3160,7 @@ export const NotificationOrderByWithRelationInputSchema: z.ZodType<Prisma.Notifi
   isRead: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => NotificationOrderByRelevanceInputSchema).optional(),
 });
 
 export const NotificationWhereUniqueInputSchema: z.ZodType<Prisma.NotificationWhereUniqueInput> = z.object({
@@ -3175,6 +3274,7 @@ export const ProfileOrderByWithRelationInputSchema: z.ZodType<Prisma.ProfileOrde
   portfolio: z.lazy(() => PortfolioItemOrderByRelationAggregateInputSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   skills: z.lazy(() => ProfileSkillOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => ProfileOrderByRelevanceInputSchema).optional(),
 });
 
 export const ProfileWhereUniqueInputSchema: z.ZodType<Prisma.ProfileWhereUniqueInput> = z.union([
@@ -3309,6 +3409,7 @@ export const ProfileSkillOrderByWithRelationInputSchema: z.ZodType<Prisma.Profil
   proficiency: z.lazy(() => SortOrderSchema).optional(),
   profile: z.lazy(() => ProfileOrderByWithRelationInputSchema).optional(),
   skill: z.lazy(() => SkillOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => ProfileSkillOrderByRelevanceInputSchema).optional(),
 });
 
 export const ProfileSkillWhereUniqueInputSchema: z.ZodType<Prisma.ProfileSkillWhereUniqueInput> = z.union([
@@ -3371,6 +3472,7 @@ export const SkillOrderByWithRelationInputSchema: z.ZodType<Prisma.SkillOrderByW
   id: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
   profiles: z.lazy(() => ProfileSkillOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => SkillOrderByRelevanceInputSchema).optional(),
 });
 
 export const SkillWhereUniqueInputSchema: z.ZodType<Prisma.SkillWhereUniqueInput> = z.union([
@@ -3429,6 +3531,7 @@ export const ConnectionOrderByWithRelationInputSchema: z.ZodType<Prisma.Connecti
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   following: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   follower: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => ConnectionOrderByRelevanceInputSchema).optional(),
 });
 
 export const ConnectionWhereUniqueInputSchema: z.ZodType<Prisma.ConnectionWhereUniqueInput> = z.union([
@@ -3497,6 +3600,7 @@ export const FeedEventOrderByWithRelationInputSchema: z.ZodType<Prisma.FeedEvent
   payload: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   actor: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => FeedEventOrderByRelevanceInputSchema).optional(),
 });
 
 export const FeedEventWhereUniqueInputSchema: z.ZodType<Prisma.FeedEventWhereUniqueInput> = z.object({
@@ -3564,6 +3668,7 @@ export const PortfolioItemOrderByWithRelationInputSchema: z.ZodType<Prisma.Portf
   tags: z.union([ z.lazy(() => SortOrderSchema), z.lazy(() => SortOrderInputSchema) ]).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   profile: z.lazy(() => ProfileOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => PortfolioItemOrderByRelevanceInputSchema).optional(),
 });
 
 export const PortfolioItemWhereUniqueInputSchema: z.ZodType<Prisma.PortfolioItemWhereUniqueInput> = z.object({
@@ -3659,6 +3764,7 @@ export const ProjectOrderByWithRelationInputSchema: z.ZodType<Prisma.ProjectOrde
   reviewSessions: z.lazy(() => ReviewSessionOrderByRelationAggregateInputSchema).optional(),
   contracts: z.lazy(() => ContractOrderByRelationAggregateInputSchema).optional(),
   tasks: z.lazy(() => TaskOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => ProjectOrderByRelevanceInputSchema).optional(),
 });
 
 export const ProjectWhereUniqueInputSchema: z.ZodType<Prisma.ProjectWhereUniqueInput> = z.union([
@@ -3768,6 +3874,7 @@ export const ServiceOrderByWithRelationInputSchema: z.ZodType<Prisma.ServiceOrde
   rating: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   executor: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => ServiceOrderByRelevanceInputSchema).optional(),
 });
 
 export const ServiceWhereUniqueInputSchema: z.ZodType<Prisma.ServiceWhereUniqueInput> = z.object({
@@ -3852,6 +3959,7 @@ export const ApplicationOrderByWithRelationInputSchema: z.ZodType<Prisma.Applica
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   project: z.lazy(() => ProjectOrderByWithRelationInputSchema).optional(),
   executor: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => ApplicationOrderByRelevanceInputSchema).optional(),
 });
 
 export const ApplicationWhereUniqueInputSchema: z.ZodType<Prisma.ApplicationWhereUniqueInput> = z.object({
@@ -3942,6 +4050,7 @@ export const ContractOrderByWithRelationInputSchema: z.ZodType<Prisma.ContractOr
   client: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   executor: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   escrow: z.lazy(() => EscrowOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => ContractOrderByRelevanceInputSchema).optional(),
 });
 
 export const ContractWhereUniqueInputSchema: z.ZodType<Prisma.ContractWhereUniqueInput> = z.object({
@@ -4021,6 +4130,7 @@ export const EscrowOrderByWithRelationInputSchema: z.ZodType<Prisma.EscrowOrderB
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   contract: z.lazy(() => ContractOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => EscrowOrderByRelevanceInputSchema).optional(),
 });
 
 export const EscrowWhereUniqueInputSchema: z.ZodType<Prisma.EscrowWhereUniqueInput> = z.union([
@@ -4108,6 +4218,7 @@ export const TaskOrderByWithRelationInputSchema: z.ZodType<Prisma.TaskOrderByWit
   project: z.lazy(() => ProjectOrderByWithRelationInputSchema).optional(),
   assignee: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   reviewSession: z.lazy(() => ReviewSessionOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => TaskOrderByRelevanceInputSchema).optional(),
 });
 
 export const TaskWhereUniqueInputSchema: z.ZodType<Prisma.TaskWhereUniqueInput> = z.object({
@@ -4190,6 +4301,7 @@ export const ReviewSessionOrderByWithRelationInputSchema: z.ZodType<Prisma.Revie
   task: z.lazy(() => TaskOrderByWithRelationInputSchema).optional(),
   project: z.lazy(() => ProjectOrderByWithRelationInputSchema).optional(),
   annotations: z.lazy(() => AnnotationOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => ReviewSessionOrderByRelevanceInputSchema).optional(),
 });
 
 export const ReviewSessionWhereUniqueInputSchema: z.ZodType<Prisma.ReviewSessionWhereUniqueInput> = z.union([
@@ -4274,6 +4386,7 @@ export const AnnotationOrderByWithRelationInputSchema: z.ZodType<Prisma.Annotati
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   session: z.lazy(() => ReviewSessionOrderByWithRelationInputSchema).optional(),
   author: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => AnnotationOrderByRelevanceInputSchema).optional(),
 });
 
 export const AnnotationWhereUniqueInputSchema: z.ZodType<Prisma.AnnotationWhereUniqueInput> = z.object({
@@ -4345,6 +4458,7 @@ export const DepartmentOrderByWithRelationInputSchema: z.ZodType<Prisma.Departme
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   programs: z.lazy(() => ProgramOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => DepartmentOrderByRelevanceInputSchema).optional(),
 });
 
 export const DepartmentWhereUniqueInputSchema: z.ZodType<Prisma.DepartmentWhereUniqueInput> = z.union([
@@ -4430,6 +4544,7 @@ export const ProgramOrderByWithRelationInputSchema: z.ZodType<Prisma.ProgramOrde
   department: z.lazy(() => DepartmentOrderByWithRelationInputSchema).optional(),
   courses: z.lazy(() => CourseOrderByRelationAggregateInputSchema).optional(),
   cohorts: z.lazy(() => CohortOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => ProgramOrderByRelevanceInputSchema).optional(),
 });
 
 export const ProgramWhereUniqueInputSchema: z.ZodType<Prisma.ProgramWhereUniqueInput> = z.union([
@@ -4523,6 +4638,7 @@ export const CategoryOrderByWithRelationInputSchema: z.ZodType<Prisma.CategoryOr
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   courses: z.lazy(() => CourseOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => CategoryOrderByRelevanceInputSchema).optional(),
 });
 
 export const CategoryWhereUniqueInputSchema: z.ZodType<Prisma.CategoryWhereUniqueInput> = z.union([
@@ -4658,6 +4774,7 @@ export const CourseOrderByWithRelationInputSchema: z.ZodType<Prisma.CourseOrderB
   assignments: z.lazy(() => AssignmentOrderByRelationAggregateInputSchema).optional(),
   schedules: z.lazy(() => ScheduleOrderByRelationAggregateInputSchema).optional(),
   certificates: z.lazy(() => CertificateOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => CourseOrderByRelevanceInputSchema).optional(),
 });
 
 export const CourseWhereUniqueInputSchema: z.ZodType<Prisma.CourseWhereUniqueInput> = z.union([
@@ -4785,6 +4902,7 @@ export const ModuleOrderByWithRelationInputSchema: z.ZodType<Prisma.ModuleOrderB
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   course: z.lazy(() => CourseOrderByWithRelationInputSchema).optional(),
   lessons: z.lazy(() => LessonOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => ModuleOrderByRelevanceInputSchema).optional(),
 });
 
 export const ModuleWhereUniqueInputSchema: z.ZodType<Prisma.ModuleWhereUniqueInput> = z.object({
@@ -4860,6 +4978,7 @@ export const LessonOrderByWithRelationInputSchema: z.ZodType<Prisma.LessonOrderB
   moduleId: z.union([ z.lazy(() => SortOrderSchema), z.lazy(() => SortOrderInputSchema) ]).optional(),
   course: z.lazy(() => CourseOrderByWithRelationInputSchema).optional(),
   module: z.lazy(() => ModuleOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => LessonOrderByRelevanceInputSchema).optional(),
 });
 
 export const LessonWhereUniqueInputSchema: z.ZodType<Prisma.LessonWhereUniqueInput> = z.object({
@@ -4955,6 +5074,7 @@ export const EnrollmentOrderByWithRelationInputSchema: z.ZodType<Prisma.Enrollme
   course: z.lazy(() => CourseOrderByWithRelationInputSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   analytics: z.lazy(() => EnrollmentAnalyticsOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => EnrollmentOrderByRelevanceInputSchema).optional(),
 });
 
 export const EnrollmentWhereUniqueInputSchema: z.ZodType<Prisma.EnrollmentWhereUniqueInput> = z.object({
@@ -5035,6 +5155,7 @@ export const EnrollmentAnalyticsOrderByWithRelationInputSchema: z.ZodType<Prisma
   completedAt: z.union([ z.lazy(() => SortOrderSchema), z.lazy(() => SortOrderInputSchema) ]).optional(),
   lastSyncAt: z.lazy(() => SortOrderSchema).optional(),
   enrollment: z.lazy(() => EnrollmentOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => EnrollmentAnalyticsOrderByRelevanceInputSchema).optional(),
 });
 
 export const EnrollmentAnalyticsWhereUniqueInputSchema: z.ZodType<Prisma.EnrollmentAnalyticsWhereUniqueInput> = z.object({
@@ -5104,6 +5225,7 @@ export const ReviewOrderByWithRelationInputSchema: z.ZodType<Prisma.ReviewOrderB
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   course: z.lazy(() => CourseOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => ReviewOrderByRelevanceInputSchema).optional(),
 });
 
 export const ReviewWhereUniqueInputSchema: z.ZodType<Prisma.ReviewWhereUniqueInput> = z.object({
@@ -5183,6 +5305,7 @@ export const AssignmentOrderByWithRelationInputSchema: z.ZodType<Prisma.Assignme
   course: z.lazy(() => CourseOrderByWithRelationInputSchema).optional(),
   rubric: z.lazy(() => RubricOrderByWithRelationInputSchema).optional(),
   submissions: z.lazy(() => SubmissionOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => AssignmentOrderByRelevanceInputSchema).optional(),
 });
 
 export const AssignmentWhereUniqueInputSchema: z.ZodType<Prisma.AssignmentWhereUniqueInput> = z.object({
@@ -5265,6 +5388,7 @@ export const SubmissionOrderByWithRelationInputSchema: z.ZodType<Prisma.Submissi
   assignment: z.lazy(() => AssignmentOrderByWithRelationInputSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   grades: z.lazy(() => GradeOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => SubmissionOrderByRelevanceInputSchema).optional(),
 });
 
 export const SubmissionWhereUniqueInputSchema: z.ZodType<Prisma.SubmissionWhereUniqueInput> = z.object({
@@ -5333,6 +5457,7 @@ export const RubricOrderByWithRelationInputSchema: z.ZodType<Prisma.RubricOrderB
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   criteria: z.lazy(() => CriteriaOrderByRelationAggregateInputSchema).optional(),
   assignments: z.lazy(() => AssignmentOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => RubricOrderByRelevanceInputSchema).optional(),
 });
 
 export const RubricWhereUniqueInputSchema: z.ZodType<Prisma.RubricWhereUniqueInput> = z.object({
@@ -5394,6 +5519,7 @@ export const CriteriaOrderByWithRelationInputSchema: z.ZodType<Prisma.CriteriaOr
   maxScore: z.lazy(() => SortOrderSchema).optional(),
   weight: z.lazy(() => SortOrderSchema).optional(),
   rubric: z.lazy(() => RubricOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => CriteriaOrderByRelevanceInputSchema).optional(),
 });
 
 export const CriteriaWhereUniqueInputSchema: z.ZodType<Prisma.CriteriaWhereUniqueInput> = z.object({
@@ -5463,6 +5589,7 @@ export const GradeOrderByWithRelationInputSchema: z.ZodType<Prisma.GradeOrderByW
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   submission: z.lazy(() => SubmissionOrderByWithRelationInputSchema).optional(),
   reviewer: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => GradeOrderByRelevanceInputSchema).optional(),
 });
 
 export const GradeWhereUniqueInputSchema: z.ZodType<Prisma.GradeWhereUniqueInput> = z.object({
@@ -5540,6 +5667,7 @@ export const CohortOrderByWithRelationInputSchema: z.ZodType<Prisma.CohortOrderB
   program: z.lazy(() => ProgramOrderByWithRelationInputSchema).optional(),
   enrollments: z.lazy(() => EnrollmentOrderByRelationAggregateInputSchema).optional(),
   schedules: z.lazy(() => ScheduleOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => CohortOrderByRelevanceInputSchema).optional(),
 });
 
 export const CohortWhereUniqueInputSchema: z.ZodType<Prisma.CohortWhereUniqueInput> = z.object({
@@ -5619,6 +5747,7 @@ export const ScheduleOrderByWithRelationInputSchema: z.ZodType<Prisma.ScheduleOr
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   course: z.lazy(() => CourseOrderByWithRelationInputSchema).optional(),
   cohort: z.lazy(() => CohortOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => ScheduleOrderByRelevanceInputSchema).optional(),
 });
 
 export const ScheduleWhereUniqueInputSchema: z.ZodType<Prisma.ScheduleWhereUniqueInput> = z.object({
@@ -5690,6 +5819,7 @@ export const AttendanceOrderByWithRelationInputSchema: z.ZodType<Prisma.Attendan
   status: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => AttendanceOrderByRelevanceInputSchema).optional(),
 });
 
 export const AttendanceWhereUniqueInputSchema: z.ZodType<Prisma.AttendanceWhereUniqueInput> = z.object({
@@ -5756,6 +5886,7 @@ export const PartnerOrderByWithRelationInputSchema: z.ZodType<Prisma.PartnerOrde
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   users: z.lazy(() => UserOrderByRelationAggregateInputSchema).optional(),
   vacancies: z.lazy(() => VacancyOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => PartnerOrderByRelevanceInputSchema).optional(),
 });
 
 export const PartnerWhereUniqueInputSchema: z.ZodType<Prisma.PartnerWhereUniqueInput> = z.object({
@@ -5828,6 +5959,7 @@ export const VacancyOrderByWithRelationInputSchema: z.ZodType<Prisma.VacancyOrde
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   partner: z.lazy(() => PartnerOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => VacancyOrderByRelevanceInputSchema).optional(),
 });
 
 export const VacancyWhereUniqueInputSchema: z.ZodType<Prisma.VacancyWhereUniqueInput> = z.object({
@@ -5896,6 +6028,7 @@ export const ReportOrderByWithRelationInputSchema: z.ZodType<Prisma.ReportOrderB
   status: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   reporter: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => ReportOrderByRelevanceInputSchema).optional(),
 });
 
 export const ReportWhereUniqueInputSchema: z.ZodType<Prisma.ReportWhereUniqueInput> = z.object({
@@ -5964,6 +6097,7 @@ export const ChatRoomOrderByWithRelationInputSchema: z.ZodType<Prisma.ChatRoomOr
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   messages: z.lazy(() => MessageOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => ChatRoomOrderByRelevanceInputSchema).optional(),
 });
 
 export const ChatRoomWhereUniqueInputSchema: z.ZodType<Prisma.ChatRoomWhereUniqueInput> = z.object({
@@ -6028,6 +6162,7 @@ export const MessageOrderByWithRelationInputSchema: z.ZodType<Prisma.MessageOrde
   text: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   room: z.lazy(() => ChatRoomOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => MessageOrderByRelevanceInputSchema).optional(),
 });
 
 export const MessageWhereUniqueInputSchema: z.ZodType<Prisma.MessageWhereUniqueInput> = z.object({
@@ -6094,6 +6229,7 @@ export const JobOpeningOrderByWithRelationInputSchema: z.ZodType<Prisma.JobOpeni
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   applications: z.lazy(() => JobApplicationOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => JobOpeningOrderByRelevanceInputSchema).optional(),
 });
 
 export const JobOpeningWhereUniqueInputSchema: z.ZodType<Prisma.JobOpeningWhereUniqueInput> = z.object({
@@ -6172,6 +6308,7 @@ export const JobApplicationOrderByWithRelationInputSchema: z.ZodType<Prisma.JobA
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   opening: z.lazy(() => JobOpeningOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => JobApplicationOrderByRelevanceInputSchema).optional(),
 });
 
 export const JobApplicationWhereUniqueInputSchema: z.ZodType<Prisma.JobApplicationWhereUniqueInput> = z.object({
@@ -6240,6 +6377,7 @@ export const SystemMetricOrderByWithRelationInputSchema: z.ZodType<Prisma.System
   nodeId: z.lazy(() => SortOrderSchema).optional(),
   status: z.lazy(() => SortOrderSchema).optional(),
   timestamp: z.lazy(() => SortOrderSchema).optional(),
+  _relevance: z.lazy(() => SystemMetricOrderByRelevanceInputSchema).optional(),
 });
 
 export const SystemMetricWhereUniqueInputSchema: z.ZodType<Prisma.SystemMetricWhereUniqueInput> = z.object({
@@ -6300,6 +6438,7 @@ export const AIBaseOrderByWithRelationInputSchema: z.ZodType<Prisma.AIBaseOrderB
   prompt: z.lazy(() => SortOrderSchema).optional(),
   role: z.union([ z.lazy(() => SortOrderSchema), z.lazy(() => SortOrderInputSchema) ]).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
+  _relevance: z.lazy(() => AIBaseOrderByRelevanceInputSchema).optional(),
 });
 
 export const AIBaseWhereUniqueInputSchema: z.ZodType<Prisma.AIBaseWhereUniqueInput> = z.union([
@@ -6366,6 +6505,7 @@ export const CareerPathOrderByWithRelationInputSchema: z.ZodType<Prisma.CareerPa
   skills: z.lazy(() => SortOrderSchema).optional(),
   steps: z.lazy(() => SortOrderSchema).optional(),
   trajectories: z.lazy(() => UserTrajectoryOrderByRelationAggregateInputSchema).optional(),
+  _relevance: z.lazy(() => CareerPathOrderByRelevanceInputSchema).optional(),
 });
 
 export const CareerPathWhereUniqueInputSchema: z.ZodType<Prisma.CareerPathWhereUniqueInput> = z.object({
@@ -6430,6 +6570,7 @@ export const UserTrajectoryOrderByWithRelationInputSchema: z.ZodType<Prisma.User
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   path: z.lazy(() => CareerPathOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => UserTrajectoryOrderByRelevanceInputSchema).optional(),
 });
 
 export const UserTrajectoryWhereUniqueInputSchema: z.ZodType<Prisma.UserTrajectoryWhereUniqueInput> = z.object({
@@ -6501,6 +6642,7 @@ export const AISimulationOrderByWithRelationInputSchema: z.ZodType<Prisma.AISimu
   status: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
+  _relevance: z.lazy(() => AISimulationOrderByRelevanceInputSchema).optional(),
 });
 
 export const AISimulationWhereUniqueInputSchema: z.ZodType<Prisma.AISimulationWhereUniqueInput> = z.object({
@@ -10591,7 +10733,7 @@ export const StringFilterSchema: z.ZodType<Prisma.StringFilter> = z.strictObject
   contains: z.string().optional(),
   startsWith: z.string().optional(),
   endsWith: z.string().optional(),
-  mode: z.lazy(() => QueryModeSchema).optional(),
+  search: z.string().optional(),
   not: z.union([ z.string(),z.lazy(() => NestedStringFilterSchema) ]).optional(),
 });
 
@@ -10606,7 +10748,7 @@ export const StringNullableFilterSchema: z.ZodType<Prisma.StringNullableFilter> 
   contains: z.string().optional(),
   startsWith: z.string().optional(),
   endsWith: z.string().optional(),
-  mode: z.lazy(() => QueryModeSchema).optional(),
+  search: z.string().optional(),
   not: z.union([ z.string(),z.lazy(() => NestedStringNullableFilterSchema) ]).optional().nullable(),
 });
 
@@ -10873,6 +11015,12 @@ export const CertificateOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Ce
   _count: z.lazy(() => SortOrderSchema).optional(),
 });
 
+export const UserOrderByRelevanceInputSchema: z.ZodType<Prisma.UserOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => UserOrderByRelevanceFieldEnumSchema), z.lazy(() => UserOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const UserCountOrderByAggregateInputSchema: z.ZodType<Prisma.UserCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   email: z.lazy(() => SortOrderSchema).optional(),
@@ -10979,7 +11127,7 @@ export const StringWithAggregatesFilterSchema: z.ZodType<Prisma.StringWithAggreg
   contains: z.string().optional(),
   startsWith: z.string().optional(),
   endsWith: z.string().optional(),
-  mode: z.lazy(() => QueryModeSchema).optional(),
+  search: z.string().optional(),
   not: z.union([ z.string(),z.lazy(() => NestedStringWithAggregatesFilterSchema) ]).optional(),
   _count: z.lazy(() => NestedIntFilterSchema).optional(),
   _min: z.lazy(() => NestedStringFilterSchema).optional(),
@@ -10997,7 +11145,7 @@ export const StringNullableWithAggregatesFilterSchema: z.ZodType<Prisma.StringNu
   contains: z.string().optional(),
   startsWith: z.string().optional(),
   endsWith: z.string().optional(),
-  mode: z.lazy(() => QueryModeSchema).optional(),
+  search: z.string().optional(),
   not: z.union([ z.string(),z.lazy(() => NestedStringNullableWithAggregatesFilterSchema) ]).optional().nullable(),
   _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
   _min: z.lazy(() => NestedStringNullableFilterSchema).optional(),
@@ -11061,6 +11209,12 @@ export const UserScalarRelationFilterSchema: z.ZodType<Prisma.UserScalarRelation
   isNot: z.lazy(() => UserWhereInputSchema).optional(),
 });
 
+export const AchievementOrderByRelevanceInputSchema: z.ZodType<Prisma.AchievementOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => AchievementOrderByRelevanceFieldEnumSchema), z.lazy(() => AchievementOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const AchievementCountOrderByAggregateInputSchema: z.ZodType<Prisma.AchievementCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
@@ -11089,6 +11243,12 @@ export const AchievementMinOrderByAggregateInputSchema: z.ZodType<Prisma.Achieve
   description: z.lazy(() => SortOrderSchema).optional(),
   icon: z.lazy(() => SortOrderSchema).optional(),
   earnedAt: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const TransactionOrderByRelevanceInputSchema: z.ZodType<Prisma.TransactionOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => TransactionOrderByRelevanceFieldEnumSchema), z.lazy(() => TransactionOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const TransactionCountOrderByAggregateInputSchema: z.ZodType<Prisma.TransactionCountOrderByAggregateInput> = z.strictObject({
@@ -11149,6 +11309,12 @@ export const FloatNullableFilterSchema: z.ZodType<Prisma.FloatNullableFilter> = 
 export const CourseScalarRelationFilterSchema: z.ZodType<Prisma.CourseScalarRelationFilter> = z.strictObject({
   is: z.lazy(() => CourseWhereInputSchema).optional(),
   isNot: z.lazy(() => CourseWhereInputSchema).optional(),
+});
+
+export const CertificateOrderByRelevanceInputSchema: z.ZodType<Prisma.CertificateOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => CertificateOrderByRelevanceFieldEnumSchema), z.lazy(() => CertificateOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const CertificateCountOrderByAggregateInputSchema: z.ZodType<Prisma.CertificateCountOrderByAggregateInput> = z.strictObject({
@@ -11214,6 +11380,12 @@ export const FloatNullableWithAggregatesFilterSchema: z.ZodType<Prisma.FloatNull
   _max: z.lazy(() => NestedFloatNullableFilterSchema).optional(),
 });
 
+export const NotificationOrderByRelevanceInputSchema: z.ZodType<Prisma.NotificationOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => NotificationOrderByRelevanceFieldEnumSchema), z.lazy(() => NotificationOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const NotificationCountOrderByAggregateInputSchema: z.ZodType<Prisma.NotificationCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
@@ -11265,6 +11437,12 @@ export const PortfolioItemOrderByRelationAggregateInputSchema: z.ZodType<Prisma.
 
 export const ProfileSkillOrderByRelationAggregateInputSchema: z.ZodType<Prisma.ProfileSkillOrderByRelationAggregateInput> = z.strictObject({
   _count: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const ProfileOrderByRelevanceInputSchema: z.ZodType<Prisma.ProfileOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ProfileOrderByRelevanceFieldEnumSchema), z.lazy(() => ProfileOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const ProfileCountOrderByAggregateInputSchema: z.ZodType<Prisma.ProfileCountOrderByAggregateInput> = z.strictObject({
@@ -11385,6 +11563,12 @@ export const SkillScalarRelationFilterSchema: z.ZodType<Prisma.SkillScalarRelati
   isNot: z.lazy(() => SkillWhereInputSchema).optional(),
 });
 
+export const ProfileSkillOrderByRelevanceInputSchema: z.ZodType<Prisma.ProfileSkillOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ProfileSkillOrderByRelevanceFieldEnumSchema), z.lazy(() => ProfileSkillOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const ProfileSkillProfileIdSkillIdCompoundUniqueInputSchema: z.ZodType<Prisma.ProfileSkillProfileIdSkillIdCompoundUniqueInput> = z.strictObject({
   profileId: z.string(),
   skillId: z.string(),
@@ -11435,6 +11619,12 @@ export const IntWithAggregatesFilterSchema: z.ZodType<Prisma.IntWithAggregatesFi
   _max: z.lazy(() => NestedIntFilterSchema).optional(),
 });
 
+export const SkillOrderByRelevanceInputSchema: z.ZodType<Prisma.SkillOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => SkillOrderByRelevanceFieldEnumSchema), z.lazy(() => SkillOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const SkillCountOrderByAggregateInputSchema: z.ZodType<Prisma.SkillCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
@@ -11448,6 +11638,12 @@ export const SkillMaxOrderByAggregateInputSchema: z.ZodType<Prisma.SkillMaxOrder
 export const SkillMinOrderByAggregateInputSchema: z.ZodType<Prisma.SkillMinOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const ConnectionOrderByRelevanceInputSchema: z.ZodType<Prisma.ConnectionOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ConnectionOrderByRelevanceFieldEnumSchema), z.lazy(() => ConnectionOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const ConnectionFollowerIdFollowingIdCompoundUniqueInputSchema: z.ZodType<Prisma.ConnectionFollowerIdFollowingIdCompoundUniqueInput> = z.strictObject({
@@ -11476,6 +11672,12 @@ export const ConnectionMinOrderByAggregateInputSchema: z.ZodType<Prisma.Connecti
   createdAt: z.lazy(() => SortOrderSchema).optional(),
 });
 
+export const FeedEventOrderByRelevanceInputSchema: z.ZodType<Prisma.FeedEventOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => FeedEventOrderByRelevanceFieldEnumSchema), z.lazy(() => FeedEventOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const FeedEventCountOrderByAggregateInputSchema: z.ZodType<Prisma.FeedEventCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   actorId: z.lazy(() => SortOrderSchema).optional(),
@@ -11501,6 +11703,12 @@ export const FeedEventMinOrderByAggregateInputSchema: z.ZodType<Prisma.FeedEvent
   refId: z.lazy(() => SortOrderSchema).optional(),
   payload: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const PortfolioItemOrderByRelevanceInputSchema: z.ZodType<Prisma.PortfolioItemOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => PortfolioItemOrderByRelevanceFieldEnumSchema), z.lazy(() => PortfolioItemOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const PortfolioItemCountOrderByAggregateInputSchema: z.ZodType<Prisma.PortfolioItemCountOrderByAggregateInput> = z.strictObject({
@@ -11549,6 +11757,12 @@ export const ReviewSessionListRelationFilterSchema: z.ZodType<Prisma.ReviewSessi
 
 export const ReviewSessionOrderByRelationAggregateInputSchema: z.ZodType<Prisma.ReviewSessionOrderByRelationAggregateInput> = z.strictObject({
   _count: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const ProjectOrderByRelevanceInputSchema: z.ZodType<Prisma.ProjectOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ProjectOrderByRelevanceFieldEnumSchema), z.lazy(() => ProjectOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const ProjectCountOrderByAggregateInputSchema: z.ZodType<Prisma.ProjectCountOrderByAggregateInput> = z.strictObject({
@@ -11610,6 +11824,12 @@ export const ProjectSumOrderByAggregateInputSchema: z.ZodType<Prisma.ProjectSumO
   budget: z.lazy(() => SortOrderSchema).optional(),
 });
 
+export const ServiceOrderByRelevanceInputSchema: z.ZodType<Prisma.ServiceOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ServiceOrderByRelevanceFieldEnumSchema), z.lazy(() => ServiceOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const ServiceCountOrderByAggregateInputSchema: z.ZodType<Prisma.ServiceCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   title: z.lazy(() => SortOrderSchema).optional(),
@@ -11659,6 +11879,12 @@ export const ServiceSumOrderByAggregateInputSchema: z.ZodType<Prisma.ServiceSumO
 export const ProjectScalarRelationFilterSchema: z.ZodType<Prisma.ProjectScalarRelationFilter> = z.strictObject({
   is: z.lazy(() => ProjectWhereInputSchema).optional(),
   isNot: z.lazy(() => ProjectWhereInputSchema).optional(),
+});
+
+export const ApplicationOrderByRelevanceInputSchema: z.ZodType<Prisma.ApplicationOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ApplicationOrderByRelevanceFieldEnumSchema), z.lazy(() => ApplicationOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const ApplicationCountOrderByAggregateInputSchema: z.ZodType<Prisma.ApplicationCountOrderByAggregateInput> = z.strictObject({
@@ -11717,6 +11943,12 @@ export const EscrowNullableScalarRelationFilterSchema: z.ZodType<Prisma.EscrowNu
   isNot: z.lazy(() => EscrowWhereInputSchema).optional().nullable(),
 });
 
+export const ContractOrderByRelevanceInputSchema: z.ZodType<Prisma.ContractOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ContractOrderByRelevanceFieldEnumSchema), z.lazy(() => ContractOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const ContractCountOrderByAggregateInputSchema: z.ZodType<Prisma.ContractCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   projectId: z.lazy(() => SortOrderSchema).optional(),
@@ -11766,6 +11998,12 @@ export const ContractScalarRelationFilterSchema: z.ZodType<Prisma.ContractScalar
   isNot: z.lazy(() => ContractWhereInputSchema).optional(),
 });
 
+export const EscrowOrderByRelevanceInputSchema: z.ZodType<Prisma.EscrowOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => EscrowOrderByRelevanceFieldEnumSchema), z.lazy(() => EscrowOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const EscrowCountOrderByAggregateInputSchema: z.ZodType<Prisma.EscrowCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   contractId: z.lazy(() => SortOrderSchema).optional(),
@@ -11809,6 +12047,12 @@ export const ReviewSessionNullableScalarRelationFilterSchema: z.ZodType<Prisma.R
   isNot: z.lazy(() => ReviewSessionWhereInputSchema).optional().nullable(),
 });
 
+export const TaskOrderByRelevanceInputSchema: z.ZodType<Prisma.TaskOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => TaskOrderByRelevanceFieldEnumSchema), z.lazy(() => TaskOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const TaskCountOrderByAggregateInputSchema: z.ZodType<Prisma.TaskCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   projectId: z.lazy(() => SortOrderSchema).optional(),
@@ -11850,6 +12094,12 @@ export const TaskNullableScalarRelationFilterSchema: z.ZodType<Prisma.TaskNullab
   isNot: z.lazy(() => TaskWhereInputSchema).optional().nullable(),
 });
 
+export const ReviewSessionOrderByRelevanceInputSchema: z.ZodType<Prisma.ReviewSessionOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ReviewSessionOrderByRelevanceFieldEnumSchema), z.lazy(() => ReviewSessionOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const ReviewSessionCountOrderByAggregateInputSchema: z.ZodType<Prisma.ReviewSessionCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   taskId: z.lazy(() => SortOrderSchema).optional(),
@@ -11886,6 +12136,12 @@ export const ReviewSessionMinOrderByAggregateInputSchema: z.ZodType<Prisma.Revie
 export const ReviewSessionScalarRelationFilterSchema: z.ZodType<Prisma.ReviewSessionScalarRelationFilter> = z.strictObject({
   is: z.lazy(() => ReviewSessionWhereInputSchema).optional(),
   isNot: z.lazy(() => ReviewSessionWhereInputSchema).optional(),
+});
+
+export const AnnotationOrderByRelevanceInputSchema: z.ZodType<Prisma.AnnotationOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => AnnotationOrderByRelevanceFieldEnumSchema), z.lazy(() => AnnotationOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const AnnotationCountOrderByAggregateInputSchema: z.ZodType<Prisma.AnnotationCountOrderByAggregateInput> = z.strictObject({
@@ -11934,6 +12190,12 @@ export const ProgramListRelationFilterSchema: z.ZodType<Prisma.ProgramListRelati
 
 export const ProgramOrderByRelationAggregateInputSchema: z.ZodType<Prisma.ProgramOrderByRelationAggregateInput> = z.strictObject({
   _count: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const DepartmentOrderByRelevanceInputSchema: z.ZodType<Prisma.DepartmentOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => DepartmentOrderByRelevanceFieldEnumSchema), z.lazy(() => DepartmentOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const DepartmentCountOrderByAggregateInputSchema: z.ZodType<Prisma.DepartmentCountOrderByAggregateInput> = z.strictObject({
@@ -11991,6 +12253,12 @@ export const CohortOrderByRelationAggregateInputSchema: z.ZodType<Prisma.CohortO
   _count: z.lazy(() => SortOrderSchema).optional(),
 });
 
+export const ProgramOrderByRelevanceInputSchema: z.ZodType<Prisma.ProgramOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ProgramOrderByRelevanceFieldEnumSchema), z.lazy(() => ProgramOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const ProgramCountOrderByAggregateInputSchema: z.ZodType<Prisma.ProgramCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   departmentId: z.lazy(() => SortOrderSchema).optional(),
@@ -12025,6 +12293,12 @@ export const ProgramMinOrderByAggregateInputSchema: z.ZodType<Prisma.ProgramMinO
   levels: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const CategoryOrderByRelevanceInputSchema: z.ZodType<Prisma.CategoryOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => CategoryOrderByRelevanceFieldEnumSchema), z.lazy(() => CategoryOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const CategoryCountOrderByAggregateInputSchema: z.ZodType<Prisma.CategoryCountOrderByAggregateInput> = z.strictObject({
@@ -12127,6 +12401,12 @@ export const ScheduleOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Sched
   _count: z.lazy(() => SortOrderSchema).optional(),
 });
 
+export const CourseOrderByRelevanceInputSchema: z.ZodType<Prisma.CourseOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => CourseOrderByRelevanceFieldEnumSchema), z.lazy(() => CourseOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const CourseCountOrderByAggregateInputSchema: z.ZodType<Prisma.CourseCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   slug: z.lazy(() => SortOrderSchema).optional(),
@@ -12215,6 +12495,12 @@ export const CourseSumOrderByAggregateInputSchema: z.ZodType<Prisma.CourseSumOrd
   lod: z.lazy(() => SortOrderSchema).optional(),
 });
 
+export const ModuleOrderByRelevanceInputSchema: z.ZodType<Prisma.ModuleOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ModuleOrderByRelevanceFieldEnumSchema), z.lazy(() => ModuleOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const ModuleCountOrderByAggregateInputSchema: z.ZodType<Prisma.ModuleCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   courseId: z.lazy(() => SortOrderSchema).optional(),
@@ -12250,6 +12536,12 @@ export const ModuleSumOrderByAggregateInputSchema: z.ZodType<Prisma.ModuleSumOrd
 export const ModuleNullableScalarRelationFilterSchema: z.ZodType<Prisma.ModuleNullableScalarRelationFilter> = z.strictObject({
   is: z.lazy(() => ModuleWhereInputSchema).optional().nullable(),
   isNot: z.lazy(() => ModuleWhereInputSchema).optional().nullable(),
+});
+
+export const LessonOrderByRelevanceInputSchema: z.ZodType<Prisma.LessonOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => LessonOrderByRelevanceFieldEnumSchema), z.lazy(() => LessonOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const LessonCountOrderByAggregateInputSchema: z.ZodType<Prisma.LessonCountOrderByAggregateInput> = z.strictObject({
@@ -12317,6 +12609,12 @@ export const EnrollmentAnalyticsOrderByRelationAggregateInputSchema: z.ZodType<P
   _count: z.lazy(() => SortOrderSchema).optional(),
 });
 
+export const EnrollmentOrderByRelevanceInputSchema: z.ZodType<Prisma.EnrollmentOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => EnrollmentOrderByRelevanceFieldEnumSchema), z.lazy(() => EnrollmentOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const EnrollmentCountOrderByAggregateInputSchema: z.ZodType<Prisma.EnrollmentCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
@@ -12371,6 +12669,12 @@ export const EnrollmentScalarRelationFilterSchema: z.ZodType<Prisma.EnrollmentSc
   isNot: z.lazy(() => EnrollmentWhereInputSchema).optional(),
 });
 
+export const EnrollmentAnalyticsOrderByRelevanceInputSchema: z.ZodType<Prisma.EnrollmentAnalyticsOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => EnrollmentAnalyticsOrderByRelevanceFieldEnumSchema), z.lazy(() => EnrollmentAnalyticsOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const EnrollmentAnalyticsCountOrderByAggregateInputSchema: z.ZodType<Prisma.EnrollmentAnalyticsCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   enrollmentId: z.lazy(() => SortOrderSchema).optional(),
@@ -12404,6 +12708,12 @@ export const EnrollmentAnalyticsMinOrderByAggregateInputSchema: z.ZodType<Prisma
 
 export const EnrollmentAnalyticsSumOrderByAggregateInputSchema: z.ZodType<Prisma.EnrollmentAnalyticsSumOrderByAggregateInput> = z.strictObject({
   watchTime: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const ReviewOrderByRelevanceInputSchema: z.ZodType<Prisma.ReviewOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ReviewOrderByRelevanceFieldEnumSchema), z.lazy(() => ReviewOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const ReviewCountOrderByAggregateInputSchema: z.ZodType<Prisma.ReviewCountOrderByAggregateInput> = z.strictObject({
@@ -12447,6 +12757,12 @@ export const ReviewSumOrderByAggregateInputSchema: z.ZodType<Prisma.ReviewSumOrd
 export const RubricNullableScalarRelationFilterSchema: z.ZodType<Prisma.RubricNullableScalarRelationFilter> = z.strictObject({
   is: z.lazy(() => RubricWhereInputSchema).optional().nullable(),
   isNot: z.lazy(() => RubricWhereInputSchema).optional().nullable(),
+});
+
+export const AssignmentOrderByRelevanceInputSchema: z.ZodType<Prisma.AssignmentOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => AssignmentOrderByRelevanceFieldEnumSchema), z.lazy(() => AssignmentOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const AssignmentCountOrderByAggregateInputSchema: z.ZodType<Prisma.AssignmentCountOrderByAggregateInput> = z.strictObject({
@@ -12498,6 +12814,12 @@ export const AssignmentScalarRelationFilterSchema: z.ZodType<Prisma.AssignmentSc
   isNot: z.lazy(() => AssignmentWhereInputSchema).optional(),
 });
 
+export const SubmissionOrderByRelevanceInputSchema: z.ZodType<Prisma.SubmissionOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => SubmissionOrderByRelevanceFieldEnumSchema), z.lazy(() => SubmissionOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const SubmissionCountOrderByAggregateInputSchema: z.ZodType<Prisma.SubmissionCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   assignmentId: z.lazy(() => SortOrderSchema).optional(),
@@ -12538,6 +12860,12 @@ export const CriteriaOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Crite
   _count: z.lazy(() => SortOrderSchema).optional(),
 });
 
+export const RubricOrderByRelevanceInputSchema: z.ZodType<Prisma.RubricOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => RubricOrderByRelevanceFieldEnumSchema), z.lazy(() => RubricOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const RubricCountOrderByAggregateInputSchema: z.ZodType<Prisma.RubricCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
@@ -12565,6 +12893,12 @@ export const RubricMinOrderByAggregateInputSchema: z.ZodType<Prisma.RubricMinOrd
 export const RubricScalarRelationFilterSchema: z.ZodType<Prisma.RubricScalarRelationFilter> = z.strictObject({
   is: z.lazy(() => RubricWhereInputSchema).optional(),
   isNot: z.lazy(() => RubricWhereInputSchema).optional(),
+});
+
+export const CriteriaOrderByRelevanceInputSchema: z.ZodType<Prisma.CriteriaOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => CriteriaOrderByRelevanceFieldEnumSchema), z.lazy(() => CriteriaOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const CriteriaCountOrderByAggregateInputSchema: z.ZodType<Prisma.CriteriaCountOrderByAggregateInput> = z.strictObject({
@@ -12607,6 +12941,12 @@ export const CriteriaSumOrderByAggregateInputSchema: z.ZodType<Prisma.CriteriaSu
 export const SubmissionScalarRelationFilterSchema: z.ZodType<Prisma.SubmissionScalarRelationFilter> = z.strictObject({
   is: z.lazy(() => SubmissionWhereInputSchema).optional(),
   isNot: z.lazy(() => SubmissionWhereInputSchema).optional(),
+});
+
+export const GradeOrderByRelevanceInputSchema: z.ZodType<Prisma.GradeOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => GradeOrderByRelevanceFieldEnumSchema), z.lazy(() => GradeOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const GradeCountOrderByAggregateInputSchema: z.ZodType<Prisma.GradeCountOrderByAggregateInput> = z.strictObject({
@@ -12652,6 +12992,12 @@ export const ProgramScalarRelationFilterSchema: z.ZodType<Prisma.ProgramScalarRe
   isNot: z.lazy(() => ProgramWhereInputSchema).optional(),
 });
 
+export const CohortOrderByRelevanceInputSchema: z.ZodType<Prisma.CohortOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => CohortOrderByRelevanceFieldEnumSchema), z.lazy(() => CohortOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const CohortCountOrderByAggregateInputSchema: z.ZodType<Prisma.CohortCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   programId: z.lazy(() => SortOrderSchema).optional(),
@@ -12683,6 +13029,12 @@ export const CohortMinOrderByAggregateInputSchema: z.ZodType<Prisma.CohortMinOrd
   status: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const ScheduleOrderByRelevanceInputSchema: z.ZodType<Prisma.ScheduleOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ScheduleOrderByRelevanceFieldEnumSchema), z.lazy(() => ScheduleOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const ScheduleCountOrderByAggregateInputSchema: z.ZodType<Prisma.ScheduleCountOrderByAggregateInput> = z.strictObject({
@@ -12719,6 +13071,12 @@ export const ScheduleMinOrderByAggregateInputSchema: z.ZodType<Prisma.ScheduleMi
   location: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const AttendanceOrderByRelevanceInputSchema: z.ZodType<Prisma.AttendanceOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => AttendanceOrderByRelevanceFieldEnumSchema), z.lazy(() => AttendanceOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const AttendanceCountOrderByAggregateInputSchema: z.ZodType<Prisma.AttendanceCountOrderByAggregateInput> = z.strictObject({
@@ -12765,6 +13123,12 @@ export const VacancyOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Vacanc
   _count: z.lazy(() => SortOrderSchema).optional(),
 });
 
+export const PartnerOrderByRelevanceInputSchema: z.ZodType<Prisma.PartnerOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => PartnerOrderByRelevanceFieldEnumSchema), z.lazy(() => PartnerOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const PartnerCountOrderByAggregateInputSchema: z.ZodType<Prisma.PartnerCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   name: z.lazy(() => SortOrderSchema).optional(),
@@ -12803,6 +13167,12 @@ export const PartnerScalarRelationFilterSchema: z.ZodType<Prisma.PartnerScalarRe
   isNot: z.lazy(() => PartnerWhereInputSchema).optional(),
 });
 
+export const VacancyOrderByRelevanceInputSchema: z.ZodType<Prisma.VacancyOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => VacancyOrderByRelevanceFieldEnumSchema), z.lazy(() => VacancyOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const VacancyCountOrderByAggregateInputSchema: z.ZodType<Prisma.VacancyCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   partnerId: z.lazy(() => SortOrderSchema).optional(),
@@ -12831,6 +13201,12 @@ export const VacancyMinOrderByAggregateInputSchema: z.ZodType<Prisma.VacancyMinO
   status: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const ReportOrderByRelevanceInputSchema: z.ZodType<Prisma.ReportOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ReportOrderByRelevanceFieldEnumSchema), z.lazy(() => ReportOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const ReportCountOrderByAggregateInputSchema: z.ZodType<Prisma.ReportCountOrderByAggregateInput> = z.strictObject({
@@ -12873,6 +13249,12 @@ export const MessageOrderByRelationAggregateInputSchema: z.ZodType<Prisma.Messag
   _count: z.lazy(() => SortOrderSchema).optional(),
 });
 
+export const ChatRoomOrderByRelevanceInputSchema: z.ZodType<Prisma.ChatRoomOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => ChatRoomOrderByRelevanceFieldEnumSchema), z.lazy(() => ChatRoomOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const ChatRoomCountOrderByAggregateInputSchema: z.ZodType<Prisma.ChatRoomCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   type: z.lazy(() => SortOrderSchema).optional(),
@@ -12908,6 +13290,12 @@ export const ChatRoomScalarRelationFilterSchema: z.ZodType<Prisma.ChatRoomScalar
   isNot: z.lazy(() => ChatRoomWhereInputSchema).optional(),
 });
 
+export const MessageOrderByRelevanceInputSchema: z.ZodType<Prisma.MessageOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => MessageOrderByRelevanceFieldEnumSchema), z.lazy(() => MessageOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const MessageCountOrderByAggregateInputSchema: z.ZodType<Prisma.MessageCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   roomId: z.lazy(() => SortOrderSchema).optional(),
@@ -12930,6 +13318,12 @@ export const MessageMinOrderByAggregateInputSchema: z.ZodType<Prisma.MessageMinO
   senderId: z.lazy(() => SortOrderSchema).optional(),
   text: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const JobOpeningOrderByRelevanceInputSchema: z.ZodType<Prisma.JobOpeningOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => JobOpeningOrderByRelevanceFieldEnumSchema), z.lazy(() => JobOpeningOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const JobOpeningCountOrderByAggregateInputSchema: z.ZodType<Prisma.JobOpeningCountOrderByAggregateInput> = z.strictObject({
@@ -12973,6 +13367,12 @@ export const JobOpeningScalarRelationFilterSchema: z.ZodType<Prisma.JobOpeningSc
   isNot: z.lazy(() => JobOpeningWhereInputSchema).optional(),
 });
 
+export const JobApplicationOrderByRelevanceInputSchema: z.ZodType<Prisma.JobApplicationOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => JobApplicationOrderByRelevanceFieldEnumSchema), z.lazy(() => JobApplicationOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const JobApplicationCountOrderByAggregateInputSchema: z.ZodType<Prisma.JobApplicationCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
@@ -13004,6 +13404,12 @@ export const JobApplicationMinOrderByAggregateInputSchema: z.ZodType<Prisma.JobA
   status: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const SystemMetricOrderByRelevanceInputSchema: z.ZodType<Prisma.SystemMetricOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => SystemMetricOrderByRelevanceFieldEnumSchema), z.lazy(() => SystemMetricOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const SystemMetricCountOrderByAggregateInputSchema: z.ZodType<Prisma.SystemMetricCountOrderByAggregateInput> = z.strictObject({
@@ -13041,6 +13447,12 @@ export const SystemMetricSumOrderByAggregateInputSchema: z.ZodType<Prisma.System
   value: z.lazy(() => SortOrderSchema).optional(),
 });
 
+export const AIBaseOrderByRelevanceInputSchema: z.ZodType<Prisma.AIBaseOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => AIBaseOrderByRelevanceFieldEnumSchema), z.lazy(() => AIBaseOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
+});
+
 export const AIBaseCountOrderByAggregateInputSchema: z.ZodType<Prisma.AIBaseCountOrderByAggregateInput> = z.strictObject({
   id: z.lazy(() => SortOrderSchema).optional(),
   key: z.lazy(() => SortOrderSchema).optional(),
@@ -13063,6 +13475,12 @@ export const AIBaseMinOrderByAggregateInputSchema: z.ZodType<Prisma.AIBaseMinOrd
   prompt: z.lazy(() => SortOrderSchema).optional(),
   role: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const CareerPathOrderByRelevanceInputSchema: z.ZodType<Prisma.CareerPathOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => CareerPathOrderByRelevanceFieldEnumSchema), z.lazy(() => CareerPathOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const CareerPathCountOrderByAggregateInputSchema: z.ZodType<Prisma.CareerPathCountOrderByAggregateInput> = z.strictObject({
@@ -13092,6 +13510,12 @@ export const CareerPathMinOrderByAggregateInputSchema: z.ZodType<Prisma.CareerPa
 export const CareerPathScalarRelationFilterSchema: z.ZodType<Prisma.CareerPathScalarRelationFilter> = z.strictObject({
   is: z.lazy(() => CareerPathWhereInputSchema).optional(),
   isNot: z.lazy(() => CareerPathWhereInputSchema).optional(),
+});
+
+export const UserTrajectoryOrderByRelevanceInputSchema: z.ZodType<Prisma.UserTrajectoryOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => UserTrajectoryOrderByRelevanceFieldEnumSchema), z.lazy(() => UserTrajectoryOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const UserTrajectoryCountOrderByAggregateInputSchema: z.ZodType<Prisma.UserTrajectoryCountOrderByAggregateInput> = z.strictObject({
@@ -13130,6 +13554,12 @@ export const UserTrajectoryMinOrderByAggregateInputSchema: z.ZodType<Prisma.User
 
 export const UserTrajectorySumOrderByAggregateInputSchema: z.ZodType<Prisma.UserTrajectorySumOrderByAggregateInput> = z.strictObject({
   currentStep: z.lazy(() => SortOrderSchema).optional(),
+});
+
+export const AISimulationOrderByRelevanceInputSchema: z.ZodType<Prisma.AISimulationOrderByRelevanceInput> = z.strictObject({
+  fields: z.union([ z.lazy(() => AISimulationOrderByRelevanceFieldEnumSchema), z.lazy(() => AISimulationOrderByRelevanceFieldEnumSchema).array() ]),
+  sort: z.lazy(() => SortOrderSchema),
+  search: z.string(),
 });
 
 export const AISimulationCountOrderByAggregateInputSchema: z.ZodType<Prisma.AISimulationCountOrderByAggregateInput> = z.strictObject({
@@ -16509,6 +16939,7 @@ export const NestedStringFilterSchema: z.ZodType<Prisma.NestedStringFilter> = z.
   contains: z.string().optional(),
   startsWith: z.string().optional(),
   endsWith: z.string().optional(),
+  search: z.string().optional(),
   not: z.union([ z.string(),z.lazy(() => NestedStringFilterSchema) ]).optional(),
 });
 
@@ -16523,6 +16954,7 @@ export const NestedStringNullableFilterSchema: z.ZodType<Prisma.NestedStringNull
   contains: z.string().optional(),
   startsWith: z.string().optional(),
   endsWith: z.string().optional(),
+  search: z.string().optional(),
   not: z.union([ z.string(),z.lazy(() => NestedStringNullableFilterSchema) ]).optional().nullable(),
 });
 
@@ -16575,6 +17007,7 @@ export const NestedStringWithAggregatesFilterSchema: z.ZodType<Prisma.NestedStri
   contains: z.string().optional(),
   startsWith: z.string().optional(),
   endsWith: z.string().optional(),
+  search: z.string().optional(),
   not: z.union([ z.string(),z.lazy(() => NestedStringWithAggregatesFilterSchema) ]).optional(),
   _count: z.lazy(() => NestedIntFilterSchema).optional(),
   _min: z.lazy(() => NestedStringFilterSchema).optional(),
@@ -16603,6 +17036,7 @@ export const NestedStringNullableWithAggregatesFilterSchema: z.ZodType<Prisma.Ne
   contains: z.string().optional(),
   startsWith: z.string().optional(),
   endsWith: z.string().optional(),
+  search: z.string().optional(),
   not: z.union([ z.string(),z.lazy(() => NestedStringNullableWithAggregatesFilterSchema) ]).optional().nullable(),
   _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
   _min: z.lazy(() => NestedStringNullableFilterSchema).optional(),
@@ -34371,11 +34805,6 @@ export const UserCreateManyArgsSchema: z.ZodType<Prisma.UserCreateManyArgs> = z.
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const UserCreateManyAndReturnArgsSchema: z.ZodType<Prisma.UserCreateManyAndReturnArgs> = z.object({
-  data: z.union([ UserCreateManyInputSchema, UserCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const UserDeleteArgsSchema: z.ZodType<Prisma.UserDeleteArgs> = z.object({
   select: UserSelectSchema.optional(),
   include: UserIncludeSchema.optional(),
@@ -34390,11 +34819,6 @@ export const UserUpdateArgsSchema: z.ZodType<Prisma.UserUpdateArgs> = z.object({
 }).strict();
 
 export const UserUpdateManyArgsSchema: z.ZodType<Prisma.UserUpdateManyArgs> = z.object({
-  data: z.union([ UserUpdateManyMutationInputSchema, UserUncheckedUpdateManyInputSchema ]),
-  where: UserWhereInputSchema.optional(), 
-}).strict();
-
-export const UserUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.UserUpdateManyAndReturnArgs> = z.object({
   data: z.union([ UserUpdateManyMutationInputSchema, UserUncheckedUpdateManyInputSchema ]),
   where: UserWhereInputSchema.optional(), 
 }).strict();
@@ -34422,11 +34846,6 @@ export const AchievementCreateManyArgsSchema: z.ZodType<Prisma.AchievementCreate
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const AchievementCreateManyAndReturnArgsSchema: z.ZodType<Prisma.AchievementCreateManyAndReturnArgs> = z.object({
-  data: z.union([ AchievementCreateManyInputSchema, AchievementCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const AchievementDeleteArgsSchema: z.ZodType<Prisma.AchievementDeleteArgs> = z.object({
   select: AchievementSelectSchema.optional(),
   include: AchievementIncludeSchema.optional(),
@@ -34441,11 +34860,6 @@ export const AchievementUpdateArgsSchema: z.ZodType<Prisma.AchievementUpdateArgs
 }).strict();
 
 export const AchievementUpdateManyArgsSchema: z.ZodType<Prisma.AchievementUpdateManyArgs> = z.object({
-  data: z.union([ AchievementUpdateManyMutationInputSchema, AchievementUncheckedUpdateManyInputSchema ]),
-  where: AchievementWhereInputSchema.optional(), 
-}).strict();
-
-export const AchievementUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.AchievementUpdateManyAndReturnArgs> = z.object({
   data: z.union([ AchievementUpdateManyMutationInputSchema, AchievementUncheckedUpdateManyInputSchema ]),
   where: AchievementWhereInputSchema.optional(), 
 }).strict();
@@ -34473,11 +34887,6 @@ export const TransactionCreateManyArgsSchema: z.ZodType<Prisma.TransactionCreate
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const TransactionCreateManyAndReturnArgsSchema: z.ZodType<Prisma.TransactionCreateManyAndReturnArgs> = z.object({
-  data: z.union([ TransactionCreateManyInputSchema, TransactionCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const TransactionDeleteArgsSchema: z.ZodType<Prisma.TransactionDeleteArgs> = z.object({
   select: TransactionSelectSchema.optional(),
   include: TransactionIncludeSchema.optional(),
@@ -34492,11 +34901,6 @@ export const TransactionUpdateArgsSchema: z.ZodType<Prisma.TransactionUpdateArgs
 }).strict();
 
 export const TransactionUpdateManyArgsSchema: z.ZodType<Prisma.TransactionUpdateManyArgs> = z.object({
-  data: z.union([ TransactionUpdateManyMutationInputSchema, TransactionUncheckedUpdateManyInputSchema ]),
-  where: TransactionWhereInputSchema.optional(), 
-}).strict();
-
-export const TransactionUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.TransactionUpdateManyAndReturnArgs> = z.object({
   data: z.union([ TransactionUpdateManyMutationInputSchema, TransactionUncheckedUpdateManyInputSchema ]),
   where: TransactionWhereInputSchema.optional(), 
 }).strict();
@@ -34524,11 +34928,6 @@ export const CertificateCreateManyArgsSchema: z.ZodType<Prisma.CertificateCreate
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const CertificateCreateManyAndReturnArgsSchema: z.ZodType<Prisma.CertificateCreateManyAndReturnArgs> = z.object({
-  data: z.union([ CertificateCreateManyInputSchema, CertificateCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const CertificateDeleteArgsSchema: z.ZodType<Prisma.CertificateDeleteArgs> = z.object({
   select: CertificateSelectSchema.optional(),
   include: CertificateIncludeSchema.optional(),
@@ -34543,11 +34942,6 @@ export const CertificateUpdateArgsSchema: z.ZodType<Prisma.CertificateUpdateArgs
 }).strict();
 
 export const CertificateUpdateManyArgsSchema: z.ZodType<Prisma.CertificateUpdateManyArgs> = z.object({
-  data: z.union([ CertificateUpdateManyMutationInputSchema, CertificateUncheckedUpdateManyInputSchema ]),
-  where: CertificateWhereInputSchema.optional(), 
-}).strict();
-
-export const CertificateUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.CertificateUpdateManyAndReturnArgs> = z.object({
   data: z.union([ CertificateUpdateManyMutationInputSchema, CertificateUncheckedUpdateManyInputSchema ]),
   where: CertificateWhereInputSchema.optional(), 
 }).strict();
@@ -34575,11 +34969,6 @@ export const NotificationCreateManyArgsSchema: z.ZodType<Prisma.NotificationCrea
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const NotificationCreateManyAndReturnArgsSchema: z.ZodType<Prisma.NotificationCreateManyAndReturnArgs> = z.object({
-  data: z.union([ NotificationCreateManyInputSchema, NotificationCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const NotificationDeleteArgsSchema: z.ZodType<Prisma.NotificationDeleteArgs> = z.object({
   select: NotificationSelectSchema.optional(),
   include: NotificationIncludeSchema.optional(),
@@ -34594,11 +34983,6 @@ export const NotificationUpdateArgsSchema: z.ZodType<Prisma.NotificationUpdateAr
 }).strict();
 
 export const NotificationUpdateManyArgsSchema: z.ZodType<Prisma.NotificationUpdateManyArgs> = z.object({
-  data: z.union([ NotificationUpdateManyMutationInputSchema, NotificationUncheckedUpdateManyInputSchema ]),
-  where: NotificationWhereInputSchema.optional(), 
-}).strict();
-
-export const NotificationUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.NotificationUpdateManyAndReturnArgs> = z.object({
   data: z.union([ NotificationUpdateManyMutationInputSchema, NotificationUncheckedUpdateManyInputSchema ]),
   where: NotificationWhereInputSchema.optional(), 
 }).strict();
@@ -34626,11 +35010,6 @@ export const ProfileCreateManyArgsSchema: z.ZodType<Prisma.ProfileCreateManyArgs
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ProfileCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ProfileCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ProfileCreateManyInputSchema, ProfileCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ProfileDeleteArgsSchema: z.ZodType<Prisma.ProfileDeleteArgs> = z.object({
   select: ProfileSelectSchema.optional(),
   include: ProfileIncludeSchema.optional(),
@@ -34645,11 +35024,6 @@ export const ProfileUpdateArgsSchema: z.ZodType<Prisma.ProfileUpdateArgs> = z.ob
 }).strict();
 
 export const ProfileUpdateManyArgsSchema: z.ZodType<Prisma.ProfileUpdateManyArgs> = z.object({
-  data: z.union([ ProfileUpdateManyMutationInputSchema, ProfileUncheckedUpdateManyInputSchema ]),
-  where: ProfileWhereInputSchema.optional(), 
-}).strict();
-
-export const ProfileUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ProfileUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ProfileUpdateManyMutationInputSchema, ProfileUncheckedUpdateManyInputSchema ]),
   where: ProfileWhereInputSchema.optional(), 
 }).strict();
@@ -34677,11 +35051,6 @@ export const ProfileSkillCreateManyArgsSchema: z.ZodType<Prisma.ProfileSkillCrea
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ProfileSkillCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ProfileSkillCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ProfileSkillCreateManyInputSchema, ProfileSkillCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ProfileSkillDeleteArgsSchema: z.ZodType<Prisma.ProfileSkillDeleteArgs> = z.object({
   select: ProfileSkillSelectSchema.optional(),
   include: ProfileSkillIncludeSchema.optional(),
@@ -34696,11 +35065,6 @@ export const ProfileSkillUpdateArgsSchema: z.ZodType<Prisma.ProfileSkillUpdateAr
 }).strict();
 
 export const ProfileSkillUpdateManyArgsSchema: z.ZodType<Prisma.ProfileSkillUpdateManyArgs> = z.object({
-  data: z.union([ ProfileSkillUpdateManyMutationInputSchema, ProfileSkillUncheckedUpdateManyInputSchema ]),
-  where: ProfileSkillWhereInputSchema.optional(), 
-}).strict();
-
-export const ProfileSkillUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ProfileSkillUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ProfileSkillUpdateManyMutationInputSchema, ProfileSkillUncheckedUpdateManyInputSchema ]),
   where: ProfileSkillWhereInputSchema.optional(), 
 }).strict();
@@ -34728,11 +35092,6 @@ export const SkillCreateManyArgsSchema: z.ZodType<Prisma.SkillCreateManyArgs> = 
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const SkillCreateManyAndReturnArgsSchema: z.ZodType<Prisma.SkillCreateManyAndReturnArgs> = z.object({
-  data: z.union([ SkillCreateManyInputSchema, SkillCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const SkillDeleteArgsSchema: z.ZodType<Prisma.SkillDeleteArgs> = z.object({
   select: SkillSelectSchema.optional(),
   include: SkillIncludeSchema.optional(),
@@ -34747,11 +35106,6 @@ export const SkillUpdateArgsSchema: z.ZodType<Prisma.SkillUpdateArgs> = z.object
 }).strict();
 
 export const SkillUpdateManyArgsSchema: z.ZodType<Prisma.SkillUpdateManyArgs> = z.object({
-  data: z.union([ SkillUpdateManyMutationInputSchema, SkillUncheckedUpdateManyInputSchema ]),
-  where: SkillWhereInputSchema.optional(), 
-}).strict();
-
-export const SkillUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.SkillUpdateManyAndReturnArgs> = z.object({
   data: z.union([ SkillUpdateManyMutationInputSchema, SkillUncheckedUpdateManyInputSchema ]),
   where: SkillWhereInputSchema.optional(), 
 }).strict();
@@ -34779,11 +35133,6 @@ export const ConnectionCreateManyArgsSchema: z.ZodType<Prisma.ConnectionCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ConnectionCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ConnectionCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ConnectionCreateManyInputSchema, ConnectionCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ConnectionDeleteArgsSchema: z.ZodType<Prisma.ConnectionDeleteArgs> = z.object({
   select: ConnectionSelectSchema.optional(),
   include: ConnectionIncludeSchema.optional(),
@@ -34798,11 +35147,6 @@ export const ConnectionUpdateArgsSchema: z.ZodType<Prisma.ConnectionUpdateArgs> 
 }).strict();
 
 export const ConnectionUpdateManyArgsSchema: z.ZodType<Prisma.ConnectionUpdateManyArgs> = z.object({
-  data: z.union([ ConnectionUpdateManyMutationInputSchema, ConnectionUncheckedUpdateManyInputSchema ]),
-  where: ConnectionWhereInputSchema.optional(), 
-}).strict();
-
-export const ConnectionUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ConnectionUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ConnectionUpdateManyMutationInputSchema, ConnectionUncheckedUpdateManyInputSchema ]),
   where: ConnectionWhereInputSchema.optional(), 
 }).strict();
@@ -34830,11 +35174,6 @@ export const FeedEventCreateManyArgsSchema: z.ZodType<Prisma.FeedEventCreateMany
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const FeedEventCreateManyAndReturnArgsSchema: z.ZodType<Prisma.FeedEventCreateManyAndReturnArgs> = z.object({
-  data: z.union([ FeedEventCreateManyInputSchema, FeedEventCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const FeedEventDeleteArgsSchema: z.ZodType<Prisma.FeedEventDeleteArgs> = z.object({
   select: FeedEventSelectSchema.optional(),
   include: FeedEventIncludeSchema.optional(),
@@ -34849,11 +35188,6 @@ export const FeedEventUpdateArgsSchema: z.ZodType<Prisma.FeedEventUpdateArgs> = 
 }).strict();
 
 export const FeedEventUpdateManyArgsSchema: z.ZodType<Prisma.FeedEventUpdateManyArgs> = z.object({
-  data: z.union([ FeedEventUpdateManyMutationInputSchema, FeedEventUncheckedUpdateManyInputSchema ]),
-  where: FeedEventWhereInputSchema.optional(), 
-}).strict();
-
-export const FeedEventUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.FeedEventUpdateManyAndReturnArgs> = z.object({
   data: z.union([ FeedEventUpdateManyMutationInputSchema, FeedEventUncheckedUpdateManyInputSchema ]),
   where: FeedEventWhereInputSchema.optional(), 
 }).strict();
@@ -34881,11 +35215,6 @@ export const PortfolioItemCreateManyArgsSchema: z.ZodType<Prisma.PortfolioItemCr
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const PortfolioItemCreateManyAndReturnArgsSchema: z.ZodType<Prisma.PortfolioItemCreateManyAndReturnArgs> = z.object({
-  data: z.union([ PortfolioItemCreateManyInputSchema, PortfolioItemCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const PortfolioItemDeleteArgsSchema: z.ZodType<Prisma.PortfolioItemDeleteArgs> = z.object({
   select: PortfolioItemSelectSchema.optional(),
   include: PortfolioItemIncludeSchema.optional(),
@@ -34900,11 +35229,6 @@ export const PortfolioItemUpdateArgsSchema: z.ZodType<Prisma.PortfolioItemUpdate
 }).strict();
 
 export const PortfolioItemUpdateManyArgsSchema: z.ZodType<Prisma.PortfolioItemUpdateManyArgs> = z.object({
-  data: z.union([ PortfolioItemUpdateManyMutationInputSchema, PortfolioItemUncheckedUpdateManyInputSchema ]),
-  where: PortfolioItemWhereInputSchema.optional(), 
-}).strict();
-
-export const PortfolioItemUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.PortfolioItemUpdateManyAndReturnArgs> = z.object({
   data: z.union([ PortfolioItemUpdateManyMutationInputSchema, PortfolioItemUncheckedUpdateManyInputSchema ]),
   where: PortfolioItemWhereInputSchema.optional(), 
 }).strict();
@@ -34932,11 +35256,6 @@ export const ProjectCreateManyArgsSchema: z.ZodType<Prisma.ProjectCreateManyArgs
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ProjectCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ProjectCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ProjectCreateManyInputSchema, ProjectCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ProjectDeleteArgsSchema: z.ZodType<Prisma.ProjectDeleteArgs> = z.object({
   select: ProjectSelectSchema.optional(),
   include: ProjectIncludeSchema.optional(),
@@ -34951,11 +35270,6 @@ export const ProjectUpdateArgsSchema: z.ZodType<Prisma.ProjectUpdateArgs> = z.ob
 }).strict();
 
 export const ProjectUpdateManyArgsSchema: z.ZodType<Prisma.ProjectUpdateManyArgs> = z.object({
-  data: z.union([ ProjectUpdateManyMutationInputSchema, ProjectUncheckedUpdateManyInputSchema ]),
-  where: ProjectWhereInputSchema.optional(), 
-}).strict();
-
-export const ProjectUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ProjectUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ProjectUpdateManyMutationInputSchema, ProjectUncheckedUpdateManyInputSchema ]),
   where: ProjectWhereInputSchema.optional(), 
 }).strict();
@@ -34983,11 +35297,6 @@ export const ServiceCreateManyArgsSchema: z.ZodType<Prisma.ServiceCreateManyArgs
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ServiceCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ServiceCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ServiceCreateManyInputSchema, ServiceCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ServiceDeleteArgsSchema: z.ZodType<Prisma.ServiceDeleteArgs> = z.object({
   select: ServiceSelectSchema.optional(),
   include: ServiceIncludeSchema.optional(),
@@ -35002,11 +35311,6 @@ export const ServiceUpdateArgsSchema: z.ZodType<Prisma.ServiceUpdateArgs> = z.ob
 }).strict();
 
 export const ServiceUpdateManyArgsSchema: z.ZodType<Prisma.ServiceUpdateManyArgs> = z.object({
-  data: z.union([ ServiceUpdateManyMutationInputSchema, ServiceUncheckedUpdateManyInputSchema ]),
-  where: ServiceWhereInputSchema.optional(), 
-}).strict();
-
-export const ServiceUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ServiceUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ServiceUpdateManyMutationInputSchema, ServiceUncheckedUpdateManyInputSchema ]),
   where: ServiceWhereInputSchema.optional(), 
 }).strict();
@@ -35034,11 +35338,6 @@ export const ApplicationCreateManyArgsSchema: z.ZodType<Prisma.ApplicationCreate
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ApplicationCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ApplicationCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ApplicationCreateManyInputSchema, ApplicationCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ApplicationDeleteArgsSchema: z.ZodType<Prisma.ApplicationDeleteArgs> = z.object({
   select: ApplicationSelectSchema.optional(),
   include: ApplicationIncludeSchema.optional(),
@@ -35053,11 +35352,6 @@ export const ApplicationUpdateArgsSchema: z.ZodType<Prisma.ApplicationUpdateArgs
 }).strict();
 
 export const ApplicationUpdateManyArgsSchema: z.ZodType<Prisma.ApplicationUpdateManyArgs> = z.object({
-  data: z.union([ ApplicationUpdateManyMutationInputSchema, ApplicationUncheckedUpdateManyInputSchema ]),
-  where: ApplicationWhereInputSchema.optional(), 
-}).strict();
-
-export const ApplicationUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ApplicationUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ApplicationUpdateManyMutationInputSchema, ApplicationUncheckedUpdateManyInputSchema ]),
   where: ApplicationWhereInputSchema.optional(), 
 }).strict();
@@ -35085,11 +35379,6 @@ export const ContractCreateManyArgsSchema: z.ZodType<Prisma.ContractCreateManyAr
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ContractCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ContractCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ContractCreateManyInputSchema, ContractCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ContractDeleteArgsSchema: z.ZodType<Prisma.ContractDeleteArgs> = z.object({
   select: ContractSelectSchema.optional(),
   include: ContractIncludeSchema.optional(),
@@ -35104,11 +35393,6 @@ export const ContractUpdateArgsSchema: z.ZodType<Prisma.ContractUpdateArgs> = z.
 }).strict();
 
 export const ContractUpdateManyArgsSchema: z.ZodType<Prisma.ContractUpdateManyArgs> = z.object({
-  data: z.union([ ContractUpdateManyMutationInputSchema, ContractUncheckedUpdateManyInputSchema ]),
-  where: ContractWhereInputSchema.optional(), 
-}).strict();
-
-export const ContractUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ContractUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ContractUpdateManyMutationInputSchema, ContractUncheckedUpdateManyInputSchema ]),
   where: ContractWhereInputSchema.optional(), 
 }).strict();
@@ -35136,11 +35420,6 @@ export const EscrowCreateManyArgsSchema: z.ZodType<Prisma.EscrowCreateManyArgs> 
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const EscrowCreateManyAndReturnArgsSchema: z.ZodType<Prisma.EscrowCreateManyAndReturnArgs> = z.object({
-  data: z.union([ EscrowCreateManyInputSchema, EscrowCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const EscrowDeleteArgsSchema: z.ZodType<Prisma.EscrowDeleteArgs> = z.object({
   select: EscrowSelectSchema.optional(),
   include: EscrowIncludeSchema.optional(),
@@ -35155,11 +35434,6 @@ export const EscrowUpdateArgsSchema: z.ZodType<Prisma.EscrowUpdateArgs> = z.obje
 }).strict();
 
 export const EscrowUpdateManyArgsSchema: z.ZodType<Prisma.EscrowUpdateManyArgs> = z.object({
-  data: z.union([ EscrowUpdateManyMutationInputSchema, EscrowUncheckedUpdateManyInputSchema ]),
-  where: EscrowWhereInputSchema.optional(), 
-}).strict();
-
-export const EscrowUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.EscrowUpdateManyAndReturnArgs> = z.object({
   data: z.union([ EscrowUpdateManyMutationInputSchema, EscrowUncheckedUpdateManyInputSchema ]),
   where: EscrowWhereInputSchema.optional(), 
 }).strict();
@@ -35187,11 +35461,6 @@ export const TaskCreateManyArgsSchema: z.ZodType<Prisma.TaskCreateManyArgs> = z.
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const TaskCreateManyAndReturnArgsSchema: z.ZodType<Prisma.TaskCreateManyAndReturnArgs> = z.object({
-  data: z.union([ TaskCreateManyInputSchema, TaskCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const TaskDeleteArgsSchema: z.ZodType<Prisma.TaskDeleteArgs> = z.object({
   select: TaskSelectSchema.optional(),
   include: TaskIncludeSchema.optional(),
@@ -35206,11 +35475,6 @@ export const TaskUpdateArgsSchema: z.ZodType<Prisma.TaskUpdateArgs> = z.object({
 }).strict();
 
 export const TaskUpdateManyArgsSchema: z.ZodType<Prisma.TaskUpdateManyArgs> = z.object({
-  data: z.union([ TaskUpdateManyMutationInputSchema, TaskUncheckedUpdateManyInputSchema ]),
-  where: TaskWhereInputSchema.optional(), 
-}).strict();
-
-export const TaskUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.TaskUpdateManyAndReturnArgs> = z.object({
   data: z.union([ TaskUpdateManyMutationInputSchema, TaskUncheckedUpdateManyInputSchema ]),
   where: TaskWhereInputSchema.optional(), 
 }).strict();
@@ -35238,11 +35502,6 @@ export const ReviewSessionCreateManyArgsSchema: z.ZodType<Prisma.ReviewSessionCr
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ReviewSessionCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ReviewSessionCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ReviewSessionCreateManyInputSchema, ReviewSessionCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ReviewSessionDeleteArgsSchema: z.ZodType<Prisma.ReviewSessionDeleteArgs> = z.object({
   select: ReviewSessionSelectSchema.optional(),
   include: ReviewSessionIncludeSchema.optional(),
@@ -35257,11 +35516,6 @@ export const ReviewSessionUpdateArgsSchema: z.ZodType<Prisma.ReviewSessionUpdate
 }).strict();
 
 export const ReviewSessionUpdateManyArgsSchema: z.ZodType<Prisma.ReviewSessionUpdateManyArgs> = z.object({
-  data: z.union([ ReviewSessionUpdateManyMutationInputSchema, ReviewSessionUncheckedUpdateManyInputSchema ]),
-  where: ReviewSessionWhereInputSchema.optional(), 
-}).strict();
-
-export const ReviewSessionUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ReviewSessionUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ReviewSessionUpdateManyMutationInputSchema, ReviewSessionUncheckedUpdateManyInputSchema ]),
   where: ReviewSessionWhereInputSchema.optional(), 
 }).strict();
@@ -35289,11 +35543,6 @@ export const AnnotationCreateManyArgsSchema: z.ZodType<Prisma.AnnotationCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const AnnotationCreateManyAndReturnArgsSchema: z.ZodType<Prisma.AnnotationCreateManyAndReturnArgs> = z.object({
-  data: z.union([ AnnotationCreateManyInputSchema, AnnotationCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const AnnotationDeleteArgsSchema: z.ZodType<Prisma.AnnotationDeleteArgs> = z.object({
   select: AnnotationSelectSchema.optional(),
   include: AnnotationIncludeSchema.optional(),
@@ -35308,11 +35557,6 @@ export const AnnotationUpdateArgsSchema: z.ZodType<Prisma.AnnotationUpdateArgs> 
 }).strict();
 
 export const AnnotationUpdateManyArgsSchema: z.ZodType<Prisma.AnnotationUpdateManyArgs> = z.object({
-  data: z.union([ AnnotationUpdateManyMutationInputSchema, AnnotationUncheckedUpdateManyInputSchema ]),
-  where: AnnotationWhereInputSchema.optional(), 
-}).strict();
-
-export const AnnotationUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.AnnotationUpdateManyAndReturnArgs> = z.object({
   data: z.union([ AnnotationUpdateManyMutationInputSchema, AnnotationUncheckedUpdateManyInputSchema ]),
   where: AnnotationWhereInputSchema.optional(), 
 }).strict();
@@ -35340,11 +35584,6 @@ export const DepartmentCreateManyArgsSchema: z.ZodType<Prisma.DepartmentCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const DepartmentCreateManyAndReturnArgsSchema: z.ZodType<Prisma.DepartmentCreateManyAndReturnArgs> = z.object({
-  data: z.union([ DepartmentCreateManyInputSchema, DepartmentCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const DepartmentDeleteArgsSchema: z.ZodType<Prisma.DepartmentDeleteArgs> = z.object({
   select: DepartmentSelectSchema.optional(),
   include: DepartmentIncludeSchema.optional(),
@@ -35359,11 +35598,6 @@ export const DepartmentUpdateArgsSchema: z.ZodType<Prisma.DepartmentUpdateArgs> 
 }).strict();
 
 export const DepartmentUpdateManyArgsSchema: z.ZodType<Prisma.DepartmentUpdateManyArgs> = z.object({
-  data: z.union([ DepartmentUpdateManyMutationInputSchema, DepartmentUncheckedUpdateManyInputSchema ]),
-  where: DepartmentWhereInputSchema.optional(), 
-}).strict();
-
-export const DepartmentUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.DepartmentUpdateManyAndReturnArgs> = z.object({
   data: z.union([ DepartmentUpdateManyMutationInputSchema, DepartmentUncheckedUpdateManyInputSchema ]),
   where: DepartmentWhereInputSchema.optional(), 
 }).strict();
@@ -35391,11 +35625,6 @@ export const ProgramCreateManyArgsSchema: z.ZodType<Prisma.ProgramCreateManyArgs
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ProgramCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ProgramCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ProgramCreateManyInputSchema, ProgramCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ProgramDeleteArgsSchema: z.ZodType<Prisma.ProgramDeleteArgs> = z.object({
   select: ProgramSelectSchema.optional(),
   include: ProgramIncludeSchema.optional(),
@@ -35410,11 +35639,6 @@ export const ProgramUpdateArgsSchema: z.ZodType<Prisma.ProgramUpdateArgs> = z.ob
 }).strict();
 
 export const ProgramUpdateManyArgsSchema: z.ZodType<Prisma.ProgramUpdateManyArgs> = z.object({
-  data: z.union([ ProgramUpdateManyMutationInputSchema, ProgramUncheckedUpdateManyInputSchema ]),
-  where: ProgramWhereInputSchema.optional(), 
-}).strict();
-
-export const ProgramUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ProgramUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ProgramUpdateManyMutationInputSchema, ProgramUncheckedUpdateManyInputSchema ]),
   where: ProgramWhereInputSchema.optional(), 
 }).strict();
@@ -35442,11 +35666,6 @@ export const CategoryCreateManyArgsSchema: z.ZodType<Prisma.CategoryCreateManyAr
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const CategoryCreateManyAndReturnArgsSchema: z.ZodType<Prisma.CategoryCreateManyAndReturnArgs> = z.object({
-  data: z.union([ CategoryCreateManyInputSchema, CategoryCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const CategoryDeleteArgsSchema: z.ZodType<Prisma.CategoryDeleteArgs> = z.object({
   select: CategorySelectSchema.optional(),
   include: CategoryIncludeSchema.optional(),
@@ -35461,11 +35680,6 @@ export const CategoryUpdateArgsSchema: z.ZodType<Prisma.CategoryUpdateArgs> = z.
 }).strict();
 
 export const CategoryUpdateManyArgsSchema: z.ZodType<Prisma.CategoryUpdateManyArgs> = z.object({
-  data: z.union([ CategoryUpdateManyMutationInputSchema, CategoryUncheckedUpdateManyInputSchema ]),
-  where: CategoryWhereInputSchema.optional(), 
-}).strict();
-
-export const CategoryUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.CategoryUpdateManyAndReturnArgs> = z.object({
   data: z.union([ CategoryUpdateManyMutationInputSchema, CategoryUncheckedUpdateManyInputSchema ]),
   where: CategoryWhereInputSchema.optional(), 
 }).strict();
@@ -35493,11 +35707,6 @@ export const CourseCreateManyArgsSchema: z.ZodType<Prisma.CourseCreateManyArgs> 
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const CourseCreateManyAndReturnArgsSchema: z.ZodType<Prisma.CourseCreateManyAndReturnArgs> = z.object({
-  data: z.union([ CourseCreateManyInputSchema, CourseCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const CourseDeleteArgsSchema: z.ZodType<Prisma.CourseDeleteArgs> = z.object({
   select: CourseSelectSchema.optional(),
   include: CourseIncludeSchema.optional(),
@@ -35512,11 +35721,6 @@ export const CourseUpdateArgsSchema: z.ZodType<Prisma.CourseUpdateArgs> = z.obje
 }).strict();
 
 export const CourseUpdateManyArgsSchema: z.ZodType<Prisma.CourseUpdateManyArgs> = z.object({
-  data: z.union([ CourseUpdateManyMutationInputSchema, CourseUncheckedUpdateManyInputSchema ]),
-  where: CourseWhereInputSchema.optional(), 
-}).strict();
-
-export const CourseUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.CourseUpdateManyAndReturnArgs> = z.object({
   data: z.union([ CourseUpdateManyMutationInputSchema, CourseUncheckedUpdateManyInputSchema ]),
   where: CourseWhereInputSchema.optional(), 
 }).strict();
@@ -35544,11 +35748,6 @@ export const ModuleCreateManyArgsSchema: z.ZodType<Prisma.ModuleCreateManyArgs> 
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ModuleCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ModuleCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ModuleCreateManyInputSchema, ModuleCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ModuleDeleteArgsSchema: z.ZodType<Prisma.ModuleDeleteArgs> = z.object({
   select: ModuleSelectSchema.optional(),
   include: ModuleIncludeSchema.optional(),
@@ -35563,11 +35762,6 @@ export const ModuleUpdateArgsSchema: z.ZodType<Prisma.ModuleUpdateArgs> = z.obje
 }).strict();
 
 export const ModuleUpdateManyArgsSchema: z.ZodType<Prisma.ModuleUpdateManyArgs> = z.object({
-  data: z.union([ ModuleUpdateManyMutationInputSchema, ModuleUncheckedUpdateManyInputSchema ]),
-  where: ModuleWhereInputSchema.optional(), 
-}).strict();
-
-export const ModuleUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ModuleUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ModuleUpdateManyMutationInputSchema, ModuleUncheckedUpdateManyInputSchema ]),
   where: ModuleWhereInputSchema.optional(), 
 }).strict();
@@ -35595,11 +35789,6 @@ export const LessonCreateManyArgsSchema: z.ZodType<Prisma.LessonCreateManyArgs> 
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const LessonCreateManyAndReturnArgsSchema: z.ZodType<Prisma.LessonCreateManyAndReturnArgs> = z.object({
-  data: z.union([ LessonCreateManyInputSchema, LessonCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const LessonDeleteArgsSchema: z.ZodType<Prisma.LessonDeleteArgs> = z.object({
   select: LessonSelectSchema.optional(),
   include: LessonIncludeSchema.optional(),
@@ -35614,11 +35803,6 @@ export const LessonUpdateArgsSchema: z.ZodType<Prisma.LessonUpdateArgs> = z.obje
 }).strict();
 
 export const LessonUpdateManyArgsSchema: z.ZodType<Prisma.LessonUpdateManyArgs> = z.object({
-  data: z.union([ LessonUpdateManyMutationInputSchema, LessonUncheckedUpdateManyInputSchema ]),
-  where: LessonWhereInputSchema.optional(), 
-}).strict();
-
-export const LessonUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.LessonUpdateManyAndReturnArgs> = z.object({
   data: z.union([ LessonUpdateManyMutationInputSchema, LessonUncheckedUpdateManyInputSchema ]),
   where: LessonWhereInputSchema.optional(), 
 }).strict();
@@ -35646,11 +35830,6 @@ export const EnrollmentCreateManyArgsSchema: z.ZodType<Prisma.EnrollmentCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const EnrollmentCreateManyAndReturnArgsSchema: z.ZodType<Prisma.EnrollmentCreateManyAndReturnArgs> = z.object({
-  data: z.union([ EnrollmentCreateManyInputSchema, EnrollmentCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const EnrollmentDeleteArgsSchema: z.ZodType<Prisma.EnrollmentDeleteArgs> = z.object({
   select: EnrollmentSelectSchema.optional(),
   include: EnrollmentIncludeSchema.optional(),
@@ -35665,11 +35844,6 @@ export const EnrollmentUpdateArgsSchema: z.ZodType<Prisma.EnrollmentUpdateArgs> 
 }).strict();
 
 export const EnrollmentUpdateManyArgsSchema: z.ZodType<Prisma.EnrollmentUpdateManyArgs> = z.object({
-  data: z.union([ EnrollmentUpdateManyMutationInputSchema, EnrollmentUncheckedUpdateManyInputSchema ]),
-  where: EnrollmentWhereInputSchema.optional(), 
-}).strict();
-
-export const EnrollmentUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.EnrollmentUpdateManyAndReturnArgs> = z.object({
   data: z.union([ EnrollmentUpdateManyMutationInputSchema, EnrollmentUncheckedUpdateManyInputSchema ]),
   where: EnrollmentWhereInputSchema.optional(), 
 }).strict();
@@ -35697,11 +35871,6 @@ export const EnrollmentAnalyticsCreateManyArgsSchema: z.ZodType<Prisma.Enrollmen
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const EnrollmentAnalyticsCreateManyAndReturnArgsSchema: z.ZodType<Prisma.EnrollmentAnalyticsCreateManyAndReturnArgs> = z.object({
-  data: z.union([ EnrollmentAnalyticsCreateManyInputSchema, EnrollmentAnalyticsCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const EnrollmentAnalyticsDeleteArgsSchema: z.ZodType<Prisma.EnrollmentAnalyticsDeleteArgs> = z.object({
   select: EnrollmentAnalyticsSelectSchema.optional(),
   include: EnrollmentAnalyticsIncludeSchema.optional(),
@@ -35716,11 +35885,6 @@ export const EnrollmentAnalyticsUpdateArgsSchema: z.ZodType<Prisma.EnrollmentAna
 }).strict();
 
 export const EnrollmentAnalyticsUpdateManyArgsSchema: z.ZodType<Prisma.EnrollmentAnalyticsUpdateManyArgs> = z.object({
-  data: z.union([ EnrollmentAnalyticsUpdateManyMutationInputSchema, EnrollmentAnalyticsUncheckedUpdateManyInputSchema ]),
-  where: EnrollmentAnalyticsWhereInputSchema.optional(), 
-}).strict();
-
-export const EnrollmentAnalyticsUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.EnrollmentAnalyticsUpdateManyAndReturnArgs> = z.object({
   data: z.union([ EnrollmentAnalyticsUpdateManyMutationInputSchema, EnrollmentAnalyticsUncheckedUpdateManyInputSchema ]),
   where: EnrollmentAnalyticsWhereInputSchema.optional(), 
 }).strict();
@@ -35748,11 +35912,6 @@ export const ReviewCreateManyArgsSchema: z.ZodType<Prisma.ReviewCreateManyArgs> 
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ReviewCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ReviewCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ReviewCreateManyInputSchema, ReviewCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ReviewDeleteArgsSchema: z.ZodType<Prisma.ReviewDeleteArgs> = z.object({
   select: ReviewSelectSchema.optional(),
   include: ReviewIncludeSchema.optional(),
@@ -35767,11 +35926,6 @@ export const ReviewUpdateArgsSchema: z.ZodType<Prisma.ReviewUpdateArgs> = z.obje
 }).strict();
 
 export const ReviewUpdateManyArgsSchema: z.ZodType<Prisma.ReviewUpdateManyArgs> = z.object({
-  data: z.union([ ReviewUpdateManyMutationInputSchema, ReviewUncheckedUpdateManyInputSchema ]),
-  where: ReviewWhereInputSchema.optional(), 
-}).strict();
-
-export const ReviewUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ReviewUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ReviewUpdateManyMutationInputSchema, ReviewUncheckedUpdateManyInputSchema ]),
   where: ReviewWhereInputSchema.optional(), 
 }).strict();
@@ -35799,11 +35953,6 @@ export const AssignmentCreateManyArgsSchema: z.ZodType<Prisma.AssignmentCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const AssignmentCreateManyAndReturnArgsSchema: z.ZodType<Prisma.AssignmentCreateManyAndReturnArgs> = z.object({
-  data: z.union([ AssignmentCreateManyInputSchema, AssignmentCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const AssignmentDeleteArgsSchema: z.ZodType<Prisma.AssignmentDeleteArgs> = z.object({
   select: AssignmentSelectSchema.optional(),
   include: AssignmentIncludeSchema.optional(),
@@ -35818,11 +35967,6 @@ export const AssignmentUpdateArgsSchema: z.ZodType<Prisma.AssignmentUpdateArgs> 
 }).strict();
 
 export const AssignmentUpdateManyArgsSchema: z.ZodType<Prisma.AssignmentUpdateManyArgs> = z.object({
-  data: z.union([ AssignmentUpdateManyMutationInputSchema, AssignmentUncheckedUpdateManyInputSchema ]),
-  where: AssignmentWhereInputSchema.optional(), 
-}).strict();
-
-export const AssignmentUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.AssignmentUpdateManyAndReturnArgs> = z.object({
   data: z.union([ AssignmentUpdateManyMutationInputSchema, AssignmentUncheckedUpdateManyInputSchema ]),
   where: AssignmentWhereInputSchema.optional(), 
 }).strict();
@@ -35850,11 +35994,6 @@ export const SubmissionCreateManyArgsSchema: z.ZodType<Prisma.SubmissionCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const SubmissionCreateManyAndReturnArgsSchema: z.ZodType<Prisma.SubmissionCreateManyAndReturnArgs> = z.object({
-  data: z.union([ SubmissionCreateManyInputSchema, SubmissionCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const SubmissionDeleteArgsSchema: z.ZodType<Prisma.SubmissionDeleteArgs> = z.object({
   select: SubmissionSelectSchema.optional(),
   include: SubmissionIncludeSchema.optional(),
@@ -35869,11 +36008,6 @@ export const SubmissionUpdateArgsSchema: z.ZodType<Prisma.SubmissionUpdateArgs> 
 }).strict();
 
 export const SubmissionUpdateManyArgsSchema: z.ZodType<Prisma.SubmissionUpdateManyArgs> = z.object({
-  data: z.union([ SubmissionUpdateManyMutationInputSchema, SubmissionUncheckedUpdateManyInputSchema ]),
-  where: SubmissionWhereInputSchema.optional(), 
-}).strict();
-
-export const SubmissionUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.SubmissionUpdateManyAndReturnArgs> = z.object({
   data: z.union([ SubmissionUpdateManyMutationInputSchema, SubmissionUncheckedUpdateManyInputSchema ]),
   where: SubmissionWhereInputSchema.optional(), 
 }).strict();
@@ -35901,11 +36035,6 @@ export const RubricCreateManyArgsSchema: z.ZodType<Prisma.RubricCreateManyArgs> 
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const RubricCreateManyAndReturnArgsSchema: z.ZodType<Prisma.RubricCreateManyAndReturnArgs> = z.object({
-  data: z.union([ RubricCreateManyInputSchema, RubricCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const RubricDeleteArgsSchema: z.ZodType<Prisma.RubricDeleteArgs> = z.object({
   select: RubricSelectSchema.optional(),
   include: RubricIncludeSchema.optional(),
@@ -35920,11 +36049,6 @@ export const RubricUpdateArgsSchema: z.ZodType<Prisma.RubricUpdateArgs> = z.obje
 }).strict();
 
 export const RubricUpdateManyArgsSchema: z.ZodType<Prisma.RubricUpdateManyArgs> = z.object({
-  data: z.union([ RubricUpdateManyMutationInputSchema, RubricUncheckedUpdateManyInputSchema ]),
-  where: RubricWhereInputSchema.optional(), 
-}).strict();
-
-export const RubricUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.RubricUpdateManyAndReturnArgs> = z.object({
   data: z.union([ RubricUpdateManyMutationInputSchema, RubricUncheckedUpdateManyInputSchema ]),
   where: RubricWhereInputSchema.optional(), 
 }).strict();
@@ -35952,11 +36076,6 @@ export const CriteriaCreateManyArgsSchema: z.ZodType<Prisma.CriteriaCreateManyAr
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const CriteriaCreateManyAndReturnArgsSchema: z.ZodType<Prisma.CriteriaCreateManyAndReturnArgs> = z.object({
-  data: z.union([ CriteriaCreateManyInputSchema, CriteriaCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const CriteriaDeleteArgsSchema: z.ZodType<Prisma.CriteriaDeleteArgs> = z.object({
   select: CriteriaSelectSchema.optional(),
   include: CriteriaIncludeSchema.optional(),
@@ -35971,11 +36090,6 @@ export const CriteriaUpdateArgsSchema: z.ZodType<Prisma.CriteriaUpdateArgs> = z.
 }).strict();
 
 export const CriteriaUpdateManyArgsSchema: z.ZodType<Prisma.CriteriaUpdateManyArgs> = z.object({
-  data: z.union([ CriteriaUpdateManyMutationInputSchema, CriteriaUncheckedUpdateManyInputSchema ]),
-  where: CriteriaWhereInputSchema.optional(), 
-}).strict();
-
-export const CriteriaUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.CriteriaUpdateManyAndReturnArgs> = z.object({
   data: z.union([ CriteriaUpdateManyMutationInputSchema, CriteriaUncheckedUpdateManyInputSchema ]),
   where: CriteriaWhereInputSchema.optional(), 
 }).strict();
@@ -36003,11 +36117,6 @@ export const GradeCreateManyArgsSchema: z.ZodType<Prisma.GradeCreateManyArgs> = 
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const GradeCreateManyAndReturnArgsSchema: z.ZodType<Prisma.GradeCreateManyAndReturnArgs> = z.object({
-  data: z.union([ GradeCreateManyInputSchema, GradeCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const GradeDeleteArgsSchema: z.ZodType<Prisma.GradeDeleteArgs> = z.object({
   select: GradeSelectSchema.optional(),
   include: GradeIncludeSchema.optional(),
@@ -36022,11 +36131,6 @@ export const GradeUpdateArgsSchema: z.ZodType<Prisma.GradeUpdateArgs> = z.object
 }).strict();
 
 export const GradeUpdateManyArgsSchema: z.ZodType<Prisma.GradeUpdateManyArgs> = z.object({
-  data: z.union([ GradeUpdateManyMutationInputSchema, GradeUncheckedUpdateManyInputSchema ]),
-  where: GradeWhereInputSchema.optional(), 
-}).strict();
-
-export const GradeUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.GradeUpdateManyAndReturnArgs> = z.object({
   data: z.union([ GradeUpdateManyMutationInputSchema, GradeUncheckedUpdateManyInputSchema ]),
   where: GradeWhereInputSchema.optional(), 
 }).strict();
@@ -36054,11 +36158,6 @@ export const CohortCreateManyArgsSchema: z.ZodType<Prisma.CohortCreateManyArgs> 
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const CohortCreateManyAndReturnArgsSchema: z.ZodType<Prisma.CohortCreateManyAndReturnArgs> = z.object({
-  data: z.union([ CohortCreateManyInputSchema, CohortCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const CohortDeleteArgsSchema: z.ZodType<Prisma.CohortDeleteArgs> = z.object({
   select: CohortSelectSchema.optional(),
   include: CohortIncludeSchema.optional(),
@@ -36073,11 +36172,6 @@ export const CohortUpdateArgsSchema: z.ZodType<Prisma.CohortUpdateArgs> = z.obje
 }).strict();
 
 export const CohortUpdateManyArgsSchema: z.ZodType<Prisma.CohortUpdateManyArgs> = z.object({
-  data: z.union([ CohortUpdateManyMutationInputSchema, CohortUncheckedUpdateManyInputSchema ]),
-  where: CohortWhereInputSchema.optional(), 
-}).strict();
-
-export const CohortUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.CohortUpdateManyAndReturnArgs> = z.object({
   data: z.union([ CohortUpdateManyMutationInputSchema, CohortUncheckedUpdateManyInputSchema ]),
   where: CohortWhereInputSchema.optional(), 
 }).strict();
@@ -36105,11 +36199,6 @@ export const ScheduleCreateManyArgsSchema: z.ZodType<Prisma.ScheduleCreateManyAr
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ScheduleCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ScheduleCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ScheduleCreateManyInputSchema, ScheduleCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ScheduleDeleteArgsSchema: z.ZodType<Prisma.ScheduleDeleteArgs> = z.object({
   select: ScheduleSelectSchema.optional(),
   include: ScheduleIncludeSchema.optional(),
@@ -36124,11 +36213,6 @@ export const ScheduleUpdateArgsSchema: z.ZodType<Prisma.ScheduleUpdateArgs> = z.
 }).strict();
 
 export const ScheduleUpdateManyArgsSchema: z.ZodType<Prisma.ScheduleUpdateManyArgs> = z.object({
-  data: z.union([ ScheduleUpdateManyMutationInputSchema, ScheduleUncheckedUpdateManyInputSchema ]),
-  where: ScheduleWhereInputSchema.optional(), 
-}).strict();
-
-export const ScheduleUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ScheduleUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ScheduleUpdateManyMutationInputSchema, ScheduleUncheckedUpdateManyInputSchema ]),
   where: ScheduleWhereInputSchema.optional(), 
 }).strict();
@@ -36156,11 +36240,6 @@ export const AttendanceCreateManyArgsSchema: z.ZodType<Prisma.AttendanceCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const AttendanceCreateManyAndReturnArgsSchema: z.ZodType<Prisma.AttendanceCreateManyAndReturnArgs> = z.object({
-  data: z.union([ AttendanceCreateManyInputSchema, AttendanceCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const AttendanceDeleteArgsSchema: z.ZodType<Prisma.AttendanceDeleteArgs> = z.object({
   select: AttendanceSelectSchema.optional(),
   include: AttendanceIncludeSchema.optional(),
@@ -36175,11 +36254,6 @@ export const AttendanceUpdateArgsSchema: z.ZodType<Prisma.AttendanceUpdateArgs> 
 }).strict();
 
 export const AttendanceUpdateManyArgsSchema: z.ZodType<Prisma.AttendanceUpdateManyArgs> = z.object({
-  data: z.union([ AttendanceUpdateManyMutationInputSchema, AttendanceUncheckedUpdateManyInputSchema ]),
-  where: AttendanceWhereInputSchema.optional(), 
-}).strict();
-
-export const AttendanceUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.AttendanceUpdateManyAndReturnArgs> = z.object({
   data: z.union([ AttendanceUpdateManyMutationInputSchema, AttendanceUncheckedUpdateManyInputSchema ]),
   where: AttendanceWhereInputSchema.optional(), 
 }).strict();
@@ -36207,11 +36281,6 @@ export const PartnerCreateManyArgsSchema: z.ZodType<Prisma.PartnerCreateManyArgs
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const PartnerCreateManyAndReturnArgsSchema: z.ZodType<Prisma.PartnerCreateManyAndReturnArgs> = z.object({
-  data: z.union([ PartnerCreateManyInputSchema, PartnerCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const PartnerDeleteArgsSchema: z.ZodType<Prisma.PartnerDeleteArgs> = z.object({
   select: PartnerSelectSchema.optional(),
   include: PartnerIncludeSchema.optional(),
@@ -36226,11 +36295,6 @@ export const PartnerUpdateArgsSchema: z.ZodType<Prisma.PartnerUpdateArgs> = z.ob
 }).strict();
 
 export const PartnerUpdateManyArgsSchema: z.ZodType<Prisma.PartnerUpdateManyArgs> = z.object({
-  data: z.union([ PartnerUpdateManyMutationInputSchema, PartnerUncheckedUpdateManyInputSchema ]),
-  where: PartnerWhereInputSchema.optional(), 
-}).strict();
-
-export const PartnerUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.PartnerUpdateManyAndReturnArgs> = z.object({
   data: z.union([ PartnerUpdateManyMutationInputSchema, PartnerUncheckedUpdateManyInputSchema ]),
   where: PartnerWhereInputSchema.optional(), 
 }).strict();
@@ -36258,11 +36322,6 @@ export const VacancyCreateManyArgsSchema: z.ZodType<Prisma.VacancyCreateManyArgs
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const VacancyCreateManyAndReturnArgsSchema: z.ZodType<Prisma.VacancyCreateManyAndReturnArgs> = z.object({
-  data: z.union([ VacancyCreateManyInputSchema, VacancyCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const VacancyDeleteArgsSchema: z.ZodType<Prisma.VacancyDeleteArgs> = z.object({
   select: VacancySelectSchema.optional(),
   include: VacancyIncludeSchema.optional(),
@@ -36277,11 +36336,6 @@ export const VacancyUpdateArgsSchema: z.ZodType<Prisma.VacancyUpdateArgs> = z.ob
 }).strict();
 
 export const VacancyUpdateManyArgsSchema: z.ZodType<Prisma.VacancyUpdateManyArgs> = z.object({
-  data: z.union([ VacancyUpdateManyMutationInputSchema, VacancyUncheckedUpdateManyInputSchema ]),
-  where: VacancyWhereInputSchema.optional(), 
-}).strict();
-
-export const VacancyUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.VacancyUpdateManyAndReturnArgs> = z.object({
   data: z.union([ VacancyUpdateManyMutationInputSchema, VacancyUncheckedUpdateManyInputSchema ]),
   where: VacancyWhereInputSchema.optional(), 
 }).strict();
@@ -36309,11 +36363,6 @@ export const ReportCreateManyArgsSchema: z.ZodType<Prisma.ReportCreateManyArgs> 
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ReportCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ReportCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ReportCreateManyInputSchema, ReportCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ReportDeleteArgsSchema: z.ZodType<Prisma.ReportDeleteArgs> = z.object({
   select: ReportSelectSchema.optional(),
   include: ReportIncludeSchema.optional(),
@@ -36328,11 +36377,6 @@ export const ReportUpdateArgsSchema: z.ZodType<Prisma.ReportUpdateArgs> = z.obje
 }).strict();
 
 export const ReportUpdateManyArgsSchema: z.ZodType<Prisma.ReportUpdateManyArgs> = z.object({
-  data: z.union([ ReportUpdateManyMutationInputSchema, ReportUncheckedUpdateManyInputSchema ]),
-  where: ReportWhereInputSchema.optional(), 
-}).strict();
-
-export const ReportUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ReportUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ReportUpdateManyMutationInputSchema, ReportUncheckedUpdateManyInputSchema ]),
   where: ReportWhereInputSchema.optional(), 
 }).strict();
@@ -36360,11 +36404,6 @@ export const ChatRoomCreateManyArgsSchema: z.ZodType<Prisma.ChatRoomCreateManyAr
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const ChatRoomCreateManyAndReturnArgsSchema: z.ZodType<Prisma.ChatRoomCreateManyAndReturnArgs> = z.object({
-  data: z.union([ ChatRoomCreateManyInputSchema, ChatRoomCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const ChatRoomDeleteArgsSchema: z.ZodType<Prisma.ChatRoomDeleteArgs> = z.object({
   select: ChatRoomSelectSchema.optional(),
   include: ChatRoomIncludeSchema.optional(),
@@ -36379,11 +36418,6 @@ export const ChatRoomUpdateArgsSchema: z.ZodType<Prisma.ChatRoomUpdateArgs> = z.
 }).strict();
 
 export const ChatRoomUpdateManyArgsSchema: z.ZodType<Prisma.ChatRoomUpdateManyArgs> = z.object({
-  data: z.union([ ChatRoomUpdateManyMutationInputSchema, ChatRoomUncheckedUpdateManyInputSchema ]),
-  where: ChatRoomWhereInputSchema.optional(), 
-}).strict();
-
-export const ChatRoomUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.ChatRoomUpdateManyAndReturnArgs> = z.object({
   data: z.union([ ChatRoomUpdateManyMutationInputSchema, ChatRoomUncheckedUpdateManyInputSchema ]),
   where: ChatRoomWhereInputSchema.optional(), 
 }).strict();
@@ -36411,11 +36445,6 @@ export const MessageCreateManyArgsSchema: z.ZodType<Prisma.MessageCreateManyArgs
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const MessageCreateManyAndReturnArgsSchema: z.ZodType<Prisma.MessageCreateManyAndReturnArgs> = z.object({
-  data: z.union([ MessageCreateManyInputSchema, MessageCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const MessageDeleteArgsSchema: z.ZodType<Prisma.MessageDeleteArgs> = z.object({
   select: MessageSelectSchema.optional(),
   include: MessageIncludeSchema.optional(),
@@ -36430,11 +36459,6 @@ export const MessageUpdateArgsSchema: z.ZodType<Prisma.MessageUpdateArgs> = z.ob
 }).strict();
 
 export const MessageUpdateManyArgsSchema: z.ZodType<Prisma.MessageUpdateManyArgs> = z.object({
-  data: z.union([ MessageUpdateManyMutationInputSchema, MessageUncheckedUpdateManyInputSchema ]),
-  where: MessageWhereInputSchema.optional(), 
-}).strict();
-
-export const MessageUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.MessageUpdateManyAndReturnArgs> = z.object({
   data: z.union([ MessageUpdateManyMutationInputSchema, MessageUncheckedUpdateManyInputSchema ]),
   where: MessageWhereInputSchema.optional(), 
 }).strict();
@@ -36462,11 +36486,6 @@ export const JobOpeningCreateManyArgsSchema: z.ZodType<Prisma.JobOpeningCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const JobOpeningCreateManyAndReturnArgsSchema: z.ZodType<Prisma.JobOpeningCreateManyAndReturnArgs> = z.object({
-  data: z.union([ JobOpeningCreateManyInputSchema, JobOpeningCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const JobOpeningDeleteArgsSchema: z.ZodType<Prisma.JobOpeningDeleteArgs> = z.object({
   select: JobOpeningSelectSchema.optional(),
   include: JobOpeningIncludeSchema.optional(),
@@ -36481,11 +36500,6 @@ export const JobOpeningUpdateArgsSchema: z.ZodType<Prisma.JobOpeningUpdateArgs> 
 }).strict();
 
 export const JobOpeningUpdateManyArgsSchema: z.ZodType<Prisma.JobOpeningUpdateManyArgs> = z.object({
-  data: z.union([ JobOpeningUpdateManyMutationInputSchema, JobOpeningUncheckedUpdateManyInputSchema ]),
-  where: JobOpeningWhereInputSchema.optional(), 
-}).strict();
-
-export const JobOpeningUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.JobOpeningUpdateManyAndReturnArgs> = z.object({
   data: z.union([ JobOpeningUpdateManyMutationInputSchema, JobOpeningUncheckedUpdateManyInputSchema ]),
   where: JobOpeningWhereInputSchema.optional(), 
 }).strict();
@@ -36513,11 +36527,6 @@ export const JobApplicationCreateManyArgsSchema: z.ZodType<Prisma.JobApplication
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const JobApplicationCreateManyAndReturnArgsSchema: z.ZodType<Prisma.JobApplicationCreateManyAndReturnArgs> = z.object({
-  data: z.union([ JobApplicationCreateManyInputSchema, JobApplicationCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const JobApplicationDeleteArgsSchema: z.ZodType<Prisma.JobApplicationDeleteArgs> = z.object({
   select: JobApplicationSelectSchema.optional(),
   include: JobApplicationIncludeSchema.optional(),
@@ -36532,11 +36541,6 @@ export const JobApplicationUpdateArgsSchema: z.ZodType<Prisma.JobApplicationUpda
 }).strict();
 
 export const JobApplicationUpdateManyArgsSchema: z.ZodType<Prisma.JobApplicationUpdateManyArgs> = z.object({
-  data: z.union([ JobApplicationUpdateManyMutationInputSchema, JobApplicationUncheckedUpdateManyInputSchema ]),
-  where: JobApplicationWhereInputSchema.optional(), 
-}).strict();
-
-export const JobApplicationUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.JobApplicationUpdateManyAndReturnArgs> = z.object({
   data: z.union([ JobApplicationUpdateManyMutationInputSchema, JobApplicationUncheckedUpdateManyInputSchema ]),
   where: JobApplicationWhereInputSchema.optional(), 
 }).strict();
@@ -36562,11 +36566,6 @@ export const SystemMetricCreateManyArgsSchema: z.ZodType<Prisma.SystemMetricCrea
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const SystemMetricCreateManyAndReturnArgsSchema: z.ZodType<Prisma.SystemMetricCreateManyAndReturnArgs> = z.object({
-  data: z.union([ SystemMetricCreateManyInputSchema, SystemMetricCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const SystemMetricDeleteArgsSchema: z.ZodType<Prisma.SystemMetricDeleteArgs> = z.object({
   select: SystemMetricSelectSchema.optional(),
   where: SystemMetricWhereUniqueInputSchema, 
@@ -36579,11 +36578,6 @@ export const SystemMetricUpdateArgsSchema: z.ZodType<Prisma.SystemMetricUpdateAr
 }).strict();
 
 export const SystemMetricUpdateManyArgsSchema: z.ZodType<Prisma.SystemMetricUpdateManyArgs> = z.object({
-  data: z.union([ SystemMetricUpdateManyMutationInputSchema, SystemMetricUncheckedUpdateManyInputSchema ]),
-  where: SystemMetricWhereInputSchema.optional(), 
-}).strict();
-
-export const SystemMetricUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.SystemMetricUpdateManyAndReturnArgs> = z.object({
   data: z.union([ SystemMetricUpdateManyMutationInputSchema, SystemMetricUncheckedUpdateManyInputSchema ]),
   where: SystemMetricWhereInputSchema.optional(), 
 }).strict();
@@ -36609,11 +36603,6 @@ export const AIBaseCreateManyArgsSchema: z.ZodType<Prisma.AIBaseCreateManyArgs> 
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const AIBaseCreateManyAndReturnArgsSchema: z.ZodType<Prisma.AIBaseCreateManyAndReturnArgs> = z.object({
-  data: z.union([ AIBaseCreateManyInputSchema, AIBaseCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const AIBaseDeleteArgsSchema: z.ZodType<Prisma.AIBaseDeleteArgs> = z.object({
   select: AIBaseSelectSchema.optional(),
   where: AIBaseWhereUniqueInputSchema, 
@@ -36626,11 +36615,6 @@ export const AIBaseUpdateArgsSchema: z.ZodType<Prisma.AIBaseUpdateArgs> = z.obje
 }).strict();
 
 export const AIBaseUpdateManyArgsSchema: z.ZodType<Prisma.AIBaseUpdateManyArgs> = z.object({
-  data: z.union([ AIBaseUpdateManyMutationInputSchema, AIBaseUncheckedUpdateManyInputSchema ]),
-  where: AIBaseWhereInputSchema.optional(), 
-}).strict();
-
-export const AIBaseUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.AIBaseUpdateManyAndReturnArgs> = z.object({
   data: z.union([ AIBaseUpdateManyMutationInputSchema, AIBaseUncheckedUpdateManyInputSchema ]),
   where: AIBaseWhereInputSchema.optional(), 
 }).strict();
@@ -36658,11 +36642,6 @@ export const CareerPathCreateManyArgsSchema: z.ZodType<Prisma.CareerPathCreateMa
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const CareerPathCreateManyAndReturnArgsSchema: z.ZodType<Prisma.CareerPathCreateManyAndReturnArgs> = z.object({
-  data: z.union([ CareerPathCreateManyInputSchema, CareerPathCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const CareerPathDeleteArgsSchema: z.ZodType<Prisma.CareerPathDeleteArgs> = z.object({
   select: CareerPathSelectSchema.optional(),
   include: CareerPathIncludeSchema.optional(),
@@ -36677,11 +36656,6 @@ export const CareerPathUpdateArgsSchema: z.ZodType<Prisma.CareerPathUpdateArgs> 
 }).strict();
 
 export const CareerPathUpdateManyArgsSchema: z.ZodType<Prisma.CareerPathUpdateManyArgs> = z.object({
-  data: z.union([ CareerPathUpdateManyMutationInputSchema, CareerPathUncheckedUpdateManyInputSchema ]),
-  where: CareerPathWhereInputSchema.optional(), 
-}).strict();
-
-export const CareerPathUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.CareerPathUpdateManyAndReturnArgs> = z.object({
   data: z.union([ CareerPathUpdateManyMutationInputSchema, CareerPathUncheckedUpdateManyInputSchema ]),
   where: CareerPathWhereInputSchema.optional(), 
 }).strict();
@@ -36709,11 +36683,6 @@ export const UserTrajectoryCreateManyArgsSchema: z.ZodType<Prisma.UserTrajectory
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const UserTrajectoryCreateManyAndReturnArgsSchema: z.ZodType<Prisma.UserTrajectoryCreateManyAndReturnArgs> = z.object({
-  data: z.union([ UserTrajectoryCreateManyInputSchema, UserTrajectoryCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const UserTrajectoryDeleteArgsSchema: z.ZodType<Prisma.UserTrajectoryDeleteArgs> = z.object({
   select: UserTrajectorySelectSchema.optional(),
   include: UserTrajectoryIncludeSchema.optional(),
@@ -36728,11 +36697,6 @@ export const UserTrajectoryUpdateArgsSchema: z.ZodType<Prisma.UserTrajectoryUpda
 }).strict();
 
 export const UserTrajectoryUpdateManyArgsSchema: z.ZodType<Prisma.UserTrajectoryUpdateManyArgs> = z.object({
-  data: z.union([ UserTrajectoryUpdateManyMutationInputSchema, UserTrajectoryUncheckedUpdateManyInputSchema ]),
-  where: UserTrajectoryWhereInputSchema.optional(), 
-}).strict();
-
-export const UserTrajectoryUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.UserTrajectoryUpdateManyAndReturnArgs> = z.object({
   data: z.union([ UserTrajectoryUpdateManyMutationInputSchema, UserTrajectoryUncheckedUpdateManyInputSchema ]),
   where: UserTrajectoryWhereInputSchema.optional(), 
 }).strict();
@@ -36760,11 +36724,6 @@ export const AISimulationCreateManyArgsSchema: z.ZodType<Prisma.AISimulationCrea
   skipDuplicates: z.boolean().optional(),
 }).strict();
 
-export const AISimulationCreateManyAndReturnArgsSchema: z.ZodType<Prisma.AISimulationCreateManyAndReturnArgs> = z.object({
-  data: z.union([ AISimulationCreateManyInputSchema, AISimulationCreateManyInputSchema.array() ]),
-  skipDuplicates: z.boolean().optional(),
-}).strict();
-
 export const AISimulationDeleteArgsSchema: z.ZodType<Prisma.AISimulationDeleteArgs> = z.object({
   select: AISimulationSelectSchema.optional(),
   include: AISimulationIncludeSchema.optional(),
@@ -36779,11 +36738,6 @@ export const AISimulationUpdateArgsSchema: z.ZodType<Prisma.AISimulationUpdateAr
 }).strict();
 
 export const AISimulationUpdateManyArgsSchema: z.ZodType<Prisma.AISimulationUpdateManyArgs> = z.object({
-  data: z.union([ AISimulationUpdateManyMutationInputSchema, AISimulationUncheckedUpdateManyInputSchema ]),
-  where: AISimulationWhereInputSchema.optional(), 
-}).strict();
-
-export const AISimulationUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.AISimulationUpdateManyAndReturnArgs> = z.object({
   data: z.union([ AISimulationUpdateManyMutationInputSchema, AISimulationUncheckedUpdateManyInputSchema ]),
   where: AISimulationWhereInputSchema.optional(), 
 }).strict();

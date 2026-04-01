@@ -6,28 +6,27 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding fresh ecosystem data...');
 
-  // 1. CLEANUP (Ordered to respect FK constraints)
-  await prisma.message.deleteMany();
-  await prisma.chatRoom.deleteMany();
-  await prisma.notification.deleteMany();
-  await prisma.transaction.deleteMany();
-  await prisma.achievement.deleteMany();
-  await prisma.feedEvent.deleteMany();
-  await prisma.connection.deleteMany();
-  await prisma.report.deleteMany();
-  await prisma.review.deleteMany();
-  await prisma.enrollment.deleteMany();
-  await prisma.lesson.deleteMany();
-  await prisma.course.deleteMany();
-  await prisma.category.deleteMany();
-  await prisma.contract.deleteMany();
-  await prisma.application.deleteMany();
-  await prisma.project.deleteMany();
-  await prisma.service.deleteMany();
-  await prisma.portfolioItem.deleteMany();
-  await prisma.profile.deleteMany();
-  await prisma.skill.deleteMany();
-  await prisma.user.deleteMany();
+  // 1. CLEANUP (Using Raw SQL for 100% reliability and bypassing P2003/undefined issues)
+  console.log('🧹 Wiping existing data...');
+  const tables = [
+    'Message', 'ChatRoom', 'Notification', 'Transaction', 'Achievement', 
+    'FeedEvent', 'Connection', 'Report', 'Review', 'EnrollmentAnalytics', 
+    'Enrollment', 'Attendance', 'Schedule', 'Lesson', 'Module', 'Course', 
+    'Category', 'Program', 'Department', 'Annotation', 'ReviewSession', 
+    'Task', 'Escrow', 'Contract', 'Application', 'Project', 'Service', 
+    'PortfolioItem', 'ProfileSkill', 'Profile', 'UserTrajectory', 'CareerPath', 
+    'AISimulation', 'User', 'Skill', 'SystemMetric', 'AIBase'
+  ];
+
+  await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 0;');
+  for (const table of tables) {
+    try {
+      await prisma.$executeRawUnsafe(`DELETE FROM \`${table}\`;`);
+    } catch (err) {
+      // Skip tables that might not exist yet
+    }
+  }
+  await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 1;');
 
   // 2. USERS
   const admin = await prisma.user.create({

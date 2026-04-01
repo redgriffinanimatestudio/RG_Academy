@@ -60,10 +60,10 @@ export default function ModeratorDashboard({ view: activeModule = 'dashboard', a
            <h1 className="text-4xl font-black uppercase tracking-tight text-white italic">
              Safety <span style={{ color: accentColor || '#ef4444' }}>Oversight Hub</span>
            </h1>
-           <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mt-3 flex items-center gap-2">
+           <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mt-3 flex items-center gap-2">
              <div className="size-1.5 rounded-full animate-ping" style={{ backgroundColor: accentColor || '#ef4444' }} />
              Industrial Node: MODERATOR-MASTER-SYNC • Identity: SYSTEM_NODE_01
-           </p>
+           </div>
         </div>
         
         <div className="flex p-1 bg-white/5 border border-white/5 rounded-2xl">

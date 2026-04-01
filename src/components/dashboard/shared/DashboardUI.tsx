@@ -53,10 +53,10 @@ export const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) =
       </div>
       <h2 className="text-5xl font-black uppercase tracking-tighter text-white italic leading-none lg:text-6xl">{title}</h2>
       {subtitle && (
-        <p className="text-white/20 text-[11px] font-black uppercase tracking-[0.4em] mt-2 flex items-center gap-3 italic">
+        <div className="text-white/20 text-[11px] font-black uppercase tracking-[0.4em] mt-2 flex items-center gap-3 italic">
           <div className="size-1.5 rounded-full bg-primary/40 animate-pulse" />
           {subtitle}
-        </p>
+        </div>
       )}
     </header>
     {action}

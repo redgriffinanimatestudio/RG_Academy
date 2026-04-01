@@ -20,8 +20,8 @@ export const searchController = {
         prisma.course.findMany({
           where: {
             OR: [
-              { title: { contains: q, mode: 'insensitive' } },
-              { description: { contains: q, mode: 'insensitive' } }
+              { title: { contains: q, } },
+              { description: { contains: q, } }
             ],
             status: 'published'
           },
@@ -33,8 +33,8 @@ export const searchController = {
         prisma.project.findMany({
           where: {
             OR: [
-              { title: { contains: q, mode: 'insensitive' } },
-              { description: { contains: q, mode: 'insensitive' } }
+              { title: { contains: q, } },
+              { description: { contains: q, } }
             ],
             status: 'open'
           },
@@ -46,9 +46,9 @@ export const searchController = {
         prisma.profile.findMany({
           where: {
             OR: [
-              { specialization: { contains: q, mode: 'insensitive' } },
-              { bio: { contains: q, mode: 'insensitive' } },
-              { user: { displayName: { contains: q, mode: 'insensitive' } } }
+              { specialization: { contains: q, } },
+              { bio: { contains: q, } },
+              { user: { displayName: { contains: q, } } }
             ]
           },
           take: 5,
@@ -62,8 +62,8 @@ export const searchController = {
         prisma.service.findMany({
           where: {
             OR: [
-              { title: { contains: q, mode: 'insensitive' } },
-              { category: { contains: q, mode: 'insensitive' } }
+              { title: { contains: q, } },
+              { category: { contains: q, } }
             ]
           },
           take: 5,

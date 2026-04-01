@@ -88,10 +88,10 @@ export default function ManagerDashboard({ view: activeView = 'overview' }: { vi
           <h1 className="text-4xl font-black uppercase tracking-tight text-white italic">
             {isChief ? 'Chief' : 'Strategic'} <span className="text-primary">Ops Hub</span>
           </h1>
-          <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-2 mt-1">
+          <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mt-3 flex items-center gap-2">
             <div className="size-1.5 rounded-full bg-primary animate-ping" />
             Industrial Node: COMMAND-CHAIN-v2.5 • Auth: {activeRole?.toUpperCase()}
-          </p>
+          </div>
         </div>
         
         <div className="flex p-1 bg-white/5 border border-white/5 rounded-2xl shrink-0">

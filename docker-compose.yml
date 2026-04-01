@@ -1,17 +1,17 @@
 services:
-  postgres:
-    image: postgres:16-alpine
+  mysql:
+    image: mysql:8.0
     container_name: rg-academy-db
     restart: always
     environment:
-      POSTGRES_USER: rg_admin
-      POSTGRES_PASSWORD: rg_password_2026
-      POSTGRES_DB: rg_academy
+      MYSQL_ROOT_PASSWORD: rg_password_2026
+      MYSQL_DATABASE: rg_academy
+      MYSQL_USER: rg_admin
+      MYSQL_PASSWORD: rg_password_2026
     ports:
-      - "5439:5432"
+      - "3306:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
 
 volumes:
-  postgres_data:
-
+  mysql_data:

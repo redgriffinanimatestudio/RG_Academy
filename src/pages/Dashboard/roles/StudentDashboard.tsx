@@ -4,7 +4,8 @@ import {
   GraduationCap, Clock, Star, Zap, Award, Cpu, 
   TrendingUp, Briefcase, CheckCircle2, Rocket, 
   Shield, Box, ChevronRight, Activity, BookOpen,
-  Map, Lightbulb, History, MessageSquare, Send, Sparkles, AlertCircle
+  Map, Lightbulb, History, MessageSquare, Send, Sparkles, AlertCircle,
+  ShieldCheck, Users, Target, Lock
 } from 'lucide-react';
 import { StatCard, SectionHeader, GlassCard } from '../../../components/dashboard/shared/DashboardUI';
 import { academyService } from '../../../services/academyService';
@@ -37,10 +38,10 @@ export default function StudentDashboard({
         <h1 className="text-4xl font-black uppercase tracking-tight text-white italic">
            Student <span className="text-primary">{activeView === 'overview' ? 'Nexus Hub' : activeView.replace('_', ' ')}</span>
         </h1>
-        <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
+        <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
           <div className="size-1.5 rounded-full bg-primary animate-ping" />
           Trajectory: Student-Node-Alpha-v5 • Status: Synchronized
-        </p>
+        </div>
       </header>
 
       <AnimatePresence mode="wait">
@@ -75,7 +76,7 @@ function OverviewModule({ stats, techStack, pipelines, certs }: any) {
     <div className="space-y-12">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {mainStats.map((card) => (
-          <StatCard key={card.label} {...card} color={card.color.split('-')[0]} />
+          <StatCard key={card.label} {...card} color={card.color.split('-')[0]} trend={card.trend as any} />
         ))}
       </div>
 
@@ -135,7 +136,7 @@ function TrajectoryModule({ techStack }: any) {
         {[
           { label: 'Foundations', status: 'completed', icon: BookOpen, desc: 'Intro to CG & Maya Basics' },
           { label: 'Technical Artist', status: 'current', icon: Map, desc: 'Unreal Engine Logic & Scripting' },
-          { label: 'Lead Developer', status: 'locked', icon: Lock, desc: 'Advanced Pipeline Architecture' },
+          { label: 'Lead Developer', status: 'locked', icon: Box, desc: 'Advanced Pipeline Architecture' },
           { label: 'Director Hub', status: 'locked', icon: ShieldCheck, desc: 'Creative Vision & Leadership' }
         ].map((node, i) => (
           <GlassCard key={i} className={`relative overflow-hidden group ${node.status === 'current' ? 'border-primary shadow-2xl shadow-primary/10' : ''}`}>
@@ -264,7 +265,7 @@ function AIMentorModule({ user }: any) {
                <div className="max-w-[70%] p-6 bg-white/5 rounded-[2rem] rounded-tr-none border border-white/10">
                   <p className="text-xs text-zinc-300 leading-relaxed font-medium">Analyze my Unreal Engine skills and tell me what's missing for a Lead role.</p>
                </div>
-               <div className="size-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white/40 shrink-0"><User size={18} /></div>
+               <div className="size-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white/40 shrink-0"><Users size={18} /></div>
             </div>
          </div>
 
@@ -313,9 +314,4 @@ function ArchiveModule() {
   );
 }
 
-function User({ size, className }: { size: number, className?: string }) { 
-  return <Users size={size} className={className} />;
-}
-function Target({ size, className }: { size: number, className?: string }) { 
-  return <Target size={size} className={className} />;
-}
+

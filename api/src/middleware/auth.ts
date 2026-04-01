@@ -120,7 +120,7 @@ export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction
 
 export const requireStaff = (req: AuthRequest, res: Response, next: NextFunction) => {
   if (!req.user) return error(res, 'Unauthorized', 401);
-  const isStaff = req.user.isAdmin || req.user.isHr || req.user.isFinance || req.user.isSupport;
+  const isStaff = req.user.isAdmin || req.user.isHr || req.user.isFinance || req.user.isSupport || req.user.isAgency;
   if (!isStaff) {
     return error(res, 'Forbidden: Staff access required', 403);
   }

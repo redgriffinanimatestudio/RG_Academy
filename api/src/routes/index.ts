@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import academyRoutes from './academy';
 import studioRoutes from './studio';
 import networkingRoutes from './networking';
@@ -16,6 +16,7 @@ import aiRoutes from './ai';
 import searchRoutes from './search';
 import agencyRoutes from './agency';
 
+import { academyController } from '../controllers/academyController.js';
 import { authController } from '../controllers/authController';
 import { authMiddleware } from '../middleware/auth';
 
@@ -39,6 +40,7 @@ router.post('/switch-role', authMiddleware, authController.switchRole);
 
 // Mount routes
 router.use('/auth', authRoutes);           // /api/auth/*
+router.get('/users/:userId/enrollments', (req: any, res: any) => academyController.getUserEnrollments(req, res)); // Direct alias for frontend
 router.use('/v1/academy', academyRoutes); // /api/v1/academy/courses, etc.
 router.use('/v1/studio', studioRoutes);   // /api/v1/studio/projects, etc.
 router.use('/v1/studio', networkingRoutes); // /api/v1/studio/profiles, etc.

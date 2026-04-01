@@ -74,10 +74,10 @@ export default function AdminDashboard({ stats, activeRole, setActiveRole }: Adm
             <h1 className="text-4xl font-black uppercase tracking-tight text-white italic">
               Registry <span className="text-red-500">Matrix</span>
             </h1>
-            <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
+            <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
               <div className="size-1.5 rounded-full bg-red-500 animate-ping" />
               Node Synchronization Active • ARCHITECT-V4
-            </p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
              <button onClick={() => setView('overview')} className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-all">Overview Hub</button>
@@ -270,10 +270,10 @@ export default function AdminDashboard({ stats, activeRole, setActiveRole }: Adm
           <h1 className="text-6xl font-black uppercase tracking-tighter text-white italic leading-none lg:text-7xl">
             Master <span className="text-primary">Architect</span>
           </h1>
-          <p className="text-white/40 text-[11px] font-black uppercase tracking-[0.4em] mt-2 flex items-center gap-3">
+          <div className="text-white/40 text-[11px] font-black uppercase tracking-[0.4em] mt-2 flex items-center gap-3">
             <div className="size-2 rounded-full bg-primary animate-ping" />
             Full Command System Active • Sync: ARCHITECT-GLOBAL-MASTER
-          </p>
+          </div>
         </div>
         <div className="flex items-center gap-4">
              <button onClick={() => setView('users')} className="px-10 py-5 bg-white/5 border border-white/10 text-white rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white active:bg-white active:text-bg-dark transition-all flex items-center gap-3 shadow-2xl">

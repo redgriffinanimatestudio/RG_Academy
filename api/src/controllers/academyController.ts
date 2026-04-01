@@ -1,4 +1,6 @@
+import { Request, Response } from 'express';
 import { success, error, paginate } from '../utils/response.js';
+import prisma from '../utils/prisma.js';
 import { AuthRequest, requireAdmin, requireLecturer } from '../middleware/auth.js';
 import { notifyUser } from '../utils/socket.js';
 import { ACADEMIC_TREE } from '../config/academic.js';
@@ -205,7 +207,7 @@ export const academyController = {
    */
   async enroll(req: AuthRequest, res: Response) {
     try {
-      const { courseId } = EnrollmentCreateInputSchema.pick({ courseId: true }).parse(req.body);
+      const { courseId } = (EnrollmentCreateInputSchema as any).pick({ courseId: true }).parse(req.body);
       
       const enrollment = await prisma.enrollment.create({
         data: { userId: req.user!.id, courseId, progress: 0, status: 'active', completedLessons: '[]' }
@@ -434,8 +436,7 @@ export const academyController = {
    */
   async addReview(req: AuthRequest, res: Response) {
     try {
-      const validatedData = ReviewCreateInputSchema.pick({ courseId: true, rating: true, comment: true }).parse(req.body);
-      const { courseId, rating, comment } = validatedData;
+      const { courseId, rating, comment } = (ReviewCreateInputSchema as any).pick({ courseId: true, rating: true, comment: true }).parse(req.body);
       
       const review = await prisma.review.create({
         data: { userId: req.user!.id, courseId, rating, comment, isApproved: false }

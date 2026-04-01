@@ -7,6 +7,7 @@ import { CreateNotificationSchema } from '../utils/validation.js';
 const router = Router();
 
 // Get notifications for user
+router.get('/', authMiddleware, notificationController.getNotifications);
 router.get('/:userId', notificationController.getNotifications);
 router.get('/:userId/unread-count', notificationController.getUnreadCount);
 
