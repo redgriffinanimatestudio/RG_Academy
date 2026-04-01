@@ -92,11 +92,11 @@ SKIP_VITE="true"
 "@
 
 $REMOTE_COMMANDS = @"
-cd $REMOTE_BASE
+cd `$REMOTE_BASE
 
 echo "--- RESOURCE CLEANUP (PRE-DEPLOY) ---"
 # Kill existing processes first to free up 'fork' slots
-pkill -u $SSH_USER node || true
+pkill -u `$SSH_USER node || true
 sleep 2
 
 echo "--- FINDING NODE ---"
@@ -106,7 +106,7 @@ if [ -f "/opt/alt/node20/bin/node" ]; then
 elif [ -f "/opt/alt/node18/bin/node" ]; then
     NODE_PATH="/opt/alt/node18/bin/node"
 else
-    NODE_PATH=$(which node 2>/dev/null || echo "node")
+    NODE_PATH=`$(which node 2>/dev/null || echo "node")
 fi
 echo "Found node at: `$NODE_PATH"
 
@@ -118,16 +118,16 @@ rm -rf public_html/dist nodejs/dist
 rm -f nodejs/index.js nodejs/server-dist.js nodejs/package.json nodejs/startup_debug.log
 sleep 1
 
-echo "--- EXTRACTING v2.12 ---"
-unzip -o "$DEPLOY_ZIP" -d nodejs/
-unzip -o "$DEPLOY_ZIP" -d public_html/
+echo "--- EXTRACTING v2.13 ---"
+unzip -o "`$DEPLOY_ZIP" -d nodejs/
+unzip -o "`$DEPLOY_ZIP" -d public_html/
 sleep 1
 
 echo "--- SYNCING DB ---"
-[ -f "$SQL_DUMP" ] && mysql -u $REMOTE_DB_USER -p'$REMOTE_DB_PASS' $REMOTE_DB < $SQL_DUMP
+[ -f "`$SQL_DUMP" ] && mysql -u `$REMOTE_DB_USER -p'`$REMOTE_DB_PASS' `$REMOTE_DB < `$SQL_DUMP
 
 echo "--- WRITING PRODUCTION ENV ---"
-printf '%s' '$REMOTE_ENV_CONTENT' > nodejs/.env
+printf '%s' '`$REMOTE_ENV_CONTENT' > nodejs/.env
 
 echo "--- SETTING PERMISSIONS ---"
 chmod +x nodejs/node_modules/.bin/prisma 2>/dev/null || true
@@ -147,7 +147,7 @@ echo "--- VERIFICATION ---"
 mkdir -p tmp && touch tmp/restart.txt
 [ -f server-dist.js ] && echo "✅ server-dist.js exists" || echo "❌ server-dist.js MISSING"
 cd ..
-rm $DEPLOY_ZIP $SQL_DUMP
+rm `$DEPLOY_ZIP `$SQL_DUMP
 "@
 
 ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" $REMOTE_COMMANDS
