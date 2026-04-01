@@ -219,6 +219,8 @@ const Login: React.FC = () => {
               <motion.div key="login" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8 flex-1 flex flex-col justify-center">
                 <form onSubmit={handleLogin} className="space-y-6">
                   <InputWithStatus 
+                    id="login-email"
+                    autoComplete="username"
                     label="Access Key / Email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
@@ -228,6 +230,8 @@ const Login: React.FC = () => {
                     required
                   />
                   <InputWithStatus 
+                    id="login-password"
+                    autoComplete="current-password"
                     label="Encryption Password"
                     type="password"
                     value={formData.password}
@@ -237,6 +241,7 @@ const Login: React.FC = () => {
                     icon={<Lock size={18} />}
                     required
                   />
+
                   <button type="submit" disabled={isLoading} className="w-full bg-red-600 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs hover:bg-red-700 transition-all shadow-2xl shadow-red-500/30 flex items-center justify-center gap-3">
                     {isLoading ? <Loader2 className="animate-spin" size={20} /> : 'Establish Connection'}
                     <ChevronRight size={18} />
@@ -262,7 +267,16 @@ const Login: React.FC = () => {
                   ))}
                 </div>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-1 max-h-[500px]">
+                <form 
+                  onSubmit={(e) => { 
+                    e.preventDefault(); 
+                    if (regStep < 4) setRegStep(regStep + 1); 
+                    else handleRegisterFinal();
+                  }}
+                  className="flex-1 flex flex-col"
+                >
+                  <div className="flex-1 overflow-y-auto custom-scrollbar px-1 max-h-[500px]">
+
                   {regStep === 1 ? (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8 py-4">
                       <div className="space-y-2 text-center">
@@ -274,6 +288,8 @@ const Login: React.FC = () => {
                   ) : regStep === 2 ? (
                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 py-4">
                       <InputWithStatus 
+                        id="reg-email"
+                        autoComplete="email"
                         label={t('network_email')}
                         value={formData.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}
@@ -286,6 +302,8 @@ const Login: React.FC = () => {
                       />
                       <div className="space-y-4">
                         <InputWithStatus 
+                          id="reg-password"
+                          autoComplete="new-password"
                           label={t('encryption_password')}
                           type="password"
                           value={formData.password}
@@ -296,20 +314,20 @@ const Login: React.FC = () => {
                           icon={<Lock size={18} />}
                           required
                         />
+
                         <div className="px-2">
                            <div className="flex justify-between items-center mb-1">
-                             <span className="text-[9px] font-bold text-white/30 uppercase">{t('entropy_analysis')}</span>
-                             <span className={`text-[9px] font-black uppercase ${passStrength < 2 ? 'text-red-400' : 'text-emerald-400'}`}>
+                             <span className="text-[9px] font-black uppercase tracking-tighter text-white/40">{t('entropy_analysis')}</span>
+                             <span className={`text-[9px] font-black uppercase tracking-widest ${passStrength < 2 ? 'text-red-400' : 'text-emerald-400'}`}>
                                {passStrength === 1 ? 'Weak' : passStrength === 2 ? 'Medium' : passStrength === 3 ? 'Fortified' : 'None'}
                              </span>
                            </div>
                            <PasswordStrengthMeter strength={passStrength} />
-                           {passStrength === 1 && (
-                             <p className="text-[9px] text-red-400/80 mt-2 italic font-medium">{t('weak_password_warning')}</p>
-                           )}
                         </div>
                       </div>
                       <InputWithStatus 
+                        id="reg-confirm-password"
+                        autoComplete="new-password"
                         label={t('repeat_security_key')}
                         type="password"
                         value={formData.confirmPassword}
@@ -321,6 +339,7 @@ const Login: React.FC = () => {
                         icon={<Lock size={18} />}
                         required
                       />
+
                       <div className="space-y-2">
                          <label className="text-[10px] font-black uppercase text-white/30 px-2">{t('phone_number')}</label>
                          <div className="flex gap-2">
@@ -442,6 +461,9 @@ const Login: React.FC = () => {
                     </motion.div>
                   )}
                 </div>
+              </form>
+
+
 
                 <div className="text-center pt-8 border-t border-white/5 mt-auto">
                    <button onClick={() => { setMode('login'); setRegStep(1); setError(''); }} className="text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-red-500 transition-colors flex items-center justify-center gap-2 mx-auto">

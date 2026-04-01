@@ -13,11 +13,14 @@ interface InputWithStatusProps {
   errorText?: string;
   required?: boolean;
   icon?: React.ReactNode;
+  id?: string;
+  autoComplete?: string;
 }
 
 export const InputWithStatus: React.FC<InputWithStatusProps> = ({
-  label, type = 'text', value, onChange, placeholder, hint, status = 'none', errorText, required, icon
+  label, type = 'text', value, onChange, placeholder, hint, status = 'none', errorText, required, icon, id, autoComplete
 }) => {
+
   const [isHovered, setIsHovered] = useState(false);
 
   const statusColors = {
@@ -60,6 +63,8 @@ export const InputWithStatus: React.FC<InputWithStatusProps> = ({
         )}
         
         <input
+          id={id}
+          autoComplete={autoComplete}
           type={type}
           value={value}
           onChange={onChange}
@@ -67,6 +72,7 @@ export const InputWithStatus: React.FC<InputWithStatusProps> = ({
           className={`w-full bg-black/40 border ${statusColors[status]} rounded-[2rem] py-5 ${icon ? 'pl-16' : 'px-8'} pr-16 text-white text-sm font-bold outline-none focus:bg-primary/5 transition-all`}
           required={required}
         />
+
 
         {/* Status Dot/Icon inside input */}
         <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-2">
