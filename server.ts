@@ -112,6 +112,14 @@ async function startServer() {
   app.use(express.urlencoded({ extended: true }));
   
   app.use('/api', limiter);
+  
+  // Phase 32: Legacy Compatibility Bridge
+  // Some old cached builds may still look for current_user instead of /me
+  app.get('/api/auth/current_user', (req, res) => {
+    console.log("🌉 Legacy Bridge Triggered: Redirecting current_user to /me");
+    res.redirect(307, '/api/auth/me');
+  });
+
   app.use('/api/auth', authLimiter);
 
   console.log("🛠️ Registering routes...");
