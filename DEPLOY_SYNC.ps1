@@ -94,10 +94,20 @@ SKIP_VITE="true"
 $REMOTE_COMMANDS = @"
 cd $REMOTE_BASE
 
+echo "--- RESOURCE CLEANUP (PRE-DEPLOY) ---"
+# Kill existing processes first to free up 'fork' slots
+pkill -u $SSH_USER node || true
+sleep 2
+
 echo "--- FINDING NODE ---"
-# Detect node location on Hostinger safely
-NODE_PATH=`$(which node 2>/dev/null || find /usr/local/bin /opt/alt/node20/bin /opt/alt/node18/bin -name node 2>/dev/null | head -n 1)
-[ -z "`$NODE_PATH" ] && NODE_PATH="node"
+# Check common Hostinger paths directly instead of using 'find' (which is resource heavy)
+if [ -f "/opt/alt/node20/bin/node" ]; then
+    NODE_PATH="/opt/alt/node20/bin/node"
+elif [ -f "/opt/alt/node18/bin/node" ]; then
+    NODE_PATH="/opt/alt/node18/bin/node"
+else
+    NODE_PATH=$(which node 2>/dev/null || echo "node")
+fi
 echo "Found node at: `$NODE_PATH"
 
 echo "--- DIRECTORY PREP ---"
@@ -106,10 +116,12 @@ mkdir -p nodejs public_html
 echo "--- PURGING OLD BUILD ---"
 rm -rf public_html/dist nodejs/dist
 rm -f nodejs/index.js nodejs/server-dist.js nodejs/package.json nodejs/startup_debug.log
+sleep 1
 
-echo "--- EXTRACTING v2.11 ---"
+echo "--- EXTRACTING v2.12 ---"
 unzip -o "$DEPLOY_ZIP" -d nodejs/
 unzip -o "$DEPLOY_ZIP" -d public_html/
+sleep 1
 
 echo "--- SYNCING DB ---"
 [ -f "$SQL_DUMP" ] && mysql -u $REMOTE_DB_USER -p'$REMOTE_DB_PASS' $REMOTE_DB < $SQL_DUMP
@@ -130,9 +142,6 @@ else
     echo "⚠️ Prisma binary missing, attempting fallback..."
     npx prisma generate 2>/dev/null || `$NODE_PATH node_modules/prisma/build/index.js generate
 fi
-
-echo "--- HARD RESTARTING PROCESSES ---"
-pkill -u $SSH_USER node || echo "No processes to kill."
 
 echo "--- VERIFICATION ---"
 mkdir -p tmp && touch tmp/restart.txt
