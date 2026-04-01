@@ -73,6 +73,11 @@ if (Test-Path "BUILD_TEMP") { Remove-Item -Recurse -Force "BUILD_TEMP" }
 New-Item -ItemType Directory -Path "BUILD_TEMP" | Out-Null
 Copy-Item -Recurse "dist" "BUILD_TEMP/dist"
 Copy-Item -Recurse "prisma" "BUILD_TEMP/prisma"
+# 💎 INJECT PRISMA ENGINES (Fixed v2.13)
+if (Test-Path "node_modules/.prisma") {
+    New-Item -ItemType Directory -Path "BUILD_TEMP/node_modules" -Force | Out-Null
+    Copy-Item -Recurse "node_modules/.prisma" "BUILD_TEMP/node_modules/.prisma"
+}
 Copy-Item "index.js", "server-dist.js", "package.json", ".env.example" "BUILD_TEMP/"
 
 if (Test-Path $DEPLOY_ZIP) { Remove-Item $DEPLOY_ZIP }
