@@ -82,6 +82,18 @@ if ($LASTEXITCODE -ne 0) { throw "SCP Transfer failed!" }
 
 # ⚡ STEP 6: REMOTE EXECUTION (Extract & DB Import)
 Write-Host "[6/6] ⚡ Finalizing Remote Deployment..." -ForegroundColor Yellow
+
+# Prepare production .env content
+$REMOTE_ENV_CONTENT = @"
+DATABASE_URL="mysql://${REMOTE_DB_USER}:${REMOTE_DB_PASS}@127.0.0.1:3306/${REMOTE_DB}"
+JWT_SECRET="Omon_Ra43213467905277"
+GEMINI_API_KEY="AIzaSyBc83wAfRuBv7nt4zoHRbuPsdmez-1sOZ0"
+PORT=3000
+APP_URL="https://rgacademy.space"
+NODE_ENV="production"
+"@
+
+# Define remote script
 $REMOTE_COMMANDS = @"
 cd $REMOTE_PATH
 echo "--- CLEANING OLD ASSETS ---"
@@ -92,6 +104,8 @@ echo "--- SYNCING DATABASE ---"
 mysql -u $REMOTE_DB_USER -p'$REMOTE_DB_PASS' $REMOTE_DB < $SQL_DUMP
 rm $DEPLOY_ZIP
 rm $SQL_DUMP
+echo "--- GENERATING ENVIRONMENT ---"
+printf '%s' '$REMOTE_ENV_CONTENT' > .env
 echo "--- VERIFYING ENVIRONMENT ---"
 cat .env
 mkdir -p tmp && touch tmp/restart.txt
@@ -106,4 +120,5 @@ Write-Host "✅ DEPLOYMENT & SYNC COMPLETED SUCCESSFULLY!" -ForegroundColor Gree
 Write-Host "===============================================" -ForegroundColor Green
 Write-Host "App URL: https://rgacademy.space" -ForegroundColor White
 Write-Host "Database sync: Local Docker -> Remote (Done)" -ForegroundColor White
+Write-Host "Environment: Remote .env generated." -ForegroundColor White
 pause
