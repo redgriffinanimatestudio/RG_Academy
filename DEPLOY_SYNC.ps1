@@ -1,16 +1,18 @@
-# 🚀 RED GRIFFIN ACADEMY - INTEGRATED DEPLOY & SYNC SCRIPT
-# Version: 2.0 (Industrial Auto-Sync)
+# 🚀 RED GRIFFIN ACADEMY - INTEGRATED DEPLOY & SYNC SCRIPT (DOCKER)
+# Version: 2.1 (Industrial Auto-Sync: Port 65002)
 # ==========================================================
 
 $ErrorActionPreference = "Stop"
 
 # --- CONFIGURATION (Adjust if needed) ---
 $SSH_USER = "u315573487"
-$SSH_HOST = "srv1987.hstgr.io"
+$SSH_HOST = "145.79.26.219"
+$SSH_PORT = "65002"
 $REMOTE_PATH = "domains/rgacademy.space/public_html" 
 $LOCAL_DB = "rg_academy"
 $LOCAL_DB_USER = "rg_admin"
 $LOCAL_DB_PASS = "rg_password_2026"
+$DB_CONTAINER = "rg-academy-db"  # Docker container name
 $REMOTE_DB = "u315573487_db"
 $REMOTE_DB_USER = "u315573487_admin"
 $REMOTE_DB_PASS = "RG_Academy_2026"
@@ -20,6 +22,8 @@ $SQL_DUMP = "local_sync.sql"
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host "🦾 STARTING INDUSTRIAL DEPLOYMENT PIPELINE" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
+Write-Host "📡 Host: $SSH_HOST | Port: $SSH_PORT" -ForegroundColor White
+Write-Host "🐳 Docker Database Container: $DB_CONTAINER" -ForegroundColor White
 
 # 💾 STEP 1: GIT SYNC & BACKUP
 Write-Host "[1/6] 💾 Syncing Git Repository..." -ForegroundColor Yellow
@@ -30,6 +34,8 @@ if ($LASTEXITCODE -ne 0) { Write-Warning "Git push failed or nothing to push. Co
 
 # 🏗️ STEP 2: BUILD FRONTEND & BACKEND
 Write-Host "[2/6] 🏗️ Building Project Assets..." -ForegroundColor Yellow
+# Stop dev server before building to prevent EPERM
+Write-Host "⚠️  Please ensure 'npm run dev' and Prisma Studio are CLOSED!" -ForegroundColor Cyan
 npm run build
 if ($LASTEXITCODE -ne 0) { throw "Frontend build failed!" }
 
@@ -39,13 +45,13 @@ if ($LASTEXITCODE -ne 0) { throw "Backend bundling failed!" }
 
 Write-Host "💎 Generating Prisma Client..." -ForegroundColor Yellow
 npx prisma generate
-if ($LASTEXITCODE -ne 0) { throw "Prisma generation failed!" }
+if ($LASTEXITCODE -ne 0) { throw "Prisma generation failed! Check if npm run dev is closed." }
 
-# 🗄️ STEP 3: DATABASE SYNC (Local -> Remote)
-Write-Host "[3/6] 🗄️ Exporting Local MySQL Data..." -ForegroundColor Yellow
-# Ensure mysqldump is in PATH
-& mysqldump -u $LOCAL_DB_USER -p"$LOCAL_DB_PASS" $LOCAL_DB > $SQL_DUMP
-if ($LASTEXITCODE -ne 0) { throw "MySQL dump failed!" }
+# 🗄️ STEP 3: DATABASE SYNC (Docker Local -> Remote)
+Write-Host "[3/6] 🗄️ Exporting Local MySQL (via Docker)..." -ForegroundColor Yellow
+# Using docker exec to dump the database from container
+& docker exec -i $DB_CONTAINER mysqldump -u $LOCAL_DB_USER -p"$LOCAL_DB_PASS" $LOCAL_DB > $SQL_DUMP
+if ($LASTEXITCODE -ne 0) { throw "Docker MySQL dump failed! Check if container '$DB_CONTAINER' is running." }
 
 # 📦 STEP 4: PACKAGING
 Write-Host "[4/6] 📦 Creating Deployment Archive..." -ForegroundColor Yellow
@@ -65,8 +71,9 @@ Compress-Archive -Path "BUILD_TEMP/*" -DestinationPath $DEPLOY_ZIP -Force
 Remove-Item -Recurse -Force "BUILD_TEMP"
 
 # 🚀 STEP 5: UPLOAD VIA SSH (SCP)
-Write-Host "[5/6] 🚀 Uploading to Hostinger (SSH Password Required)..." -ForegroundColor Yellow
-scp $DEPLOY_ZIP $SQL_DUMP "$($SSH_USER)@$($SSH_HOST):$($REMOTE_PATH)/"
+Write-Host "[5/6] 🚀 Uploading to Hostinger (Port $SSH_PORT)..." -ForegroundColor Yellow
+# Use -P for SCP port
+scp -P $SSH_PORT $DEPLOY_ZIP $SQL_DUMP "$($SSH_USER)@$($SSH_HOST):$($REMOTE_PATH)/"
 if ($LASTEXITCODE -ne 0) { throw "SCP Transfer failed!" }
 
 # ⚡ STEP 6: REMOTE EXECUTION (Extract & DB Import)
@@ -80,12 +87,13 @@ rm $SQL_DUMP
 touch tmp/restart.txt
 "@
 
-ssh "$($SSH_USER)@$($SSH_HOST)" $REMOTE_COMMANDS
+# Use -p for SSH port
+ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" $REMOTE_COMMANDS
 if ($LASTEXITCODE -ne 0) { throw "Remote execution failed!" }
 
 Write-Host "===============================================" -ForegroundColor Green
 Write-Host "✅ DEPLOYMENT & SYNC COMPLETED SUCCESSFULLY!" -ForegroundColor Green
 Write-Host "===============================================" -ForegroundColor Green
 Write-Host "App URL: https://rgacademy.space" -ForegroundColor White
-Write-Host "Database sync: Local -> Remote (Done)" -ForegroundColor White
+Write-Host "Database sync: Local Docker -> Remote (Done)" -ForegroundColor White
 pause
