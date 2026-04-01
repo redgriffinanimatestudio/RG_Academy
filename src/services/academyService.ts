@@ -54,11 +54,11 @@ export interface Module {
 const API_V1 = '/v1/academy';
 
 // Shadow Logging для верификации миграции
-const shadowLog = (feature: string, postgresData: any, legacyData: any) => {
+const shadowLog = (feature: string, prodData: any, legacyData: any) => {
   if (MIGRATION_CONFIG.LOG_DIFFS) {
-    const isDifferent = JSON.stringify(postgresData) !== JSON.stringify(legacyData);
+    const isDifferent = JSON.stringify(prodData) !== JSON.stringify(legacyData);
     if (isDifferent) {
-      console.warn(`[Migration Diff] ${feature} mismatch!`, { postgres: postgresData, legacy: legacyData });
+      console.warn(`[Migration Diff] ${feature} mismatch!`, { production: prodData, legacy: legacyData });
     }
   }
 };
@@ -66,7 +66,7 @@ const shadowLog = (feature: string, postgresData: any, legacyData: any) => {
 export const academyService = {
   // 1. Получение курсов с поддержкой пагинации и фильтрации
   async getCourses(filters?: { status?: string, category?: string, level?: string, search?: string, page?: number, limit?: number }): Promise<Course[]> {
-    const fetchFromPostgres = async () => {
+    const fetchFromProductionDB = async () => {
       const { data } = await apiClient.get(`${API_V1}/courses`, { params: filters });
       return data.success ? data.data : [];
     };
@@ -78,12 +78,12 @@ export const academyService = {
       return result.success ? result.data : [];
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
-        const pgData = await fetchFromPostgres();
+        const prodData = await fetchFromProductionDB();
         // В фоновом режиме проверяем Shadow Log (опционально для отладки)
-        if (MIGRATION_CONFIG.LOG_DIFFS) fetchFromLegacy().then(legacy => shadowLog('getCourses', pgData, legacy));
-        return pgData;
+        if (MIGRATION_CONFIG.LOG_DIFFS) fetchFromLegacy().then(legacy => shadowLog('getCourses', prodData, legacy));
+        return prodData;
       } catch (err) {
         console.error('[Migration] Academy Read failed, falling back:', err);
         if (MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) return await fetchFromLegacy();
@@ -96,14 +96,10 @@ export const academyService = {
 
   // 2. Получение курса по Slug
   async getCourseBySlug(slug: string): Promise<Course | null> {
-    const fetchFromPostgres = async () => {
-      const { data } = await apiClient.get(`${API_V1}/courses/${slug}`);
-      return data.success ? data.data : null;
-    };
-
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
-        return await fetchFromPostgres();
+        const { data } = await apiClient.get(`${API_V1}/courses/${slug}`);
+        return data.success ? data.data : null;
       } catch (err) {
         if (MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) {
           const response = await fetch(`/api/v1/academy/courses/${slug}`);
@@ -134,12 +130,12 @@ export const academyService = {
 
   // 4. Запись на курс (Write Operation)
   async enrollInCourse(courseId: string): Promise<void> {
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
         await apiClient.post(`${API_V1}/enroll`, { courseId });
         if (!MIGRATION_CONFIG.DUAL_WRITE) return;
       } catch (err) {
-        console.error('[Migration] Postgres Enroll failed:', err);
+        console.error('[Migration] ProductionDB Enroll failed:', err);
         if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;
       }
     }

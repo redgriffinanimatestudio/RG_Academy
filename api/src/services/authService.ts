@@ -31,12 +31,12 @@ export const authService = {
     const token = this.getToken();
     if (!token) return null;
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
         const { data } = await apiClient.get('/me');
         return data; 
       } catch (e) {
-        console.error('[Migration] Postgres read failed:', e);
+        console.error('[Migration] ProductionDB read failed:', e);
         if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw e;
       }
     }
@@ -54,11 +54,11 @@ export const authService = {
   },
 
   async syncUser(userData: any): Promise<void> {
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
         await apiClient.post('/sync', userData);
       } catch (e) {
-        console.error('[Migration] Sync to Postgres failed:', e);
+        console.error('[Migration] Sync to ProductionDB failed:', e);
       }
     }
   },

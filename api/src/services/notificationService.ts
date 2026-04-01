@@ -16,7 +16,7 @@ const API_BASE = '/notifications';
 
 export const notificationService = {
   async getNotifications(userId: string): Promise<Notification[]> {
-    const fetchFromPostgres = async () => {
+    const fetchFromProductionDB = async () => {
       try {
         const { data } = await apiClient.get(`${API_BASE}`);
         return (data.success && Array.isArray(data.data)) ? data.data : [];
@@ -25,9 +25,9 @@ export const notificationService = {
       }
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
-        return await fetchFromPostgres();
+        return await fetchFromProductionDB();
       } catch (err) {
         console.error('[Migration] Notifications Read failed:', err);
         if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;
@@ -53,7 +53,7 @@ export const notificationService = {
   },
 
   async markAsRead(notificationId: string): Promise<void> {
-    const markInPostgres = () => apiClient.patch(`${API_BASE}/${notificationId}/read`);
+    const markInProductionDB = () => apiClient.patch(`${API_BASE}/${notificationId}/read`);
     
     const markInLegacy = async () => {
       const token = localStorage.getItem('auth_token');
@@ -63,9 +63,9 @@ export const notificationService = {
       });
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
-        await markInPostgres();
+        await markInProductionDB();
         if (MIGRATION_CONFIG.DUAL_WRITE) {
           markInLegacy().catch(e => console.error('[Migration] Dual-Write NotifMarkRead failed:', e));
         }
@@ -79,14 +79,14 @@ export const notificationService = {
   },
 
   async sendNotification(notification: Omit<Notification, 'id' | 'createdAt' | 'isRead'>): Promise<string> {
-    const sendInPostgres = async () => {
+    const sendInProductionDB = async () => {
       const { data } = await apiClient.post(`${API_BASE}`, notification);
       return data.data.id;
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
-        const newId = await sendInPostgres();
+        const newId = await sendInProductionDB();
         return newId;
       } catch (err) {
         if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;

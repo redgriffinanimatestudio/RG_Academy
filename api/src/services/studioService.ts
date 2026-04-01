@@ -58,14 +58,14 @@ export interface Contract {
 export const studioService = {
   // --- Projects Module ---
   async getProjects(filters?: { status?: string, urgency?: string }): Promise<Project[]> {
-    const fetchFromPostgres = async () => {
+    const fetchFromProductionDB = async () => {
       const { data } = await apiClient.get(`${API_V1}/projects`, { params: filters });
       return data.success ? data.data : [];
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
-        return await fetchFromPostgres();
+        return await fetchFromProductionDB();
       } catch (err) {
         console.error('[Migration] Projects Read failed:', err);
         if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;
@@ -79,7 +79,7 @@ export const studioService = {
   },
 
   async getProject(slug: string): Promise<Project | null> {
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
         const { data } = await apiClient.get(`${API_V1}/projects/${slug}`);
         return data.success ? data.data : null;
@@ -94,7 +94,7 @@ export const studioService = {
   },
 
   async createProject(project: Partial<Project>): Promise<Project> {
-    const createInPostgres = async () => {
+    const createInProductionDB = async () => {
       const { data } = await apiClient.post(`${API_V1}/projects`, project);
       return data.data;
     };
@@ -113,9 +113,9 @@ export const studioService = {
       return result.data;
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
-        const newProject = await createInPostgres();
+        const newProject = await createInProductionDB();
         if (MIGRATION_CONFIG.DUAL_WRITE) {
           createInLegacy().catch(e => console.error('[Migration] Dual-Write Project failed:', e));
         }
@@ -131,7 +131,7 @@ export const studioService = {
 
   // --- Contracts Module ---
   async getContracts(userId: string, role: 'client' | 'executor'): Promise<Contract[]> {
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
         const { data } = await apiClient.get(`${API_V1}/contracts`, { params: { userId, role } });
         return data.success ? data.data : [];
@@ -149,14 +149,14 @@ export const studioService = {
   },
 
   async releaseMilestone(contractId: string, index: number): Promise<Contract> {
-    const releaseInPostgres = async () => {
+    const releaseInProductionDB = async () => {
       const { data } = await apiClient.post(`${API_V1}/contracts/${contractId}/milestones/${index}/release`);
       return data.data;
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
-        const updated = await releaseInPostgres();
+        const updated = await releaseInProductionDB();
         return updated;
       } catch (err) {
         if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;

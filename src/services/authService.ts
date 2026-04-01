@@ -18,7 +18,7 @@ const legacyFirestore = {
 };
 
 export const authService = {
-  // 1. Вход: Всегда через основной сервер (Postgres)
+  // 1. Вход: Всегда через основной сервер (ProductionDB)
   async login(login: string, password: string): Promise<AuthResponse> {
     try {
       const { data: apiResponse } = await apiClient.post('/auth/login', { login, password });
@@ -38,18 +38,18 @@ export const authService = {
     }
   },
 
-  // 2. Dual-Read: Попытка взять из Postgres, откат на Firestore
+  // 2. Dual-Read: Попытка взять из ProductionDB
   async getCurrentUser(): Promise<any | null> {
     const token = this.getToken();
     if (!token) return null;
 
-    // Пытаемся прочитать из Postgres (новое API)
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    // Пытаемся прочитать из ProductionDB (новое API)
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
         const { data } = await apiClient.get('/auth/me');
         return data; // Returns { success: true, data: user }
       } catch (e) {
-        console.error('[Migration] Postgres read failed:', e);
+        console.error('[Migration] ProductionDB read failed:', e);
         if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw e;
       }
     }
@@ -69,11 +69,11 @@ export const authService = {
 
   // 3. Синхронизация: Для наполнения новой БД из внешних источников (OAuth/Firebase)
   async syncUser(userData: any): Promise<void> {
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
         await apiClient.post('/auth/sync', userData);
       } catch (e) {
-        console.error('[Migration] Sync to Postgres failed:', e);
+        console.error('[Migration] Sync to ProductionDB failed:', e);
       }
     }
   },

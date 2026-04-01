@@ -3,9 +3,10 @@
  * This mimics the root config to ensure services work correctly.
  */
 export const MIGRATION_CONFIG = {
-  USE_POSTGRES_READ: false,
-  USE_POSTGRES_WRITE: false,
-  FAILOVER_TO_FIRESTORE: false,
-  DUAL_WRITE: false,
-  SYNC_USER_ON_LOGIN: false
+  USE_PRODUCTION_READ: false, // Reading from Primary DB
+  USE_PRODUCTION_WRITE: false, // Writing to Primary DB
+  DUAL_WRITE: false, // Writing to both Legacy and Primary
+  FAILOVER_TO_FIRESTORE: true,
+  SYNC_TO_PRODUCTION: false,
+  LOG_DIFFS: false
 };

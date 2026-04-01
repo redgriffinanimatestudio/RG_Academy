@@ -45,7 +45,7 @@ const API_V1 = '/v1/academy';
 export const academyService = {
   // 1. Получение курсов с поддержкой пагинации и фильтрации
   async getCourses(filters?: { status?: string, category?: string, level?: string, search?: string, page?: number, limit?: number }): Promise<Course[]> {
-    const fetchFromPostgres = async () => {
+    const fetchFromProductionDB = async () => {
       const { data } = await apiClient.get(`${API_V1}/courses`, { params: filters });
       return data.success ? data.data : [];
     };
@@ -57,9 +57,9 @@ export const academyService = {
       return result.success ? result.data : [];
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
-        return await fetchFromPostgres();
+        return await fetchFromProductionDB();
       } catch (err) {
         console.error('[Migration] Academy Read failed, falling back:', err);
         if (MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) return await fetchFromLegacy();
@@ -72,14 +72,14 @@ export const academyService = {
 
   // 2. Получение курса по Slug
   async getCourseBySlug(slug: string): Promise<Course | null> {
-    const fetchFromPostgres = async () => {
+    const fetchFromProductionDB = async () => {
       const { data } = await apiClient.get(`${API_V1}/courses/${slug}`);
       return data.success ? data.data : null;
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
-        return await fetchFromPostgres();
+        return await fetchFromProductionDB();
       } catch (err) {
         if (MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) {
           const response = await fetch(`/api/v1/academy/courses/${slug}`);
@@ -109,7 +109,7 @@ export const academyService = {
 
   // 4. Запись на курс (Write Operation)
   async enrollInCourse(courseId: string): Promise<void> {
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
         await apiClient.post(`${API_V1}/enroll`, { courseId });
         if (!MIGRATION_CONFIG.DUAL_WRITE) return;

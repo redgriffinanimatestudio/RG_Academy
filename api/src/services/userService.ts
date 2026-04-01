@@ -38,14 +38,14 @@ const API_BASE = '/users';
 
 export const userService = {
   async getProfile(uid: string): Promise<UserProfile | null> {
-    const fetchFromPostgres = async () => {
+    const fetchFromProductionDB = async () => {
       const { data } = await apiClient.get(`${API_BASE}/${uid}`);
       return data.success ? data.data : data;
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_READ) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
       try {
-        return await fetchFromPostgres();
+        return await fetchFromProductionDB();
       } catch (err) {
         console.error('[Migration] User Profile Read failed:', err);
         if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw err;
@@ -59,7 +59,7 @@ export const userService = {
   },
 
   async updateProfile(uid: string, profileData: Partial<UserProfile>): Promise<void> {
-    const updateInPostgres = () => apiClient.patch(`${API_BASE}/${uid}`, profileData);
+    const updateInProductionDB = () => apiClient.patch(`${API_BASE}/${uid}`, profileData);
     
     const updateInLegacy = async () => {
       const token = localStorage.getItem('auth_token');
@@ -73,9 +73,9 @@ export const userService = {
       });
     };
 
-    if (MIGRATION_CONFIG.USE_POSTGRES_WRITE) {
+    if (MIGRATION_CONFIG.USE_PRODUCTION_WRITE) {
       try {
-        await updateInPostgres();
+        await updateInProductionDB();
         if (MIGRATION_CONFIG.DUAL_WRITE) {
           updateInLegacy().catch(e => console.error('[Migration] Dual-Write User Profile failed:', e));
         }
