@@ -50,7 +50,7 @@ if ($LASTEXITCODE -ne 0) { throw "Prisma generation failed! Check if npm run dev
 # 🗄️ STEP 3: DATABASE SYNC (Docker Local -> Remote)
 Write-Host "[3/6] 🗄️ Exporting Local MySQL (via Docker)..." -ForegroundColor Yellow
 # Using docker exec to dump the database from container
-& docker exec -i $DB_CONTAINER mysqldump -u $LOCAL_DB_USER -p"$LOCAL_DB_PASS" $LOCAL_DB > $SQL_DUMP
+& docker exec -i $DB_CONTAINER mysqldump --no-tablespaces -u $LOCAL_DB_USER -p"$LOCAL_DB_PASS" $LOCAL_DB > $SQL_DUMP
 if ($LASTEXITCODE -ne 0) { throw "Docker MySQL dump failed! Check if container '$DB_CONTAINER' is running." }
 
 # 📦 STEP 4: PACKAGING
@@ -84,7 +84,7 @@ unzip -o $DEPLOY_ZIP
 mysql -u $REMOTE_DB_USER -p'$REMOTE_DB_PASS' $REMOTE_DB < $SQL_DUMP
 rm $DEPLOY_ZIP
 rm $SQL_DUMP
-touch tmp/restart.txt
+mkdir -p tmp && touch tmp/restart.txt
 "@
 
 # Use -p for SSH port
