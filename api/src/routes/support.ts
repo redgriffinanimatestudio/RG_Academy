@@ -8,8 +8,11 @@ const router = Router();
 router.post('/create', authMiddleware, supportController.createReport);
 
 // --- PROTECTED SUPPORT ACCESS (Support Staff only) ---
-router.get('/', authMiddleware, checkRole(['support', 'admin']), supportController.getReports);
-router.patch('/:reportId/resolve', authMiddleware, checkRole(['support', 'admin']), supportController.resolveReport);
-router.delete('/:reportId', authMiddleware, checkRole(['support', 'admin']), supportController.deleteReport);
+router.use(authMiddleware, checkRole(['support', 'admin']));
+router.get('/summary', supportController.getSummary);
+router.get('/', supportController.getReports);
+router.patch('/:reportId/resolve', supportController.resolveReport);
+router.delete('/:reportId', supportController.deleteReport);
+
 
 export default router;

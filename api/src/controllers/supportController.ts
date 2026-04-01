@@ -4,7 +4,37 @@ import { success, error } from '../utils/response';
 import { AuthRequest } from '../middleware/auth';
 
 export const supportController = {
+  // --- DASHBOARD SUMMARY ---
+  async getSummary(req: AuthRequest, res: Response) {
+    try {
+      const [totalTickets, pendingTickets, resolvedTickets] = await Promise.all([
+        prisma.report.count(),
+        prisma.report.count({ where: { status: 'pending' } }),
+        prisma.report.count({ where: { status: 'resolved' } })
+      ]);
+
+      const recentReports = await prisma.report.findMany({
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        include: { reporter: { select: { displayName: true } } }
+      });
+
+      return success(res, {
+        stats: {
+          totalTickets,
+          pendingTickets,
+          resolvedTickets,
+          efficiency: totalTickets > 0 ? Math.round((resolvedTickets / totalTickets) * 100) : 100
+        },
+        recentReports
+      });
+    } catch (e) {
+      return error(res, 'Failed to fetch support summary');
+    }
+  },
+
   // --- REPORTS & TICKETS ---
+
   async createReport(req: AuthRequest, res: Response) {
     try {
       const { targetType, targetId, reason } = req.body;
