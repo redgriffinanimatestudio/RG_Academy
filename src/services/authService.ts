@@ -38,31 +38,17 @@ export const authService = {
     }
   },
 
-  // 2. Dual-Read: Попытка взять из ProductionDB
+  // 2. ProductionDB Read (Primary)
   async getCurrentUser(): Promise<any | null> {
-    const token = this.getToken();
-    if (!token) return null;
-
-    // Пытаемся прочитать из ProductionDB (новое API)
-    if (MIGRATION_CONFIG.USE_PRODUCTION_READ) {
-      try {
-        const { data } = await apiClient.get('/auth/me');
-        return data; // Returns { success: true, data: user }
-      } catch (e) {
-        console.error('[Migration] ProductionDB read failed:', e);
-        if (!MIGRATION_CONFIG.FAILOVER_TO_FIRESTORE) throw e;
-      }
-    }
-
-    // Откат на Legacy Firestore / Локальное хранилище
     try {
-      const response = await fetch(`${API_URL}/auth/me`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!response.ok) return null;
-      const data = await response.json();
-      return data;
-    } catch (e) {
+      const response = await apiClient.get('/auth/me');
+      // Handle standard response wrapper { success: true, data: user }
+      if (response.data && response.data.success) {
+        return response.data.data;
+      }
+      return response.data; // Return top-level if no wrapper
+    } catch (e: any) {
+      console.error('[AUTH] User verification failed:', e.message);
       return null;
     }
   },
