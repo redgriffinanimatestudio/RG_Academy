@@ -34,7 +34,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const { 
     isDashboardPage, isStudio, isAcademy, isCommunity, 
-    modePrefix, modeColor, modeBg, sidebarCategories 
+    modePrefix, modeColor, modeBg, sidebarCategories,
+    dashboardCategories 
   } = useLayoutMetadata(profile, activeRole || '');
 
   useEffect(() => {
@@ -42,7 +43,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       if (window.innerWidth < 1200) setIsSidebarCollapsed(true);
       else setIsSidebarCollapsed(false);
 
-      // Close mobile menu if resized to desktop
       if (window.innerWidth >= 1024) {
         setIsMobileMenuOpen(false);
       }
@@ -94,21 +94,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       { id: 'studio', label: t('studio'), path: `/studio/${lang || 'eng'}`, icon: Box, active: isStudio, categories: STUDIO_CATEGORIES, color: 'text-primary-hover' }
     ];
 
-    if (isDashboardPage && sidebarCategories.length > 0) {
-      // Inject Dashboard sections at the top for quick access
+    if (isDashboardPage && dashboardCategories.length > 0) {
+      // Inject ONLY Dashboard-specific sections at the top
       sections.unshift({
         id: 'dashboards',
         label: t('dashboards'),
         path: `${modePrefix}/${lang || 'eng'}/dashboard`,
         icon: LayoutDashboard,
         active: true,
-        categories: sidebarCategories,
+        categories: dashboardCategories,
         color: modeColor
       });
     }
 
     return sections;
-  }, [lang, isAcademy, isStudio, isDashboardPage, sidebarCategories, modePrefix, modeColor, t]);
+  }, [lang, isAcademy, isStudio, isDashboardPage, dashboardCategories, modePrefix, modeColor, t]);
 
 
   if (authLoading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">Initializing...</div>;
