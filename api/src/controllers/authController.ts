@@ -3,7 +3,7 @@ import prisma from '../utils/prisma.js';
 import { success, error } from '../utils/response.js';
 import { AuthRequest } from '../middleware/auth.js';
 import { generateToken } from '../utils/auth.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { 
   UserCreateInputSchema, 
   UserUpdateInputSchema,
