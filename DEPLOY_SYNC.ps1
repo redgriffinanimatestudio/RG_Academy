@@ -48,7 +48,7 @@ Write-Host "🏗️  Building Frontend..." -ForegroundColor Yellow
 npm run build
 
 Write-Host "📦 Bundling Backend..." -ForegroundColor Yellow
-npx esbuild server.ts --bundle --platform=node --format=esm --outfile=server-dist.js --minify --external:@prisma/client --external:".prisma/client" --external:vite --banner:js="import { createRequire } from 'module'; const require = createRequire(import.meta.url);"
+npx esbuild server.ts --bundle --platform=node --format=esm --outfile=server-dist.js --minify --external:@prisma/client --external:".prisma/client" --external:vite --banner:js=`"import { createRequire } from 'module'; const require = createRequire(import.meta.url);`"
 
 # 🛡️ VERIFY BUILD INTEGRITY
 Write-Host "🛡️ Verifying Build Integrity for 'Postgres' ghosts..." -ForegroundColor Cyan
