@@ -122,6 +122,26 @@ async function startServer() {
 
   app.use('/api/auth', authLimiter);
 
+  // --- HEALTH CHECK ---
+  app.get('/api/health', async (req, res) => {
+    let dbStatus = "Unknown";
+    try {
+      const { prisma } = await import("./api/src/utils/prisma");
+      await prisma.$queryRaw`SELECT 1`;
+      dbStatus = "Connected";
+    } catch (err) {
+      dbStatus = "Disconnected";
+      console.error("Health Check DB Error:", err.message);
+    }
+
+    res.status(dbStatus === "Connected" ? 200 : 503).json({ 
+      status: "Operational", 
+      database: dbStatus,
+      timestamp: new Date().toISOString(),
+      node: "RG_ACADEMY_INDUSTRIAL_CORE v2.6.1"
+    });
+  });
+
   console.log("🛠️ Registering routes...");
   // --- API ROUTES ---
   app.use('/api', routes);

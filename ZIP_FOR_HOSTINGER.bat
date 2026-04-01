@@ -47,6 +47,7 @@ echo [4/4] Creating final ZIP for Hostinger...
 if exist "RG_Academy_HOSTINGER_DEPLOY.zip" del "RG_Academy_HOSTINGER_DEPLOY.zip"
 
 :: Создаем временную папку сборки
+if exist "BUILD_TEMP" rd /s /q "BUILD_TEMP"
 mkdir BUILD_TEMP
 xcopy /s /e /h /y /q dist BUILD_TEMP\dist\
 xcopy /s /e /h /y /q prisma BUILD_TEMP\prisma\
@@ -54,6 +55,7 @@ copy index.js BUILD_TEMP\
 copy server-dist.js BUILD_TEMP\
 copy package.json BUILD_TEMP\
 copy .env.example BUILD_TEMP\
+copy .env.example BUILD_TEMP\.env
 
 :: Хитрость для Hostinger: отключаем `vite build` внутри сервера,
 :: так как фронтенд уже собран локально в папке dist!
@@ -72,16 +74,19 @@ if not exist "RG_Academy_HOSTINGER_DEPLOY.zip" (
 )
 
 echo.
-echo ===========================================
+echo ===================================================
 echo [SUCCESS] RG_Academy_HOSTINGER_DEPLOY.zip is ready!
-echo -------------------------------------------
+echo ---------------------------------------------------
 echo ТЕПЕРЬ СДЕЛАЙТЕ СЛЕДУЮЩЕЕ В ПАНЕЛИ HOSTINGER:
 echo.
-echo [1] Зайдите в Node.js Web App
-echo [2] Загрузите НОВЫЙ RG_Academy_HOSTINGER_DEPLOY.zip и нажмите "Extract"
-echo [3] Выберите файл "index.js" в настройках
-echo [4] Нажмите "Apply Build Settings" и затем "Deploy"
+echo [1] Зайдите в раздел "Node.js Web App"
+echo [2] Загрузите НОВЫЙ ZIP и нажмите "Extract"
+echo [3] Проверьте "Application Setup":
+echo     - Entry File: index.js
+echo     - Node Version: 18.x или 20.x (ВАЖНО!)
+echo [4] Нажмите "Apply Build Settings" и "Deploy"
+echo [5] Перейдите на https://rgacademy.space/api/health
 echo.
-echo ЭТО РЕШИТ ПРОБЛЕМУ 503 ОШИБКИ!
-echo ===========================================
+echo ЭТО РЕШИТ ПРОБЛЕМУ 503 И БЕЛОГО ЭКРАНА!
+echo ===================================================
 pause
