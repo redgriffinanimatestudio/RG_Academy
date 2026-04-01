@@ -141,7 +141,7 @@ async function startServer() {
 
   app.use(errorHandler);
 
-  server.listen(Number(PORT), "0.0.0.0", () => {
+  server.listen(Number(PORT), () => {
     console.log(`\n🚀 ========================================== 🚀`);
     console.log(`🔥 PLATFORM READY: http://localhost:${PORT}`);
     console.log(`🌐 FRONTEND:      http://localhost:${PORT}`);
