@@ -95,10 +95,10 @@ $REMOTE_COMMANDS = @"
 cd $REMOTE_BASE
 
 echo "--- FINDING NODE ---"
-# Detect node location on Hostinger
-NODE_PATH=$(which node 2>/dev/null || find /usr/local/bin /opt/alt/node20/bin /opt/alt/node18/bin -name node 2>/dev/null | head -n 1)
-[ -z "$NODE_PATH" ] && NODE_PATH="node"
-echo "Found node at: $NODE_PATH"
+# Detect node location on Hostinger safely
+NODE_PATH=\$(which node 2>/dev/null || find /usr/local/bin /opt/alt/node20/bin /opt/alt/node18/bin -name node 2>/dev/null | head -n 1)
+[ -z "\$NODE_PATH" ] && NODE_PATH="node"
+echo "Found node at: \$NODE_PATH"
 
 echo "--- DIRECTORY PREP ---"
 mkdir -p nodejs public_html
@@ -125,10 +125,10 @@ echo "--- REGENERATING PRISMA FOR LINUX ---"
 cd nodejs
 export NODE_ENV=production
 if [ -f "./node_modules/.bin/prisma" ]; then
-    $NODE_PATH ./node_modules/.bin/prisma generate
+    \$NODE_PATH ./node_modules/.bin/prisma generate
 else
     echo "⚠️ Prisma binary missing, attempting fallback..."
-    npx prisma generate 2>/dev/null || $NODE_PATH node_modules/prisma/build/index.js generate
+    npx prisma generate 2>/dev/null || \$NODE_PATH node_modules/prisma/build/index.js generate
 fi
 
 echo "--- HARD RESTARTING PROCESSES ---"
