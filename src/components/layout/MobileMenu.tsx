@@ -91,29 +91,36 @@ export default function MobileMenu({
                 </div>
               </div>
 
-              <nav className="space-y-2">
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 px-2 mb-4">Core Ecosystem</p>
+              {/* ⚡ Tier 1: Layer Switcher (Academy / Studio / Community) */}
+              <div className="grid grid-cols-3 gap-2">
                 {[
-                  { label: t('academy'), path: `/aca/${currentLangCode}`, icon: GraduationCap, color: 'text-primary' },
-                  { label: t('studio'), path: `/studio/${currentLangCode}`, icon: Box, color: 'text-primary-hover' },
-                  { label: t('community'), path: `${modePrefix}/${currentLangCode}/community`, icon: Users, color: 'text-emerald-500' }
+                  { id: 'academy', label: 'Academy', path: `/aca/${currentLangCode}`, icon: GraduationCap, active: location.pathname.includes('/aca'), color: 'text-primary', glow: 'shadow-red-500/10' },
+                  { id: 'studio', label: 'Studio', path: `/studio/${currentLangCode}`, icon: Box, active: location.pathname.includes('/studio'), color: 'text-primary-hover', glow: 'shadow-cyan-400/10' },
+                  { id: 'community', label: 'Community', path: `${modePrefix}/${currentLangCode}/community`, icon: Users, active: location.pathname.includes('/community'), color: 'text-emerald-500', glow: 'shadow-emerald-500/10' }
                 ].map((item) => (
                   <Link
-                    key={item.label}
+                    key={item.id}
                     to={item.path}
                     onClick={onClose}
-                    className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/5 active:scale-[0.98] transition-all group"
+                    className={`flex flex-col items-center justify-center p-4 rounded-3xl border transition-all relative overflow-hidden group ${
+                      item.active 
+                        ? `bg-white/[0.05] border-white/20 ${item.glow} shadow-xl` 
+                        : 'bg-white/[0.02] border-white/5 text-white/20 hover:bg-white/5 hover:text-white/40'
+                    }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`size-10 rounded-xl bg-white/5 flex items-center justify-center ${item.color} group-hover:scale-110 transition-transform`}>
-                        <item.icon size={20} />
-                      </div>
-                      <span className="text-xs font-black uppercase tracking-widest text-white/80">{item.label}</span>
+                    <div className={`mb-1 transition-transform group-hover:scale-110 ${item.active ? item.color : 'opacity-40'}`}>
+                      <item.icon size={20} />
                     </div>
-                    <ChevronRight size={14} className="text-white/10 group-hover:text-white transition-colors" />
+                    <span className={`text-[8px] font-black uppercase tracking-widest ${item.active ? 'text-white' : 'text-white/20'}`}>
+                      {item.label}
+                    </span>
+                    {item.active && (
+                      <motion.div layoutId="active-layer" className="absolute bottom-0 inset-x-4 h-[2px] bg-gradient-to-r from-transparent via-current to-transparent" style={{ color: item.color.includes('primary') ? (item.id === 'academy' ? '#ff3b30' : '#00ffd1') : '#10b981' }} />
+                    )}
                   </Link>
                 ))}
-              </nav>
+              </div>
+
 
               {isDashboard && (
                 <div className="space-y-4 pt-4 border-t border-white/5">
