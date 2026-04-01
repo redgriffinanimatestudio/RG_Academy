@@ -34,6 +34,10 @@ if ($LASTEXITCODE -ne 0) { Write-Warning "Git push failed or nothing to push. Co
 
 # 🏗️ STEP 2: BUILD FRONTEND & BACKEND
 Write-Host "[2/6] 🏗️ Building Project Assets..." -ForegroundColor Yellow
+
+# Clean up local typo files
+if (Test-Path "server-dist.js)") { Remove-Item "server-dist.js)" }
+
 # Stop dev server before building to prevent EPERM
 Write-Host "⚠️  Please ensure 'npm run dev' and Prisma Studio are CLOSED!" -ForegroundColor Cyan
 npm run build
@@ -80,10 +84,16 @@ if ($LASTEXITCODE -ne 0) { throw "SCP Transfer failed!" }
 Write-Host "[6/6] ⚡ Finalizing Remote Deployment..." -ForegroundColor Yellow
 $REMOTE_COMMANDS = @"
 cd $REMOTE_PATH
+echo "--- CLEANING OLD ASSETS ---"
+rm -rf dist index.js server-dist.js package.json
+echo "--- EXTRACTING NEW BUILD ---"
 unzip -o $DEPLOY_ZIP
+echo "--- SYNCING DATABASE ---"
 mysql -u $REMOTE_DB_USER -p'$REMOTE_DB_PASS' $REMOTE_DB < $SQL_DUMP
 rm $DEPLOY_ZIP
 rm $SQL_DUMP
+echo "--- VERIFYING ENVIRONMENT ---"
+cat .env
 mkdir -p tmp && touch tmp/restart.txt
 "@
 
