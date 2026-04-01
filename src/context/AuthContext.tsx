@@ -91,10 +91,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
-    await authService.logout();
+    console.log("[AUTH] Logging out...");
+    try {
+      await authService.logout();
+    } catch (err) {
+      console.warn("Logout request failed, proceeding to clear local state anyway.");
+    }
     setProfile(null);
     setActiveRoleState(null);
-    window.location.href = '/';
+    // Force a full clean reload to the login page
+    sessionStorage.clear();
+    localStorage.removeItem('rg_auth_session'); 
+    
+    // Extract lang from current path or default to eng
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const currentLang = (pathParts.length > 0 && pathParts[0].length === 3) ? pathParts[0] : 'eng';
+    
+    window.location.href = `/aca/${currentLang}/login`;
   };
 
   const login = async (loginStr: string, pass: string) => {

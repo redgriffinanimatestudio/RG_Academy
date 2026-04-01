@@ -116,11 +116,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   if (authLoading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">Initializing...</div>;
   
   // Phase 31: Logout & API Fallback Guard (Anti-Black Screen)
-  // If session is lost and we are on a protected page, stop rendering full layout.
-  // BUT: Never block rendering if we are on the login/register/main pages (no black screen on landing).
-  const isPublicPage = path.includes('/login') || path.includes('/register') || path === `/${lang}` || path === `/${lang}/`;
+  // If session is lost and we are on a protected page, force redirect to landing.
+  const isPublicPage = path.includes('/login') || path.includes('/register') || path === `/${lang}` || path === `/${lang}/` || path === '/';
+  
+  useEffect(() => {
+    if (!authLoading && !profile && (isDashboardPage || isProfile) && !isPublicPage) {
+      console.log("[Layout] Unauthorized access detected, redirecting to landing...");
+      window.location.href = `/${lang || 'eng'}`;
+    }
+  }, [profile, authLoading, isDashboardPage, isProfile, isPublicPage, lang]);
+
   if (!profile && (isDashboardPage || isProfile) && !isPublicPage) {
-    return <div className="min-h-screen bg-[#050505] animate-pulse" />;
+    return <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+      <div className="size-12 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+    </div>;
   }
 
   return (

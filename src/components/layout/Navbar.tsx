@@ -63,11 +63,11 @@ export default function Navbar({
     return `${modePrefix}/${currentLangCode}/dashboard`;
   };
 
-  const navClass = isDashboardPage ? 'bg-black/10 border-white/10' : (isStudio ? 'bg-[#030303]/10 border-primary/30' : 'bg-black/10 border-white/10');
+  const navClass = isDashboardPage ? 'bg-black/80 border-white/10' : (isStudio ? 'bg-[#030303]/90 border-primary/30' : 'bg-black/80 border-white/10');
   const cardClass = 'bg-white/10 border-white/10 backdrop-blur-3xl';
 
   return (
-    <nav className={`sticky top-0 z-50 backdrop-blur-xl border-b transition-colors duration-500 ${navClass}`}>
+    <nav className={`sticky top-0 z-[100] backdrop-blur-3xl border-b transition-colors duration-500 ${navClass}`}>
       <div className="mx-auto px-2 sm:px-6 lg:px-8">
         <div className="flex h-14 sm:h-16 lg:h-20 items-center justify-between gap-2 sm:gap-4 lg:gap-8">
           <div className="flex items-center gap-2 sm:gap-6">
@@ -92,7 +92,7 @@ export default function Navbar({
           <div className="flex items-center gap-1 sm:gap-3">
             <div className="relative hidden sm:block">
               <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)} className={`p-2 transition-colors flex items-center gap-2 font-black text-[9px] sm:text-[10px] uppercase ${modeColor}`}>
-                <Globe size={16} sm:size={18} /><span className="hidden md:inline">{currentLang.code}</span>
+                <Globe size={18} className="w-4 h-4 sm:w-[18px] sm:h-[18px]" /><span className="hidden md:inline">{currentLang.code}</span>
               </button>
               <AnimatePresence>
                 {isLangMenuOpen && (

@@ -1,30 +1,59 @@
 #!/usr/bin/env node
 
 /** 
- * RG Academy - Production Bootstrap v2.12 (Error Trapping Mode)
- * This version includes global handlers for silent crashes and a heartbeat mechanism.
+ * RG Academy - Production Bootstrap v2.13 (Enhanced Debug Mode)
+ * This version includes improved logging for silent crashes on Hostinger.
  */
 
-// Global Error Handlers - Log errors even if they are not in Express context
+import fs from 'fs';
+import path from 'path';
+
+// Local log file for emergency capture if stdout is suppressed
+const EMERGENCY_LOG = 'startup_debug.log';
+
+function logEmergency(msg) {
+  const timestamp = new Date().toISOString();
+  const entry = `[${timestamp}] ${msg}\n`;
+  console.log(msg);
+  try {
+    fs.appendFileSync(EMERGENCY_LOG, entry);
+  } catch (e) {
+    // Ignore log failures
+  }
+}
+
+logEmergency('🚀 BOOTSTRAP: RG Academy Native Server initializing...');
+
+// Global Error Handlers
 process.on('uncaughtException', (err) => {
-  console.error('🔥 FATAL EXCEPTION (process.on):', err.message);
-  console.error(err.stack);
+  logEmergency(`🔥 FATAL EXCEPTION: ${err.message}`);
+  logEmergency(err.stack);
   process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('🔥 UNHANDLED REJECTION:', reason);
+  logEmergency(`🔥 UNHANDLED REJECTION: ${reason}`);
 });
 
-// Process Heartbeat - Reduced for production stability
+// Process Heartbeat
 setInterval(() => {
   console.log('💓 Heartbeat: RG Academy Server is operational.');
 }, 3600000); // 1 hour
 
-console.log('🚀 Starting RG Academy Native Server (v2.12 Error Trapping)...');
+// Dynamic import with better error context
+const serverPath = './server-dist.js';
 
-import('./server-dist.js').catch((error) => {
-  console.error('❌ Server failed to boot!', error.message);
-  console.error(error.stack);
+logEmergency(`📦 BOOTSTRAP: Attempting to import ${serverPath}...`);
+
+if (!fs.existsSync(serverPath)) {
+  logEmergency(`❌ ERROR: ${serverPath} NOT FOUND! Run ZIP_FOR_HOSTINGER.bat before deploying.`);
+  process.exit(1);
+}
+
+import(serverPath).then(() => {
+  logEmergency('✅ BOOTSTRAP: Server logic imported successfully.');
+}).catch((error) => {
+  logEmergency(`❌ BOOTSTRAP: Server failed to boot! Error: ${error.message}`);
+  logEmergency(error.stack);
   process.exit(1);
 });
