@@ -16,10 +16,10 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('🔥 UNHANDLED REJECTION:', reason);
 });
 
-// Process Heartbeat - Prove that the process is still alive every 30s
+// Process Heartbeat - Reduced for production stability
 setInterval(() => {
-  console.log('💓 Heartbeat: RG Academy Server process is alive at ' + new Date().toISOString());
-}, 30000);
+  console.log('💓 Heartbeat: RG Academy Server is operational.');
+}, 3600000); // 1 hour
 
 console.log('🚀 Starting RG Academy Native Server (v2.12 Error Trapping)...');
 
