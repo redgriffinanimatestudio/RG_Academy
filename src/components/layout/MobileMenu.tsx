@@ -1,10 +1,11 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  X, Search, GraduationCap, Box, Users, ChevronDown, ChevronRight, LogIn, LogOut, Settings, Globe, Shield, ShoppingCart 
+  X, Search, GraduationCap, Box, Users, ChevronDown, ChevronRight, LogIn, LogOut, Settings, Globe, Shield, ShoppingCart, Target 
 } from 'lucide-react';
+import { PERSPECTIVES } from './Layout.constants';
 import { useAuth } from '../../context/AuthContext';
 import { usePlatform } from '../../context/PlatformContext';
 
@@ -34,6 +35,20 @@ export default function MobileMenu({
   const { data: platformData } = usePlatform();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  const isDashboard = location.pathname.includes('/dashboard');
+
+  const getPerspectiveUrl = (id: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (id === 'admin') {
+      params.delete('perspective');
+    } else {
+      params.set('perspective', id);
+    }
+    return `${location.pathname}?${params.toString()}`;
+  };
 
   const cartCount = platformData?.cart?.length || 0;
 
@@ -99,6 +114,32 @@ export default function MobileMenu({
                   </Link>
                 ))}
               </nav>
+
+              {isDashboard && (
+                <div className="space-y-4 pt-4 border-t border-white/5">
+                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 px-2 mb-4">Command Perspectives</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {PERSPECTIVES.map((p) => {
+                      const isActive = (searchParams.get('perspective') === p.id) || (!searchParams.get('perspective') && p.id === 'admin');
+                      return (
+                        <Link
+                          key={p.id}
+                          to={getPerspectiveUrl(p.id)}
+                          onClick={onClose}
+                          className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${
+                            isActive 
+                              ? 'bg-white/10 border-white/20 text-white shadow-lg' 
+                              : 'bg-white/[0.02] border-white/5 text-white/40 hover:bg-white/5'
+                          }`}
+                        >
+                          <p.icon size={14} style={{ color: isActive ? p.color : 'inherit' }} />
+                          <span className="text-[9px] font-black uppercase tracking-widest truncate">{p.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-4 pt-4 border-t border-white/5">
                 <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 px-2 mb-4">Explore Modules</p>

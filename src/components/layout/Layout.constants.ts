@@ -168,3 +168,19 @@ export const SUPERADMIN_HUB = [
     { name: 'agency_hub', icon: Briefcase, role: 'agency' }
   ]}
 ];
+
+// --- ROLE PERSPECTIVES (Universal Hubs) ---
+export const PERSPECTIVES = [
+  { id: 'admin', icon: Shield, label: 'Master Admin', color: '#ef4444' },
+  { id: 'hr', icon: UserPlus, label: 'HR Talent', color: '#378add' },
+  { id: 'finance', icon: DollarSign, label: 'Treasury', color: '#1d9e75' },
+  { id: 'support', icon: LifeBuoy, label: 'User Support', color: '#7f77dd' },
+  { id: 'lecturer', icon: Video, label: 'Instructor', color: '#1d9e75' },
+  { id: 'client', icon: Box, label: 'Client Node', color: '#ef9f27' },
+  { id: 'executor', icon: Zap, label: 'Freelance Node', color: '#e24b4a' },
+  { id: 'student', icon: GraduationCap, label: 'Student Nexus', color: '#378add' },
+  { id: 'chief_manager', icon: Target, label: 'Strategic Hub', color: '#7f77dd' },
+  { id: 'manager', icon: LayoutDashboard, label: 'Operations', color: '#1d9e75' },
+  { id: 'agency', icon: Briefcase, label: 'Agency Hub', color: '#9333ea' }
+];
+
