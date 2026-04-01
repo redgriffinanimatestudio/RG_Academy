@@ -56,6 +56,10 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 async function startServer() {
   console.log("🛠️ Starting RG Academy Server (Step 1: INIT)...");
   const app = express();
+  
+  // Required for Hostinger/Cloudflare/Proxy environments
+  app.set('trust proxy', 1);
+
   const server = createServer(app);
   const io = new SocketIOServer(server, {
     cors: { origin: true, credentials: true }
