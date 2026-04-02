@@ -453,6 +453,7 @@ const Login: React.FC = () => {
                         <CyberCalendar 
                           value={formData.dateOfBirth}
                           onChange={(val) => handleInputChange('dateOfBirth', val)}
+                          lang={lang}
                         />
                       </div>
 
