@@ -105,9 +105,13 @@ echo "--- DATABASE ---"
 echo "--- ENV & PRISMA ---"
 printf "DATABASE_URL=mysql://${REMOTE_DB_USER}:${REMOTE_DB_PASS}@145.79.26.219:3306/${REMOTE_DB}\nJWT_SECRET=super_secret_2026\nPORT=3000\nNODE_ENV=production" > nodejs/.env
 
-chmod +x nodejs/node_modules/.bin/prisma 2>/dev/null || true
+NPM_PATH=`$(which npm 2>/dev/null || echo "/opt/alt/alt-nodejs20/root/usr/bin/npm")
+NPX_PATH=`$(which npx 2>/dev/null || echo "/opt/alt/alt-nodejs20/root/usr/bin/npx")
+
 cd nodejs
-`$NODE_PATH ./node_modules/prisma/build/index.js generate || npx prisma generate
+echo "Installing Database Engines on Hostinger..."
+`$NPM_PATH install @prisma/client prisma --no-save
+`$NPX_PATH prisma generate
 
 echo "--- RESTARTING ---"
 mkdir -p tmp && touch tmp/restart.txt
