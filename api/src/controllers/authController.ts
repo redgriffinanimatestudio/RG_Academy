@@ -10,6 +10,7 @@ import {
   ProfileUpsertWithoutUserInputSchema
 } from '../schemas/generated/index.js';
 import { z } from 'zod';
+import { mapSocialPayload } from '../utils/socialMapper.js';
 
 // Временное кэширование OTP в памяти сервера
 // Формат: { '+7900...': { code: '123456', expiresAt: 1234123, attempts: 0 } }
@@ -405,26 +406,74 @@ export const authController = {
    */
   async socialAuth(req: Request, res: Response) {
     try {
-      const { email, displayName, photoURL, provider, remoteId } = req.body;
-      let user = await prisma.user.findUnique({ where: { email }, include: { profile: true } });
+      const { provider, payload } = req.body;
+      if (!payload || !payload.email) return error(res, 'Invalid social payload', 400);
+
+      const socialData = mapSocialPayload(provider, payload);
+      const { email, displayName, photoURL, remoteId, bio, location, website, socialHandles } = socialData;
+
+      let user = await prisma.user.findUnique({ 
+        where: { email }, 
+        include: { profile: true } 
+      });
+
       if (!user) {
+        // Full professional creation on first handshake
         user = await prisma.user.create({
           data: {
-            email, displayName, photoURL, remoteId, source: provider,
-            role: 'user', primaryRole: 'user', roles: JSON.stringify(['user']),
-            isStudent: false, isClient: false, isExecutor: false,
-            profile: { create: { bio: `Social login`, avatar: photoURL } }
+            email, 
+            displayName, 
+            photoURL, 
+            remoteId, 
+            source: provider,
+            role: 'user', 
+            primaryRole: 'user', 
+            roles: JSON.stringify(['user']),
+            isStudent: false, 
+            isClient: false, 
+            isExecutor: false,
+            profile: { 
+              create: { 
+                bio: bio || `Social identity synchronized via ${provider}`, 
+                avatar: photoURL,
+                location: location,
+                portfolioUrl: website,
+                telegramHandle: socialHandles?.telegram,
+                linkedInUrl: socialHandles?.linkedin
+              } 
+            }
           },
           include: { profile: true }
         });
+        console.log(`✨ [AUTH] New social node authorized: ${email} via ${provider}`);
+      } else {
+        // SMART SYNC: Update profile if it exists (Industrial Standard)
+        console.log(`🔄 [AUTH] Synchronizing identity for node: ${email}`);
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { photoURL, displayName, remoteId }
+        });
+
+        if (user.profile) {
+          await prisma.profile.update({
+            where: { id: user.profile.id },
+            data: { 
+              avatar: photoURL,
+              bio: bio || user.profile.bio, // Keep existing bio if social is empty
+              location: location || user.profile.location
+            }
+          });
+        }
       }
+
       const rolesArray = JSON.parse(user.roles || '["student"]');
       return success(res, { 
         token: generateToken(user.id, user.email!), 
         user: { ...user, roles: rolesArray } 
       });
-    } catch (e) {
-      return error(res, 'Social auth failed', 500);
+    } catch (e: any) {
+      console.error('Social Auth Sync Error:', e);
+      return error(res, 'Identity synchronization failed', 500);
     }
   },
 

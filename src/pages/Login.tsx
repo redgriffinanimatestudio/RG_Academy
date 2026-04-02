@@ -211,16 +211,16 @@ const Login: React.FC = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-xl relative z-10"
       >
-        <div className="bg-[#0f0f0f] border border-white/5 rounded-[3rem] sm:rounded-[4rem] p-6 sm:p-10 lg:p-12 shadow-2xl space-y-8 sm:space-y-10 backdrop-blur-3xl min-h-[500px] sm:min-h-[700px] flex flex-col justify-center">
+        <div className="bg-[#0f0f0f] border border-white/5 rounded-[3rem] p-4 sm:p-8 lg:p-10 shadow-2xl space-y-6 sm:space-y-8 backdrop-blur-3xl min-h-[400px] flex flex-col justify-center">
           
           {/* Header */}
           <div className="text-center space-y-4">
             <motion.div 
               key={mode}
               initial={{ rotateY: 90 }} animate={{ rotateY: 0 }}
-              className="inline-flex items-center justify-center size-14 sm:size-20 rounded-[1.5rem] sm:rounded-[2rem] bg-gradient-to-br from-red-600/20 to-red-900/5 border border-red-500/20 text-red-500 shadow-2xl shadow-red-500/20"
+              className="inline-flex items-center justify-center size-12 sm:size-16 rounded-[1.2rem] bg-gradient-to-br from-red-600/20 to-red-900/5 border border-red-500/20 text-red-500 shadow-2xl shadow-red-500/20"
             >
-              {mode === 'register' ? <UserPlus size={24} className="sm:w-8 sm:h-8" /> : <LogIn size={24} className="sm:w-8 sm:h-8" />}
+              {mode === 'register' ? <UserPlus size={20} className="sm:w-6 sm:h-6" /> : <LogIn size={20} className="sm:w-6 sm:h-6" />}
             </motion.div>
             <div className="space-y-1">
               <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-tighter text-white italic leading-none">
@@ -304,18 +304,18 @@ const Login: React.FC = () => {
                   }}
                   className="flex-1 flex flex-col"
                 >
-                  <div className="flex-1 overflow-y-auto custom-scrollbar px-1 max-h-[500px]">
+                  <div className="flex-1 px-1">
 
                   {regStep === 1 ? (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8 py-4">
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 py-2">
                       <div className="space-y-2 text-center">
-                        <h3 className="text-lg font-black uppercase tracking-widest text-white">{t('step_role')}</h3>
-                        <p className="text-xs font-bold text-white/40 uppercase tracking-widest leading-relaxed">Choose your gateway into the ecosystem</p>
+                        <h3 className="text-base font-black uppercase text-white">{t('step_role')}</h3>
+                        <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest leading-relaxed">Choose your gateway into the ecosystem</p>
                       </div>
                       <RoleTree onShowDetail={(id) => { handleInputChange('selectedRole', id); setRegStep(2); }} />
                     </motion.div>
                   ) : regStep === 2 ? (
-                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 py-4">
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-3 py-2">
                       <InputWithStatus 
                         id="reg-email"
                         autoComplete="email"
@@ -329,7 +329,7 @@ const Login: React.FC = () => {
                         icon={<Mail size={18} />}
                         required
                       />
-                      <div className="space-y-4">
+                      <div className="space-y-2">
                         <InputWithStatus 
                           id="reg-password"
                           autoComplete="new-password"
@@ -369,7 +369,7 @@ const Login: React.FC = () => {
                         required
                       />
 
-                      <div className="space-y-2">
+                      <div className="space-y-1">
                          <label className="text-[10px] font-black uppercase text-white/30 px-2">{t('phone_number')}</label>
                          <div className="flex gap-2">
                            <select 
@@ -390,12 +390,12 @@ const Login: React.FC = () => {
                            />
                          </div>
                       </div>
-                      <button onClick={() => setRegStep(3)} disabled={!formData.email || !formData.password || emailStatus === 'error' || passConfirmStatus !== 'success'} className="w-full bg-red-600 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs hover:bg-red-700 transition-all flex items-center justify-center gap-2">
-                        {t('security_check_passed')} <ChevronRight size={18} />
+                      <button onClick={() => setRegStep(3)} disabled={!formData.email || !formData.password || emailStatus === 'error' || passConfirmStatus !== 'success'} className="w-full bg-red-600 text-white py-4 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-700 transition-all flex items-center justify-center gap-2">
+                        {t('security_check_passed')} <ChevronRight size={14} />
                       </button>
                     </motion.div>
                   ) : regStep === 3 ? (
-                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 py-4">
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-3 py-2">
                       <InputWithStatus 
                         label={t('full_name')}
                         value={formData.displayName}
@@ -407,54 +407,56 @@ const Login: React.FC = () => {
                         required
                       />
                       
-                      <div className="space-y-3">
-                         <label className="text-[10px] font-black uppercase text-white/30 px-2">{t('gender')}</label>
-                         <div className="grid grid-cols-3 gap-3">
-                           {['male', 'female', 'other'].map(g => (
-                             <button
-                               key={g}
-                               onClick={() => handleInputChange('gender', g)}
-                               className={`py-4 rounded-2xl border transition-all text-[10px] font-black uppercase tracking-widest ${formData.gender === g ? 'bg-red-600/20 border-red-500 text-red-400' : 'bg-white/5 border-white/5 text-white/40 hover:text-white'}`}
-                             >
-                               {t(`gender_${g}`)}
-                             </button>
-                           ))}
-                         </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                           <label className="text-[10px] font-black uppercase text-white/30 px-2">{t('gender')}</label>
+                           <div className="grid grid-cols-3 gap-1.5">
+                             {['male', 'female', 'other'].map(g => (
+                               <button
+                                 key={g}
+                                 type="button"
+                                 onClick={() => handleInputChange('gender', g)}
+                                 className={`py-3.5 rounded-xl border transition-all text-[8px] font-black uppercase tracking-widest ${formData.gender === g ? 'bg-red-600/20 border-red-500 text-red-400' : 'bg-white/5 border-white/5 text-white/40 hover:text-white'}`}
+                               >
+                                 {t(`gender_${g}`)}
+                               </button>
+                             ))}
+                           </div>
+                        </div>
+
+                        <div className="space-y-2">
+                           <label className="text-[10px] font-black uppercase text-white/30 px-2">{t('date_of_birth')}</label>
+                           <div className="relative">
+                              <input 
+                                type="date"
+                                className="w-full bg-black/40 border border-white/5 rounded-xl py-3.5 px-4 text-white text-xs outline-none focus:border-red-500/40 custom-calendar-icon"
+                                value={formData.dateOfBirth}
+                                onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+                              />
+                              <Calendar size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" />
+                           </div>
+                        </div>
                       </div>
 
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black uppercase text-white/30 px-2">{t('date_of_birth')}</label>
-                         <div className="relative">
-                            <input 
-                              type="date"
-                              className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-white text-sm outline-none focus:border-red-500/40 custom-calendar-icon"
-                              value={formData.dateOfBirth}
-                              onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                            />
-                            <Calendar size={18} className="absolute right-6 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" />
-                         </div>
-                         <p className="text-[9px] text-white/20 px-2 italic uppercase font-bold tracking-tighter leading-tight">
-                           <Shield size={10} className="inline mr-1" /> {t('age_restriction_notice')}
-                         </p>
+                      <div className="grid grid-cols-2 gap-4">
+                        <CountrySelector 
+                          value={formData.country}
+                          onChange={(val) => handleInputChange('country', val)}
+                        />
+
+                        <InputWithStatus 
+                          label={t('citizenship')}
+                          value={formData.citizenship}
+                          onChange={(e) => handleInputChange('citizenship', e.target.value)}
+                          placeholder="GR, UK, RU"
+                          hint="Legal residency status."
+                          icon={<Globe size={16} />}
+                          required
+                        />
                       </div>
 
-                      <CountrySelector 
-                        value={formData.country}
-                        onChange={(val) => handleInputChange('country', val)}
-                      />
-
-                      <InputWithStatus 
-                        label={t('citizenship')}
-                        value={formData.citizenship}
-                        onChange={(e) => handleInputChange('citizenship', e.target.value)}
-                        placeholder="e.g. GR, UK, RU"
-                        hint="Legal residency status."
-                        icon={<Globe size={18} />}
-                        required
-                      />
-
-                      <button onClick={() => setRegStep(4)} disabled={!formData.displayName || !formData.dateOfBirth || !formData.country || !formData.citizenship} className="w-full bg-red-600 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs hover:bg-red-700 transition-all flex items-center justify-center gap-2">
-                        {t('establish_identity')} <ChevronRight size={18} />
+                      <button onClick={() => setRegStep(4)} disabled={!formData.displayName || !formData.dateOfBirth || !formData.country || !formData.citizenship} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2">
+                        {t('establish_identity')} <ChevronRight size={14} />
                       </button>
                     </motion.div>
                   ) : regStep === 4 ? (
@@ -474,8 +476,8 @@ const Login: React.FC = () => {
                         <label className="text-[10px] font-black uppercase text-white/30">Brief Intelligence (Bio)</label>
                         <textarea value={formData.bio} onChange={(e)=>handleInputChange('bio', e.target.value)} placeholder="Skills, goals, expertise..." className="w-full bg-black/40 border border-white/5 rounded-3xl p-6 text-white text-sm outline-none focus:border-red-500/40 min-h-[100px] resize-none" />
                       </div>
-                      <button onClick={handleRegisterFinal} disabled={isLoading} className="w-full bg-red-600 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs hover:bg-red-700 transition-all flex items-center justify-center gap-3">
-                        {t('node_online')} <Zap size={18} />
+                      <button onClick={handleRegisterFinal} disabled={isLoading} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2">
+                        {t('node_online')} <Zap size={14} />
                       </button>
                       {error && (
                         <motion.div 
@@ -514,7 +516,7 @@ const Login: React.FC = () => {
 
 
 
-                <div className="text-center pt-8 border-t border-white/5 mt-auto">
+                <div className="text-center pt-4 border-t border-white/5 mt-auto">
                    <button onClick={() => { setMode('login'); setRegStep(1); setError(''); }} className="text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-red-500 transition-colors flex items-center justify-center gap-2 mx-auto">
                      <ArrowLeft size={14} /> {t('go_back')}
                    </button>

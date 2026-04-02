@@ -40,7 +40,7 @@ export const InputWithStatus: React.FC<InputWithStatusProps> = ({
   };
 
   return (
-    <div className="space-y-2 relative group">
+    <div className="space-y-1.5 relative group">
       <div className="flex items-center justify-between px-2">
         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
           {label} {required && <span className="text-red-500/50">*</span>}
