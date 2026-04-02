@@ -113,12 +113,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [lang, isAcademy, isStudio, isDashboardPage, dashboardCategories, modePrefix, modeColor, t]);
 
 
-  if (authLoading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">Initializing...</div>;
-  
-  // Phase 31: Logout & API Fallback Guard (Anti-Black Screen)
-  // If session is lost and we are on a protected page, force redirect to landing.
   const isPublicPage = path.includes('/login') || path.includes('/register') || path === `/${lang}` || path === `/${lang}/` || path === '/';
   
+  // Phase 31: Logout & API Fallback Guard (Anti-Black Screen)
   useEffect(() => {
     if (!authLoading && !profile && (isDashboardPage || isProfile) && !isPublicPage) {
       console.log("[Layout] Unauthorized access detected, redirecting to landing...");
@@ -126,6 +123,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [profile, authLoading, isDashboardPage, isProfile, isPublicPage, lang]);
 
+  if (authLoading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">Initializing...</div>;
+  
   if (!profile && (isDashboardPage || isProfile) && !isPublicPage) {
     return <div className="min-h-screen bg-[#050505] flex items-center justify-center">
       <div className="size-12 border-2 border-primary border-t-transparent rounded-full animate-spin" />
