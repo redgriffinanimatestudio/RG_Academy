@@ -47,7 +47,7 @@ Write-Host "🏗️  Building Frontend..."
 npm run build
 
 Write-Host "📦 Bundling Backend..."
-npx esbuild server.ts --bundle --platform=node --format=esm --outfile=server-dist.js --banner:js="import { createRequire } from 'module'; const require = createRequire(import.meta.url);" --external:fsevents --external:canvas --external:sharp --external:prisma --external:@prisma/client
+npx esbuild server.ts --bundle --platform=node --format=esm --outfile=server-dist.js --banner:js="import { createRequire as __createRequire } from 'module'; const require = __createRequire(import.meta.url);" --external:fsevents --external:canvas --external:sharp --external:prisma --external:@prisma/client
 
 Write-Host "🛡️ Verifying Build Integrity..."
 if (-not (Test-Path "dist/index.html") -or -not (Test-Path "server-dist.js")) {
