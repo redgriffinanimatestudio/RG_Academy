@@ -189,6 +189,7 @@ async function startServer() {
       app.get('*', (req, res) => {
         // Only fallback to index.html if it's not an API call
         if (!req.path.startsWith('/api')) {
+          res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
           res.sendFile(path.join(distPath, 'index.html'));
         } else {
           res.status(404).json({ error: 'API endpoint not found' });

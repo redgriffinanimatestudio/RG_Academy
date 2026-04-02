@@ -107,7 +107,7 @@ printf "DATABASE_URL=mysql://${REMOTE_DB_USER}:${REMOTE_DB_PASS}@145.79.26.219:3
 
 chmod +x nodejs/node_modules/.bin/prisma 2>/dev/null || true
 cd nodejs
-`$NODE_PATH ./node_modules/.bin/prisma generate || npx prisma generate
+`$NODE_PATH ./node_modules/prisma/build/index.js generate || npx prisma generate
 
 echo "--- RESTARTING ---"
 mkdir -p tmp && touch tmp/restart.txt
