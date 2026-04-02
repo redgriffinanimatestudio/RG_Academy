@@ -214,7 +214,8 @@ const Login: React.FC = () => {
       sessionStorage.removeItem('rg_reg_step');
       setIsRegistered(true);
     } catch (err: any) { 
-      setError(err.message); 
+      const msg = err.response?.data?.error || err.message;
+      setError(`NETWORK REJECTION: ${msg.toUpperCase()}`); 
     } finally { 
       setIsLoading(false); 
     }

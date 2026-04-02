@@ -19,9 +19,9 @@ const RoleNode: React.FC<RoleNodeProps> = ({ title, icon, x, y, color, onShowDet
   <motion.div
     initial={{ scale: 0, opacity: 0 }}
     animate={{ 
-      scale: isSelected ? 1.3 : (isHighlighted ? 1.05 : 1), 
+      scale: isSelected ? 1.6 : (isHighlighted ? 1.05 : 1), 
       opacity: isSelected ? 1 : (isHighlighted ? 1 : (disabled ? 0.65 : 0.95)),
-      zIndex: isSelected ? 50 : 20
+      zIndex: isSelected ? 100 : 20
     }}
     whileHover={!disabled && !isSelected ? { scale: 1.15 } : {}}
     className={`absolute -translate-x-1/2 -translate-y-1/2 group ${disabled ? 'cursor-not-allowed filter grayscale' : 'cursor-pointer'}`}
@@ -29,19 +29,19 @@ const RoleNode: React.FC<RoleNodeProps> = ({ title, icon, x, y, color, onShowDet
     onClick={() => !disabled && !isSelected && onShowDetail(id)}
   >
     <div 
-      className={`size-12 sm:size-16 rounded-[1.8rem] bg-[#0a0a0a]/90 backdrop-blur-xl border-2 flex flex-col items-center justify-center transition-all duration-500 shadow-2xl ${!disabled || isHighlighted ? 'group-hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]' : ''} ${isSelected ? 'ring-4 ring-white/20' : ''}`}
+      className={`size-12 sm:size-20 rounded-[2.2rem] bg-[#0a0a0a]/95 backdrop-blur-3xl border-2 flex flex-col items-center justify-center transition-all duration-700 shadow-2xl ${!disabled || isHighlighted ? 'group-hover:shadow-[0_0_40px_rgba(255,255,255,0.15)]' : ''} ${isSelected ? 'ring-8 ring-white/10' : ''}`}
       style={{ 
         borderColor: isSelected ? '#fff' : (isHighlighted ? color : (disabled ? '#333' : color)), 
-        boxShadow: isSelected ? `0 0 50px #fff40` : (isHighlighted ? `0 0 35px ${color}50` : (disabled ? 'none' : `0 0 25px ${color}20`)) 
+        boxShadow: isSelected ? `0 0 80px rgba(255, 255, 255, 0.4)` : (isHighlighted ? `0 0 35px ${color}50` : (disabled ? 'none' : `0 0 25px ${color}20`)) 
       }}
     >
-      <div style={{ color: isSelected ? '#fff' : (isHighlighted ? color : (disabled ? '#666' : color)) }} className="mb-0.5">
+      <div style={{ color: isSelected ? '#000' : (isHighlighted ? color : (disabled ? '#666' : color)) }} className={`mb-0.5 z-10 ${isSelected ? 'bg-white p-2 rounded-full' : ''}`}>
         {isSelected ? (
-           <motion.div initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", damping: 10 }}>
-              <Check size={28} className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+           <motion.div initial={{ scale: 0, rotate: -45 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", damping: 8, stiffness: 200 }}>
+              <Check size={32} strokeWidth={4} />
            </motion.div>
         ) : (
-           React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { size: 22 }) : icon
+           React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { size: 26 }) : icon
         )}
       </div>
       
@@ -148,7 +148,7 @@ export const RoleTree: React.FC<{ onShowDetail: (id: string) => void }> = ({ onS
     setSelectedId(id);
     setTimeout(() => {
       onShowDetail(id);
-    }, 850);
+    }, 1200);
   };
 
   return (
