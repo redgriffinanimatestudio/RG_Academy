@@ -17,7 +17,7 @@ interface RoleNodeProps {
 const RoleNode: React.FC<RoleNodeProps> = ({ title, icon, x, y, color, onShowDetail, id, disabled, isHighlighted }) => (
   <motion.div
     initial={{ scale: 0, opacity: 0 }}
-    animate={{ scale: 1, opacity: isHighlighted ? 1 : (disabled ? 0.6 : 0.9) }}
+    animate={{ scale: 1, opacity: isHighlighted ? 1 : (disabled ? 0.65 : 0.95) }}
     whileHover={!disabled ? { scale: 1.15 } : {}}
     className={`absolute -translate-x-1/2 -translate-y-1/2 group z-20 ${disabled ? 'cursor-not-allowed filter grayscale' : 'cursor-pointer'}`}
     style={{ left: `${x}%`, top: `${y}%` }}
@@ -26,11 +26,11 @@ const RoleNode: React.FC<RoleNodeProps> = ({ title, icon, x, y, color, onShowDet
     <div 
       className={`size-12 sm:size-16 rounded-[1.8rem] bg-[#0a0a0a]/90 backdrop-blur-xl border-2 flex flex-col items-center justify-center transition-all duration-500 shadow-2xl ${!disabled || isHighlighted ? 'group-hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]' : ''}`}
       style={{ 
-        borderColor: isHighlighted ? color : (disabled ? '#222' : color), 
-        boxShadow: isHighlighted ? `0 0 30px ${color}40` : (disabled ? 'none' : `0 0 25px ${color}15`) 
+        borderColor: isHighlighted ? color : (disabled ? '#333' : color), 
+        boxShadow: isHighlighted ? `0 0 35px ${color}50` : (disabled ? 'none' : `0 0 25px ${color}20`) 
       }}
     >
-      <div style={{ color: isHighlighted ? color : (disabled ? '#444' : color) }} className="mb-0.5">
+      <div style={{ color: isHighlighted ? color : (disabled ? '#666' : color) }} className="mb-0.5">
         {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { size: 22 }) : icon}
       </div>
       

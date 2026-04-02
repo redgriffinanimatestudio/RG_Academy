@@ -28,6 +28,7 @@ const Login: React.FC = () => {
   const [showTreeModal, setShowTreeModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [redirectCountdown, setRedirectCountdown] = useState(5);
   
   const { t, i18n: i18nInstance } = useTranslation();
   const { lang = 'eng' } = useParams();
@@ -158,13 +159,11 @@ const Login: React.FC = () => {
     setError('');
     try {
       await login(formData.email, formData.password);
-      // Clear persistence on successful login/register
       sessionStorage.removeItem('rg_reg_data');
       sessionStorage.removeItem('rg_reg_step');
       navigate(`/${lang}`);
     } catch (err: any) {
       console.error("[LOGIN] Error caught in UI:", err);
-      // Map specific errors as requested
       const msg = err.message || '';
       if (msg.toLowerCase().includes('password') || msg.toLowerCase().includes('credential')) {
         setError('WRONG PASSCODE: Authentication hash mismatch. Please re-verify credentials.');
@@ -177,6 +176,19 @@ const Login: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  // Auto-redirect after registration success
+  useEffect(() => {
+    let timer: any;
+    if (isRegistered && redirectCountdown > 0) {
+      timer = setTimeout(() => {
+        setRedirectCountdown(prev => prev - 1);
+      }, 1000);
+    } else if (isRegistered && redirectCountdown === 0) {
+      navigate(`/${lang}/dashboard`);
+    }
+    return () => clearTimeout(timer);
+  }, [isRegistered, redirectCountdown, navigate, lang]);
 
   const handleRegisterFinal = async () => {
     setIsLoading(true);
@@ -198,7 +210,6 @@ const Login: React.FC = () => {
           dateOfBirth: formData.dateOfBirth
         }
       });
-      // Clear persistence
       sessionStorage.removeItem('rg_reg_data');
       sessionStorage.removeItem('rg_reg_step');
       setIsRegistered(true);
@@ -211,7 +222,6 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#050505] px-6 py-12 overflow-hidden relative font-sans">
-      {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-red-600/10 blur-[150px] rounded-full" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[150px] rounded-full" />
@@ -300,7 +310,6 @@ const Login: React.FC = () => {
               </motion.div>
             ) : (
               <motion.div key="register" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8 flex-1 flex flex-col">
-                {/* Step Indicator */}
                 <div className="flex items-center justify-between px-2">
                   {[1, 2, 3, 4, 5].map(s => (
                     <div key={s} className="flex items-center gap-2">
@@ -531,7 +540,7 @@ const Login: React.FC = () => {
                          <div className="flex items-start gap-4">
                             <div className="size-2 rounded-full bg-red-500 mt-1.5 shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
                             <p className="text-[11px] font-medium text-white/60 leading-relaxed italic">
-                              You are establishing a professional presence within the Grid. As a resident of <span className="text-red-400 font-black uppercase">{(ALL_COUNTRIES.find(c => c.code === formData.country)?.name || formData.country).toUpperCase()}</span>, your data will be managed according to the Red Griffin Global Protocol and local node hosting regulations.
+                               You are establishing a professional presence within the Grid. As a resident of <span className="text-red-400 font-black uppercase">{(ALL_COUNTRIES.find(c => c.code === formData.country)?.name || formData.country).toUpperCase()}</span>, your data will be managed according to the Red Griffin Global Protocol and local node hosting regulations.
                             </p>
                          </div>
 
@@ -559,34 +568,67 @@ const Login: React.FC = () => {
                     </motion.div>
                   ) : isRegistered ? (
                     <motion.div 
-                      initial={{ opacity: 0, scale: 0.9, y: 20 }} 
-                      animate={{ opacity: 1, scale: 1, y: 0 }} 
-                      className="flex flex-col items-center justify-center py-10 text-center space-y-10"
+                      initial={{ opacity: 0, scale: 0.95 }} 
+                      animate={{ opacity: 1, scale: 1 }} 
+                      className="flex flex-col items-center justify-center py-10 text-center space-y-12"
                     >
                        <div className="relative">
-                          <div className="absolute inset-0 bg-emerald-500/20 blur-[60px] rounded-full animate-pulse" />
-                          <div className="size-24 rounded-[2rem] bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-500 relative z-10 shadow-2xl shadow-emerald-500/20">
-                             <CheckCircle2 size={48} className="animate-bounce" />
-                          </div>
+                          <div className="absolute inset-0 bg-emerald-500/20 blur-[80px] rounded-full animate-pulse" />
+                          <motion.div 
+                            initial={{ rotate: -180, scale: 0 }}
+                            animate={{ rotate: 0, scale: 1 }}
+                            transition={{ type: "spring", damping: 12 }}
+                            className="size-32 rounded-[2.5rem] bg-[#0a0a0a] border-2 border-emerald-500/40 flex items-center justify-center text-emerald-500 relative z-10 shadow-[0_0_50px_rgba(16,185,129,0.2)]"
+                          >
+                             <CheckCircle2 size={64} className="drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+                          </motion.div>
                        </div>
 
-                       <div className="space-y-3 relative z-10">
-                         <h3 className="text-4xl font-black uppercase text-white tracking-widest leading-none">
-                            Congratulations
-                         </h3>
-                         <p className="text-[11px] font-black uppercase tracking-[0.5em] text-emerald-400 italic">
-                            Node Successfully Activated
-                         </p>
-                         <p className="text-[12px] font-bold text-white/30 max-w-[280px] mx-auto mt-4 leading-relaxed">
-                            Welcome to the Red Griffin Academy. Your digital identity is now synchronized with our global grid.
-                         </p>
+                       <div className="space-y-4 relative z-10">
+                          <motion.h3 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-5xl font-black uppercase text-white tracking-widest"
+                          >
+                             Welcome
+                          </motion.h3>
+                          <motion.p 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-[12px] font-black uppercase tracking-[0.8em] text-emerald-400 italic"
+                          >
+                             Node Successfully Forged
+                          </motion.p>
+                          <motion.p 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                            className="text-[12px] font-medium text-white/40 max-w-[320px] mx-auto mt-6 leading-relaxed"
+                          >
+                             Your identity shard is now synchronized with our global grid. Initializing neural bridge to your dashboard...
+                          </motion.p>
+                       </div>
+
+                       <div className="w-full max-w-[280px] space-y-4">
+                          <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                             <motion.div 
+                               initial={{ width: "100%" }}
+                               animate={{ width: "0%" }}
+                               transition={{ duration: 5, ease: "linear" }}
+                               className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                             />
+                          </div>
+                          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">
+                             Auto-redirect in {redirectCountdown}s...
+                          </p>
                        </div>
 
                        <button 
                          onClick={() => navigate(`/${lang}/dashboard`)}
-                         className="px-12 py-5 bg-emerald-600 text-white rounded-2xl text-[12px] font-black uppercase tracking-[0.4em] hover:bg-emerald-700 transition-all shadow-2xl shadow-emerald-600/40 flex items-center gap-4 group active:scale-95"
+                         className="px-14 py-5 bg-white text-black rounded-2xl text-[13px] font-black uppercase tracking-[0.5em] hover:bg-emerald-500 hover:text-white transition-all shadow-3xl flex items-center gap-5 group active:scale-95"
                        >
-                          Enter Dashboard <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                          ENTER HUB <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
                        </button>
                     </motion.div>
                   ) : (
