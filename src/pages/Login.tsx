@@ -211,7 +211,7 @@ const Login: React.FC = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-xl relative z-10"
       >
-        <div className="bg-[#0f0f0f] border border-white/5 rounded-[3rem] sm:rounded-[4rem] p-6 sm:p-10 lg:p-14 shadow-2xl space-y-8 sm:space-y-10 backdrop-blur-3xl min-h-[500px] sm:min-h-[750px] flex flex-col justify-center">
+        <div className="bg-[#0f0f0f] border border-white/5 rounded-[3rem] sm:rounded-[4rem] p-6 sm:p-10 lg:p-12 shadow-2xl space-y-8 sm:space-y-10 backdrop-blur-3xl min-h-[500px] sm:min-h-[700px] flex flex-col justify-center">
           
           {/* Header */}
           <div className="text-center space-y-4">
@@ -226,7 +226,7 @@ const Login: React.FC = () => {
               <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-tighter text-white italic leading-none">
                 {mode === 'register' ? t('join_grid') : 'Node Auth'}
               </h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">{t('reg_protocol')}</p>
+              <p className="text-[12px] font-black uppercase tracking-[0.4em] text-white/30">{t('reg_protocol')}</p>
             </div>
           </div>
 
@@ -240,42 +240,45 @@ const Login: React.FC = () => {
                 ) : (
                   <>
                     <form onSubmit={handleLogin} className="space-y-6">
-                      <InputWithStatus 
-                        id="login-email"
-                        autoComplete="username"
-                        label="Access Key / Email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        placeholder="ENTER NODE ID"
-                        hint="Use your registered email or system-assigned node identifier."
-                        status={emailStatus}
-                        errorText={emailError}
-                        icon={<User size={18} />}
-                        required
-                      />
-                      <InputWithStatus 
-                        id="login-password"
-                        autoComplete="current-password"
-                        label="Encryption Password"
-                        type="password"
-                        value={formData.password}
-                        onChange={(e) => handleInputChange('password', e.target.value)}
-                        placeholder="ENTER PASSCODE"
-                        hint="Enter the encryption key associated with this node."
-                        icon={<Lock size={18} />}
-                        required
-                      />
+                      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
+                        <InputWithStatus 
+                          id="login-email"
+                          autoComplete="username"
+                          label="Access Key / Email"
+                          value={formData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          placeholder="ENTER NODE ID"
+                          hint="Use your registered email or system-assigned node identifier."
+                          status={emailStatus}
+                          errorText={emailError}
+                          icon={<User size={18} />}
+                          required
+                        />
+                      </motion.div>
+                      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
+                        <InputWithStatus 
+                          id="login-password"
+                          autoComplete="current-password"
+                          label="Encryption Password"
+                          type="password"
+                          value={formData.password}
+                          onChange={(e) => handleInputChange('password', e.target.value)}
+                          placeholder="ENTER PASSCODE"
+                          hint="Enter the encryption key associated with this node."
+                          icon={<Lock size={18} />}
+                          required
+                        />
+                      </motion.div>
 
-                      <button type="submit" disabled={isLoading} className="w-full bg-red-600 text-white py-4 sm:py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs hover:bg-red-700 transition-all shadow-2xl shadow-red-500/30 flex items-center justify-center gap-3">
-                        Establish Connection
-                        <ChevronRight size={18} />
-                      </button>
+                      <div className="grid grid-cols-2 gap-4">
+                        <button type="submit" disabled={isLoading} className="bg-red-600 text-white py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-700 transition-all shadow-2xl shadow-red-500/30 flex items-center justify-center gap-2">
+                          Connect <ChevronRight size={14} />
+                        </button>
+                        <button type="button" onClick={() => setMode('register')} className="bg-white/5 border border-white/10 text-white/60 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2">
+                           New Node <UserPlus size={14} />
+                        </button>
+                      </div>
                     </form>
-                    <div className="text-center">
-                      <button onClick={() => setMode('register')} className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-red-500 transition-colors">
-                        Don't have a node? <span className="text-white underline decoration-red-500/40 underline-offset-4">Initialize Journey</span>
-                      </button>
-                    </div>
                   </>
                 )}
               </motion.div>
@@ -285,10 +288,10 @@ const Login: React.FC = () => {
                 <div className="flex items-center justify-between px-2">
                   {[1, 2, 3, 4].map(s => (
                     <div key={s} className="flex items-center gap-2">
-                      <div className={`size-8 rounded-full flex items-center justify-center text-[10px] font-black border-2 transition-all duration-500 ${regStep >= s ? 'bg-red-600 border-red-600 text-white' : 'border-white/10 text-white/20'}`}>
+                      <div className={`size-7 rounded-full flex items-center justify-center text-[9px] font-black border-2 transition-all duration-500 ${regStep >= s ? 'bg-red-600 border-red-600 text-white' : 'border-white/10 text-white/20'}`}>
                         {s}
                       </div>
-                      {s < 4 && <div className={`h-[2px] w-8 lg:w-12 transition-all duration-500 ${regStep > s ? 'bg-red-600' : 'bg-white/10'}`} />}
+                      {s < 4 && <div className={`h-[2px] w-6 lg:w-10 transition-all duration-500 ${regStep > s ? 'bg-red-600' : 'bg-white/10'}`} />}
                     </div>
                   ))}
                 </div>
@@ -307,7 +310,7 @@ const Login: React.FC = () => {
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8 py-4">
                       <div className="space-y-2 text-center">
                         <h3 className="text-lg font-black uppercase tracking-widest text-white">{t('step_role')}</h3>
-                        <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest leading-relaxed">Choose your gateway into the ecosystem</p>
+                        <p className="text-xs font-bold text-white/40 uppercase tracking-widest leading-relaxed">Choose your gateway into the ecosystem</p>
                       </div>
                       <RoleTree onShowDetail={(id) => { handleInputChange('selectedRole', id); setRegStep(2); }} />
                     </motion.div>

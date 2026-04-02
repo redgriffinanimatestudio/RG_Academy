@@ -20,6 +20,7 @@ import Preloader from './Preloader';
 // Optimization Hooks & Constants
 import { LANGUAGES, ACADEMY_CATEGORIES, STUDIO_CATEGORIES } from './layout/Layout.constants';
 import { useLayoutMetadata } from './layout/useLayoutMetadata';
+import { GuideOverlay } from './GuideOverlay';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { profile, activeRole, setActiveRole, loading: authLoading } = useAuth();
@@ -56,6 +57,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({ academy: true, dashboards: true });
   const [showBanner, setShowBanner] = useState(true);
+  const [showGuide, setShowGuide] = useState(false);
   
   const notifications = Array.isArray(platformData.notifications) ? platformData.notifications : [];
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -178,7 +180,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <main className="mx-auto max-w-[1920px] px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-12">
         <div className="flex flex-col md:flex-row gap-4 sm:gap-6 lg:gap-8">
-          {(isAcademy || isStudio || isCommunity || isDashboardPage) && (
+          {(isAcademy || isStudio || isCommunity || isDashboardPage) && !isPublicPage && (
             <div className="hidden md:block shrink-0">
               <Sidebar 
                 profile={profile}
@@ -186,6 +188,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 isSidebarCollapsed={isSidebarCollapsed} setIsSidebarCollapsed={setIsSidebarCollapsed}
                 handleSetCategory={handleSetCategory} handleSetSub={handleSetSub}
                 modeColor={modeColor} isStudio={isStudio}
+                onOpenGuide={() => setShowGuide(true)}
               />
             </div>
           )}
@@ -212,6 +215,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       />
       <BottomNav />
       <AIAssistant />
+      <GuideOverlay 
+        isOpen={showGuide} 
+        onClose={() => setShowGuide(false)} 
+        mode={isStudio ? 'studio' : 'academy'} 
+      />
     </div>
   );
 }

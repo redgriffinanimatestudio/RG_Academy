@@ -69,17 +69,17 @@ export const InputWithStatus: React.FC<InputWithStatusProps> = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full bg-black/40 border ${statusColors[status]} rounded-2xl py-4 sm:py-5 ${icon ? 'pl-16' : 'px-8'} pr-16 text-white text-sm font-bold outline-none focus:bg-primary/5 transition-all`}
+          className={`w-full bg-black/40 border ${statusColors[status]} rounded-2xl py-3.5 sm:py-4 ${icon ? 'pl-12' : 'px-6'} pr-14 text-xs font-bold outline-none focus:bg-primary/5 transition-all`}
           required={required}
         />
 
 
         {/* Status Dot/Icon inside input */}
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-2">
-          {status === 'success' && <CheckCircle2 size={18} className="text-emerald-500" />}
-          {status === 'error' && <XCircle size={18} className="text-red-500" />}
-          {status === 'warning' && <AlertCircle size={18} className="text-amber-500" />}
-          <div className={`w-3 h-3 rounded-full ${dotColors[status]} transition-all duration-500 shadow-sm`} />
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          {status === 'success' && <CheckCircle2 size={16} className="text-emerald-500" />}
+          {status === 'error' && <XCircle size={16} className="text-red-500" />}
+          {status === 'warning' && <AlertCircle size={16} className="text-amber-500" />}
+          <div className={`w-2 h-2 rounded-full ${dotColors[status]} transition-all duration-500 shadow-sm`} />
         </div>
       </div>
 

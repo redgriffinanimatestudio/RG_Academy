@@ -15,6 +15,7 @@ interface SidebarProps {
   handleSetSub: (sub: any, cat: any) => void;
   modeColor: string;
   isStudio: boolean;
+  onOpenGuide: () => void;
 }
 
 export default function Sidebar({
@@ -27,7 +28,8 @@ export default function Sidebar({
   handleSetCategory,
   handleSetSub,
   modeColor,
-  isStudio
+  isStudio,
+  onOpenGuide
 }: SidebarProps) {
   const { t } = useTranslation();
 
@@ -49,11 +51,17 @@ export default function Sidebar({
                 <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">Genesis Guide</h4>
                 <p className="text-[11px] font-bold text-white mb-4 leading-relaxed">Join the Red Griffin Creative Ecosystem to unlock professional nodes.</p>
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-[9px] font-black uppercase text-primary">
+                  <div 
+                    onClick={onOpenGuide}
+                    className="flex items-center gap-2 text-[9px] font-black uppercase text-primary cursor-pointer hover:translate-x-1 transition-transform"
+                  >
                     <div className="size-1 rounded-full bg-primary animate-pulse" />
                     How to start
                   </div>
-                  <div className="flex items-center gap-2 text-[9px] font-black uppercase text-white/40 hover:text-white transition-colors cursor-pointer">
+                  <div 
+                    onClick={onOpenGuide}
+                    className="flex items-center gap-2 text-[9px] font-black uppercase text-white/40 hover:text-white transition-all cursor-pointer hover:translate-x-1"
+                  >
                     <div className="size-1 rounded-full bg-white/10" />
                     Ecosystem Map
                   </div>
