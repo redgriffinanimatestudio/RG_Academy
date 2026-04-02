@@ -57,10 +57,10 @@ self.addEventListener('fetch', (e) => { });
 $KillSwitchSW | Out-File -FilePath "dist/sw.js" -Encoding utf8
 
 Write-Host "📦 Bundling Backend..."
-npx esbuild server.ts --bundle --platform=node --format=esm --outfile=server-dist.js --banner:js="import { createRequire as __createRequire } from 'module'; const require = __createRequire(import.meta.url);" --external:fsevents --external:canvas --external:sharp --external:prisma --external:@prisma/client
+npx esbuild server.ts --bundle --platform=node --format=cjs --outfile=server-dist.cjs --external:fsevents --external:canvas --external:sharp --external:prisma --external:@prisma/client
 
 Write-Host "🛡️ Verifying Build Integrity..."
-if (-not (Test-Path "dist/index.html") -or -not (Test-Path "server-dist.js")) {
+if (-not (Test-Path "dist/index.html") -or -not (Test-Path "server-dist.cjs")) {
     Write-Host "❌ Build check FAILED!" -ForegroundColor Red
     exit 1
 }
@@ -73,7 +73,8 @@ docker exec $DB_CONTAINER mysqldump -u$LOCAL_DB_USER -p$LOCAL_DB_PASS $LOCAL_DB 
 # [4/6] Creating Archive
 Write-Host "[4/6] 📦 Creating Archive (v2.17)..." -ForegroundColor Yellow
 Copy-Item -Recurse "dist" "$BUILD_TEMP/dist"
-Copy-Item "server-dist.js" "$BUILD_TEMP/index.js"
+Copy-Item "server-dist.cjs" "$BUILD_TEMP/server-dist.cjs"
+Copy-Item "index.js" "$BUILD_TEMP/index.js"
 Copy-Item "package.json" "$BUILD_TEMP/package.json"
 if (Test-Path "prisma") { Copy-Item -Recurse "prisma" "$BUILD_TEMP/prisma" }
 
@@ -115,7 +116,7 @@ echo "Using Node: `$NODE_PATH"
 
 mkdir -p nodejs public_html
 rm -rf nodejs/dist public_html/dist
-rm -f nodejs/index.js nodejs/server-dist.js nodejs/.env
+rm -f nodejs/index.js nodejs/server-dist.cjs nodejs/.env
 
 echo "--- UNPACKING ---"
 unzip -o "$DEPLOY_ZIP" -d nodejs/

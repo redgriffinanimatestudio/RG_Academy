@@ -41,7 +41,7 @@ setInterval(() => {
 }, 3600000); // 1 hour heartbeat to save CPU
 
 // Dynamic import with better error context
-const serverPath = './server-dist.js';
+const serverPath = './server-dist.cjs';
 
 logEmergency(`📦 BOOTSTRAP: Attempting to import ${serverPath}...`);
 
