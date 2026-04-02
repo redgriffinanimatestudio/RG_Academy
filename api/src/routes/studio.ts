@@ -67,6 +67,7 @@ router.post('/contracts/:contractId/milestones/:index/release',
 );
 
 // Tasks
+router.get('/tasks', authMiddleware, studioController.getMyTasks);
 router.get('/projects/:projectId/tasks', studioController.getTasks);
 router.post('/tasks', authMiddleware, studioController.createTask);
 router.patch('/tasks/:taskId', authMiddleware, studioController.updateTask);
