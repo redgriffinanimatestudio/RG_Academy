@@ -91,7 +91,7 @@ NODE_PATH=`$(which node 2>/dev/null || echo "/opt/alt/alt-nodejs20/root/usr/bin/
 echo "Using Node: `$NODE_PATH"
 
 mkdir -p nodejs public_html
-rm -rf public_html/dist nodejs/dist
+rm -rf nodejs/dist public_html/dist
 rm -f nodejs/index.js nodejs/server-dist.js nodejs/.env
 
 echo "--- UNPACKING ---"
