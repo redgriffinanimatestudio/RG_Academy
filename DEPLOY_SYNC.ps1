@@ -1,5 +1,5 @@
 # 🚀 RED GRIFFIN ACADEMY - INTEGRATED DEPLOY & SYNC SCRIPT (DOCKER)
-# Version: 2.25 (Pro Max Sync - Zero Token Edition)
+# Version: 2.32 (Neural Industrialization - Sharded Registry)
 # ==========================================================
 
 $ErrorActionPreference = 'Stop'
@@ -25,13 +25,13 @@ $SQL_DUMP = 'local_sync.sql'
 $BUILD_TEMP = 'BUILD_TEMP'
 
 Write-Host '===============================================' -ForegroundColor Cyan
-Write-Host '🦾 STARTING PRO MAX DEPLOYMENT PIPELINE v2.25' -ForegroundColor Cyan
+Write-Host '🦾 STARTING NEURAL DEPLOYMENT PIPELINE v2.32' -ForegroundColor Cyan
 Write-Host '===============================================' -ForegroundColor Cyan
 
 # [1/6] Syncing Git
 Write-Host '💾 Syncing Git...' -ForegroundColor Yellow
 $CommitDate = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-$CommitMsg = 'UI Pro Max Transformation (v2.25): ' + $CommitDate
+$CommitMsg = 'Neural Industrialization (v2.32): ' + $CommitDate
 git add .
 try {
     git commit -m $CommitMsg 2>$null
@@ -89,7 +89,7 @@ $RemotePath = $SSH_USER + '@' + $SSH_HOST + ':' + $REMOTE_BASE + '/'
 scp -P $SSH_PORT $DEPLOY_ZIP $SQL_DUMP $RemotePath
 
 # [6/6] Finalize Remote
-Write-Host '⚡ Finalizing v2.25 (Zero Token Sync)...' -ForegroundColor Yellow
+Write-Host '⚡ Finalizing v2.32 (Neural Identity Sync)...' -ForegroundColor Yellow
 
 $C = 'cd __BASE__' + "`n"
 $C += 'echo "--- RESOURCE CLEANUP ---"' + "`n"
@@ -120,7 +120,7 @@ $SshTarget = $SSH_USER + '@' + $SSH_HOST
 ssh -p $SSH_PORT $SshTarget $REMOTE_COMMANDS
 
 Write-Host '===============================================' -ForegroundColor Green
-Write-Host '✅ PRO MAX DEPLOY v2.25 COMPLETED!' -ForegroundColor Green
+Write-Host '✅ NEURAL DEPLOY v2.32 COMPLETED!' -ForegroundColor Green
 Write-Host '🌐 Health Check: https://rgacademy.space/api/health' -ForegroundColor Cyan
 Write-Host '===============================================' -ForegroundColor Green
 Start-Sleep -Seconds 2

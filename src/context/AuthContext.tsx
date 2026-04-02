@@ -49,6 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isAgency: dbUser.isAgency,
       isSupport: dbUser.isSupport,
       balance: dbUser.balance || 0, // Phase 6.2 Financial Bridge
+      isOnboarded: dbUser.isOnboarded, // v2.29 Legal Protocol flag
       createdAt: dbUser.createdAt
     };
     console.log("[AUTH] Mapped Profile:", profile);

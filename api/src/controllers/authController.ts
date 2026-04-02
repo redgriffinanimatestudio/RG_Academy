@@ -11,6 +11,7 @@ import {
 } from '../schemas/generated/index.js';
 import { z } from 'zod';
 import { mapSocialPayload } from '../utils/socialMapper.js';
+import { identityService } from '../services/identityService.js';
 
 // Временное кэширование OTP в памяти сервера
 // Формат: { '+7900...': { code: '123456', expiresAt: 1234123, attempts: 0 } }
@@ -140,54 +141,19 @@ export const authController = {
    */
   async register(req: Request, res: Response) {
     try {
-      const { email, displayName, phone, password, role, provider, profileData } = req.body;
+      const { email, displayName, phone, password, role, provider, profileData, signature } = req.body;
 
       // Check for existing node
       let user = await prisma.user.findUnique({ where: { email } });
       if (user) return res.status(400).json({ success: false, error: 'Node already active in grid' });
 
-      const roles = role === 'admin' ? ['admin', 'student', 'lecturer'] : [role || 'student'];
-      const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
-      
-      // Create user with full professional profile node
-      user = await prisma.user.create({
-        data: {
-          email, 
-          displayName, 
-          phone, 
-          password: hashedPassword,
-          role: role || 'user', 
-          primaryRole: role || 'user',
-          roles: JSON.stringify(roles), 
-          source: provider || 'local', 
-          isStudent: role === 'student', 
-          isClient: role === 'client', 
-          isExecutor: role === 'executor',
-          profile: { 
-            create: { 
-              bio: profileData?.bio || `Registered via ${provider || 'Auth System'}`,
-              country: profileData?.country,
-              citizenship: profileData?.citizenship,
-              linkedInUrl: profileData?.linkedInUrl,
-              telegramHandle: profileData?.telegramHandle,
-              portfolioUrl: profileData?.portfolioUrl,
-              gender: profileData?.gender,
-              dateOfBirth: profileData?.dateOfBirth ? new Date(profileData.dateOfBirth) : undefined,
-              ageCategory: profileData?.dateOfBirth ? (() => {
-                const age = new Date().getFullYear() - new Date(profileData.dateOfBirth).getFullYear();
-                if (age < 13) return 'child';
-                if (age < 18) return 'teen';
-                return 'adult';
-              })() : undefined
-            } 
-          }
-        },
-        include: { profile: true }
+      const result = await identityService.registerUser({ 
+        email, displayName, phone, password, role, provider, profileData, signature 
       });
 
       return success(res, { 
-        token: generateToken(user.id, user.email!), 
-        user: { ...user, roles } 
+        token: generateToken(result.user.id, result.user.email!), 
+        user: { ...result.user, roles: result.roles } 
       });
     } catch (e: any) {
       console.error('Registration Error:', e);
@@ -286,6 +252,7 @@ export const authController = {
             primaryRole: 'user',
             roles: JSON.stringify(roles),
             source: 'fast_access',
+            isOnboarded: false, // Force protocol steps 2-5
             isStudent: false,
             isClient: false,
             isExecutor: false,
@@ -293,7 +260,7 @@ export const authController = {
             profile: { create: { bio: `Registered via OTP (Pending Onboarding)` } }
           }
         });
-        console.log(`✨ [AUTH] Создан новый профиль USER для ${phone}`);
+        console.log(`✨ [AUTH] Created new OTP node for ${phone} (Protocol: Pending)`);
       }
 
       return success(res, { 
@@ -335,61 +302,32 @@ export const authController = {
     try {
       const onboardingSchema = z.object({
         role: z.enum(['student', 'client', 'executor']),
+        signature: z.string().optional(),
         profileData: z.object({
           bio: z.string().optional(),
           country: z.string().optional(),
           citizenship: z.string().optional(),
           linkedInUrl: z.string().optional(),
           telegramHandle: z.string().optional(),
-          portfolioUrl: z.string().optional()
+          portfolioUrl: z.string().optional(),
+          gender: z.string().optional(),
+          dateOfBirth: z.string().optional()
         }).optional()
       });
 
-      const { role, profileData } = onboardingSchema.parse(req.body);
+      const { role, profileData, signature } = onboardingSchema.parse(req.body);
       const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
       if (!user) return error(res, 'User not found', 404);
 
-      console.log(`[ONBOARDING] Пользователь ${user.email} завершает регистрацию как [${role}]`);
+      console.log(`[ONBOARDING] Node ${user.email} synchronizing profile as [${role}]`);
 
-      // Устанавливаем флаги роли
-      const updateData: any = { 
-        role, 
-        primaryRole: role,
-        roles: JSON.stringify([role])
-      };
-      
-      if (role === 'student') updateData.isStudent = true;
-      if (role === 'client') updateData.isClient = true;
-      if (role === 'executor') updateData.isExecutor = true;
-
-      // Обновляем права
-      await prisma.user.update({
-        where: { id: user.id },
-        data: updateData
-      });
-
-      // Обновляем профиль (анкета)
-      if (profileData) {
-        // Убираем потенциально вредные поля, если есть
-        const safeData = { ...profileData };
-        delete safeData.id;
-        delete safeData.userId;
-        
-        await prisma.profile.upsert({
-          where: { userId: user.id },
-          create: { userId: user.id, ...safeData },
-          update: { ...safeData }
-        });
-      }
-
-      const updatedUser = await prisma.user.findUnique({
-        where: { id: user.id },
-        include: { profile: true }
+      const result = await identityService.finalizeOnboarding(user.id, user.email!, {
+        role, profileData, signature
       });
 
       return success(res, { 
         message: 'Onboarding complete', 
-        user: { ...updatedUser, roles: JSON.parse(updatedUser?.roles || '[]') } 
+        user: { ...result.user, roles: result.roles } 
       });
     } catch (e: any) {
       console.error('Onboarding Error:', e);
@@ -409,67 +347,11 @@ export const authController = {
       const { provider, payload } = req.body;
       if (!payload || !payload.email) return error(res, 'Invalid social payload', 400);
 
-      const socialData = mapSocialPayload(provider, payload);
-      const { email, displayName, photoURL, remoteId, bio, location, website, socialHandles } = socialData;
+      const result = await identityService.synchronizeSocialIdentity({ provider, payload });
 
-      let user = await prisma.user.findUnique({ 
-        where: { email }, 
-        include: { profile: true } 
-      });
-
-      if (!user) {
-        // Full professional creation on first handshake
-        user = await prisma.user.create({
-          data: {
-            email, 
-            displayName, 
-            photoURL, 
-            remoteId, 
-            source: provider,
-            role: 'user', 
-            primaryRole: 'user', 
-            roles: JSON.stringify(['user']),
-            isStudent: false, 
-            isClient: false, 
-            isExecutor: false,
-            profile: { 
-              create: { 
-                bio: bio || `Social identity synchronized via ${provider}`, 
-                avatar: photoURL,
-                location: location,
-                portfolioUrl: website,
-                telegramHandle: socialHandles?.telegram,
-                linkedInUrl: socialHandles?.linkedin
-              } 
-            }
-          },
-          include: { profile: true }
-        });
-        console.log(`✨ [AUTH] New social node authorized: ${email} via ${provider}`);
-      } else {
-        // SMART SYNC: Update profile if it exists (Industrial Standard)
-        console.log(`🔄 [AUTH] Synchronizing identity for node: ${email}`);
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { photoURL, displayName, remoteId }
-        });
-
-        if (user.profile) {
-          await prisma.profile.update({
-            where: { id: user.profile.id },
-            data: { 
-              avatar: photoURL,
-              bio: bio || user.profile.bio, // Keep existing bio if social is empty
-              location: location || user.profile.location
-            }
-          });
-        }
-      }
-
-      const rolesArray = JSON.parse(user.roles || '["student"]');
       return success(res, { 
-        token: generateToken(user.id, user.email!), 
-        user: { ...user, roles: rolesArray } 
+        token: generateToken(result.user.id, result.user.email!), 
+        user: { ...result.user, roles: result.roles } 
       });
     } catch (e: any) {
       console.error('Social Auth Sync Error:', e);
