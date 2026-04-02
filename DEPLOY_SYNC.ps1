@@ -67,6 +67,14 @@ Copy-Item "server-dist.js" "$BUILD_TEMP/index.js"
 Copy-Item "package.json" "$BUILD_TEMP/package.json"
 if (Test-Path "prisma") { Copy-Item -Recurse "prisma" "$BUILD_TEMP/prisma" }
 
+# Include pre-compiled Prisma Engines so Hostinger doesn't have to build them
+Write-Host "📦 Injecting Pre-compiled Prisma Engines..."
+New-Item -ItemType Directory -Force "$BUILD_TEMP/node_modules/@prisma" | Out-Null
+Copy-Item -Recurse "node_modules/@prisma/client" "$BUILD_TEMP/node_modules/@prisma/"
+if (Test-Path "node_modules/.prisma") {
+    Copy-Item -Recurse "node_modules/.prisma" "$BUILD_TEMP/node_modules/"
+}
+
 if (Test-Path "$DEPLOY_ZIP") { Remove-Item "$DEPLOY_ZIP" }
 Compress-Archive -Path "$BUILD_TEMP/*" -DestinationPath "$DEPLOY_ZIP"
 
@@ -97,21 +105,17 @@ rm -f nodejs/index.js nodejs/server-dist.js nodejs/.env
 echo "--- UNPACKING ---"
 unzip -o "$DEPLOY_ZIP" -d nodejs/
 unzip -o "$DEPLOY_ZIP" -d public_html/
-sleep 2
+
+echo "--- OPTIMIZING LITESPEED CACHE ---"
+# Move assets to root public_html so Hostinger LiteSpeed serves them directly (Zero Node overhead)
+mv public_html/dist/* public_html/ 2>/dev/null || true
+rm -rf public_html/dist
 
 echo "--- DATABASE ---"
 [ -f "$SQL_DUMP" ] && mysql -u $REMOTE_DB_USER -p'$REMOTE_DB_PASS' $REMOTE_DB < $SQL_DUMP
 
-echo "--- ENV & PRISMA ---"
+echo "--- ENV STAGE ---"
 printf "DATABASE_URL=mysql://${REMOTE_DB_USER}:${REMOTE_DB_PASS}@145.79.26.219:3306/${REMOTE_DB}\nJWT_SECRET=super_secret_2026\nPORT=3000\nNODE_ENV=production" > nodejs/.env
-
-NPM_PATH=`$(which npm 2>/dev/null || echo "/opt/alt/alt-nodejs20/root/usr/bin/npm")
-NPX_PATH=`$(which npx 2>/dev/null || echo "/opt/alt/alt-nodejs20/root/usr/bin/npx")
-
-cd nodejs
-echo "Installing Database Engines on Hostinger..."
-`$NPM_PATH install @prisma/client prisma --no-save
-`$NPX_PATH prisma generate
 
 echo "--- RESTARTING ---"
 mkdir -p tmp && touch tmp/restart.txt
