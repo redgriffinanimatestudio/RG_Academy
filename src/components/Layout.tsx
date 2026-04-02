@@ -15,6 +15,7 @@ import BottomNav from './layout/BottomNav';
 import Footer from './layout/Footer';
 import AIAssistant from './AIAssistant';
 import ErrorBoundary from './ErrorBoundary';
+import Preloader from './Preloader';
 
 // Optimization Hooks & Constants
 import { LANGUAGES, ACADEMY_CATEGORIES, STUDIO_CATEGORIES } from './layout/Layout.constants';
@@ -123,13 +124,32 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [profile, authLoading, isDashboardPage, isProfile, isPublicPage, lang]);
 
-  if (authLoading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center text-white font-black uppercase tracking-widest animate-pulse">Initializing...</div>;
+  if (authLoading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center"><Preloader message="Initializing Red Griffin..." size="lg" /></div>;
   
   if (!profile && (isDashboardPage || isProfile) && !isPublicPage) {
     return <div className="min-h-screen bg-[#050505] flex items-center justify-center">
       <div className="size-12 border-2 border-primary border-t-transparent rounded-full animate-spin" />
     </div>;
   }
+
+  const changeLanguage = (newLang: string) => {
+    const pathParts = location.pathname.split('/').filter(Boolean);
+    const modes = ['aca', 'studio', 'community', 'dashboard', 'dev'];
+    
+    if (modes.includes(pathParts[0])) {
+      if (pathParts[1] && LANGUAGES.some(l => l.code === pathParts[1])) {
+        pathParts[1] = newLang;
+      } else {
+        pathParts.splice(1, 0, newLang);
+      }
+    } else if (LANGUAGES.some(l => l.code === pathParts[0])) {
+      pathParts[0] = newLang;
+    } else {
+      pathParts.unshift(newLang);
+    }
+    
+    navigate('/' + pathParts.join('/'));
+  };
 
   return (
     <div className={`min-h-screen font-sans text-white transition-colors duration-500 touch-manipulation`}>
@@ -152,7 +172,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         toggleSection={(id) => setExpandedSections(p => ({ ...p, [id]: !p[id] }))}
         handleSetSub={handleSetSub} activeSubName={activeSubName}
         modeColor={modeColor} modeBg={modeBg} modePrefix={modePrefix} cardClass="bg-white/10"
-        changeLanguage={(l) => navigate(location.pathname.replace(`/${lang}`, `/${l}`))}
+        changeLanguage={changeLanguage}
         currentLangCode={lang || 'eng'} LANGUAGES={LANGUAGES}
       />
 
@@ -188,6 +208,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         modePrefix={modePrefix} modeColor={modeColor} modeBg={modeBg} 
         currentLang={LANGUAGES.find(l => l.code === (lang || 'eng')) || LANGUAGES[0]}
         onOpenLangMenu={() => {}}
+        onChangeLanguage={changeLanguage}
       />
       <BottomNav />
       <AIAssistant />

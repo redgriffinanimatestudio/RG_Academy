@@ -26,7 +26,7 @@ export default function AIAssistant() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[70]">
+    <div className="fixed bottom-32 right-6 z-30">
       <AnimatePresence>
         {!isOpen ? (
           <motion.button

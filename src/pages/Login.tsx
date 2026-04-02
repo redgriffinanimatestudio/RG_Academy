@@ -15,6 +15,7 @@ import { PasswordStrengthMeter } from '../components/auth/PasswordStrengthMeter'
 import { CountrySelector } from '../components/auth/CountrySelector';
 import { useTranslation } from 'react-i18next';
 import apiClient from '../services/apiClient';
+import Preloader from '../components/Preloader';
 
 // Comprehensive Country Data
 const COUNTRIES = [
@@ -232,43 +233,51 @@ const Login: React.FC = () => {
           <AnimatePresence mode="wait">
             {mode === 'login' ? (
               <motion.div key="login" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8 flex-1 flex flex-col justify-center">
-                <form onSubmit={handleLogin} className="space-y-6">
-                  <InputWithStatus 
-                    id="login-email"
-                    autoComplete="username"
-                    label="Access Key / Email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="ENTER NODE ID"
-                    hint="Use your registered email or system-assigned node identifier."
-                    status={emailStatus}
-                    errorText={emailError}
-                    icon={<User size={18} />}
-                    required
-                  />
-                  <InputWithStatus 
-                    id="login-password"
-                    autoComplete="current-password"
-                    label="Encryption Password"
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
-                    placeholder="ENTER PASSCODE"
-                    hint="Enter the encryption key associated with this node."
-                    icon={<Lock size={18} />}
-                    required
-                  />
+                {isLoading ? (
+                  <div className="py-20">
+                    <Preloader message="Authenticating Node..." size="md" />
+                  </div>
+                ) : (
+                  <>
+                    <form onSubmit={handleLogin} className="space-y-6">
+                      <InputWithStatus 
+                        id="login-email"
+                        autoComplete="username"
+                        label="Access Key / Email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        placeholder="ENTER NODE ID"
+                        hint="Use your registered email or system-assigned node identifier."
+                        status={emailStatus}
+                        errorText={emailError}
+                        icon={<User size={18} />}
+                        required
+                      />
+                      <InputWithStatus 
+                        id="login-password"
+                        autoComplete="current-password"
+                        label="Encryption Password"
+                        type="password"
+                        value={formData.password}
+                        onChange={(e) => handleInputChange('password', e.target.value)}
+                        placeholder="ENTER PASSCODE"
+                        hint="Enter the encryption key associated with this node."
+                        icon={<Lock size={18} />}
+                        required
+                      />
 
-                  <button type="submit" disabled={isLoading} className="w-full bg-red-600 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs hover:bg-red-700 transition-all shadow-2xl shadow-red-500/30 flex items-center justify-center gap-3">
-                    {isLoading ? <Loader2 className="animate-spin" size={20} /> : 'Establish Connection'}
-                    <ChevronRight size={18} />
-                  </button>
-                </form>
-                <div className="text-center">
-                  <button onClick={() => setMode('register')} className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-red-500 transition-colors">
-                    Don't have a node? <span className="text-white underline decoration-red-500/40 underline-offset-4">Initialize Journey</span>
-                  </button>
-                </div>
+                      <button type="submit" disabled={isLoading} className="w-full bg-red-600 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs hover:bg-red-700 transition-all shadow-2xl shadow-red-500/30 flex items-center justify-center gap-3">
+                        Establish Connection
+                        <ChevronRight size={18} />
+                      </button>
+                    </form>
+                    <div className="text-center">
+                      <button onClick={() => setMode('register')} className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-red-500 transition-colors">
+                        Don't have a node? <span className="text-white underline decoration-red-500/40 underline-offset-4">Initialize Journey</span>
+                      </button>
+                    </div>
+                  </>
+                )}
               </motion.div>
             ) : (
               <motion.div key="register" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8 flex-1 flex flex-col">
@@ -463,7 +472,7 @@ const Login: React.FC = () => {
                         <textarea value={formData.bio} onChange={(e)=>handleInputChange('bio', e.target.value)} placeholder="Skills, goals, expertise..." className="w-full bg-black/40 border border-white/5 rounded-3xl p-6 text-white text-sm outline-none focus:border-red-500/40 min-h-[100px] resize-none" />
                       </div>
                       <button onClick={handleRegisterFinal} disabled={isLoading} className="w-full bg-red-600 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs hover:bg-red-700 transition-all flex items-center justify-center gap-3">
-                        {isLoading ? <Loader2 className="animate-spin" size={20} /> : t('node_online')} <Zap size={18} />
+                        {t('node_online')} <Zap size={18} />
                       </button>
                       {error && (
                         <motion.div 
@@ -490,9 +499,7 @@ const Login: React.FC = () => {
                     </motion.div>
                   ) : (
                     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-20 text-center space-y-8">
-                       <div className="size-32 rounded-full border-4 border-emerald-500 flex items-center justify-center text-emerald-500 shadow-[0_0_50px_rgba(16,185,129,0.3)] bg-emerald-500/10">
-                         <CheckCircle2 size={64} className="animate-pulse" />
-                       </div>
+                       <Preloader message="Synchronizing Identity..." size="lg" />
                        <div className="space-y-2">
                          <h3 className="text-3xl font-black uppercase text-white">{t('node_online')}</h3>
                          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500/60 animate-bounce">{t('sync_success')}</p>

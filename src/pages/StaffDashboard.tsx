@@ -11,6 +11,7 @@ import { hrService } from '../services/hrService';
 import { financeService } from '../services/financeService';
 import { supportService } from '../services/supportService';
 import CreateOpeningModal from '../components/hr/CreateOpeningModal';
+import Preloader from '../components/Preloader';
 
 // --- STAFF DASHBOARD CONTENT ---
 
@@ -77,7 +78,7 @@ function HRDashboard({ accent, module }: any) {
     }
   };
 
-  if (loading) return <div className="py-20 text-center opacity-20 uppercase tracking-[0.5em] font-black">Syncing HR Node...</div>;
+  if (loading) return <Preloader message="Syncing HR Node..." size="lg" />;
 
   return (
     <div className="space-y-8">
@@ -189,7 +190,7 @@ function FinanceDashboard({ accent, module }: any) {
   const handleRelease = async (escrowId: string, amount: number) => {
     if (!window.confirm(`Confirm release of $${amount}?`)) return;
     try {
-      await financeService.releasePayment(escrowId, amount);
+      await financeService.releasePayment(escrowId);
       setEscrows(prev => prev.filter(e => e.id !== escrowId));
       // Refresh stats
       const s = await financeService.getStats();
@@ -199,7 +200,7 @@ function FinanceDashboard({ accent, module }: any) {
     }
   };
 
-  if (loading) return <div className="py-20 text-center opacity-20 uppercase tracking-[0.5em] font-black">Syncing Treasury Node...</div>;
+  if (loading) return <Preloader message="Syncing Treasury Node..." size="lg" />;
 
   return (
     <div className="space-y-8">
@@ -296,7 +297,7 @@ function SupportDashboard({ accent, module }: any) {
     }
   };
 
-  if (loading) return <div className="py-20 text-center opacity-20 uppercase tracking-[0.5em] font-black">Syncing Support Node...</div>;
+  if (loading) return <Preloader message="Syncing Support Node..." size="lg" />;
 
   return (
     <div className="space-y-8">

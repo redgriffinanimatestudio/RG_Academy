@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Video, BookOpen, ShieldCheck } from 'lucide-react';
+import Preloader from '../../../components/Preloader';
 
 const SynergySection = ({ data, loading, activeRole }: any) => {
-  if (loading) return <div className="h-48 bg-white/5 animate-pulse rounded-[2.5rem]" />;
+  if (loading) return <Preloader message="Synchronizing Synergy Node..." size="sm" className="mb-12" />;
   if (!data) return null;
 
   const Icon = activeRole === 'lecturer' ? Video : (activeRole === 'student' ? BookOpen : ShieldCheck);

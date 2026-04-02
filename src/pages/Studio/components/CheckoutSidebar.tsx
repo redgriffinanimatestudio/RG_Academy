@@ -30,7 +30,7 @@ const CheckoutSidebar: React.FC<CheckoutSidebarProps> = ({ onClose }) => {
             </div>
             <h2 className="text-xl font-black uppercase tracking-tighter text-bg-dark">Secure Checkout</h2>
           </div>
-          <button onClick={onClose} className="p-2 text-zinc-300 hover:text-bg-dark transition-colors">
+          <button onClick={onClose} className="p-2 text-zinc-500 hover:text-bg-dark transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -53,13 +53,13 @@ const CheckoutSidebar: React.FC<CheckoutSidebarProps> = ({ onClose }) => {
               <div className="p-4 rounded-xl border border-zinc-200 bg-zinc-50 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <CreditCard size={20} className="text-zinc-400" />
-                  <span className="text-sm font-bold text-zinc-300">•••• •••• •••• 4242</span>
+                  <span className="text-sm font-bold text-zinc-500">•••• •••• •••• 4242</span>
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-primary">Edit</span>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl border border-zinc-200 bg-zinc-50 text-sm font-bold text-zinc-300">12 / 26</div>
-                <div className="p-4 rounded-xl border border-zinc-200 bg-zinc-50 text-sm font-bold text-zinc-300">CVC</div>
+                <div className="p-4 rounded-xl border border-zinc-200 bg-zinc-50 text-sm font-bold text-zinc-500">12 / 26</div>
+                <div className="p-4 rounded-xl border border-zinc-200 bg-zinc-50 text-sm font-bold text-zinc-500">CVC</div>
               </div>
             </div>
           </div>

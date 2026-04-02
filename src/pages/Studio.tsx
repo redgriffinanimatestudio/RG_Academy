@@ -104,7 +104,7 @@ export default function Studio() {
         </div>
         <div className="flex flex-col gap-4 w-full lg:w-auto">
           <div className="flex flex-col sm:flex-row gap-4">
-            <div className="p-1 bg-white/5 rounded-2xl border border-white/5 flex flex-1">
+            <div className="p-1 bg-white/10 rounded-2xl border border-white/5 flex flex-1">
               <button 
                 onClick={() => setActiveTab('browse')}
                 className={`flex-1 px-4 sm:px-6 py-3 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'browse' ? 'bg-primary text-bg-dark shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
@@ -131,16 +131,16 @@ export default function Studio() {
           
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} />
               <input
                 type="text" placeholder="Search projects..." value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium text-white placeholder:text-white/20 outline-none"
+                className="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/5 rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium text-white placeholder:text-white/40 outline-none"
               />
             </div>
             <button 
               onClick={() => setShowFilters(!showFilters)}
-              className={`px-6 py-4 rounded-2xl flex items-center justify-center gap-3 font-black uppercase tracking-widest text-[10px] transition-all border ${showFilters ? 'bg-primary text-bg-dark border-primary' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
+              className={`px-6 py-4 rounded-2xl flex items-center justify-center gap-3 font-black uppercase tracking-widest text-[10px] transition-all border ${showFilters ? 'bg-primary text-bg-dark border-primary' : 'bg-white/10 text-white/60 border-white/5 hover:border-white/20'}`}
             >
               <Filter size={18} /> {t('filters')}
             </button>
@@ -219,9 +219,19 @@ export default function Studio() {
               <button className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-primary hover:text-primary-hover transition-colors">{t('view_all')}</button>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-              {filteredProjects.map((project) => (
-                <ProjectCard key={project.id} project={project} t={t} onViewDetails={(p) => { setSelectedProject(p); setShowApplyModal(true); }} />
-              ))}
+              {loadingProjects ? (
+                <div className="col-span-full">
+                  <Preloader message="Synchronizing Project Feed..." size="md" />
+                </div>
+              ) : filteredProjects.length > 0 ? (
+                filteredProjects.map((project) => (
+                  <ProjectCard key={project.id} project={project} t={t} onViewDetails={(p) => { setSelectedProject(p); setShowApplyModal(true); }} />
+                ))
+              ) : (
+                <div className="col-span-full py-20 text-center text-white/20 uppercase font-black border border-dashed border-white/5 rounded-[2.5rem]">
+                  No projects found in the current sector.
+                </div>
+              )}
             </div>
           </section>
 

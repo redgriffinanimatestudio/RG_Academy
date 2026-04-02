@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Globe, ChevronRight, Activity, Cpu, ShieldCheck, Github, Twitter, MessageSquare } from 'lucide-react';
+import { Globe, ChevronRight, Activity, Cpu, ShieldCheck, Github, Twitter, MessageSquare, ChevronUp, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LANGUAGES } from './Layout.constants';
 
 interface FooterProps {
   profile: any;
@@ -10,17 +12,20 @@ interface FooterProps {
   modeBg: string;
   currentLang: any;
   onOpenLangMenu: () => void;
+  onChangeLanguage?: (newLang: string) => void;
 }
 
-export default function Footer({ profile, modePrefix, modeColor, modeBg, currentLang, onOpenLangMenu }: FooterProps) {
+export default function Footer({ 
+  profile, modePrefix, modeColor, modeBg, currentLang, onOpenLangMenu, onChangeLanguage 
+}: FooterProps) {
   const { t } = useTranslation();
   const { lang } = useParams();
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
   // 💎 Tier 2: Industrial Minimal Member Footer (Authenticated)
-  // Designed for efficiency and minimal vertical footprint on Dashboards
   if (profile) {
     return (
-      <footer className="w-full bg-[#050505]/80 backdrop-blur-3xl border-t border-white/5 py-4 mt-12 relative z-50">
+      <footer className="w-full bg-[#050505]/80 backdrop-blur-3xl border-t border-white/5 py-4 mt-12 pb-24 md:pb-4 relative z-50">
         <div className="mx-auto max-w-[1920px] px-4 sm:px-8 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-12">
           
           {/* Status Telemetry */}
@@ -62,9 +67,8 @@ export default function Footer({ profile, modePrefix, modeColor, modeBg, current
   }
 
   // 🏛️ Tier 1: Bold Marketing Guest Footer
-  // Designed to convert guests into members with high-impact visuals
   return (
-    <footer className="bg-[#050505] border-t border-white/5 pt-24 pb-12 overflow-hidden relative">
+    <footer className="bg-[#050505] border-t border-white/5 pt-24 pb-32 md:pb-12 overflow-hidden relative">
       {/* Subtle Background Glow */}
       <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[500px] ${modeBg.replace('bg-', 'bg-')}/5 blur-[120px] rounded-full -mb-64 opacity-20`} />
 
@@ -76,7 +80,7 @@ export default function Footer({ profile, modePrefix, modeColor, modeBg, current
             <h3 className="text-4xl sm:text-5xl font-black tracking-tighter uppercase italic text-white leading-none">
               Ready to <span className="text-primary">Sync?</span>
             </h3>
-            <p className="text-sm text-white/40 font-medium tracking-wide max-w-md">Join the collective of technical artists, architects and creators pushing the limits of the ecosystem.</p>
+            <p className="text-sm text-white/40 font-medium tracking-wide max-w-md">{t('join_collective_desc') || 'Join the collective of technical artists, architects and creators pushing the limits of the ecosystem.'}</p>
           </div>
           <Link to={`/aca/${lang || 'eng'}/register`} className="px-16 py-6 bg-primary text-bg-dark rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs hover:scale-105 transition-all shadow-2xl shadow-primary/20 active:scale-95 group-hover:rotate-[-1deg]">
             {t('join_collective') || 'Join Ecosystem'}
@@ -87,7 +91,7 @@ export default function Footer({ profile, modePrefix, modeColor, modeBg, current
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-16 mb-24 lg:mb-32">
           {/* Brand Info */}
           <div className="col-span-full lg:col-span-2 space-y-8 pr-0 lg:pr-12">
-            <Link to="/" className="flex items-center gap-4 group">
+            <Link to={`/${lang || 'eng'}`} className="flex items-center gap-4 group">
               <div className={`size-14 ${modeBg} rounded-2xl flex items-center justify-center text-bg-dark shadow-[0_0_40px_rgba(var(--primary-rgb),0.2)] group-hover:scale-110 transition-transform duration-500`}>
                 <span className="text-2xl font-black italic">RG</span>
               </div>
@@ -100,7 +104,7 @@ export default function Footer({ profile, modePrefix, modeColor, modeBg, current
               Industrialized Creative Architecture for the New Digital Era. Verified, Scalable, Performance-driven.
             </p>
             {/* Social Icons */}
-            <div className="flex items-center gap-6 text-white/30 truncate">
+            <div className="flex items-center gap-6 text-white/40">
                <Twitter size={18} className="hover:text-primary transition-colors cursor-pointer" />
                <Github size={18} className="hover:text-primary transition-colors cursor-pointer" />
                <MessageSquare size={18} className="hover:text-primary transition-colors cursor-pointer" />
@@ -128,7 +132,7 @@ export default function Footer({ profile, modePrefix, modeColor, modeBg, current
           <div className="space-y-8">
             <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-white/60 italic underline underline-offset-8 decoration-white/10">{t('community')}</h4>
             <ul className="space-y-5 text-[11px] font-black uppercase tracking-[0.15em] text-white/30 italic">
-              <li><Link to="#" className="hover:text-white transition-colors">{t('blog')}</Link></li>
+              <li><Link to={`/community/${lang || 'eng'}`} className="hover:text-white transition-colors">{t('blog')}</Link></li>
               <li><Link to="#" className="hover:text-white transition-colors">Collective</Link></li>
               <li><Link to="#" className="hover:text-white transition-colors">Registry</Link></li>
             </ul>
@@ -153,17 +157,41 @@ export default function Footer({ profile, modePrefix, modeColor, modeBg, current
           </div>
 
           {/* Language Integrated */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-8 relative">
             <button 
-              onClick={onOpenLangMenu} 
+              onClick={() => setIsLangMenuOpen(!isLangMenuOpen)} 
               className="flex items-center gap-4 px-8 py-3 rounded-2xl border border-white/5 bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/10 transition-all group/lang"
             >
               <Globe size={14} className={`${modeColor} group-hover/lang:scale-110 transition-transform`} />
               <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/60">
                 {currentLang?.name || 'SYNCED_NODE'}
               </span>
-              <ChevronRight size={12} className="opacity-20 group-hover/lang:translate-x-1 transition-transform" />
+              {isLangMenuOpen ? <ChevronDown size={12} className="opacity-20" /> : <ChevronUp size={12} className="opacity-20 translate-y-[-1px]" />}
             </button>
+
+            <AnimatePresence>
+              {isLangMenuOpen && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: -10, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute bottom-full right-0 mb-4 w-44 bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl py-2 z-50 overflow-hidden backdrop-blur-xl"
+                >
+                  {LANGUAGES.map((l) => (
+                    <button 
+                      key={l.code} 
+                      onClick={() => {
+                        onChangeLanguage?.(l.code);
+                        setIsLangMenuOpen(false);
+                      }} 
+                      className={`w-full text-left px-6 py-3 text-[10px] font-black uppercase flex items-center justify-between transition-all ${currentLang?.code === l.code ? 'text-primary bg-white/5' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                    >
+                      <span className="flex items-center gap-3"><span>{l.flag}</span> {l.name}</span>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
