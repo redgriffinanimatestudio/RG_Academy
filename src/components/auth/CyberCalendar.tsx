@@ -112,7 +112,8 @@ export const CyberCalendar: React.FC<CyberCalendarProps> = ({ value, onChange, l
                   </p>
                 </div>
                 <button 
-                  onClick={() => setIsOpen(false)}
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
                   className="size-8 rounded-full border border-white/5 flex items-center justify-center text-white/20 hover:text-white hover:bg-white/5 transition-all"
                 >
                   <X size={16} />
@@ -122,19 +123,22 @@ export const CyberCalendar: React.FC<CyberCalendarProps> = ({ value, onChange, l
               {/* View Control */}
               <div className="flex gap-2 mb-6">
                 <button 
-                  onClick={() => setView('days')}
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setView('days'); }}
                   className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${view === 'days' ? 'bg-red-600 text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/30 hover:text-white'}`}
                 >
                   {isRu ? 'ДНИ' : 'DAYS'}
                 </button>
                 <button 
-                  onClick={() => setView('months')}
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setView('months'); }}
                   className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${view === 'months' ? 'bg-red-600 text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/30 hover:text-white'}`}
                 >
                   {isRu ? 'МЕСЯЦЫ' : 'MONTHS'}
                 </button>
                 <button 
-                  onClick={() => setView('years')}
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setView('years'); }}
                   className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${view === 'years' ? 'bg-red-600 text-white shadow-lg shadow-red-500/20' : 'bg-white/5 text-white/30 hover:text-white'}`}
                 >
                   {isRu ? 'ГОДЫ' : 'YEARS'}
@@ -196,19 +200,22 @@ export const CyberCalendar: React.FC<CyberCalendarProps> = ({ value, onChange, l
               {view === 'days' && (
                 <div className="mt-6 flex items-center justify-between">
                   <button 
-                    onClick={() => viewedMonth === 0 ? (setViewedMonth(11), setViewedYear(viewedYear-1)) : setViewedMonth(viewedMonth-1)}
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); viewedMonth === 0 ? (setViewedMonth(11), setViewedYear(viewedYear-1)) : setViewedMonth(viewedMonth-1); }}
                     className="p-3 bg-white/5 rounded-2xl text-white/40 hover:text-white transition-all"
                   >
                     <ChevronLeft size={16} />
                   </button>
                   <button 
-                    onClick={() => setIsOpen(false)}
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
                     className="px-6 py-3 bg-red-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-all flex items-center gap-2"
                   >
                     {isRu ? 'ПОДТВЕРДИТЬ' : 'CONFIRM'} <Check size={14} />
                   </button>
                   <button 
-                    onClick={() => viewedMonth === 11 ? (setViewedMonth(0), setViewedYear(viewedYear+1)) : setViewedMonth(viewedMonth+1)}
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); viewedMonth === 11 ? (setViewedMonth(0), setViewedYear(viewedYear+1)) : setViewedMonth(viewedMonth+1); }}
                     className="p-3 bg-white/5 rounded-2xl text-white/40 hover:text-white transition-all"
                   >
                     <ChevronRight size={16} />

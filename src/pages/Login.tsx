@@ -27,6 +27,7 @@ const Login: React.FC = () => {
   });
   const [showTreeModal, setShowTreeModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
   
   const { t, i18n: i18nInstance } = useTranslation();
   const { lang = 'eng' } = useParams();
@@ -200,8 +201,7 @@ const Login: React.FC = () => {
       // Clear persistence
       sessionStorage.removeItem('rg_reg_data');
       sessionStorage.removeItem('rg_reg_step');
-      setRegStep(5);
-      setTimeout(() => navigate(`/${lang}/dashboard`), 2500);
+      setIsRegistered(true);
     } catch (err: any) { 
       setError(err.message); 
     } finally { 
@@ -417,7 +417,12 @@ const Login: React.FC = () => {
                             <p className="text-[8px] font-black uppercase tracking-widest text-white italic">Future Protocol: SMS confirmation required for node activation.</p>
                          </div>
                       </div>
-                      <button onClick={() => setRegStep(3)} disabled={!formData.email || !formData.password || emailStatus === 'error' || passConfirmStatus !== 'success' || phoneStatus === 'error' || phoneStatus === 'none'} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 group">
+                      <button 
+                        type="button"
+                        onClick={() => setRegStep(3)} 
+                        disabled={!formData.email || !formData.password || emailStatus === 'error' || passConfirmStatus !== 'success' || phoneStatus === 'error' || phoneStatus === 'none'} 
+                        className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 group"
+                      >
                         {t('security_check_passed')} <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                       </button>
                     </motion.div>
@@ -474,7 +479,12 @@ const Login: React.FC = () => {
                         />
                       </div>
 
-                      <button onClick={() => setRegStep(4)} disabled={!formData.displayName || !formData.dateOfBirth || !formData.country || !formData.citizenship} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 group">
+                      <button 
+                        type="button"
+                        onClick={() => setRegStep(4)} 
+                        disabled={!formData.displayName || !formData.dateOfBirth || !formData.country || !formData.citizenship} 
+                        className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 group"
+                      >
                         {t('establish_identity')} <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                       </button>
                     </motion.div>
@@ -482,7 +492,11 @@ const Login: React.FC = () => {
                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4 py-2">
                       <div className="flex justify-between items-center mb-2 px-2">
                         <h3 className="text-lg font-black uppercase text-white">{t('step_specs')}</h3>
-                        <button onClick={() => setRegStep(5)} className="text-[9px] font-black uppercase text-red-500 border border-red-500/20 px-4 py-2 rounded-xl bg-red-500/5 hover:bg-red-500 hover:text-white transition-all">
+                        <button 
+                          type="button"
+                          onClick={() => setRegStep(5)} 
+                          className="text-[9px] font-black uppercase text-red-500 border border-red-500/20 px-4 py-2 rounded-xl bg-red-500/5 hover:bg-red-500 hover:text-white transition-all"
+                        >
                           {t('skip_sync')}
                         </button>
                       </div>
@@ -495,7 +509,11 @@ const Login: React.FC = () => {
                         <label className="text-[10px] font-black uppercase text-white/30">Brief Intelligence (Bio)</label>
                         <textarea value={formData.bio} onChange={(e)=>handleInputChange('bio', e.target.value)} placeholder="Skills, goals, expertise..." className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-xs outline-none focus:border-red-500/40 min-h-[80px] resize-none" />
                       </div>
-                      <button onClick={() => setRegStep(5)} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-2xl shadow-red-600/40 group">
+                      <button 
+                        type="button"
+                        onClick={() => setRegStep(5)} 
+                        className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-2xl shadow-red-600/40 group"
+                      >
                          {t('next_step')} <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                       </button>
                     </motion.div>
@@ -531,12 +549,45 @@ const Login: React.FC = () => {
                       </div>
 
                       <button 
+                        type="button"
                         onClick={handleRegisterFinal} 
                         disabled={!termsAccepted || isLoading} 
                         className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.25em] text-[10px] transition-all flex items-center justify-center gap-3 shadow-2xl ${termsAccepted ? 'bg-red-600 text-white hover:bg-red-700 shadow-red-600/40' : 'bg-white/5 text-white/20 cursor-not-allowed opacity-50'}`}
                       >
                          ACTIVATE NODE <Zap size={16} />
                       </button>
+                    </motion.div>
+                  ) : isRegistered ? (
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.9, y: 20 }} 
+                      animate={{ opacity: 1, scale: 1, y: 0 }} 
+                      className="flex flex-col items-center justify-center py-10 text-center space-y-10"
+                    >
+                       <div className="relative">
+                          <div className="absolute inset-0 bg-emerald-500/20 blur-[60px] rounded-full animate-pulse" />
+                          <div className="size-24 rounded-[2rem] bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-500 relative z-10 shadow-2xl shadow-emerald-500/20">
+                             <CheckCircle2 size={48} className="animate-bounce" />
+                          </div>
+                       </div>
+
+                       <div className="space-y-3 relative z-10">
+                         <h3 className="text-4xl font-black uppercase text-white tracking-widest leading-none">
+                            Congratulations
+                         </h3>
+                         <p className="text-[11px] font-black uppercase tracking-[0.5em] text-emerald-400 italic">
+                            Node Successfully Activated
+                         </p>
+                         <p className="text-[12px] font-bold text-white/30 max-w-[280px] mx-auto mt-4 leading-relaxed">
+                            Welcome to the Red Griffin Academy. Your digital identity is now synchronized with our global grid.
+                         </p>
+                       </div>
+
+                       <button 
+                         onClick={() => navigate(`/${lang}/dashboard`)}
+                         className="px-12 py-5 bg-emerald-600 text-white rounded-2xl text-[12px] font-black uppercase tracking-[0.4em] hover:bg-emerald-700 transition-all shadow-2xl shadow-emerald-600/40 flex items-center gap-4 group active:scale-95"
+                       >
+                          Enter Dashboard <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                       </button>
                     </motion.div>
                   ) : (
                     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-20 text-center space-y-8">
