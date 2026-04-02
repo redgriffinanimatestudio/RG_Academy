@@ -67,7 +67,8 @@ export default function Navbar({
   const cardClass = 'bg-white/10 border-white/10 backdrop-blur-3xl';
 
   return (
-    <nav className={`sticky top-0 z-[100] backdrop-blur-3xl border-b transition-colors duration-500 ${navClass}`}>
+  return (
+    <nav className={`sticky top-0 z-[100] glass-pro-max border-b transition-all duration-500 ${navClass}`}>
       <div className="mx-auto px-2 sm:px-6 lg:px-8">
         <div className="flex h-14 sm:h-16 lg:h-20 items-center justify-between gap-2 sm:gap-4 lg:gap-8">
           <div className="flex items-center gap-2 sm:gap-6">
@@ -75,10 +76,10 @@ export default function Navbar({
               <Menu size={20} />
             </button>
             <Link to={`${modePrefix}/${currentLangCode}`} className="flex items-center gap-2 sm:gap-3 group shrink-0">
-              <img src="/logo-web.png" alt="RG" className="h-6 sm:h-8 lg:h-10 w-auto object-contain" />
+              <img src="/logo-web.png" alt="RG" className="h-6 sm:h-8 lg:h-10 w-auto object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
               <div className="flex flex-col hidden xs:flex lg:hidden xl:flex">
-                <span className="text-[10px] sm:text-xs lg:text-base font-black tracking-tighter text-white uppercase leading-none">Red Griffin</span>
-                <span className={`text-[5px] sm:text-[6px] lg:text-[8px] font-bold tracking-[0.3em] ${modeColor} uppercase mt-0.5 sm:mt-1`}>{t('creative_ecosystem')}</span> 
+                <span className="text-[10px] sm:text-xs lg:text-base font-black tracking-tighter text-white uppercase leading-none text-data-glow">Red Griffin</span>
+                <span className={`text-[5px] sm:text-[6px] lg:text-[8px] font-bold tracking-[0.3em] ${modeColor} uppercase mt-0.5 sm:mt-1 neural-pulse`}>{t('creative_ecosystem')}</span> 
               </div>
             </Link>
           </div>
@@ -139,7 +140,7 @@ export default function Navbar({
                   
                   <AnimatePresence>
                     {isUserMenuOpen && (
-                      <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }} className={`absolute right-0 mt-4 w-64 border rounded-2xl shadow-2xl py-2 z-50 ${cardClass}`}>
+                      <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }} className={`absolute right-0 mt-4 w-64 glass-pro-max border rounded-[2rem] shadow-2xl py-2 z-50`}>
                         <div className="px-6 py-4 border-b border-white/5 text-[9px]">
                           <p className="font-black text-white uppercase">{profile.displayName}</p>
                           <p className="text-white/40 uppercase mt-1">{profile.email}</p>
@@ -175,7 +176,7 @@ export default function Navbar({
               </div>
             ) : (
               <div className="hidden md:flex items-center gap-2 sm:gap-6">
-                <Link to={`/aca/${currentLangCode}/login`} className="px-6 py-3 bg-primary text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20">
+                <Link to={`/aca/${currentLangCode}/login`} className="px-6 py-3 bg-primary text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20 metallic-glow">
                   Join Ecosystem
                 </Link>
               </div>

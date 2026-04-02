@@ -52,17 +52,17 @@ export default function Studio() {
         <motion.div 
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-1 border border-sky-500/20 bg-sky-500/5 rounded-2xl sm:rounded-[2.5rem] backdrop-blur-xl mb-8 sm:mb-12 overflow-hidden"
+          className="glass-pro-max mb-8 sm:mb-12 overflow-hidden"
         >
           <div className="p-4 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
             <div className="flex items-center gap-4 sm:gap-6">
-              <div className="size-12 sm:size-16 rounded-xl sm:rounded-2xl bg-sky-500/20 flex items-center justify-center text-sky-400 border border-sky-500/20 shadow-lg shadow-sky-500/10 shrink-0">
+              <div className="size-12 sm:size-16 rounded-xl sm:rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-400 border border-sky-500/20 shadow-lg shadow-sky-500/10 shrink-0 metallic-glow">
                 <Layers size={24} className="sm:w-8 sm:h-8" />
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                  <h3 className="text-sm sm:text-xl font-black uppercase tracking-tight text-white italic truncate">Subcontracting Hub</h3>
-                  <span className="px-2 py-0.5 bg-sky-500 text-bg-dark text-[7px] sm:text-[8px] font-black uppercase tracking-widest rounded shadow-lg shadow-primary/20">Production Synergy</span>
+                  <h3 className="text-sm sm:text-xl font-black uppercase tracking-tight text-white italic truncate text-data-glow">Subcontracting Hub</h3>
+                  <span className="px-2 py-0.5 bg-sky-500 text-bg-dark text-[7px] sm:text-[8px] font-black uppercase tracking-widest rounded shadow-lg shadow-primary/20 neural-pulse">Production Synergy</span>
                 </div>
                 <p className="text-[9px] sm:text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1 italic truncate">
                   "Может нанимать других и сам браться за работу — идеальный баланс субподряда"
@@ -71,7 +71,7 @@ export default function Studio() {
             </div>
             
             <div className="flex flex-wrap justify-center md:justify-end gap-3 sm:gap-4 w-full md:w-auto">
-              <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white">
+              <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white metallic-glow">
                 <Sparkles size={14} className="text-sky-400" /> <span className="sm:inline">Delegate Tasks</span>
               </button>
               <button 
@@ -79,7 +79,7 @@ export default function Studio() {
                   setActiveSession({ id: 'demo-session', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80', type: 'image' });
                   setShowReviewRoom(true);
                 }}
-                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-sky-500 text-bg-dark rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-sky-500/20"
+                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-sky-500 text-bg-dark rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-sky-500/20 metallic-glow"
               >
                 Master Dashboard
               </button>
@@ -96,7 +96,7 @@ export default function Studio() {
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tighter text-white leading-none uppercase">
             {t('build_impossible').split('.')[0]} <br />
-            <span className="text-primary italic">{t('build_impossible').split('.')[1] || 'IMPOSSIBLE.'}</span>
+            <span className="text-primary italic text-data-glow">{t('build_impossible').split('.')[1] || 'IMPOSSIBLE.'}</span>
           </h1>
           <p className="text-sm sm:text-lg text-white/40 max-w-xl font-medium mx-auto lg:mx-0">
             {t('studio_desc')}
@@ -130,12 +130,12 @@ export default function Studio() {
           </div>
           
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} />
+            <div className="relative flex-1 group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" size={18} />
               <input
                 type="text" placeholder="Search projects..." value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/5 rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium text-white placeholder:text-white/40 outline-none"
+                className="glass-pro-max w-full pl-12 pr-4 py-4 !bg-white/5 rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium text-white placeholder:text-white/20 outline-none border-white/5 focus:border-primary/40"
               />
             </div>
             <button 

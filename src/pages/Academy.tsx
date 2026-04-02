@@ -47,7 +47,7 @@ export default function Academy() {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-1 border border-primary/20 bg-primary/5 rounded-[2.5rem] backdrop-blur-xl mb-12 overflow-hidden shadow-2xl shadow-primary/5 group"
+          className="glass-pro-max mb-12 overflow-hidden shadow-2xl shadow-primary/5 group"
         >
           <div className="p-8 sm:p-12 flex flex-col lg:flex-row items-center justify-between gap-10 relative">
             <div className="absolute top-0 right-0 p-12 opacity-5 -translate-y-1/2 translate-x-1/4 group-hover:scale-110 transition-transform duration-1000">
@@ -59,19 +59,19 @@ export default function Academy() {
                 <Video size={32} />
               </div>
               <div className="min-w-0">
-                <h3 className="text-2xl font-black uppercase tracking-tight text-white italic">Creator <span className="text-primary">Hub Node.</span></h3>
+                <h3 className="text-2xl font-black uppercase tracking-tight text-white italic text-data-glow">Creator <span className="text-primary">Hub Node.</span></h3>
                 <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.3em] mt-2 flex items-center gap-3">
-                  <div className="size-2 rounded-full bg-primary animate-pulse" />
+                  <div className="size-2 rounded-full bg-primary neural-pulse" />
                   Lecturer Telemetry: {lecturerStats?.coursesCount || 0} Workshops Active • {lecturerStats?.studentsCount || 0} Students Synchronized
                 </p>
               </div>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto relative z-10">
-              <button className="px-8 py-4 bg-white text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-white/5 active:scale-95 flex items-center justify-center gap-3">
+              <button className="px-8 py-4 bg-white text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-white/5 active:scale-95 flex items-center justify-center gap-3 metallic-glow">
                 <Plus size={16} /> New Workshop
               </button>
-              <button className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white/60 hover:text-white flex items-center justify-center gap-3">
+              <button className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white/60 hover:text-white flex items-center justify-center gap-3 metallic-glow">
                 <BarChart3 size={16} /> Analytics Node
               </button>
             </div>
@@ -85,10 +85,10 @@ export default function Academy() {
       {/* 3. Student Progress Synergy Block */}
       {isStudent && (
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-8 p-10 sm:p-14 rounded-[3.5rem] bg-[#0a0a0a] border border-white/5 space-y-10 relative overflow-hidden group shadow-2xl">
+          <div className="lg:col-span-8 p-10 sm:p-14 rounded-[3.5rem] glass-pro-max !bg-[#050505]/60 border border-white/5 space-y-10 relative overflow-hidden group shadow-2xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between relative z-10 gap-6">
               <div className="space-y-2">
-                <h3 className="text-2xl font-black uppercase tracking-tighter text-white italic">Keep <span className="text-primary">Learning.</span></h3>
+                <h3 className="text-2xl font-black uppercase tracking-tighter text-white italic text-data-glow">Keep <span className="text-primary">Learning.</span></h3>
                 <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.3em]">Last active learning trajectory node</p>
               </div>
               <div className="flex flex-col items-end">
@@ -116,7 +116,7 @@ export default function Academy() {
                     <span className="text-[9px] font-black text-primary uppercase animate-pulse italic">In progress</span>
                   </div>
                 </div>
-                <button className="w-full lg:w-auto px-10 py-4 bg-primary text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-xl shadow-primary/20 active:scale-95">
+                <button className="w-full lg:w-auto px-10 py-4 bg-primary text-bg-dark rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-xl shadow-primary/20 active:scale-95 metallic-glow">
                   Resume Trajectory
                 </button>
               </div>
@@ -172,7 +172,7 @@ export default function Academy() {
               <div className="h-px w-12 bg-white/20" />
               <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] italic">Specialist Node</span>
             </motion.div>
-            <motion.h1 key={`h1-${currentSlide}`} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} className="text-6xl sm:text-8xl font-black tracking-tighter text-white leading-[0.8] uppercase italic">
+            <motion.h1 key={`h1-${currentSlide}`} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} className="text-6xl sm:text-8xl font-black tracking-tighter text-white leading-[0.8] uppercase italic text-data-glow">
               {HERO_SLIDES[currentSlide].title} <br /><span className="text-primary">{HERO_SLIDES[currentSlide].accent}.</span>
             </motion.h1>
             <motion.p key={`p-${currentSlide}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xl text-white/60 font-medium max-w-xl leading-relaxed">{HERO_SLIDES[currentSlide].desc}</motion.p>
@@ -200,12 +200,12 @@ export default function Academy() {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-5 w-full lg:w-auto">
-            <div className="relative flex-1 lg:w-[450px]">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" size={24} />
+            <div className="relative flex-1 lg:w-[450px] group">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" size={24} />
               <input
                 type="text" placeholder={t('search_workshops')} value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-16 pr-8 py-6 bg-white/5 border border-white/5 rounded-[2rem] focus:border-primary/40 focus:ring-[12px] focus:ring-primary/5 transition-all font-bold text-white placeholder:text-white/20 outline-none text-sm uppercase tracking-widest"
+                className="glass-pro-max w-full pl-16 pr-8 py-6 !bg-white/5 border-white/5 focus:border-primary/40 focus:ring-[12px] focus:ring-primary/5 transition-all font-bold text-white placeholder:text-white/20 outline-none text-sm uppercase tracking-widest rounded-[2rem]"
               />
             </div>
             <button 

@@ -38,17 +38,17 @@ export default function Sidebar({
       <motion.aside 
         initial={false} 
         animate={{ width: isSidebarCollapsed ? 70 : 260 }} 
-        className="sticky top-24 sm:top-28 lg:top-32 h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar border-r border-white/5 pr-2 sm:pr-4"
+        className="sticky top-24 sm:top-28 lg:top-32 h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar border-r border-white/5 pr-2 sm:pr-4 glass-pro-max !bg-transparent border-none"
       >
         <div className="space-y-6 sm:space-y-8">
           {/* 🧿 Tier 1: Contextual Discovery (Guest only) */}
           {!profile && !isSidebarCollapsed && (
             <div className="px-2 mb-8 animate-in fade-in slide-in-from-left duration-700">
-              <div className="p-5 rounded-3xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 relative overflow-hidden group">
+              <div className="p-5 rounded-[2rem] glass-pro-max border border-white/10 relative overflow-hidden group metallic-glow">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <Box size={40} className={modeColor} />
                 </div>
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">Genesis Guide</h4>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2 text-data-glow">Genesis Guide</h4>
                 <p className="text-[11px] font-bold text-white mb-4 leading-relaxed">Join the Red Griffin Creative Ecosystem to unlock professional nodes.</p>
                 <div className="space-y-2">
                   <div 
@@ -77,11 +77,18 @@ export default function Sidebar({
                 <div key={cat?.name || Math.random()} className="space-y-1">
                   <button 
                     onClick={() => { if (isSidebarCollapsed) setIsSidebarCollapsed(false); handleSetCategory(cat); }} 
-                    className={`w-full text-left p-2.5 sm:p-3 rounded-xl border transition-all flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-between'} ${isCatActive ? (isStudio ? 'bg-primary-hover/10 border-primary-hover/20 text-white' : 'bg-primary/10 border-primary/20 text-white') : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white'}`}
+                    className={`w-full text-left p-2.5 sm:p-3 rounded-xl border transition-all flex items-center relative z-10 ${isSidebarCollapsed ? 'justify-center' : 'justify-between'} ${isCatActive ? (isStudio ? 'border-primary-hover/40 text-white shadow-[0_0_20px_rgba(59,130,246,0.1)]' : 'border-primary/40 text-white shadow-[0_0_20px_rgba(0,245,212,0.1)]') : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white'}`}
                   >
+                    {isCatActive && (
+                      <motion.div 
+                        layoutId="sidebar-active-indicator"
+                        className="absolute inset-0 bg-white/5 rounded-xl -z-10"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
                     <div className="flex items-center gap-2 sm:gap-3">
-                      <Icon size={16} className={isCatActive ? modeColor : 'opacity-40'} />
-                      {!isSidebarCollapsed && <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest truncate max-w-[140px]">{t(cat?.name || '')}</span>}
+                      <Icon size={16} className={isCatActive ? `${modeColor} neural-pulse` : 'opacity-40'} />
+                      {!isSidebarCollapsed && <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest truncate max-w-[140px] text-data-glow">{t(cat?.name || '')}</span>}
                     </div>
                     {!isSidebarCollapsed && <ChevronDown size={12} className={`transition-transform duration-300 shrink-0 ${isCatActive ? 'rotate-180 opacity-100' : 'opacity-20'}`} />}
                   </button>
