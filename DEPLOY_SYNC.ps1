@@ -22,7 +22,7 @@ $SQL_DUMP = "local_sync.sql"
 $BUILD_TEMP = "BUILD_TEMP"
 
 Write-Host "`n===============================================" -ForegroundColor Cyan
-Write-Host "🦾 STARTING INDUSTRIAL DEPLOYMENT PIPELINE v2.14" -ForegroundColor Cyan
+Write-Host "🦾 STARTING INDUSTRIAL DEPLOYMENT PIPELINE v2.15" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 
 # [1/6] Syncing Git
@@ -80,64 +80,41 @@ Write-Host "[6/6] ⚡ Finalizing v2.14 (Hotfix Sync)..." -ForegroundColor Yellow
 
 # Construction of remote commands with backtick-escaped subshells for Windows/Bash compatibility
 $REMOTE_COMMANDS = @"
-cd `$REMOTE_BASE
+cd `$REMOTE_BASE || exit 1
 
-echo "--- RESOURCE CLEANUP (PRE-DEPLOY) ---"
-# Kill existing processes first to free up 'fork' slots
+echo "--- RESOURCE CLEANUP ---"
+# Kill all node processes first
 pkill -u `$SSH_USER node || true
-sleep 3
+sleep 5
 
-echo "--- FINDING NODE ---"
-# Detect node location on Hostinger safely (Check common paths explicitly)
-if [ -f "/opt/alt/node20/bin/node" ]; then
-    NODE_PATH="/opt/alt/node20/bin/node"
-elif [ -f "/opt/alt/node18/bin/node" ]; then
-    NODE_PATH="/opt/alt/node18/bin/node"
-else
-    NODE_PATH=`$(which node 2>/dev/null || echo "node")
-fi
-echo "Found node at: `$NODE_PATH"
+echo "--- SETUP & DEPLOY v2.15 ---"
+# Detect node using absolute paths without find
+[ -f "/opt/alt/node20/bin/node" ] && NODE_PATH="/opt/alt/node20/bin/node" || NODE_PATH=`$(which node 2>/dev/null || echo "node")
 
-echo "--- DIRECTORY PREP ---"
 mkdir -p nodejs public_html
-
-echo "--- PURGING OLD BUILD ---"
 rm -rf public_html/dist nodejs/dist
-rm -f nodejs/index.js nodejs/server-dist.js nodejs/package.json nodejs/startup_debug.log
-sleep 1
+rm -f nodejs/index.js nodejs/server-dist.js nodejs/.env
 
-echo "--- EXTRACTING v2.14 ---"
-unzip -o "`$DEPLOY_ZIP" -d nodejs/
-unzip -o "`$DEPLOY_ZIP" -d public_html/
+unzip -qqo "`$DEPLOY_ZIP" -d nodejs/
+unzip -qqo "`$DEPLOY_ZIP" -d public_html/
 sleep 2
 
-echo "--- SYNCING DB ---"
+# DB Sync
 [ -f "`$SQL_DUMP" ] && mysql -u `$REMOTE_DB_USER -p'`$REMOTE_DB_PASS' `$REMOTE_DB < `$SQL_DUMP
 
-echo "--- WRITING PRODUCTION ENV ---"
-# Use temporary file to avoid complex quoting in echo
-printf '%s' "DATABASE_URL=mysql://u315573487_admin:RG_Academy_2026@145.79.26.219:3306/u315573487_db
+# PROD ENV
+echo "DATABASE_URL=mysql://u315573487_admin:RG_Academy_2026@145.79.26.219:3306/u315573487_db
 JWT_SECRET=super_secret_production_key_2026
 PORT=3000
 NODE_ENV=production" > nodejs/.env
 
-echo "--- SETTING PERMISSIONS ---"
+# Prisma (Atomic)
 chmod +x nodejs/node_modules/.bin/prisma 2>/dev/null || true
-find nodejs/node_modules/.prisma -name "*.node" -exec chmod +x {} \; 2>/dev/null || true
-
-echo "--- REGENERATING PRISMA FOR LINUX ---"
 cd nodejs
-export NODE_ENV=production
-if [ -f "./node_modules/.bin/prisma" ]; then
-    `$NODE_PATH ./node_modules/.bin/prisma generate
-else
-    echo "⚠️ Prisma binary missing, attempting fallback..."
-    npx prisma generate 2>/dev/null || `$NODE_PATH node_modules/prisma/build/index.js generate
-fi
+`$NODE_PATH ./node_modules/.bin/prisma generate || npx prisma generate
 
-echo "--- VERIFICATION ---"
+echo "--- SUCCESS ---"
 mkdir -p tmp && touch tmp/restart.txt
-[ -f index.js ] && echo "✅ index.js exists" || echo "❌ index.js MISSING"
 cd ..
 rm `$DEPLOY_ZIP `$SQL_DUMP
 "@
