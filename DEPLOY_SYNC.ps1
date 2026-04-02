@@ -1,5 +1,5 @@
 # 🚀 RED GRIFFIN ACADEMY - INTEGRATED DEPLOY & SYNC SCRIPT (DOCKER)
-# Version: 2.18 (Industrial UX Sync)
+# Version: 2.19 (Mobile Compact Sync)
 # ==========================================================
 
 $ErrorActionPreference = "Stop"
@@ -22,17 +22,17 @@ $SQL_DUMP = "local_sync.sql"
 $BUILD_TEMP = "BUILD_TEMP"
 
 Write-Host "`n===============================================" -ForegroundColor Cyan
-Write-Host "🦾 STARTING INDUSTRIAL DEPLOYMENT PIPELINE v2.18" -ForegroundColor Cyan
+Write-Host "🦾 STARTING INDUSTRIAL DEPLOYMENT PIPELINE v2.19" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
 
 # [1/6] Syncing Git
 Write-Host "`n[1/6] 💾 Syncing Git..." -ForegroundColor Yellow
 git add .
-git commit -m "Auto-sync (v2.18 Fix): $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" 2>$null || $true
+git commit -m "Auto-sync (v2.19 Mobile Fix): $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" 2>$null || $true
 git push origin main 2>$null || $true
 
 # [2/6] Rebuild Assets
-Write-Host "[2/6] 🏗️ Rebuilding Assets (v2.18 Clean)..." -ForegroundColor Yellow
+Write-Host "[2/6] 🏗️ Rebuilding Assets (v2.19 Clean)..." -ForegroundColor Yellow
 if (Test-Path "$BUILD_TEMP") { Remove-Item -Recurse -Force "$BUILD_TEMP" }
 New-Item -ItemType Directory -Path "$BUILD_TEMP" | Out-Null
 
@@ -71,7 +71,7 @@ Write-Host "`n[3/6] 🗄️ Exporting Database..." -ForegroundColor Yellow
 docker exec $DB_CONTAINER mysqldump -u$LOCAL_DB_USER -p$LOCAL_DB_PASS $LOCAL_DB > $SQL_DUMP
 
 # [4/6] Creating Archive
-Write-Host "[4/6] 📦 Creating Archive (v2.18)..." -ForegroundColor Yellow
+Write-Host "[4/6] 📦 Creating Archive (v2.19)..." -ForegroundColor Yellow
 Copy-Item -Recurse "dist" "$BUILD_TEMP/dist"
 Copy-Item "server-dist.cjs" "$BUILD_TEMP/server-dist.cjs"
 Copy-Item "index.js" "$BUILD_TEMP/index.js"
@@ -100,7 +100,7 @@ Write-Host "[5/6] 🚀 Uploading to Hostinger..." -ForegroundColor Yellow
 scp -P $SSH_PORT "$DEPLOY_ZIP" "$SQL_DUMP" "$($SSH_USER)@$($SSH_HOST):$REMOTE_BASE/"
 
 # [6/6] Finalize Remote
-Write-Host "[6/6] ⚡ Finalizing v2.18 (Production Sync)..." -ForegroundColor Yellow
+Write-Host "[6/6] ⚡ Finalizing v2.19 (Mobile Compact Sync)..." -ForegroundColor Yellow
 
 # Use PowerShell interpolation for values, but escape bash variables with backtick `
 $REMOTE_COMMANDS = @"
@@ -144,7 +144,7 @@ echo "✅ DEPLOY SUCCESSFUL"
 ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" $REMOTE_COMMANDS
 
 Write-Host "`n===============================================" -ForegroundColor Green
-Write-Host "✅ DEPLOY v2.18 COMPLETED!" -ForegroundColor Green
+Write-Host "✅ DEPLOY v2.19 COMPLETED!" -ForegroundColor Green
 Write-Host "🌐 Health Check: https://rgacademy.space/api/health" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Green
 

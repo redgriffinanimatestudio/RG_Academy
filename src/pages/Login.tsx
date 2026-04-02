@@ -211,19 +211,19 @@ const Login: React.FC = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-xl relative z-10"
       >
-        <div className="bg-[#0f0f0f] border border-white/5 rounded-[4rem] p-10 lg:p-14 shadow-2xl space-y-10 backdrop-blur-3xl min-h-[750px] flex flex-col justify-center">
+        <div className="bg-[#0f0f0f] border border-white/5 rounded-[3rem] sm:rounded-[4rem] p-6 sm:p-10 lg:p-14 shadow-2xl space-y-8 sm:space-y-10 backdrop-blur-3xl min-h-[500px] sm:min-h-[750px] flex flex-col justify-center">
           
           {/* Header */}
           <div className="text-center space-y-4">
             <motion.div 
               key={mode}
               initial={{ rotateY: 90 }} animate={{ rotateY: 0 }}
-              className="inline-flex items-center justify-center size-20 rounded-[2rem] bg-gradient-to-br from-red-600/20 to-red-900/5 border border-red-500/20 text-red-500 shadow-2xl shadow-red-500/20"
+              className="inline-flex items-center justify-center size-14 sm:size-20 rounded-[1.5rem] sm:rounded-[2rem] bg-gradient-to-br from-red-600/20 to-red-900/5 border border-red-500/20 text-red-500 shadow-2xl shadow-red-500/20"
             >
-              {mode === 'register' ? <UserPlus size={32} /> : <LogIn size={32} />}
+              {mode === 'register' ? <UserPlus size={24} className="sm:w-8 sm:h-8" /> : <LogIn size={24} className="sm:w-8 sm:h-8" />}
             </motion.div>
             <div className="space-y-1">
-              <h2 className="text-4xl font-black uppercase tracking-tighter text-white italic leading-none">
+              <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-tighter text-white italic leading-none">
                 {mode === 'register' ? t('join_grid') : 'Node Auth'}
               </h2>
               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">{t('reg_protocol')}</p>
@@ -266,7 +266,7 @@ const Login: React.FC = () => {
                         required
                       />
 
-                      <button type="submit" disabled={isLoading} className="w-full bg-red-600 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs hover:bg-red-700 transition-all shadow-2xl shadow-red-500/30 flex items-center justify-center gap-3">
+                      <button type="submit" disabled={isLoading} className="w-full bg-red-600 text-white py-4 sm:py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs hover:bg-red-700 transition-all shadow-2xl shadow-red-500/30 flex items-center justify-center gap-3">
                         Establish Connection
                         <ChevronRight size={18} />
                       </button>
@@ -550,10 +550,10 @@ const Login: React.FC = () => {
                  <span className="relative bg-[#0f0f0f] px-6 text-[10px] font-black uppercase tracking-[0.5em] text-white/10">Handshake</span>
                </div>
                <div className="grid grid-cols-2 gap-4">
-                 <button onClick={() => socialAuth({ provider: 'github' } as any)} className="py-5 rounded-3xl bg-white/5 border border-white/5 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest text-white/40 hover:bg-white/10 hover:text-white transition-all">
+                 <button onClick={() => socialAuth({ provider: 'github' } as any)} className="py-4 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest text-white/40 hover:bg-white/10 hover:text-white transition-all">
                    <Github size={18} /> GitHub
                  </button>
-                 <button onClick={() => socialAuth({ provider: 'google' } as any)} className="py-5 rounded-3xl bg-white/5 border border-white/5 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest text-white/40 hover:bg-white/10 hover:text-white transition-all">
+                 <button onClick={() => socialAuth({ provider: 'google' } as any)} className="py-4 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest text-white/40 hover:bg-white/10 hover:text-white transition-all">
                    <Globe size={18} /> Google
                  </button>
                </div>

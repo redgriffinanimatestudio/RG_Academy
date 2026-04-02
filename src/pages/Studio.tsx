@@ -263,10 +263,10 @@ export default function Studio() {
       <div className="fixed bottom-8 right-8 z-40">
         <button 
           onClick={() => setShowCheckout(true)}
-          className="size-16 bg-white text-bg-dark rounded-[2rem] flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all group border-4 border-primary/20"
+          className="size-14 bg-white text-bg-dark rounded-2xl flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all group border-4 border-primary/20"
         >
-          <CreditCard size={28} className="group-hover:rotate-12 transition-transform" />
-          <div className="absolute -top-2 -right-2 size-6 bg-primary text-bg-dark text-[10px] font-black flex items-center justify-center rounded-full border-4 border-bg-dark">1</div>
+          <CreditCard size={22} className="group-hover:rotate-12 transition-transform" />
+          <div className="absolute -top-1 -right-1 size-5 bg-primary text-bg-dark text-[9px] font-black flex items-center justify-center rounded-full border-2 border-bg-dark">1</div>
         </button>
       </div>
 

@@ -35,9 +35,9 @@ export default function AIAssistant() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setIsOpen(true)}
-            className="w-14 h-14 bg-primary text-bg-dark rounded-2xl shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 transition-transform border-4 border-bg-dark"
+            className="w-12 h-12 bg-primary text-bg-dark rounded-2xl shadow-2xl shadow-primary/40 flex items-center justify-center hover:scale-110 transition-transform border-4 border-bg-dark"
           >
-            <Brain size={28} />
+            <Brain size={22} />
           </motion.button>
         ) : (
           <motion.div

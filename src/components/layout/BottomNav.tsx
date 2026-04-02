@@ -50,10 +50,10 @@ export default function BottomNav() {
           <button
             key={idx}
             onClick={() => item.path ? navigate(item.path) : item.action?.()}
-            className="relative flex flex-col items-center justify-center flex-1 py-3 group outline-none"
+            className="relative flex flex-col items-center justify-center flex-1 py-2 group outline-none"
           >
             <div className={`relative z-10 transition-all duration-300 ${isActive(item.path) ? 'text-primary scale-110' : 'text-white/20 group-active:scale-90'}`}>
-              <item.icon size={20} strokeWidth={isActive(item.path) ? 3 : 2} />
+              <item.icon size={18} strokeWidth={isActive(item.path) ? 3 : 2} />
               
               {item.badge > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 size-4 bg-rose-500 rounded-full flex items-center justify-center text-[7px] font-black text-white border-2 border-[#050505]">

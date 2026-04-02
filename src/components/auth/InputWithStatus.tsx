@@ -69,7 +69,7 @@ export const InputWithStatus: React.FC<InputWithStatusProps> = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full bg-black/40 border ${statusColors[status]} rounded-[2rem] py-5 ${icon ? 'pl-16' : 'px-8'} pr-16 text-white text-sm font-bold outline-none focus:bg-primary/5 transition-all`}
+          className={`w-full bg-black/40 border ${statusColors[status]} rounded-2xl py-4 sm:py-5 ${icon ? 'pl-16' : 'px-8'} pr-16 text-white text-sm font-bold outline-none focus:bg-primary/5 transition-all`}
           required={required}
         />
 
