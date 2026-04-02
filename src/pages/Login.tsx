@@ -6,46 +6,18 @@ import {
   ChevronRight, Sparkles, Shield, UserPlus, CheckCircle2, Zap,
   Info, X, ArrowLeft, Loader2, GraduationCap, Briefcase, Users,
   Smartphone, Link as LinkIcon, Send, BriefcaseIcon, UserCheck,
-  Calendar, Binary, Cpu
+  Calendar, Binary, Cpu, SmartphoneIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RoleTree } from '../components/RoleTree';
 import { InputWithStatus } from '../components/auth/InputWithStatus';
 import { PasswordStrengthMeter } from '../components/auth/PasswordStrengthMeter';
 import { CountrySelector } from '../components/auth/CountrySelector';
+import { CyberCalendar } from '../components/auth/CyberCalendar';
+import { ALL_COUNTRIES } from '../utils/countries';
 import { useTranslation } from 'react-i18next';
 import apiClient from '../services/apiClient';
 import Preloader from '../components/Preloader';
-
-// Comprehensive Country Data
-const COUNTRIES = [
-  { code: 'US', name: 'United States', phone: '1', flag: '🇺🇸' },
-  { code: 'GB', name: 'United Kingdom', phone: '44', flag: '🇬🇧' },
-  { code: 'RU', name: 'Russia', phone: '7', flag: '🇷🇺' },
-  { code: 'KZ', name: 'Kazakhstan', phone: '7', flag: '🇰🇿' },
-  { code: 'GE', name: 'Georgia', phone: '995', flag: '🇬🇪' },
-  { code: 'UA', name: 'Ukraine', phone: '380', flag: '🇺🇦' },
-  { code: 'BY', name: 'Belarus', phone: '375', flag: '🇧🇾' },
-  { code: 'UZ', name: 'Uzbekistan', phone: '998', flag: '🇺🇿' },
-  { code: 'TR', name: 'Turkey', phone: '90', flag: '🇹🇷' },
-  { code: 'PL', name: 'Poland', phone: '48', flag: '🇵🇱' },
-  { code: 'DE', name: 'Germany', phone: '49', flag: '🇩🇪' },
-  { code: 'FR', name: 'France', phone: '33', flag: '🇫🇷' },
-  { code: 'ES', name: 'Spain', phone: '34', flag: '🇪🇸' },
-  { code: 'IT', name: 'Italy', phone: '39', flag: '🇮🇹' },
-  { code: 'CA', name: 'Canada', phone: '1', flag: '🇨🇦' },
-  { code: 'AU', name: 'Australia', phone: '61', flag: '🇦🇺' },
-  { code: 'CN', name: 'China', phone: '86', flag: '🇨🇳' },
-  { code: 'JP', name: 'Japan', phone: '81', flag: '🇯🇵' },
-  { code: 'KR', name: 'South Korea', phone: '82', flag: '🇰🇷' },
-  { code: 'AE', name: 'United Arab Emirates', phone: '971', flag: '🇦🇪' },
-  { code: 'IL', name: 'Israel', phone: '972', flag: '🇮🇱' },
-  { code: 'RS', name: 'Serbia', phone: '381', flag: '🇷🇸' },
-  { code: 'ME', name: 'Montenegro', phone: '382', flag: '🇲🇪' },
-  { code: 'TH', name: 'Thailand', phone: '66', flag: '🇹🇭' },
-  { code: 'ID', name: 'Indonesia', phone: '62', flag: '🇮🇩' },
-  { code: 'VN', name: 'Vietnam', phone: '84', flag: '🇻🇳' },
-];
 
 const Login: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -81,6 +53,7 @@ const Login: React.FC = () => {
   const [emailError, setEmailError] = useState('');
   const [passStrength, setPassStrength] = useState<0 | 1 | 2 | 3>(0);
   const [passConfirmStatus, setPassConfirmStatus] = useState<'none' | 'success' | 'error'>('none');
+  const [phoneStatus, setPhoneStatus] = useState<'none' | 'success' | 'warning' | 'error'>('none');
   
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -116,7 +89,6 @@ const Login: React.FC = () => {
               setEmailError('Email already registered in Grid');
             }
           } else {
-            // LOGIN MODE: If exists, it's SUCCESS. If not, it's ERROR.
             if (exists) {
               setEmailStatus('success');
               setEmailError('');
@@ -150,6 +122,14 @@ const Login: React.FC = () => {
     if (!formData.confirmPassword) { setPassConfirmStatus('none'); return; }
     setPassConfirmStatus(formData.password === formData.confirmPassword ? 'success' : 'error');
   }, [formData.password, formData.confirmPassword]);
+
+  // Phone Validation Logic
+  useEffect(() => {
+    if (!formData.phone) { setPhoneStatus('none'); return; }
+    if (formData.phone.length < 7) setPhoneStatus('warning');
+    else if (formData.phone.length > 15) setPhoneStatus('error');
+    else setPhoneStatus('success');
+  }, [formData.phone]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -190,7 +170,7 @@ const Login: React.FC = () => {
         }
       });
       setRegStep(5);
-      setTimeout(() => navigate(`/${lang}/dashboard`), 3000);
+      setTimeout(() => navigate(`/${lang}/dashboard`), 2500);
     } catch (err: any) { 
       setError(err.message); 
     } finally { 
@@ -213,7 +193,6 @@ const Login: React.FC = () => {
       >
         <div className="bg-[#0f0f0f] border border-white/5 rounded-[3rem] p-4 sm:p-8 lg:p-10 shadow-2xl space-y-6 sm:space-y-8 backdrop-blur-3xl min-h-[400px] flex flex-col justify-center">
           
-          {/* Header */}
           <div className="text-center space-y-4">
             <motion.div 
               key={mode}
@@ -315,7 +294,7 @@ const Login: React.FC = () => {
                       <RoleTree onShowDetail={(id) => { handleInputChange('selectedRole', id); setRegStep(2); }} />
                     </motion.div>
                   ) : regStep === 2 ? (
-                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-3 py-2">
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-2 py-0">
                       <InputWithStatus 
                         id="reg-email"
                         autoComplete="email"
@@ -329,7 +308,7 @@ const Login: React.FC = () => {
                         icon={<Mail size={18} />}
                         required
                       />
-                      <div className="space-y-2">
+                      <div className="space-y-1.5">
                         <InputWithStatus 
                           id="reg-password"
                           autoComplete="new-password"
@@ -373,29 +352,40 @@ const Login: React.FC = () => {
                          <label className="text-[10px] font-black uppercase text-white/30 px-2">{t('phone_number')}</label>
                          <div className="flex gap-2">
                            <select 
-                             className="bg-black/40 border border-white/5 rounded-2xl px-4 text-white text-sm outline-none focus:border-red-500/40"
+                             className="bg-black/40 border border-white/5 rounded-2xl px-3 text-white text-xs outline-none focus:border-red-500/40"
                              value={formData.phoneCode}
                              onChange={(e) => handleInputChange('phoneCode', e.target.value)}
                            >
-                             {COUNTRIES.sort((a,b)=>a.name.localeCompare(b.name)).map(c => (
+                             {ALL_COUNTRIES.map(c => (
                                <option key={c.code} value={c.phone} className="bg-[#0f0f0f]">{c.flag} +{c.phone}</option>
                              ))}
                            </select>
-                           <input 
-                             type="tel"
-                             className="flex-1 bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-white text-sm outline-none focus:border-red-500/40"
-                             placeholder="Phone Number"
-                             value={formData.phone}
-                             onChange={(e) => handleInputChange('phone', e.target.value)}
-                           />
+                           <div className="flex-1 relative">
+                             <input 
+                               type="tel"
+                               className={`w-full bg-black/40 border rounded-2xl py-3 px-5 text-white text-sm outline-none transition-all ${phoneStatus === 'error' ? 'border-red-500/50' : phoneStatus === 'success' ? 'border-emerald-500/30' : 'border-white/5 focus:border-red-500/40'}`}
+                               placeholder="Phone Number"
+                               value={formData.phone}
+                               onChange={(e) => handleInputChange('phone', e.target.value)}
+                             />
+                             <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+                                {phoneStatus === 'success' && <CheckCircle2 size={14} className="text-emerald-500" />}
+                                {phoneStatus === 'error' && <X size={14} className="text-red-500" />}
+                                {phoneStatus === 'warning' && <Info size={14} className="text-yellow-500" />}
+                             </div>
+                           </div>
+                         </div>
+                         <div className="px-2 flex items-center gap-2 opacity-40 group hover:opacity-100 transition-opacity">
+                            <Info size={10} className="text-[#00f3ff]" />
+                            <p className="text-[8px] font-black uppercase tracking-widest text-white italic">Future Protocol: SMS confirmation required for node activation.</p>
                          </div>
                       </div>
-                      <button onClick={() => setRegStep(3)} disabled={!formData.email || !formData.password || emailStatus === 'error' || passConfirmStatus !== 'success'} className="w-full bg-red-600 text-white py-4 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-700 transition-all flex items-center justify-center gap-2">
+                      <button onClick={() => setRegStep(3)} disabled={!formData.email || !formData.password || emailStatus === 'error' || passConfirmStatus !== 'success' || phoneStatus === 'error' || phoneStatus === 'none'} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-700 transition-all flex items-center justify-center gap-2">
                         {t('security_check_passed')} <ChevronRight size={14} />
                       </button>
                     </motion.div>
                   ) : regStep === 3 ? (
-                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-3 py-2">
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-3 py-0">
                       <InputWithStatus 
                         label={t('full_name')}
                         value={formData.displayName}
@@ -424,34 +414,25 @@ const Login: React.FC = () => {
                            </div>
                         </div>
 
-                        <div className="space-y-2">
-                           <label className="text-[10px] font-black uppercase text-white/30 px-2">{t('date_of_birth')}</label>
-                           <div className="relative">
-                              <input 
-                                type="date"
-                                className="w-full bg-black/40 border border-white/5 rounded-xl py-3.5 px-4 text-white text-xs outline-none focus:border-red-500/40 custom-calendar-icon"
-                                value={formData.dateOfBirth}
-                                onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                              />
-                              <Calendar size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" />
-                           </div>
-                        </div>
+                        <CyberCalendar 
+                          value={formData.dateOfBirth}
+                          onChange={(val) => handleInputChange('dateOfBirth', val)}
+                        />
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                         <CountrySelector 
+                          label="Country of Residence"
+                          placeholder="Select Node Host"
                           value={formData.country}
                           onChange={(val) => handleInputChange('country', val)}
                         />
 
-                        <InputWithStatus 
-                          label={t('citizenship')}
+                        <CountrySelector 
+                          label="Citizenship"
+                          placeholder="Legal Citizenship"
                           value={formData.citizenship}
-                          onChange={(e) => handleInputChange('citizenship', e.target.value)}
-                          placeholder="GR, UK, RU"
-                          hint="Legal residency status."
-                          icon={<Globe size={16} />}
-                          required
+                          onChange={(val) => handleInputChange('citizenship', val)}
                         />
                       </div>
 
@@ -460,7 +441,7 @@ const Login: React.FC = () => {
                       </button>
                     </motion.div>
                   ) : regStep === 4 ? (
-                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 py-4">
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4 py-2">
                       <div className="flex justify-between items-center mb-2 px-2">
                         <h3 className="text-lg font-black uppercase text-white">{t('step_specs')}</h3>
                         <button onClick={handleRegisterFinal} className="text-[9px] font-black uppercase text-red-500 border border-red-500/20 px-4 py-2 rounded-xl bg-red-500/5 hover:bg-red-500 hover:text-white transition-all">
@@ -472,35 +453,13 @@ const Login: React.FC = () => {
                         <InputWithStatus label="LinkedIn" value={formData.linkedInUrl} onChange={(e)=>handleInputChange('linkedInUrl', e.target.value)} placeholder="ID" hint="Professional link." icon={<LinkIcon size={16} />} />
                         <InputWithStatus label="Telegram" value={formData.telegramHandle} onChange={(e)=>handleInputChange('telegramHandle', e.target.value)} placeholder="@handle" hint="Direct comms." icon={<Send size={16} />} />
                       </div>
-                      <div className="space-y-2 px-2">
+                      <div className="space-y-1.5 px-2">
                         <label className="text-[10px] font-black uppercase text-white/30">Brief Intelligence (Bio)</label>
-                        <textarea value={formData.bio} onChange={(e)=>handleInputChange('bio', e.target.value)} placeholder="Skills, goals, expertise..." className="w-full bg-black/40 border border-white/5 rounded-3xl p-6 text-white text-sm outline-none focus:border-red-500/40 min-h-[100px] resize-none" />
+                        <textarea value={formData.bio} onChange={(e)=>handleInputChange('bio', e.target.value)} placeholder="Skills, goals, expertise..." className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-xs outline-none focus:border-red-500/40 min-h-[80px] resize-none" />
                       </div>
-                      <button onClick={handleRegisterFinal} disabled={isLoading} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2">
-                        {t('node_online')} <Zap size={14} />
+                      <button onClick={handleRegisterFinal} disabled={isLoading} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-2xl shadow-red-600/40">
+                         Node Online <Zap size={14} />
                       </button>
-                      {error && (
-                        <motion.div 
-                          initial={{ opacity: 0, scale: 0.9, y: 10 }} 
-                          animate={{ opacity: 1, scale: 1, y: 0 }} 
-                          className="mt-6 p-8 bg-red-500/5 border border-red-500/20 rounded-[2.5rem] relative overflow-hidden group shadow-2xl shadow-red-500/10"
-                        >
-                          {/* Error Background Pulse */}
-                          <div className="absolute inset-0 bg-red-600/5 animate-pulse" />
-                          
-                          <div className="relative z-10 flex flex-col items-center text-center space-y-3">
-                            <div className="size-12 rounded-2xl bg-red-500/20 flex items-center justify-center text-red-500 mb-2 shadow-xl shadow-red-500/20">
-                              <Shield size={24} className="animate-pulse" />
-                            </div>
-                            <div className="space-y-1">
-                              <h4 className="text-[12px] font-black uppercase tracking-[0.3em] text-red-500 italic">Access Denied</h4>
-                              <p className="text-[10px] font-black uppercase tracking-widest text-white/40 leading-relaxed max-w-[280px] mx-auto">
-                                {error === 'Validation failed' ? 'PROTOCOL ERROR: Invalid Node Identification Pattern' : error}
-                              </p>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
                     </motion.div>
                   ) : (
                     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-20 text-center space-y-8">
@@ -514,10 +473,8 @@ const Login: React.FC = () => {
                 </div>
               </form>
 
-
-
                 <div className="text-center pt-4 border-t border-white/5 mt-auto">
-                   <button onClick={() => { setMode('login'); setRegStep(1); setError(''); }} className="text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-red-500 transition-colors flex items-center justify-center gap-2 mx-auto">
+                   <button onClick={() => { if (regStep > 1) setRegStep(regStep - 1); else setMode('login'); setError(''); }} className="text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-red-500 transition-colors flex items-center justify-center gap-2 mx-auto">
                      <ArrowLeft size={14} /> {t('go_back')}
                    </button>
                 </div>
@@ -529,27 +486,23 @@ const Login: React.FC = () => {
             <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 10 }} 
               animate={{ opacity: 1, scale: 1, y: 0 }} 
-              className="mt-6 p-8 bg-red-500/5 border border-red-500/20 rounded-[2.5rem] relative overflow-hidden group shadow-2xl shadow-red-500/10"
+              className="mt-4 p-6 bg-red-500/5 border border-red-500/20 rounded-[2rem] relative overflow-hidden group"
             >
-              {/* Error Background Pulse */}
               <div className="absolute inset-0 bg-red-600/5 animate-pulse" />
-              
-              <div className="relative z-10 flex flex-col items-center text-center space-y-3">
-                <div className="size-12 rounded-2xl bg-red-500/20 flex items-center justify-center text-red-500 mb-2 shadow-xl shadow-red-500/20">
-                  <Shield size={24} className="animate-pulse" />
+              <div className="relative z-10 flex flex-col items-center text-center space-y-2">
+                <div className="size-10 rounded-xl bg-red-500/20 flex items-center justify-center text-red-500 mb-1">
+                  <Shield size={20} className="animate-pulse" />
                 </div>
-                <div className="space-y-1">
-                  <h4 className="text-[12px] font-black uppercase tracking-[0.3em] text-red-500 italic">Access Denied</h4>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-white/40 leading-relaxed max-w-[280px] mx-auto">
-                    {error === 'Validation failed' ? 'PROTOCOL ERROR: Invalid Node Identification Pattern' : error}
-                  </p>
-                </div>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500 italic">Access Denied</h4>
+                <p className="text-[9px] font-black uppercase tracking-widest text-white/40 leading-relaxed max-w-[280px] mx-auto">
+                  {error === 'Validation failed' ? 'PROTOCOL ERROR: Invalid Node Pattern' : error}
+                </p>
               </div>
             </motion.div>
           )}
 
           {(mode === 'login' || (mode === 'register' && regStep === 1)) && (
-            <div className="pt-10 border-t border-white/5 space-y-6">
+            <div className="pt-8 border-t border-white/5 space-y-6">
                <div className="relative flex items-center justify-center">
                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
                  <span className="relative bg-[#0f0f0f] px-6 text-[10px] font-black uppercase tracking-[0.5em] text-white/10">Handshake</span>

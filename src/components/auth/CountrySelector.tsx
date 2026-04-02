@@ -1,41 +1,37 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Globe, Shield, Search, ChevronDown, Check } from 'lucide-react';
-
-const COMMON_COUNTRIES = [
-  { code: 'GE', name: 'Georgia' },
-  { code: 'US', name: 'United States' },
-  { code: 'GB', name: 'United Kingdom' },
-  { code: 'DE', name: 'Germany' },
-  { code: 'FR', name: 'France' },
-  { code: 'UA', name: 'Ukraine' },
-  { code: 'KZ', name: 'Kazakhstan' },
-  { code: 'AE', name: 'UAE' },
-  { code: 'CA', name: 'Canada' },
-  { code: 'PL', name: 'Poland' }
-];
+import { ALL_COUNTRIES } from '../../utils/countries';
 
 interface CountrySelectorProps {
   value: string;
   onChange: (val: string) => void;
+  label?: string;
+  placeholder?: string;
 }
 
-export const CountrySelector: React.FC<CountrySelectorProps> = ({ value, onChange }) => {
+export const CountrySelector: React.FC<CountrySelectorProps> = ({ 
+  value, 
+  onChange, 
+  label = 'Country of Residence',
+  placeholder = 'Select Node Location'
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [isPrivacyHovered, setIsPrivacyHovered] = useState(false);
 
-  const filtered = COMMON_COUNTRIES.filter(c => 
-    c.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = ALL_COUNTRIES.filter(c => 
+    c.name.toLowerCase().includes(search.toLowerCase()) ||
+    c.code.toLowerCase().includes(search.toLowerCase())
   );
 
-  const selectedCountry = COMMON_COUNTRIES.find(c => c.code === value);
+  const selectedCountry = ALL_COUNTRIES.find(c => c.code === value);
 
   return (
     <div className="space-y-2 relative">
       <div className="flex items-center justify-between px-2">
         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
-          Country / Residency <span className="text-red-500/50">*</span>
+          {label} <span className="text-red-500/50">*</span>
         </label>
         
         <div 
@@ -43,8 +39,8 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({ value, onChang
           onMouseEnter={() => setIsPrivacyHovered(true)}
           onMouseLeave={() => setIsPrivacyHovered(false)}
         >
-          <span className="text-[8px] font-black uppercase tracking-widest">Privacy Compliance</span>
-          <Shield size={12} />
+          <span className="text-[8px] font-black uppercase tracking-widest text-[#00f3ff]/40">Node Compliance</span>
+          <Shield size={10} className="text-[#00f3ff]/40" />
         </div>
       </div>
 
@@ -52,43 +48,53 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({ value, onChang
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full bg-black/40 border border-white/5 rounded-[2rem] py-5 pl-16 pr-8 text-white text-sm font-bold flex items-center justify-between hover:bg-white/5 transition-all outline-none"
+          className="w-full bg-black/40 border border-white/5 rounded-xl py-3.5 pl-12 pr-6 text-white text-xs font-bold flex items-center justify-between hover:bg-white/5 transition-all outline-none"
         >
-          <Globe className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" size={20} />
-          <span>{selectedCountry ? selectedCountry.name : 'Select Jurisdiction'}</span>
-          <ChevronDown size={18} className={`text-white/20 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <div className="flex items-center gap-3 overflow-hidden">
+            <Globe className="flex-shrink-0 text-white/20" size={16} />
+            <span className="truncate">{selectedCountry ? `${selectedCountry.flag} ${selectedCountry.name}` : placeholder}</span>
+          </div>
+          <ChevronDown size={14} className={`flex-shrink-0 text-white/20 transition-transform ${isOpen ? 'rotate-180 text-primary' : ''}`} />
         </button>
 
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              initial={{ opacity: 0, scaleY: 0.9, originY: 0 }}
-              animate={{ opacity: 1, scaleY: 1 }}
-              exit={{ opacity: 0, scaleY: 0.9 }}
-              className="absolute top-full left-0 right-0 z-[100] mt-2 bg-[#1a1a1a] border border-white/10 rounded-[2rem] shadow-2xl overflow-hidden backdrop-blur-3xl"
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="absolute top-full left-0 right-0 z-[200] mt-2 bg-[#0f0f0f] border border-white/10 rounded-2xl shadow-3xl overflow-hidden backdrop-blur-3xl"
             >
-              <div className="p-4 border-b border-white/5 flex items-center gap-3">
-                <Search size={16} className="text-white/20" />
+              <div className="p-3 border-b border-white/5 flex items-center gap-3">
+                <Search size={14} className="text-white/20" />
                 <input
                   autoFocus
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="FIND NODE..."
-                  className="bg-transparent border-none outline-none text-[10px] font-black uppercase tracking-widest text-primary w-full"
+                  placeholder="SEARCH COORDINATES..."
+                  className="bg-transparent border-none outline-none text-[9px] font-black uppercase tracking-[0.2em] text-primary w-full"
                 />
               </div>
-              <div className="max-h-[250px] overflow-y-auto p-2 custom-scrollbar">
+              <div className="max-h-[220px] overflow-y-auto p-1 custom-scrollbar">
                 {filtered.map(c => (
                   <button
                     key={c.code}
                     type="button"
-                    onClick={() => { onChange(c.code); setIsOpen(false); }}
-                    className={`w-full flex items-center justify-between p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${value === c.code ? 'bg-primary text-black' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}
+                    onClick={() => { onChange(c.code); setIsOpen(false); setSearch(''); }}
+                    className={`w-full flex items-center justify-between p-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${value === c.code ? 'bg-primary/20 text-primary border border-primary/20' : 'text-white/40 hover:bg-white/5 hover:text-white'}`}
                   >
-                    <span>{c.name}</span>
-                    {value === c.code && <Check size={14} />}
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm">{c.flag}</span>
+                      <span>{c.name}</span>
+                    </div>
+                    {value === c.code && <Check size={12} className="text-primary" />}
                   </button>
                 ))}
+                {filtered.length === 0 && (
+                  <div className="p-6 text-center text-white/20 text-[9px] font-black uppercase italic">
+                    Node Location Not Found
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -98,19 +104,14 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({ value, onChang
       <AnimatePresence>
         {isPrivacyHovered && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="absolute z-[110] bottom-full left-0 right-0 mb-4 p-6 bg-[#0f0f0f] border border-primary/20 rounded-3xl shadow-2xl backdrop-blur-2xl"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="absolute z-[210] top-0 left-full ml-4 w-48 p-4 bg-[#0f0f0f] border border-[#00f3ff]/20 rounded-2xl shadow-2xl backdrop-blur-2xl hidden lg:block"
           >
-            <div className="flex items-center gap-3 mb-3 text-primary">
-              <Shield size={18} />
-              <h5 className="text-[10px] font-black uppercase tracking-[0.2em]">Regional Protocol Policy</h5>
-            </div>
-            <p className="text-[10px] font-medium text-white/40 leading-relaxed uppercase tracking-widest">
-              We require your jurisdiction to determine **GDPR compliance** (EU Citizens), data localization laws (Georgia/UAE), and to dynamically generate **Smart Contracts** relevant to your specific residency. Your digital rights are governed by this parameter.
+            <p className="text-[8px] font-bold text-white/40 leading-relaxed uppercase tracking-widest">
+              Coordinate identification is required for <span className="text-[#00f3ff]">Protocol Compliance</span> and dynamic Smart Contract generation.
             </p>
-            <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-[#0f0f0f]" />
           </motion.div>
         )}
       </AnimatePresence>
