@@ -47,7 +47,7 @@ Write-Host "🏗️  Building Frontend..."
 npm run build
 
 Write-Host "📦 Bundling Backend..."
-npx esbuild server.ts --bundle --platform=node --format=esm --outfile=server-dist.js --external:fsevents --external:canvas --external:sharp
+npx esbuild server.ts --bundle --platform=node --format=esm --outfile=server-dist.js --banner:js="import { createRequire } from 'module'; const require = createRequire(import.meta.url);" --external:fsevents --external:canvas --external:sharp --external:prisma --external:@prisma/client
 
 Write-Host "🛡️ Verifying Build Integrity..."
 if (-not (Test-Path "dist/index.html") -or -not (Test-Path "server-dist.js")) {
@@ -87,7 +87,7 @@ sleep 3
 
 echo "--- SETUP PATHS ---"
 # Safe node detection
-NODE_PATH=`$(which node 2>/dev/null || echo "/opt/alt/node20/bin/node")
+NODE_PATH=`$(which node 2>/dev/null || echo "/opt/alt/alt-nodejs20/root/usr/bin/node")
 echo "Using Node: `$NODE_PATH"
 
 mkdir -p nodejs public_html
