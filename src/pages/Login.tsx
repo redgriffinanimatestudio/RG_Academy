@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
   LogIn, User, Lock, Mail, Github, Globe, 
-  ChevronRight, Sparkles, Shield, UserPlus, CheckCircle2, Zap,
+  ChevronRight, ChevronLeft, Sparkles, Shield, UserPlus, CheckCircle2, Zap, Check,
   Info, X, ArrowLeft, Loader2, GraduationCap, Briefcase, Users,
   Smartphone, Link as LinkIcon, Send, BriefcaseIcon, UserCheck,
   Calendar, Binary, Cpu, SmartphoneIcon
@@ -26,6 +26,7 @@ const Login: React.FC = () => {
     return saved ? parseInt(saved, 10) : 1;
   });
   const [showTreeModal, setShowTreeModal] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   
   const { t, i18n: i18nInstance } = useTranslation();
   const { lang = 'eng' } = useParams();
@@ -301,12 +302,12 @@ const Login: React.FC = () => {
               <motion.div key="register" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8 flex-1 flex flex-col">
                 {/* Step Indicator */}
                 <div className="flex items-center justify-between px-2">
-                  {[1, 2, 3, 4].map(s => (
+                  {[1, 2, 3, 4, 5].map(s => (
                     <div key={s} className="flex items-center gap-2">
-                      <div className={`size-7 rounded-full flex items-center justify-center text-[9px] font-black border-2 transition-all duration-500 ${regStep >= s ? 'bg-red-600 border-red-600 text-white' : 'border-white/10 text-white/20'}`}>
+                      <div className={`size-6 sm:size-7 rounded-full flex items-center justify-center text-[9px] font-black border-2 transition-all duration-500 ${regStep >= s ? 'bg-red-600 border-red-600 text-white' : 'border-white/10 text-white/20'}`}>
                         {s}
                       </div>
-                      {s < 4 && <div className={`h-[2px] w-6 lg:w-10 transition-all duration-500 ${regStep > s ? 'bg-red-600' : 'bg-white/10'}`} />}
+                      {s < 5 && <div className={`h-[2px] w-4 lg:w-8 transition-all duration-500 ${regStep > s ? 'bg-red-600' : 'bg-white/10'}`} />}
                     </div>
                   ))}
                 </div>
@@ -314,7 +315,7 @@ const Login: React.FC = () => {
                 <form 
                   onSubmit={(e) => { 
                     e.preventDefault(); 
-                    if (regStep < 4) setRegStep(regStep + 1); 
+                    if (regStep < 5) setRegStep(regStep + 1); 
                     else handleRegisterFinal();
                   }}
                   className="flex-1 flex flex-col"
@@ -481,7 +482,7 @@ const Login: React.FC = () => {
                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4 py-2">
                       <div className="flex justify-between items-center mb-2 px-2">
                         <h3 className="text-lg font-black uppercase text-white">{t('step_specs')}</h3>
-                        <button onClick={handleRegisterFinal} className="text-[9px] font-black uppercase text-red-500 border border-red-500/20 px-4 py-2 rounded-xl bg-red-500/5 hover:bg-red-500 hover:text-white transition-all">
+                        <button onClick={() => setRegStep(5)} className="text-[9px] font-black uppercase text-red-500 border border-red-500/20 px-4 py-2 rounded-xl bg-red-500/5 hover:bg-red-500 hover:text-white transition-all">
                           {t('skip_sync')}
                         </button>
                       </div>
@@ -494,8 +495,47 @@ const Login: React.FC = () => {
                         <label className="text-[10px] font-black uppercase text-white/30">Brief Intelligence (Bio)</label>
                         <textarea value={formData.bio} onChange={(e)=>handleInputChange('bio', e.target.value)} placeholder="Skills, goals, expertise..." className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-xs outline-none focus:border-red-500/40 min-h-[80px] resize-none" />
                       </div>
-                      <button onClick={handleRegisterFinal} disabled={isLoading} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-2xl shadow-red-600/40 group">
-                         Node Online <Zap size={14} className="group-hover:scale-110 transition-transform" />
+                      <button onClick={() => setRegStep(5)} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-2xl shadow-red-600/40 group">
+                         {t('next_step')} <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </motion.div>
+                  ) : regStep === 5 ? (
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 py-4">
+                      <div className="text-center space-y-2">
+                        <div className="size-16 rounded-full bg-red-600/10 border border-red-500/20 flex items-center justify-center mx-auto text-red-500 mb-4">
+                           <Shield size={32} />
+                        </div>
+                        <h3 className="text-xl font-black uppercase text-white tracking-widest">Protocol Agreement</h3>
+                        <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.22em] leading-relaxed">Final Node Activation Compliance</p>
+                      </div>
+
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+                         <div className="flex items-start gap-4">
+                            <div className="size-2 rounded-full bg-red-500 mt-1.5 shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
+                            <p className="text-[11px] font-medium text-white/60 leading-relaxed italic">
+                              You are establishing a professional presence within the Grid. As a resident of <span className="text-red-400 font-black uppercase">{(ALL_COUNTRIES.find(c => c.code === formData.country)?.name || formData.country).toUpperCase()}</span>, your data will be managed according to the Red Griffin Global Protocol and local node hosting regulations.
+                            </p>
+                         </div>
+
+                         <div 
+                           onClick={() => setTermsAccepted(!termsAccepted)}
+                           className="flex items-center gap-4 cursor-pointer group p-3 rounded-xl hover:bg-white/5 transition-all border border-transparent hover:border-white/5"
+                         >
+                            <div className={`size-5 rounded-md border-2 flex items-center justify-center transition-all ${termsAccepted ? 'bg-red-600 border-red-600 shadow-[0_0_10px_rgba(239,68,68,0.4)]' : 'border-white/10 bg-white/5'}`}>
+                               {termsAccepted && <Check size={12} className="text-white" />}
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-white/40 group-hover:text-white transition-colors">
+                               I acknowledge and accept the <a href={`/${lang}/terms`} className="text-red-500 hover:underline" onClick={(e)=>e.stopPropagation()}>Terms of Use</a> & <a href={`/${lang}/privacy`} className="text-red-500 hover:underline" onClick={(e)=>e.stopPropagation()}>Privacy Policy</a>.
+                            </span>
+                         </div>
+                      </div>
+
+                      <button 
+                        onClick={handleRegisterFinal} 
+                        disabled={!termsAccepted || isLoading} 
+                        className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.25em] text-[10px] transition-all flex items-center justify-center gap-3 shadow-2xl ${termsAccepted ? 'bg-red-600 text-white hover:bg-red-700 shadow-red-600/40' : 'bg-white/5 text-white/20 cursor-not-allowed opacity-50'}`}
+                      >
+                         ACTIVATE NODE <Zap size={16} />
                       </button>
                     </motion.div>
                   ) : (

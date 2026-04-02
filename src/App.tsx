@@ -26,6 +26,8 @@ import { AuthProvider } from './context/AuthContext';
 import { PlatformProvider } from './context/PlatformContext';
 import { useSyncManager } from './services/syncManager';
 import { useTranslation } from 'react-i18next';
+import Terms from './pages/Terms';
+import { CookieConsent } from './components/common/CookieConsent';
 import './i18n';
 
 const LANGUAGES = ['eng', 'ru', 'tr', 'az', 'es', 'fr', 'de', 'it'];
@@ -70,6 +72,7 @@ export default function App() {
           <SyncHandler>
             <AlertProvider>
               <GlobalSearchOverlay />
+              <CookieConsent />
               <Routes>
                 <Route path="/" element={<Navigate to="/eng" replace />} />
                 {/* Main Routes */}
@@ -112,7 +115,7 @@ export default function App() {
             {/* Other */}
             <Route path="/learn/:lang/:slug" element={<LanguageWrapper><Learn /></LanguageWrapper>} />
             <Route path="/:lang/privacy" element={<LanguageWrapper><Layout><InfoPage /></Layout></LanguageWrapper>} />
-            <Route path="/:lang/terms" element={<LanguageWrapper><Layout><InfoPage /></Layout></LanguageWrapper>} />
+            <Route path="/:lang/terms" element={<LanguageWrapper><Terms /></LanguageWrapper>} />
             
             {/* Review Terminal */}
             <Route path="/review/:lang/:projectId" element={<LanguageWrapper><AssetReview /></LanguageWrapper>} />
