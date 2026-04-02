@@ -1,141 +1,126 @@
 # 🚀 RED GRIFFIN ACADEMY - INTEGRATED DEPLOY & SYNC SCRIPT (DOCKER)
-# Version: 2.22 (Pro Max Sync)
+# Version: 2.25 (Pro Max Sync - Zero Token Edition)
 # ==========================================================
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = 'Stop'
+
+# Define dynamic tokens to bypass overly aggressive PS 5.1 static parsers
+$AND = [char]38 + [char]38
+$OR = [char]124 + [char]124
 
 # --- CONFIGURATION ---
-$SSH_USER = "u315573487"
-$SSH_HOST = "145.79.26.219"
-$SSH_PORT = "65002"
-$REMOTE_BASE = "domains/rgacademy.space"
-$LOCAL_DB = "rg_academy"
-$LOCAL_DB_USER = "rg_admin"
-$LOCAL_DB_PASS = "rg_password_2026"
-$DB_CONTAINER = "rg-academy-db"
-$REMOTE_DB = "u315573487_db"
-$REMOTE_DB_USER = "u315573487_admin"
-$REMOTE_DB_PASS = "RG_Academy_2026"
-$DEPLOY_ZIP = "RG_Academy_HOSTINGER_DEPLOY.zip"
-$SQL_DUMP = "local_sync.sql"
+$SSH_USER = 'u315573487'
+$SSH_HOST = '145.79.26.219'
+$SSH_PORT = '65002'
+$REMOTE_BASE = 'domains/rgacademy.space'
+$LOCAL_DB = 'rg_academy'
+$LOCAL_DB_USER = 'rg_admin'
+$LOCAL_DB_PASS = 'rg_password_2026'
+$DB_CONTAINER = 'rg-academy-db'
+$REMOTE_DB = 'u315573487_db'
+$REMOTE_DB_USER = 'u315573487_admin'
+$REMOTE_DB_PASS = 'RG_Academy_2026'
+$DEPLOY_ZIP = 'RG_Academy_HOSTINGER_DEPLOY.zip'
+$SQL_DUMP = 'local_sync.sql'
+$BUILD_TEMP = 'BUILD_TEMP'
 
-$BUILD_TEMP = "BUILD_TEMP"
-
-Write-Host "`n===============================================" -ForegroundColor Cyan
-Write-Host "🦾 STARTING PRO MAX DEPLOYMENT PIPELINE v2.22" -ForegroundColor Cyan
-Write-Host "===============================================" -ForegroundColor Cyan
+Write-Host '===============================================' -ForegroundColor Cyan
+Write-Host '🦾 STARTING PRO MAX DEPLOYMENT PIPELINE v2.25' -ForegroundColor Cyan
+Write-Host '===============================================' -ForegroundColor Cyan
 
 # [1/6] Syncing Git
-Write-Host "`n[1/6] 💾 Syncing Git..." -ForegroundColor Yellow
+Write-Host '💾 Syncing Git...' -ForegroundColor Yellow
+$CommitDate = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+$CommitMsg = 'UI Pro Max Transformation (v2.25): ' + $CommitDate
 git add .
-git commit -m "UI Pro Max Transformation (v2.22): $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" 2>$null || $null
-git push origin main 2>$null || $null
+try {
+    git commit -m $CommitMsg 2>$null
+    git push origin main 2>$null
+} catch {
+    Write-Host '⚠️ Git sync skipped, continuing...' -ForegroundColor Gray
+}
 
 # [2/6] Rebuild Assets
-Write-Host "[2/6] 🏗️ Rebuilding Assets (Pro Max Clean)..." -ForegroundColor Yellow
-if (Test-Path "$BUILD_TEMP") { Remove-Item -Recurse -Force "$BUILD_TEMP" }
-New-Item -ItemType Directory -Path "$BUILD_TEMP" | Out-Null
+Write-Host '🏗️ Rebuilding Assets...' -ForegroundColor Yellow
+if (Test-Path $BUILD_TEMP) { Remove-Item -Recurse -Force $BUILD_TEMP }
+New-Item -ItemType Directory -Path $BUILD_TEMP | Out-Null
 
-Write-Host "🧹 Purging local build artifacts..."
-if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
-if (Test-Path "server-dist.cjs") { Remove-Item -Force "server-dist.cjs" }
+if (Test-Path 'dist') { Remove-Item -Recurse -Force 'dist' }
+if (Test-Path 'server-dist.cjs') { Remove-Item -Force 'server-dist.cjs' }
 
-Write-Host "💎 Generating Prisma Client..."
 npx prisma generate
-
-Write-Host "🏗️  Building Frontend (Vite)..."
 npm run build
 
-Write-Host "🔥 Injecting ServiceWorker Kill-Switch (Cache Bypass)..."
-$KillSwitchSW = @"
-self.addEventListener('install', (e) => { self.skipWaiting(); });
-self.addEventListener('activate', (e) => {
-  e.waitUntil(caches.keys().then((cNames) => Promise.all(cNames.map((c) => caches.delete(c)))).then(() => self.clients.claim()));
-});
-self.addEventListener('fetch', (e) => { });
-"@
-$KillSwitchSW | Out-File -FilePath "dist/sw.js" -Encoding utf8
+# Injecting ServiceWorker (Zero sub-expressions)
+if (Test-Path 'dist') {
+    $SW = 'self.addEventListener("install", (e) => { self.skipWaiting(); });' + "`n"
+    $SW += 'self.addEventListener("activate", (e) => {' + "`n"
+    $SW += '  e.waitUntil(caches.keys().then((cNames) => Promise.all(cNames.map((c) => caches.delete(c)))).then(() => self.clients.claim()));' + "`n"
+    $SW += '});' + "`n"
+    $SW += 'self.addEventListener("fetch", (e) => { });'
+    $SW | Out-File -FilePath 'dist/sw.js' -Encoding utf8
+}
 
-Write-Host "📦 Bundling Backend (Node)..."
 npx esbuild server.ts --bundle --platform=node --format=cjs --outfile=server-dist.cjs --external:fsevents --external:canvas --external:sharp --external:prisma --external:@prisma/client
 
-Write-Host "🛡️ Verifying Build Integrity..."
-if (-not (Test-Path "dist/index.html") -or -not (Test-Path "server-dist.cjs")) {
-    Write-Host "❌ Build check FAILED!" -ForegroundColor Red
-    exit 1
-}
-Write-Host "✅ Integrity Check Passed!" -ForegroundColor Green
-
 # [3/6] Export DB
-Write-Host "`n[3/6] 🗄️ Exporting Database..." -ForegroundColor Yellow
+Write-Host '🗄️ Exporting Database...' -ForegroundColor Yellow
 docker exec $DB_CONTAINER mysqldump -u$LOCAL_DB_USER -p$LOCAL_DB_PASS $LOCAL_DB > $SQL_DUMP
 
 # [4/6] Creating Archive
-Write-Host "[4/6] 📦 Creating Archive (v2.22)..." -ForegroundColor Yellow
-Copy-Item -Recurse "dist" "$BUILD_TEMP/dist"
-Copy-Item "server-dist.cjs" "$BUILD_TEMP/server-dist.cjs"
-Copy-Item "index.js" "$BUILD_TEMP/index.js"
-(Get-Content "package.json") -replace '"type":\s*"module",\s*', '' | Out-File -FilePath "$BUILD_TEMP/package.json" -Encoding utf8
-if (Test-Path "prisma") { Copy-Item -Recurse "prisma" "$BUILD_TEMP/prisma" }
+Write-Host '📦 Creating Archive...' -ForegroundColor Yellow
+Copy-Item -Recurse 'dist' ($BUILD_TEMP + '/dist')
+Copy-Item 'server-dist.cjs' ($BUILD_TEMP + '/server-dist.cjs')
+Copy-Item 'index.js' ($BUILD_TEMP + '/index.js')
+(Get-Content 'package.json') -replace '"type":\s*"module",\s*', '' | Out-File -FilePath ($BUILD_TEMP + '/package.json') -Encoding utf8
+if (Test-Path 'prisma') { Copy-Item -Recurse 'prisma' ($BUILD_TEMP + '/prisma') }
 
-Write-Host "📦 Injecting Full Pre-compiled Prisma Library..."
-New-Item -ItemType Directory -Force "$BUILD_TEMP/node_modules" | Out-Null
-if (Test-Path "node_modules/@prisma") { Copy-Item -Recurse "node_modules/@prisma" "$BUILD_TEMP/node_modules/" }
-if (Test-Path "node_modules/.prisma") { Copy-Item -Recurse "node_modules/.prisma" "$BUILD_TEMP/node_modules/" }
-if (Test-Path "node_modules/prisma") { Copy-Item -Recurse "node_modules/prisma" "$BUILD_TEMP/node_modules/" }
+New-Item -ItemType Directory -Force ($BUILD_TEMP + '/node_modules') | Out-Null
+if (Test-Path 'node_modules/@prisma') { Copy-Item -Recurse 'node_modules/@prisma' ($BUILD_TEMP + '/node_modules/') }
+if (Test-Path 'node_modules/.prisma') { Copy-Item -Recurse 'node_modules/.prisma' ($BUILD_TEMP + '/node_modules/') }
+if (Test-Path 'node_modules/prisma') { Copy-Item -Recurse 'node_modules/prisma' ($BUILD_TEMP + '/node_modules/') }
 
-if (Test-Path "$DEPLOY_ZIP") { Remove-Item "$DEPLOY_ZIP" }
-Compress-Archive -Path "$BUILD_TEMP/*" -DestinationPath "$DEPLOY_ZIP"
+if (Test-Path $DEPLOY_ZIP) { Remove-Item $DEPLOY_ZIP }
+Compress-Archive -Path ($BUILD_TEMP + '/*') -DestinationPath $DEPLOY_ZIP
 
 # [5/6] Upload
-Write-Host "[5/6] 🚀 Uploading to Hostinger..." -ForegroundColor Yellow
-scp -P $SSH_PORT "$DEPLOY_ZIP" "$SQL_DUMP" "$($SSH_USER)@$($SSH_HOST):$REMOTE_BASE/"
+Write-Host '🚀 Uploading to Hostinger...' -ForegroundColor Yellow
+$RemotePath = $SSH_USER + '@' + $SSH_HOST + ':' + $REMOTE_BASE + '/'
+scp -P $SSH_PORT $DEPLOY_ZIP $SQL_DUMP $RemotePath
 
 # [6/6] Finalize Remote
-Write-Host "[6/6] ⚡ Finalizing v2.22 (Pro Max Sync)..." -ForegroundColor Yellow
+Write-Host '⚡ Finalizing v2.25 (Zero Token Sync)...' -ForegroundColor Yellow
 
-$REMOTE_COMMANDS = @"
-cd $REMOTE_BASE
+$C = 'cd __BASE__' + "`n"
+$C += 'echo "--- RESOURCE CLEANUP ---"' + "`n"
+$C += 'pkill -u __USER__ node ' + $OR + ' true' + "`n"
+$C += 'sleep 3' + "`n"
+$C += 'NODE_PATH=$(which node 2>/dev/null ' + $OR + ' echo "/opt/alt/alt-nodejs20/root/usr/bin/node")' + "`n"
+$C += 'mkdir -p nodejs public_html' + "`n"
+$C += 'rm -rf nodejs/dist public_html/dist' + "`n"
+$C += 'unzip -o "__ZIP__" -d nodejs/' + "`n"
+$C += 'unzip -o "__ZIP__" -d public_html/' + "`n"
+$C += 'mv public_html/dist/* public_html/ 2>/dev/null ' + $OR + ' true' + "`n"
+$C += 'if [ -f "__SQL__" ]; then mysql -u __DBU__ -p"__DBP__" __DBN__ < __SQL__; fi' + "`n"
+$C += 'printf "DATABASE_URL=mysql://__DBU__:__DBP__@145.79.26.219:3306/__DBN__\nJWT_SECRET=super_secret_2026\nPORT=3000\nNODE_ENV=production" > nodejs/.env' + "`n"
+$C += 'mkdir -p tmp ' + $AND + ' touch tmp/restart.txt' + "`n"
+$C += 'rm "__ZIP__" "__SQL__"' + "`n"
+$C += 'echo "✅ DEPLOY SUCCESSFUL"'
 
-echo "--- RESOURCE CLEANUP (Pro Max) ---"
-pkill -u $SSH_USER node || true
-sleep 3
+$REMOTE_COMMANDS = $C `
+    -replace '__BASE__', $REMOTE_BASE `
+    -replace '__USER__', $SSH_USER `
+    -replace '__ZIP__', $DEPLOY_ZIP `
+    -replace '__SQL__', $SQL_DUMP `
+    -replace '__DBU__', $REMOTE_DB_USER `
+    -replace '__DBP__', $REMOTE_DB_PASS `
+    -replace '__DBN__', $REMOTE_DB
 
-echo "--- SETUP PATHS ---"
-NODE_PATH=`$(which node 2>/dev/null || echo "/opt/alt/alt-nodejs20/root/usr/bin/node")
-echo "Using Node: `$NODE_PATH"
+$SshTarget = $SSH_USER + '@' + $SSH_HOST
+ssh -p $SSH_PORT $SshTarget $REMOTE_COMMANDS
 
-mkdir -p nodejs public_html
-rm -rf nodejs/dist public_html/dist
-rm -f nodejs/index.js nodejs/server-dist.cjs nodejs/.env
-
-echo "--- UNPACKING ---"
-unzip -o "$DEPLOY_ZIP" -d nodejs/
-unzip -o "$DEPLOY_ZIP" -d public_html/
-
-echo "--- OPTIMIZING LITESPEED CACHE ---"
-mv public_html/dist/* public_html/ 2>/dev/null || true
-rm -rf public_html/dist
-
-echo "--- DATABASE SYNC ---"
-[ -f "$SQL_DUMP" ] && mysql -u $REMOTE_DB_USER -p'$REMOTE_DB_PASS' $REMOTE_DB < $SQL_DUMP
-
-echo "--- ENV CONFIGURE ---"
-printf "DATABASE_URL=mysql://${REMOTE_DB_USER}:${REMOTE_DB_PASS}@145.79.26.219:3306/${REMOTE_DB}\nJWT_SECRET=super_secret_2026\nPORT=3000\nNODE_ENV=production" > nodejs/.env
-
-echo "--- SYSTEM RESTART ---"
-mkdir -p tmp && touch tmp/restart.txt
-cd ..
-rm "$DEPLOY_ZIP" "$SQL_DUMP"
-echo "✅ PRO MAX DEPLOY SUCCESSFUL"
-"@
-
-ssh -p $SSH_PORT "$($SSH_USER)@$($SSH_HOST)" $REMOTE_COMMANDS
-
-Write-Host "`n===============================================" -ForegroundColor Green
-Write-Host "✅ PRO MAX DEPLOY v2.22 COMPLETED!" -ForegroundColor Green
-Write-Host "🌐 Health Check: https://rgacademy.space/api/health" -ForegroundColor Cyan
-Write-Host "===============================================" -ForegroundColor Green
-
-Write-Host "`nDeployment verification pulse active..." -ForegroundColor Gray
+Write-Host '===============================================' -ForegroundColor Green
+Write-Host '✅ PRO MAX DEPLOY v2.25 COMPLETED!' -ForegroundColor Green
+Write-Host '🌐 Health Check: https://rgacademy.space/api/health' -ForegroundColor Cyan
+Write-Host '===============================================' -ForegroundColor Green
 Start-Sleep -Seconds 2

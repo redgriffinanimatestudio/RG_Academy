@@ -67,7 +67,6 @@ export default function Navbar({
   const cardClass = 'bg-white/10 border-white/10 backdrop-blur-3xl';
 
   return (
-  return (
     <nav className={`sticky top-0 z-[100] glass-pro-max border-b transition-all duration-500 ${navClass}`}>
       <div className="mx-auto px-2 sm:px-6 lg:px-8">
         <div className="flex h-14 sm:h-16 lg:h-20 items-center justify-between gap-2 sm:gap-4 lg:gap-8">
