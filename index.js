@@ -38,7 +38,7 @@ process.on('unhandledRejection', (reason, promise) => {
 // Process Heartbeat
 setInterval(() => {
   console.log('💓 Heartbeat: RG Academy Server is operational.');
-}, 3600000); // 1 hour
+}, 3600000); // 1 hour heartbeat to save CPU
 
 // Dynamic import with better error context
 const serverPath = './server-dist.js';

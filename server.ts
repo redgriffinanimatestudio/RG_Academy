@@ -59,6 +59,14 @@ async function startServer() {
   console.log("🛠️ Starting RG Academy Server (Step 1: INIT)...");
   const app = express();
   
+  // LOGGING: Critical for Hostinger diagnostics
+  app.use((req, res, next) => {
+    if (req.url.startsWith('/assets')) {
+      console.log(`[ASSET] ${req.method} ${req.url}`);
+    }
+    next();
+  });
+  
   // --- SECURITY MIDDLEWARE ---
   app.use(helmet({
     contentSecurityPolicy: {
@@ -173,8 +181,11 @@ async function startServer() {
 
   if (isProduction || skipVite) {
     if (fs.existsSync(distPath)) {
-      console.log("📦 PRODUCTION MODE: Serving static files from dist/");
-      app.use(express.static(distPath));
+      console.log(`📦 PRODUCTION MODE: Serving static files from: ${distPath}`);
+      app.use(express.static(distPath, {
+        maxAge: '1d', // Cache assets to reduce server hitting
+        index: false
+      }));
       app.get('*', (req, res) => {
         // Only fallback to index.html if it's not an API call
         if (!req.path.startsWith('/api')) {
