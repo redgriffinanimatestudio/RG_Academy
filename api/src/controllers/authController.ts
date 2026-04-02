@@ -161,7 +161,7 @@ export const authController = {
       });
     } catch (e: any) {
       console.error('❌ [AUTH] Registration Critical Failure:', e);
-      return error(res, `Registration failed: ${e.message || 'Internal Error'}`, 500);
+      return error(res, `Registration failed: ${e.message || 'Internal Error'}`, 500, { message: e.message, stack: e.stack });
     }
   },
 
@@ -287,7 +287,7 @@ export const authController = {
       return success(res, { available: !user });
     } catch (e: any) {
       console.error('❌ [AUTH] CheckEmail Failure:', e);
-      return error(res, 'Validation failed: Identification query error', 500);
+      return error(res, 'Validation failed: Identification query error', 500, { message: e.message, stack: e.stack });
     }
   },
 
