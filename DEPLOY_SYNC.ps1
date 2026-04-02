@@ -51,13 +51,17 @@ if (Test-Path 'server-dist.cjs') { Remove-Item -Force 'server-dist.cjs' }
 npx prisma generate
 npm run build
 
-# Injecting ServiceWorker (Zero sub-expressions)
+# Injecting ServiceWorker Kill-Switch (Zero sub-expressions)
 if (Test-Path 'dist') {
     $SW = 'self.addEventListener("install", (e) => { self.skipWaiting(); });' + "`n"
     $SW += 'self.addEventListener("activate", (e) => {' + "`n"
-    $SW += '  e.waitUntil(caches.keys().then((cNames) => Promise.all(cNames.map((c) => caches.delete(c)))).then(() => self.clients.claim()));' + "`n"
-    $SW += '});' + "`n"
-    $SW += 'self.addEventListener("fetch", (e) => { });'
+    $SW += '  caches.keys().then(names => { for (let name of names) caches.delete(name); });' + "`n"
+    $SW += '  self.registration.unregister().then(() => {' + "`n"
+    $SW += '    return self.clients.matchAll();' + "`n"
+    $SW += '  }).then(clients => {' + "`n"
+    $SW += '    clients.forEach(client => client.navigate(client.url));' + "`n"
+    $SW += '  });' + "`n"
+    $SW += '});'
     $SW | Out-File -FilePath 'dist/sw.js' -Encoding utf8
 }
 
