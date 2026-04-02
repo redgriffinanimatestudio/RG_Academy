@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { User, GraduationCap, Briefcase, Users, Info, Lock, Share2, Shield, Settings, Zap } from 'lucide-react';
+import { User, GraduationCap, Briefcase, Users, Info, Lock, Share2, Shield, Settings, Zap, Check } from 'lucide-react';
 
 interface RoleNodeProps {
   id: string;
@@ -12,26 +12,37 @@ interface RoleNodeProps {
   onShowDetail: (id: string) => void;
   disabled?: boolean;
   isHighlighted?: boolean;
+  isSelected?: boolean;
 }
 
-const RoleNode: React.FC<RoleNodeProps> = ({ title, icon, x, y, color, onShowDetail, id, disabled, isHighlighted }) => (
+const RoleNode: React.FC<RoleNodeProps> = ({ title, icon, x, y, color, onShowDetail, id, disabled, isHighlighted, isSelected }) => (
   <motion.div
     initial={{ scale: 0, opacity: 0 }}
-    animate={{ scale: 1, opacity: isHighlighted ? 1 : (disabled ? 0.65 : 0.95) }}
-    whileHover={!disabled ? { scale: 1.15 } : {}}
-    className={`absolute -translate-x-1/2 -translate-y-1/2 group z-20 ${disabled ? 'cursor-not-allowed filter grayscale' : 'cursor-pointer'}`}
+    animate={{ 
+      scale: isSelected ? 1.3 : (isHighlighted ? 1.05 : 1), 
+      opacity: isSelected ? 1 : (isHighlighted ? 1 : (disabled ? 0.65 : 0.95)),
+      zIndex: isSelected ? 50 : 20
+    }}
+    whileHover={!disabled && !isSelected ? { scale: 1.15 } : {}}
+    className={`absolute -translate-x-1/2 -translate-y-1/2 group ${disabled ? 'cursor-not-allowed filter grayscale' : 'cursor-pointer'}`}
     style={{ left: `${x}%`, top: `${y}%` }}
-    onClick={() => !disabled && onShowDetail(id)}
+    onClick={() => !disabled && !isSelected && onShowDetail(id)}
   >
     <div 
-      className={`size-12 sm:size-16 rounded-[1.8rem] bg-[#0a0a0a]/90 backdrop-blur-xl border-2 flex flex-col items-center justify-center transition-all duration-500 shadow-2xl ${!disabled || isHighlighted ? 'group-hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]' : ''}`}
+      className={`size-12 sm:size-16 rounded-[1.8rem] bg-[#0a0a0a]/90 backdrop-blur-xl border-2 flex flex-col items-center justify-center transition-all duration-500 shadow-2xl ${!disabled || isHighlighted ? 'group-hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]' : ''} ${isSelected ? 'ring-4 ring-white/20' : ''}`}
       style={{ 
-        borderColor: isHighlighted ? color : (disabled ? '#333' : color), 
-        boxShadow: isHighlighted ? `0 0 35px ${color}50` : (disabled ? 'none' : `0 0 25px ${color}20`) 
+        borderColor: isSelected ? '#fff' : (isHighlighted ? color : (disabled ? '#333' : color)), 
+        boxShadow: isSelected ? `0 0 50px #fff40` : (isHighlighted ? `0 0 35px ${color}50` : (disabled ? 'none' : `0 0 25px ${color}20`)) 
       }}
     >
-      <div style={{ color: isHighlighted ? color : (disabled ? '#666' : color) }} className="mb-0.5">
-        {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { size: 22 }) : icon}
+      <div style={{ color: isSelected ? '#fff' : (isHighlighted ? color : (disabled ? '#666' : color)) }} className="mb-0.5">
+        {isSelected ? (
+           <motion.div initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", damping: 10 }}>
+              <Check size={28} className="drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+           </motion.div>
+        ) : (
+           React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { size: 22 }) : icon
+        )}
       </div>
       
       {/* Node Title Overlay */}
@@ -130,6 +141,16 @@ export const RoleTree: React.FC<{ onShowDetail: (id: string) => void }> = ({ onS
     return highlightPath.includes(id1) && highlightPath.includes(id2);
   };
 
+  const [selectedId, setSelectedId] = React.useState<string | null>(null);
+
+  const handleNodeSelect = (id: string) => {
+    if (selectedId) return;
+    setSelectedId(id);
+    setTimeout(() => {
+      onShowDetail(id);
+    }, 850);
+  };
+
   return (
     <div className="relative w-full h-[520px] bg-[#050505]/60 rounded-[3.5rem] border border-white/5 overflow-hidden p-10 cursor-default">
       
@@ -164,43 +185,43 @@ export const RoleTree: React.FC<{ onShowDetail: (id: string) => void }> = ({ onS
 
       {/* NODES LAYER 0 - THE CORE */}
       <div onMouseEnter={() => setHoveredNode('user')} onMouseLeave={() => setHoveredNode(null)}>
-        <RoleNode id="user" title="Node: User" icon={<User />} x={50} y={12} color="#6366f1" onShowDetail={onShowDetail} disabled isHighlighted={highlightPath.includes('user')} />
+        <RoleNode id="user" title="Node: User" icon={<User />} x={50} y={12} color="#6366f1" onShowDetail={handleNodeSelect} isSelected={selectedId === 'user'} isHighlighted={highlightPath.includes('user')} />
       </div>
 
       {/* NODES LAYER 1 - INITIATION */}
       <div onMouseEnter={() => setHoveredNode('student')} onMouseLeave={() => setHoveredNode(null)}>
-        <RoleNode id="student" title="Academy Path" icon={<GraduationCap />} x={25} y={35} color="#ec4899" onShowDetail={onShowDetail} isHighlighted={highlightPath.includes('student')} />
+        <RoleNode id="student" title="Academy Path" icon={<GraduationCap />} x={25} y={35} color="#ec4899" onShowDetail={handleNodeSelect} isSelected={selectedId === 'student'} isHighlighted={highlightPath.includes('student')} />
       </div>
       <div onMouseEnter={() => setHoveredNode('client')} onMouseLeave={() => setHoveredNode(null)}>
-        <RoleNode id="client" title="Studio Path" icon={<Briefcase />} x={75} y={35} color="#3b82f6" onShowDetail={onShowDetail} isHighlighted={highlightPath.includes('client')} />
+        <RoleNode id="client" title="Studio Path" icon={<Briefcase />} x={75} y={35} color="#3b82f6" onShowDetail={handleNodeSelect} isSelected={selectedId === 'client'} isHighlighted={highlightPath.includes('client')} />
       </div>
       <div onMouseEnter={() => setHoveredNode('community')} onMouseLeave={() => setHoveredNode(null)}>
-        <RoleNode id="community" title="Community" icon={<Users />} x={50} y={42} color="#10b981" onShowDetail={onShowDetail} isHighlighted={highlightPath.includes('community')} />
+        <RoleNode id="community" title="Community" icon={<Users />} x={50} y={42} color="#10b981" onShowDetail={handleNodeSelect} isSelected={selectedId === 'community'} isHighlighted={highlightPath.includes('community')} />
       </div>
 
       {/* NODES LAYER 2 - SPECIALIZATION (LOCKED) */}
       <div onMouseEnter={() => setHoveredNode('artist')} onMouseLeave={() => setHoveredNode(null)}>
-        <RoleNode id="artist" title="Artist/VFX" icon={<Zap />} x={12} y={65} color="#ec4899" onShowDetail={onShowDetail} disabled isHighlighted={highlightPath.includes('artist')} />
+        <RoleNode id="artist" title="Artist/VFX" icon={<Zap />} x={12} y={65} color="#ec4899" onShowDetail={handleNodeSelect} disabled isSelected={selectedId === 'artist'} isHighlighted={highlightPath.includes('artist')} />
       </div>
       <div onMouseEnter={() => setHoveredNode('engineer')} onMouseLeave={() => setHoveredNode(null)}>
-        <RoleNode id="engineer" title="Engineer" icon={<Settings />} x={38} y={65} color="#ec4899" onShowDetail={onShowDetail} disabled isHighlighted={highlightPath.includes('engineer')} />
+        <RoleNode id="engineer" title="Engineer" icon={<Settings />} x={38} y={65} color="#ec4899" onShowDetail={handleNodeSelect} disabled isSelected={selectedId === 'engineer'} isHighlighted={highlightPath.includes('engineer')} />
       </div>
       <div onMouseEnter={() => setHoveredNode('manager')} onMouseLeave={() => setHoveredNode(null)}>
-        <RoleNode id="manager" title="Manager" icon={<Shield />} x={62} y={65} color="#3b82f6" onShowDetail={onShowDetail} disabled isHighlighted={highlightPath.includes('manager')} />
+        <RoleNode id="manager" title="Manager" icon={<Shield />} x={62} y={65} color="#3b82f6" onShowDetail={handleNodeSelect} disabled isSelected={selectedId === 'manager'} isHighlighted={highlightPath.includes('manager')} />
       </div>
       <div onMouseEnter={() => setHoveredNode('client_ceo')} onMouseLeave={() => setHoveredNode(null)}>
-        <RoleNode id="client_ceo" title="Client/CEO" icon={<Briefcase />} x={88} y={65} color="#3b82f6" onShowDetail={onShowDetail} disabled isHighlighted={highlightPath.includes('client_ceo')} />
+        <RoleNode id="client_ceo" title="Client/CEO" icon={<Briefcase />} x={88} y={65} color="#3b82f6" onShowDetail={handleNodeSelect} disabled isSelected={selectedId === 'client_ceo'} isHighlighted={highlightPath.includes('client_ceo')} />
       </div>
 
       {/* NODES LAYER 3 - MASTERY (LOCKED) */}
       <div onMouseEnter={() => setHoveredNode('executor')} onMouseLeave={() => setHoveredNode(null)}>
-        <RoleNode id="executor" title="Pro Specialist" icon={<Shield />} x={25} y={88} color="#ef4444" onShowDetail={onShowDetail} disabled isHighlighted={highlightPath.includes('executor')} />
+        <RoleNode id="executor" title="Pro Specialist" icon={<Shield />} x={25} y={88} color="#ef4444" onShowDetail={handleNodeSelect} disabled isSelected={selectedId === 'executor'} isHighlighted={highlightPath.includes('executor')} />
       </div>
       <div onMouseEnter={() => setHoveredNode('partner')} onMouseLeave={() => setHoveredNode(null)}>
-        <RoleNode id="partner" title="Agency Partner" icon={<Briefcase />} x={75} y={88} color="#fbbf24" onShowDetail={onShowDetail} disabled isHighlighted={highlightPath.includes('partner')} />
+        <RoleNode id="partner" title="Agency Partner" icon={<Briefcase />} x={75} y={88} color="#fbbf24" onShowDetail={handleNodeSelect} disabled isSelected={selectedId === 'partner'} isHighlighted={highlightPath.includes('partner')} />
       </div>
       <div onMouseEnter={() => setHoveredNode('moderator')} onMouseLeave={() => setHoveredNode(null)}>
-        <RoleNode id="moderator" title="Moderator" icon={<Shield />} x={50} y={75} color="#10b981" onShowDetail={onShowDetail} disabled isHighlighted={highlightPath.includes('moderator')} />
+        <RoleNode id="moderator" title="Moderator" icon={<Shield />} x={50} y={75} color="#10b981" onShowDetail={handleNodeSelect} disabled isSelected={selectedId === 'moderator'} isHighlighted={highlightPath.includes('moderator')} />
       </div>
 
       {/* LAYER LABELS */}
