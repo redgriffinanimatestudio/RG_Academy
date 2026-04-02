@@ -143,9 +143,13 @@ export const authController = {
     try {
       const { email, displayName, phone, password, role, provider, profileData, signature } = req.body;
 
-      // Check for existing node
+      if (!email) return error(res, 'Email is required for registration', 400);
+
+      // Check for existing node (Prisma findUnique requires value)
       let user = await prisma.user.findUnique({ where: { email } });
       if (user) return res.status(400).json({ success: false, error: 'Node already active in grid' });
+
+      console.log(`[AUTH] Industrializing request for: ${email} | Role: ${role}`);
 
       const result = await identityService.registerUser({ 
         email, displayName, phone, password, role, provider, profileData, signature 
@@ -156,8 +160,8 @@ export const authController = {
         user: { ...result.user, roles: result.roles } 
       });
     } catch (e: any) {
-      console.error('Registration Error:', e);
-      return error(res, 'Registration failed', 500);
+      console.error('❌ [AUTH] Registration Critical Failure:', e);
+      return error(res, `Registration failed: ${e.message || 'Internal Error'}`, 500);
     }
   },
 
@@ -274,19 +278,16 @@ export const authController = {
     }
   },
 
-  /**
-   * @swagger
-   * /api/auth/check-email:
-   *   post:
-   *     summary: Real-time email validation
-   */
   async checkEmail(req: Request, res: Response) {
     try {
       const { email } = req.body;
+      if (!email) return success(res, { available: true }); // Guest check
+      
       const user = await prisma.user.findUnique({ where: { email } });
       return success(res, { available: !user });
-    } catch (e) {
-      return error(res, 'Validation failed', 500);
+    } catch (e: any) {
+      console.error('❌ [AUTH] CheckEmail Failure:', e);
+      return error(res, 'Validation failed: Identification query error', 500);
     }
   },
 

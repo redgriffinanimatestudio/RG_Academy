@@ -43,6 +43,7 @@ model User {
   source       String       @default("local")
   lastSyncedAt DateTime?
   balance      Float        @default(0) // Financial Bridge Ledger balance
+  isOnboarded  Boolean      @default(false) // Whether registration steps 2-5 are complete
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   
@@ -85,6 +86,8 @@ model User {
   trajectories  UserTrajectory[]
   simulations   AISimulation[]
   certificates  Certificate[]
+  documents     UserDocument[]
+  socialLinks   SocialConnection[]
 }
 
 model Achievement {
@@ -727,4 +730,34 @@ model AISimulation {
   history   String   @default("[]") // JSON message history
   status    String   @default("active") // active, closed, passed, failed
   createdAt DateTime @default(now())
+}
+
+model UserDocument {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // CONSENT, CERTIFICATE, CONTRACT, ID_VERIFICATION
+  title     String
+  content   String?  @db.LongText
+  fileUrl   String?
+  signature String?  // Digital hash/metadata
+  status    String   @default("SIGNED") // SIGNED, EXPIRED, REVOKED
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([type])
+}
+
+model SocialConnection {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  provider    String   // GOOGLE, GITHUB, LINKEDIN
+  remoteId    String
+  profileData String?  @default("{}") // JSON metadata
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, provider])
+  @@index([userId])
+  @@index([remoteId])
 }
