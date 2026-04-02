@@ -75,7 +75,8 @@ Write-Host "[4/6] 📦 Creating Archive (v2.17)..." -ForegroundColor Yellow
 Copy-Item -Recurse "dist" "$BUILD_TEMP/dist"
 Copy-Item "server-dist.cjs" "$BUILD_TEMP/server-dist.cjs"
 Copy-Item "index.js" "$BUILD_TEMP/index.js"
-Copy-Item "package.json" "$BUILD_TEMP/package.json"
+# Strip "type": "module" so Hostinger safely treats index.js as a CommonJS application natively
+(Get-Content "package.json") -replace '"type":\s*"module",\s*', '' | Out-File -FilePath "$BUILD_TEMP/package.json" -Encoding utf8
 if (Test-Path "prisma") { Copy-Item -Recurse "prisma" "$BUILD_TEMP/prisma" }
 
 # Include full pre-compiled Prisma Libs so Hostinger doesn't crash on missing config

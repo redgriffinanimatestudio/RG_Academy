@@ -3,7 +3,6 @@ import fs from "fs";
 import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import path from "path";
-import { fileURLToPath } from "url";
 import cors from "cors";
 import "dotenv/config";
 import swaggerUi from "swagger-ui-express";
@@ -15,8 +14,8 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import hpp from "hpp";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Universally compatible paths (No import.meta.url required)
+const _cwd = process.cwd();
 
 const PORT = process.env.PORT || 3000;
 
@@ -175,7 +174,7 @@ async function startServer() {
 
   // --- MODE SELECTION ---
   // --- PRODUCTION & SERVING MODE ---
-  const distPath = path.resolve(__dirname, 'dist');
+  const distPath = path.resolve(_cwd, 'dist');
   const isProduction = process.env.NODE_ENV === "production";
   const skipVite = process.env.SKIP_VITE === "true";
 
