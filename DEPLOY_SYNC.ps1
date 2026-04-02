@@ -46,6 +46,16 @@ npx prisma generate
 Write-Host "🏗️  Building Frontend..."
 npm run build
 
+Write-Host "🔥 Injecting ServiceWorker Kill-Switch (Cache Bypass)..."
+$KillSwitchSW = @"
+self.addEventListener('install', (e) => { self.skipWaiting(); });
+self.addEventListener('activate', (e) => {
+  e.waitUntil(caches.keys().then((cNames) => Promise.all(cNames.map((c) => caches.delete(c)))).then(() => self.clients.claim()));
+});
+self.addEventListener('fetch', (e) => { });
+"@
+$KillSwitchSW | Out-File -FilePath "dist/sw.js" -Encoding utf8
+
 Write-Host "📦 Bundling Backend..."
 npx esbuild server.ts --bundle --platform=node --format=esm --outfile=server-dist.js --banner:js="import { createRequire as __createRequire } from 'module'; const require = __createRequire(import.meta.url);" --external:fsevents --external:canvas --external:sharp --external:prisma --external:@prisma/client
 
@@ -67,12 +77,17 @@ Copy-Item "server-dist.js" "$BUILD_TEMP/index.js"
 Copy-Item "package.json" "$BUILD_TEMP/package.json"
 if (Test-Path "prisma") { Copy-Item -Recurse "prisma" "$BUILD_TEMP/prisma" }
 
-# Include pre-compiled Prisma Engines so Hostinger doesn't have to build them
-Write-Host "📦 Injecting Pre-compiled Prisma Engines..."
-New-Item -ItemType Directory -Force "$BUILD_TEMP/node_modules/@prisma" | Out-Null
-Copy-Item -Recurse "node_modules/@prisma/client" "$BUILD_TEMP/node_modules/@prisma/"
+# Include full pre-compiled Prisma Libs so Hostinger doesn't crash on missing config
+Write-Host "📦 Injecting Full Pre-compiled Prisma Library..."
+New-Item -ItemType Directory -Force "$BUILD_TEMP/node_modules" | Out-Null
+if (Test-Path "node_modules/@prisma") {
+    Copy-Item -Recurse "node_modules/@prisma" "$BUILD_TEMP/node_modules/"
+}
 if (Test-Path "node_modules/.prisma") {
     Copy-Item -Recurse "node_modules/.prisma" "$BUILD_TEMP/node_modules/"
+}
+if (Test-Path "node_modules/prisma") {
+    Copy-Item -Recurse "node_modules/prisma" "$BUILD_TEMP/node_modules/"
 }
 
 if (Test-Path "$DEPLOY_ZIP") { Remove-Item "$DEPLOY_ZIP" }
