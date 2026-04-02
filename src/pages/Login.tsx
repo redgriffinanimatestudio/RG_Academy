@@ -21,7 +21,10 @@ import Preloader from '../components/Preloader';
 
 const Login: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [regStep, setRegStep] = useState(1);
+  const [regStep, setRegStep] = useState(() => {
+    const saved = sessionStorage.getItem('rg_reg_step');
+    return saved ? parseInt(saved, 10) : 1;
+  });
   const [showTreeModal, setShowTreeModal] = useState(false);
   
   const { t, i18n: i18nInstance } = useTranslation();
@@ -29,24 +32,36 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login, register, socialAuth } = useAuth();
 
-  // Registration Form State
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    displayName: '',
-    phone: '',
-    phoneCode: '7',
-    country: '',
-    citizenship: '',
-    selectedRole: 'user',
-    bio: '',
-    portfolioUrl: '',
-    linkedInUrl: '',
-    telegramHandle: '',
-    gender: 'none' as 'male' | 'female' | 'other' | 'none',
-    dateOfBirth: ''
+  // Registration Form State with Session Persistence
+  const [formData, setFormData] = useState(() => {
+    const saved = sessionStorage.getItem('rg_reg_data');
+    if (saved) {
+      try { return JSON.parse(saved); } catch { /* fallback */ }
+    }
+    return {
+      email: '',
+      password: '',
+      confirmPassword: '',
+      displayName: '',
+      phone: '',
+      phoneCode: '7',
+      country: '',
+      citizenship: '',
+      selectedRole: 'user',
+      bio: '',
+      portfolioUrl: '',
+      linkedInUrl: '',
+      telegramHandle: '',
+      gender: 'none' as 'male' | 'female' | 'other' | 'none',
+      dateOfBirth: ''
+    };
   });
+
+  // Save to Session Storage on change
+  useEffect(() => {
+    sessionStorage.setItem('rg_reg_data', JSON.stringify(formData));
+    sessionStorage.setItem('rg_reg_step', regStep.toString());
+  }, [formData, regStep]);
 
   // Validation States
   const [emailStatus, setEmailStatus] = useState<'none' | 'loading' | 'success' | 'error'>('none');
@@ -132,7 +147,7 @@ const Login: React.FC = () => {
   }, [formData.phone]);
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -141,9 +156,21 @@ const Login: React.FC = () => {
     setError('');
     try {
       await login(formData.email, formData.password);
+      // Clear persistence on successful login/register
+      sessionStorage.removeItem('rg_reg_data');
+      sessionStorage.removeItem('rg_reg_step');
       navigate(`/${lang}`);
     } catch (err: any) {
-      setError(err.message || 'Authentication failed');
+      console.error("[LOGIN] Error caught in UI:", err);
+      // Map specific errors as requested
+      const msg = err.message || '';
+      if (msg.toLowerCase().includes('password') || msg.toLowerCase().includes('credential')) {
+        setError('WRONG PASSCODE: Authentication hash mismatch. Please re-verify credentials.');
+      } else if (msg.toLowerCase().includes('not found') || msg.toLowerCase().includes('user')) {
+        setError('NODE NOT FOUND: This identification is not active in the system.');
+      } else {
+        setError(msg || 'Authentication failed. Link status: offline.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -169,6 +196,9 @@ const Login: React.FC = () => {
           dateOfBirth: formData.dateOfBirth
         }
       });
+      // Clear persistence
+      sessionStorage.removeItem('rg_reg_data');
+      sessionStorage.removeItem('rg_reg_step');
       setRegStep(5);
       setTimeout(() => navigate(`/${lang}/dashboard`), 2500);
     } catch (err: any) { 
@@ -233,6 +263,12 @@ const Login: React.FC = () => {
                           icon={<User size={18} />}
                           required
                         />
+                        {mode === 'login' && emailStatus === 'success' && (
+                           <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="px-4 mt-1 flex items-center gap-2">
+                             <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                             <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500 italic">Verified Node Detected</span>
+                           </motion.div>
+                        )}
                       </motion.div>
                       <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
                         <InputWithStatus 
@@ -250,8 +286,8 @@ const Login: React.FC = () => {
                       </motion.div>
 
                       <div className="grid grid-cols-2 gap-4">
-                        <button type="submit" disabled={isLoading} className="bg-red-600 text-white py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-700 transition-all shadow-2xl shadow-red-500/30 flex items-center justify-center gap-2">
-                          Connect <ChevronRight size={14} />
+                        <button type="submit" disabled={isLoading} className="bg-red-600 text-white py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-700 transition-all shadow-2xl shadow-red-500/30 flex items-center justify-center gap-2 group">
+                          Connect <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                         </button>
                         <button type="button" onClick={() => setMode('register')} className="bg-white/5 border border-white/10 text-white/60 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2">
                            New Node <UserPlus size={14} />
@@ -380,8 +416,8 @@ const Login: React.FC = () => {
                             <p className="text-[8px] font-black uppercase tracking-widest text-white italic">Future Protocol: SMS confirmation required for node activation.</p>
                          </div>
                       </div>
-                      <button onClick={() => setRegStep(3)} disabled={!formData.email || !formData.password || emailStatus === 'error' || passConfirmStatus !== 'success' || phoneStatus === 'error' || phoneStatus === 'none'} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-700 transition-all flex items-center justify-center gap-2">
-                        {t('security_check_passed')} <ChevronRight size={14} />
+                      <button onClick={() => setRegStep(3)} disabled={!formData.email || !formData.password || emailStatus === 'error' || passConfirmStatus !== 'success' || phoneStatus === 'error' || phoneStatus === 'none'} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 group">
+                        {t('security_check_passed')} <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                       </button>
                     </motion.div>
                   ) : regStep === 3 ? (
@@ -436,8 +472,8 @@ const Login: React.FC = () => {
                         />
                       </div>
 
-                      <button onClick={() => setRegStep(4)} disabled={!formData.displayName || !formData.dateOfBirth || !formData.country || !formData.citizenship} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2">
-                        {t('establish_identity')} <ChevronRight size={14} />
+                      <button onClick={() => setRegStep(4)} disabled={!formData.displayName || !formData.dateOfBirth || !formData.country || !formData.citizenship} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 group">
+                        {t('establish_identity')} <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                       </button>
                     </motion.div>
                   ) : regStep === 4 ? (
@@ -457,8 +493,8 @@ const Login: React.FC = () => {
                         <label className="text-[10px] font-black uppercase text-white/30">Brief Intelligence (Bio)</label>
                         <textarea value={formData.bio} onChange={(e)=>handleInputChange('bio', e.target.value)} placeholder="Skills, goals, expertise..." className="w-full bg-black/40 border border-white/5 rounded-2xl p-4 text-white text-xs outline-none focus:border-red-500/40 min-h-[80px] resize-none" />
                       </div>
-                      <button onClick={handleRegisterFinal} disabled={isLoading} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-2xl shadow-red-600/40">
-                         Node Online <Zap size={14} />
+                      <button onClick={handleRegisterFinal} disabled={isLoading} className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-2xl shadow-red-600/40 group">
+                         Node Online <Zap size={14} className="group-hover:scale-110 transition-transform" />
                       </button>
                     </motion.div>
                   ) : (
@@ -474,7 +510,14 @@ const Login: React.FC = () => {
               </form>
 
                 <div className="text-center pt-4 border-t border-white/5 mt-auto">
-                   <button onClick={() => { if (regStep > 1) setRegStep(regStep - 1); else setMode('login'); setError(''); }} className="text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-red-500 transition-colors flex items-center justify-center gap-2 mx-auto">
+                   <button 
+                     type="button"
+                     onClick={() => { 
+                       if (regStep > 1) setRegStep(regStep - 1); 
+                       else { setMode('login'); setError(''); }
+                     }} 
+                     className="text-[9px] font-black uppercase tracking-widest text-white/20 hover:text-red-500 transition-colors flex items-center justify-center gap-2 mx-auto"
+                   >
                      <ArrowLeft size={14} /> {t('go_back')}
                    </button>
                 </div>
@@ -486,16 +529,16 @@ const Login: React.FC = () => {
             <motion.div 
               initial={{ opacity: 0, scale: 0.9, y: 10 }} 
               animate={{ opacity: 1, scale: 1, y: 0 }} 
-              className="mt-4 p-6 bg-red-500/5 border border-red-500/20 rounded-[2rem] relative overflow-hidden group"
+              className="mt-4 p-6 bg-red-500/5 border border-red-500/20 rounded-[2rem] relative overflow-hidden group shadow-2xl shadow-red-500/10"
             >
               <div className="absolute inset-0 bg-red-600/5 animate-pulse" />
               <div className="relative z-10 flex flex-col items-center text-center space-y-2">
                 <div className="size-10 rounded-xl bg-red-500/20 flex items-center justify-center text-red-500 mb-1">
                   <Shield size={20} className="animate-pulse" />
                 </div>
-                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500 italic">Access Denied</h4>
-                <p className="text-[9px] font-black uppercase tracking-widest text-white/40 leading-relaxed max-w-[280px] mx-auto">
-                  {error === 'Validation failed' ? 'PROTOCOL ERROR: Invalid Node Pattern' : error}
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500 italic">Central Command Notice</h4>
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white leading-relaxed max-w-[320px] mx-auto font-bold uppercase">
+                  {error}
                 </p>
               </div>
             </motion.div>
