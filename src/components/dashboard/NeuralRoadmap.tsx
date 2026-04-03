@@ -57,7 +57,7 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                    <div className="size-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-primary/40 group-hover:text-primary transition-colors relative z-10 backdrop-blur-md">
                       <span className="text-xs font-black italic">0{pIdx + 1}</span>
                    </div>
-                   <h3 className="text-sm font-black uppercase tracking-[0.3em] text-white/40">{phase.name}</h3>
+                   <h3 className="text-sm font-black uppercase tracking-[0.3em] text-white/40">{t(phase.name)}</h3>
                 </div>
 
                 <div className="ml-12 lg:ml-16 flex flex-col md:grid md:grid-cols-2 gap-4">
@@ -79,7 +79,7 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                          
                          <div className="space-y-3 relative z-10">
                             <span className={`text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] ${isCompleted ? 'text-primary' : 'text-white/20'}`}>Node_{node.id}</span>
-                            <h4 className={`text-base md:text-sm font-black uppercase tracking-tight italic ${isCompleted ? 'text-white' : 'text-white/60'}`}>{node.name}</h4>
+                            <h4 className={`text-base md:text-sm font-black uppercase tracking-tight italic ${isCompleted ? 'text-white' : 'text-white/60'}`}>{t(`node_${node.id}`, node.name)}</h4>
                             
                             <div className="flex items-center gap-4 opacity-40">
                                <div className="flex items-center gap-1">
@@ -114,11 +114,11 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                >
                   <div className="space-y-2">
                      <span className="text-[9px] font-black uppercase tracking-[0.4em] text-primary">{t('node_intelligence')}</span>
-                     <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white italic">{selectedNode.name}</h3>
+                     <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white italic">{t(`node_${selectedNode.id}`, selectedNode.name)}</h3>
                   </div>
 
                   <p className="text-xs text-white/40 leading-relaxed font-medium italic">
-                     {selectedNode.description}
+                     {t(`node_${selectedNode.id}_desc`, selectedNode.description)}
                   </p>
 
                   <div className="space-y-6 pt-6 border-t border-white/5">
@@ -145,8 +145,8 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                      </div>
                   </div>
 
-                  <button className="w-full h-16 bg-white text-bg-dark rounded-2xl font-black uppercase tracking-[0.4em] text-[10px] hover:bg-primary transition-all flex items-center justify-center gap-3">
-                     Synchronize_Node_0{Math.floor(Math.random() * 9) + 1} <Sparkles size={14} />
+                  <button className={`w-full h-16 rounded-2xl font-black uppercase tracking-[0.4em] text-[10px] transition-all flex items-center justify-center gap-3 ${selectedNode.workshopId ? 'bg-primary text-bg-dark hover:brightness-125' : 'bg-white text-bg-dark hover:bg-white/90'}`}>
+                     {selectedNode.workshopId ? t('terminal_initiate_workshop', 'Initialize_Workshop_Sync') : t('terminal_mastery_sequence')} <Sparkles size={14} />
                   </button>
                </motion.div>
              ) : (

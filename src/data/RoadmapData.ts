@@ -21,12 +21,14 @@ export interface Discipline {
   color: string;
   software: string[];
   levels: string[];
+  i18nKey: string;
 }
 
 export const CG_DISCIPLINES: Discipline[] = [
   {
     id: 'char_anim',
     name: 'Breathe_Life: Character Animation',
+    i18nKey: 'disc_char_anim',
     description: 'Transform static models into living, breathing entities with soulful motion and rigging mastery.',
     icon: Users,
     color: 'text-primary',
@@ -36,6 +38,7 @@ export const CG_DISCIPLINES: Discipline[] = [
   {
     id: 'world_gen',
     name: 'World_Forge: Environment Design',
+    i18nKey: 'disc_world_gen',
     description: 'Construct vast, high-fidelity digital worlds from the smallest prop to procedural landscapes.',
     icon: Globe,
     color: 'text-cyan-400',
@@ -45,6 +48,7 @@ export const CG_DISCIPLINES: Discipline[] = [
   {
     id: 'vfx_sim',
     name: 'Chaos_Control: Visual FX & Sim',
+    i18nKey: 'disc_vfx_sim',
     description: 'Master the physics of fire, water, and mass destruction. Pure procedural wizardry.',
     icon: Zap,
     color: 'text-orange-500',
@@ -54,6 +58,7 @@ export const CG_DISCIPLINES: Discipline[] = [
   {
     id: 'motion_design',
     name: 'Neural_Flow: Motion Graphics',
+    i18nKey: 'disc_motion_design',
     description: 'High-stakes visual communication, sleek branding, and cinematic title design.',
     icon: Layers,
     color: 'text-emerald-500',
@@ -63,6 +68,7 @@ export const CG_DISCIPLINES: Discipline[] = [
   {
     id: 'archviz',
     name: 'Meta_Arch: ArchViz & XR',
+    i18nKey: 'disc_archviz',
     description: 'Architecting the future of real-estate and virtual spaces with photorealistic precision.',
     icon: Home,
     color: 'text-purple-500',
@@ -72,6 +78,7 @@ export const CG_DISCIPLINES: Discipline[] = [
   {
     id: 'concept_art',
     name: 'Genesis: Concept & Design',
+    i18nKey: 'disc_concept',
     description: 'The foundation of all high-end visuals. Designing the soul of characters and worlds.',
     icon: PenTool,
     color: 'text-rose-500',

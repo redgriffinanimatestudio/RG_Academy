@@ -60,7 +60,7 @@ export default function NeuralPathfinder() {
            <div className="space-y-2">
               <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white italic">Synchronize Your_Soul.</h2>
               <p className="text-white/20 font-medium italic max-w-2xl leading-relaxed">
-                 The Matrix is complex. Let us map your internal aspirations to the industrial roadmaps of tomorrow. Step-by-step into your digital sovereignty.
+                 {t('terminal_background_desc', 'The Matrix is complex. Let us map your internal aspirations to the industrial roadmaps of tomorrow. Step-by-step into your digital sovereignty.')}
               </p>
            </div>
         </header>
@@ -88,11 +88,11 @@ export default function NeuralPathfinder() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[
-                        { id: 'hollywood', label: 'Hollywood Blockbusters', sub: 'Cinematic VFX & Storytelling' },
-                        { id: 'metaverse', label: 'Metaverse Architectures', sub: 'ArchViz & Virtual Spaces' },
-                        { id: 'gaming', label: 'Next-Gen Game Worlds', sub: 'Environment & Level Design' },
-                        { id: 'brands', label: 'High-Stakes Brand Motion', sub: 'Motion Graphics & Neural Flow' }
-                      ].map(v => (
+                        { id: 'hollywood', label: t('vision_hollywood'), sub: t('vision_sub_hollywood') },
+                        { id: 'metaverse', label: t('vision_metaverse'), sub: t('vision_sub_metaverse') },
+                        { id: 'gaming', label: t('vision_gaming'), sub: t('vision_sub_gaming') },
+                        { id: 'brands', label: t('vision_brands'), sub: t('vision_sub_brands') }
+                      ].map((v) => (
                         <button 
                           key={v.id}
                           onClick={() => handleVisionSelect(v.id)}
@@ -126,8 +126,8 @@ export default function NeuralPathfinder() {
                            className="p-8 rounded-[2.5rem] bg-white/[0.02] border border-white/5 text-left transition-all hover:bg-white/[0.05] hover:border-white/10 relative group overflow-hidden"
                          >
                             <d.icon className={`size-8 mb-6 ${d.color} transition-transform group-hover:scale-125`} />
-                            <h4 className="text-lg font-black uppercase tracking-tight text-white italic">{d.name}</h4>
-                            <p className="text-[9px] text-white/20 uppercase tracking-widest mt-3 leading-relaxed italic">{d.description}</p>
+                            <h4 className="text-lg font-black uppercase tracking-tight text-white italic">{t(d.i18nKey)}</h4>
+                            <p className="text-[9px] text-white/20 uppercase tracking-widest mt-3 leading-relaxed italic">{t(`${d.i18nKey}_desc`, d.description)}</p>
                             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                <Sparkles size={40} className={d.color} />
                             </div>
