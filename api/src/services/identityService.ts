@@ -45,7 +45,7 @@ export const identityService = {
                 if (age < 13) return 'child';
                 if (age < 18) return 'teen';
                 return 'adult';
-              })() : undefined
+              })() : 'adult' // Default to adult if birthDate is missing or invalid
             }
           }
         },
@@ -155,13 +155,24 @@ export const identityService = {
       });
 
       if (profileData) {
-        const safeData: any = { ...profileData };
-        if (safeData.dateOfBirth) safeData.dateOfBirth = new Date(safeData.dateOfBirth);
+        const safeData: any = {
+           userId,
+           bio: profileData.bio,
+           country: profileData.country,
+           citizenship: profileData.citizenship,
+           linkedInUrl: profileData.linkedInUrl,
+           telegramHandle: profileData.telegramHandle,
+           portfolioUrl: profileData.portfolioUrl,
+           gender: profileData.gender || 'none',
+           dateOfBirth: profileData.dateOfBirth && !isNaN(Date.parse(profileData.dateOfBirth)) 
+             ? new Date(profileData.dateOfBirth) 
+             : undefined
+        };
 
         await tx.profile.upsert({
           where: { userId: userId },
-          create: { userId: userId, ...safeData },
-          update: { ...safeData }
+          create: safeData,
+          update: safeData
         });
       }
 

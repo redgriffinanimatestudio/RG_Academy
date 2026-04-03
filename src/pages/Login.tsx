@@ -170,7 +170,7 @@ const Login: React.FC = () => {
         ...formData,
         role: formData.selectedRole,
         profileData: {
-          bio: formData.bio,
+          bio: formData.bio || `Synchronized via ${formData.selectedRole.toUpperCase()} PROTOCOL`,
           country: formData.country,
           citizenship: formData.citizenship,
           linkedInUrl: formData.linkedInUrl,
@@ -182,6 +182,8 @@ const Login: React.FC = () => {
         signature
       });
       setIsRegistered(true);
+      sessionStorage.removeItem('rg_reg_data');
+      sessionStorage.removeItem('rg_reg_step');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Registration failed');
     } finally {
@@ -202,15 +204,15 @@ const Login: React.FC = () => {
   }, [isRegistered, redirectCountdown, navigate, lang]);
 
   return (
-    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 sm:p-8 font-['Inter'] selection:bg-red-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-2 sm:p-8 font-['Inter'] selection:bg-red-500/30 overflow-x-hidden">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-5xl bg-[#0a0a0a]/90 backdrop-blur-3xl border border-white/5 rounded-[3rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] flex flex-col lg:flex-row relative group"
+        className="w-full max-w-7xl bg-[#0a0a0a]/90 backdrop-blur-3xl border border-white/5 rounded-[1.5rem] sm:rounded-[3rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] flex flex-col lg:flex-row relative group"
       >
         <div className="absolute inset-0 bg-gradient-to-tr from-red-500/5 via-transparent to-emerald-500/5 opacity-30 pointer-events-none" />
         
-        <div className="lg:w-[420px] p-8 sm:p-14 border-r border-white/5 relative z-10 flex flex-col justify-center bg-black/20">
+        <div className="lg:w-[420px] p-6 sm:p-14 border-b lg:border-r lg:border-b-0 border-white/5 relative z-10 flex flex-col justify-center bg-black/20">
           <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-8">
             <div className="size-16 rounded-[2rem] bg-red-600 flex items-center justify-center shadow-[0_0_40px_rgba(220,38,38,0.4)] group-hover:scale-110 transition-transform duration-500">
                <Zap size={32} className="text-white fill-white" />
@@ -234,7 +236,7 @@ const Login: React.FC = () => {
           </motion.div>
         </div>
 
-        <div className="flex-1 p-8 sm:p-14 relative z-10 flex flex-col min-h-[500px]">
+        <div className="flex-1 p-6 sm:p-14 relative z-10 flex flex-col min-h-[500px]">
           <div className="flex items-center gap-6 mb-12">
             <div className={`p-4 rounded-2.5xl transition-all duration-500 ${mode === 'login' ? 'bg-red-600 text-white shadow-[0_0_30px_rgba(220,38,38,0.3)]' : 'bg-white/5 text-white/40 hover:text-white'}`}>
               <LogIn size={20} />
