@@ -102,9 +102,9 @@ export default function MobileMenu({
               {/* ⚡ Tier 1: Layer Switcher (Academy / Studio / Community) */}
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { id: 'academy', label: 'Academy', path: `/aca/${currentLangCode}`, icon: GraduationCap, active: location.pathname.includes('/aca'), color: 'text-primary', glow: 'shadow-red-500/10' },
-                  { id: 'studio', label: 'Studio', path: `/studio/${currentLangCode}`, icon: Box, active: location.pathname.includes('/studio'), color: 'text-primary-hover', glow: 'shadow-cyan-400/10' },
-                  { id: 'community', label: 'Community', path: `${modePrefix}/${currentLangCode}/community`, icon: Users, active: location.pathname.includes('/community'), color: 'text-emerald-500', glow: 'shadow-emerald-500/10' }
+                  { id: 'academy', label: t('nav_academy'), path: `/aca/${currentLangCode}`, icon: GraduationCap, active: location.pathname.includes('/aca'), color: 'text-primary', glow: 'shadow-red-500/10' },
+                  { id: 'studio', label: t('nav_studio'), path: `/studio/${currentLangCode}`, icon: Box, active: location.pathname.includes('/studio'), color: 'text-primary-hover', glow: 'shadow-cyan-400/10' },
+                  { id: 'community', label: t('nav_community'), path: `${modePrefix}/${currentLangCode}/community`, icon: Users, active: location.pathname.includes('/community'), color: 'text-emerald-500', glow: 'shadow-emerald-500/10' }
                 ].map((item) => (
                   <Link
                     key={item.id}
@@ -133,10 +133,10 @@ export default function MobileMenu({
               {profile && (
                 <div className="space-y-6 pt-4 border-t border-white/5">
                   <div className="flex items-center justify-between px-2 mb-4">
-                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Evolution Matrix</p>
+                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">{t('evolution_matrix')}</p>
                     <div className="flex items-center gap-2">
                         <div className="size-1 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[7px] font-bold text-emerald-500/60 uppercase tracking-widest">Neural Sync Active</span>
+                        <span className="text-[7px] font-bold text-emerald-500/60 uppercase tracking-widest">{t('neural_sync_active')}</span>
                     </div>
                   </div>
 
@@ -152,15 +152,15 @@ export default function MobileMenu({
                           {activeRole === 'admin' ? <Shield size={22} /> : activeRole === 'lecturer' ? <GraduationCap size={22} /> : activeRole === 'student' ? <Cpu size={22} /> : <Users size={22} />}
                         </div>
                         <div className="flex flex-col min-w-0">
-                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5">Current Role</span>
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5">{t('current_role')}</span>
                           <span className="text-sm font-black uppercase text-white truncate">{activeRole || 'Genesis'}</span>
                         </div>
                       </div>
 
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest">
-                          <span className="text-white/20">Experience Level</span>
-                          <span className={modeColor}>Level 01 Matrix</span>
+                          <span className="text-white/20">{t('experience_level')}</span>
+                          <span className={modeColor}>{t('level_01_matrix')}</span>
                         </div>
                         <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
                           <motion.div 
@@ -176,7 +176,7 @@ export default function MobileMenu({
                   {/* ⚡ Identity Switcher (Quick Access) */}
                   {profile.roles && profile.roles.length > 1 && (
                     <div className="grid grid-cols-1 gap-2 pt-2">
-                      <p className="text-[8px] font-black uppercase tracking-widest text-white/20 px-2">Switch Identity Path</p>
+                      <p className="text-[8px] font-black uppercase tracking-widest text-white/20 px-2">{t('switch_identity_path')}</p>
                       <div className="flex flex-wrap gap-2 px-2">
                         {profile.roles.filter((r: string) => r !== activeRole).map((r: string) => (
                            <button 
@@ -195,7 +195,7 @@ export default function MobileMenu({
               )}
 
               <div className="space-y-4 pt-4 border-t border-white/5">
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 px-2 mb-4">Explore Modules</p>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 px-2 mb-4">{t('explore_modules')}</p>
                 {mobileSections.map(section => (
                   <div key={section.id} className="space-y-2">
                     <button onClick={() => toggleSection(section.id)} className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${expandedSections[section.id] ? 'bg-white/5 border-white/10' : 'hover:bg-white/[0.02]'}`}>

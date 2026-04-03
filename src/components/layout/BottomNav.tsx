@@ -11,8 +11,10 @@ import {
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { usePlatform } from '../../context/PlatformContext';
+import { useTranslation } from 'react-i18next';
 
 export default function BottomNav() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { lang } = useParams();
@@ -26,15 +28,15 @@ export default function BottomNav() {
     const modePrefix = isStudio ? '/studio' : '/aca';
   
     const navItems = [
-      { icon: Home, label: 'Home', path: `/${currentLangCode}` },
-      { icon: GraduationCap, label: 'Academy', path: `/aca/${currentLangCode}` },
-      { icon: Search, label: 'Search', action: () => {
+      { icon: Home, label: t('nav_home'), path: `/${currentLangCode}` },
+      { icon: GraduationCap, label: t('nav_academy'), path: `/aca/${currentLangCode}` },
+      { icon: Search, label: t('nav_search'), action: () => {
         window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, metaKey: true }));
       }},
-      { icon: Briefcase, label: 'Studio', path: `/studio/${currentLangCode}` },
+      { icon: Briefcase, label: t('nav_studio'), path: `/studio/${currentLangCode}` },
       profile 
-        ? { icon: LayoutDashboard, label: 'Dashboard', path: `${modePrefix}/${currentLangCode}/dashboard` }
-        : { icon: LogIn, label: 'Join', path: `/aca/${currentLangCode}/login` }
+        ? { icon: LayoutDashboard, label: t('nav_dashboard'), path: `${modePrefix}/${currentLangCode}/dashboard` }
+        : { icon: LogIn, label: t('nav_join'), path: `/aca/${currentLangCode}/login` }
     ];
 
   const isActive = (path?: string) => path && location.pathname === path;

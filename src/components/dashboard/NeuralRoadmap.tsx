@@ -15,6 +15,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { MASTER_PLAN_DATA, SovereignPath, RoadmapNode } from '../../data/MasterPlanData';
+import { useTranslation } from 'react-i18next';
 
 interface NeuralRoadmapProps {
   activePathId: string;
@@ -22,6 +23,7 @@ interface NeuralRoadmapProps {
 }
 
 export default function NeuralRoadmap({ activePathId, completedNodeIds }: NeuralRoadmapProps) {
+  const { t } = useTranslation();
   const path = MASTER_PLAN_DATA.find(p => p.id === activePathId) || MASTER_PLAN_DATA[0];
   const [selectedNode, setSelectedNode] = useState<RoadmapNode | null>(null);
 
@@ -33,13 +35,13 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                <Map className="size-4 text-primary" />
                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60">Neural_Roadmap_v4.1</span>
             </div>
-            <h2 className="text-3xl font-black uppercase tracking-tighter text-white italic">Active_Sovereignty_Path.</h2>
+            <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white italic">{t('master_plan_active_sovereignty')}.</h2>
          </div>
          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center gap-4">
             <path.icon className="size-6 text-primary" />
             <div className="flex flex-col">
                <span className="text-[10px] font-black uppercase tracking-widest text-white">{path.name}</span>
-               <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">Operational Status: Syncing</span>
+               <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">{t('master_plan_syncing')}</span>
             </div>
          </div>
       </header>
@@ -58,7 +60,7 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-white/40">{phase.name}</h3>
                 </div>
 
-                <div className="ml-16 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="ml-12 lg:ml-16 flex flex-col md:grid md:grid-cols-2 gap-4">
                    {phase.nodes.map((node) => {
                      const isCompleted = completedNodeIds.includes(node.id);
                      const isSelected = selectedNode?.id === node.id;
@@ -76,8 +78,8 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                          {isCompleted && <div className="absolute top-0 right-0 p-4 text-primary"><CheckCircle2 size={16} /></div>}
                          
                          <div className="space-y-3 relative z-10">
-                            <span className={`text-[8px] font-black uppercase tracking-[0.3em] ${isCompleted ? 'text-primary' : 'text-white/20'}`}>Node_{node.id}</span>
-                            <h4 className={`text-sm font-black uppercase tracking-tight italic ${isCompleted ? 'text-white' : 'text-white/60'}`}>{node.name}</h4>
+                            <span className={`text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] ${isCompleted ? 'text-primary' : 'text-white/20'}`}>Node_{node.id}</span>
+                            <h4 className={`text-base md:text-sm font-black uppercase tracking-tight italic ${isCompleted ? 'text-white' : 'text-white/60'}`}>{node.name}</h4>
                             
                             <div className="flex items-center gap-4 opacity-40">
                                <div className="flex items-center gap-1">
@@ -111,8 +113,8 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                  className="sticky top-12 p-10 rounded-[3rem] bg-white/[0.03] border border-white/5 backdrop-blur-3xl space-y-8"
                >
                   <div className="space-y-2">
-                     <span className="text-[9px] font-black uppercase tracking-[0.4em] text-primary">Intelligence_Node</span>
-                     <h3 className="text-3xl font-black uppercase tracking-tighter text-white italic">{selectedNode.name}</h3>
+                     <span className="text-[9px] font-black uppercase tracking-[0.4em] text-primary">{t('node_intelligence')}</span>
+                     <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white italic">{selectedNode.name}</h3>
                   </div>
 
                   <p className="text-xs text-white/40 leading-relaxed font-medium italic">
@@ -153,7 +155,7 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                      <Compass size={40} className="animate-spin-slow" />
                   </div>
                   <div className="space-y-2">
-                     <p className="text-[10px] font-black uppercase tracking-widest">Select_Node_Intelligence</p>
+                     <p className="text-[10px] font-black uppercase tracking-widest">{t('node_select_pending')}</p>
                      <p className="text-[9px] font-medium italic">Pending Operational Focus</p>
                   </div>
                </div>

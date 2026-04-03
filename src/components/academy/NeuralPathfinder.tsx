@@ -12,8 +12,10 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { CG_DISCIPLINES, SOFTWARE_MAP, Discipline } from '../../data/RoadmapData';
+import { useTranslation } from 'react-i18next';
 
 export default function NeuralPathfinder() {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [vision, setVision] = useState<string | null>(null);
   const [selectedDiscipline, setSelectedDiscipline] = useState<Discipline | null>(null);
@@ -49,14 +51,14 @@ export default function NeuralPathfinder() {
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
       <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary/10 to-transparent blur-[140px] opacity-20" />
 
-      <div className="max-w-6xl mx-auto space-y-16 relative z-10">
+      <div className="max-w-6xl mx-auto space-y-12 lg:space-y-16 relative z-10">
         <header className="space-y-4">
            <div className="flex items-center gap-3">
               <div className="size-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60">Neural_Pathfinding_Terminal_v3.5</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60">{t('terminal_title')}</span>
            </div>
            <div className="space-y-2">
-              <h2 className="text-5xl font-black uppercase tracking-tighter text-white italic">Synchronize Your_Soul.</h2>
+              <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white italic">Synchronize Your_Soul.</h2>
               <p className="text-white/20 font-medium italic max-w-2xl leading-relaxed">
                  The Matrix is complex. Let us map your internal aspirations to the industrial roadmaps of tomorrow. Step-by-step into your digital sovereignty.
               </p>
@@ -66,8 +68,8 @@ export default function NeuralPathfinder() {
         <div className="p-12 lg:p-20 bg-[#080808]/80 border border-white/5 rounded-[4rem] backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,1)] relative overflow-hidden group">
            <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('/scanlines.png')] bg-repeat" />
            
-           <div className="absolute top-0 right-0 p-12 text-primary/10 group-hover:scale-110 transition-transform duration-700">
-              <Compass size={180} />
+           <div className="absolute top-0 right-0 p-8 lg:p-12 text-primary/10 group-hover:scale-110 transition-transform duration-700">
+              <Compass className="size-24 lg:size-[180px]" />
            </div>
 
            <div className="w-full max-w-4xl mx-auto">
@@ -80,9 +82,9 @@ export default function NeuralPathfinder() {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-12"
                   >
-                    <div className="space-y-2">
-                       <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Phase_01: Vision_Initialization</span>
-                       <h3 className="text-4xl font-black uppercase tracking-tighter text-white italic">What do you want to breathe life into?</h3>
+                    <div className="space-y-2 text-center md:text-left">
+                       <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">{t('terminal_phase_01')}</span>
+                       <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white italic">{t('terminal_vision_prompt')}</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[
@@ -112,9 +114,9 @@ export default function NeuralPathfinder() {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-12"
                   >
-                     <div className="space-y-2">
-                       <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Phase_02: Discipline_Matrix</span>
-                       <h3 className="text-4xl font-black uppercase tracking-tighter text-white italic">Where does your digital soul belong?</h3>
+                     <div className="space-y-2 text-center md:text-left">
+                       <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">{t('terminal_phase_02')}</span>
+                       <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white italic">{t('terminal_soul_belong')}</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                        {CG_DISCIPLINES.map(d => (
@@ -146,9 +148,9 @@ export default function NeuralPathfinder() {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-12"
                   >
-                     <div className="space-y-2">
-                       <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Phase_03: Toolset_Synchronization</span>
-                       <h3 className="text-4xl font-black uppercase tracking-tighter text-white italic">Master the industry-standard matrix.</h3>
+                     <div className="space-y-2 text-center md:text-left">
+                       <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">{t('terminal_phase_03')}</span>
+                       <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white italic">Master the industry-standard matrix.</h3>
                     </div>
                     <div className="space-y-12">
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -182,9 +184,9 @@ export default function NeuralPathfinder() {
                        
                        <button 
                           onClick={() => setStep(3)}
-                          className="h-24 w-full bg-white text-bg-dark rounded-[2.5rem] font-black uppercase tracking-[0.4em] text-sm hover:bg-primary hover:scale-[1.02] active:scale-95 transition-all shadow-[0_40px_100px_-20px_rgba(255,255,255,0.1)] flex items-center justify-center gap-4"
+                          className="h-20 lg:h-24 w-full bg-white text-bg-dark rounded-[2rem] lg:rounded-[2.5rem] font-black uppercase tracking-[0.2em] lg:tracking-[0.4em] text-xs lg:text-sm hover:bg-primary hover:scale-[1.02] active:scale-95 transition-all shadow-[0_40px_100px_-20px_rgba(255,255,255,0.1)] flex items-center justify-center gap-4"
                         >
-                          Generate_Sovereignty_Roadmap <ChevronRight size={20} />
+                          {t('terminal_generate_roadmap')} <ChevronRight size={20} />
                        </button>
                     </div>
                   </motion.div>
@@ -198,9 +200,9 @@ export default function NeuralPathfinder() {
                     className="space-y-16 text-center"
                   >
                      <div className="space-y-4">
-                        <Zap className="size-16 text-primary mx-auto animate-pulse" />
-                        <h2 className="text-6xl font-black uppercase tracking-widest text-white italic">Path_Synchronized.</h2>
-                        <p className="text-white/20 font-black uppercase tracking-[0.3em]">Operational Mastery Roadmap Prepared</p>
+                        <Zap className="size-12 lg:size-16 text-primary mx-auto animate-pulse" />
+                        <h2 className="text-4xl lg:text-6xl font-black uppercase tracking-widest text-white italic">{t('terminal_synchronized')}</h2>
+                        <p className="text-[10px] lg:text-xs text-white/20 font-black uppercase tracking-[0.3em]">{t('master_plan_syncing')}</p>
                      </div>
 
                      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -211,17 +213,17 @@ export default function NeuralPathfinder() {
                              <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
                                 <motion.div initial={{ width: 0 }} animate={{ width: `${(i + 1) * 33}%` }} className="h-full bg-primary" />
                              </div>
-                             <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20">Sync_Parity_Nominal</p>
+                             <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/20">{t('node_sync_confirmed')}</p>
                           </div>
                         ))}
                      </div>
 
-                     <div className="flex items-center justify-center gap-6">
-                        <button onClick={handleReset} className="h-20 px-12 bg-white/5 border border-white/10 rounded-[2rem] font-black uppercase tracking-[0.3em] text-[10px] text-white/40 hover:text-white hover:bg-white/10 transition-all">
-                           Reset_Neural_Flow
+                     <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">
+                        <button onClick={handleReset} className="h-16 md:h-20 w-full md:w-auto px-12 bg-white/5 border border-white/10 rounded-2xl md:rounded-[2rem] font-black uppercase tracking-[0.3em] text-[10px] text-white/40 hover:text-white hover:bg-white/10 transition-all">
+                           {t('terminal_reset')}
                         </button>
-                        <button className="h-20 px-16 bg-primary text-bg-dark rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs hover:brightness-125 transition-all shadow-[0_30px_80px_-20px_rgba(var(--primary-rgb),0.5)] flex items-center gap-4">
-                           Initiate_Mastery_Sequence <ArrowRight size={18} />
+                        <button className="h-16 md:h-20 w-full md:w-auto px-16 bg-primary text-bg-dark rounded-2xl md:rounded-[2rem] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-xs hover:brightness-125 transition-all shadow-[0_30px_80px_-20px_rgba(var(--primary-rgb),0.5)] flex items-center justify-center gap-4">
+                           {t('terminal_mastery_sequence')} <ArrowRight size={18} />
                         </button>
                      </div>
                   </motion.div>
