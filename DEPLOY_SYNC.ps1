@@ -77,7 +77,8 @@ Write-Host '📦 Creating Archive...' -ForegroundColor Yellow
 Copy-Item -Recurse 'dist' ($BUILD_TEMP + '/dist')
 Copy-Item 'server-dist.cjs' ($BUILD_TEMP + '/server-dist.cjs')
 Copy-Item 'index.js' ($BUILD_TEMP + '/index.js')
-"v2.33-Neural-Debug" | Out-File -FilePath ($BUILD_TEMP + '/VERSION') -Encoding utf8
+Copy-Item 'update_v2.35.sql' ($BUILD_TEMP + '/update_v2.35.sql')
+"v2.35-Neural-Patch" | Out-File -FilePath ($BUILD_TEMP + '/VERSION') -Encoding utf8
 
 # Generate .env locally for security (avoid remote printf mangling)
 $REMOTE_ENV = "DATABASE_URL=mysql://${REMOTE_DB_USER}:${REMOTE_DB_PASS}@localhost:3306/${REMOTE_DB_NAME}`n"
@@ -103,7 +104,7 @@ $RemotePath = $SSH_USER + '@' + $SSH_HOST + ':' + $REMOTE_BASE + '/'
 scp -P $SSH_PORT $DEPLOY_ZIP $RemotePath
 
 # [6/6] Finalize Remote
-Write-Host '⚡ Finalizing v2.33 (Neural Identity Debug)...' -ForegroundColor Yellow
+Write-Host '⚡ Finalizing v2.35 (Neural Schema Patch)...' -ForegroundColor Yellow
 
 $C = 'cd __BASE__' + "`n"
 $C += 'echo "--- RESOURCE CLEANUP ---"' + "`n"
@@ -114,9 +115,11 @@ $C += 'rm -rf nodejs/dist public_html/dist 2>/dev/null' + "`n"
 $C += 'unzip -o "__ZIP__" -d nodejs/' + "`n"
 $C += 'unzip -o "__ZIP__" -d public_html/' + "`n"
 $C += 'mv public_html/dist/* public_html/ 2>/dev/null ' + $OR + ' true' + "`n"
+$C += 'echo "--- APPLYING SCHEMA PATCH v2.35 ---"' + "`n"
+$C += 'mysql -u __DBU__ -p"__DBP__" __DBN__ < nodejs/update_v2.35.sql ' + $OR + ' echo "⚠️ SQL Patch Warning: Partial failure or columns already exist."' + "`n"
 $C += 'mkdir -p tmp ' + $AND + ' touch tmp/restart.txt' + "`n"
 $C += 'rm "__ZIP__"' + "`n"
-$C += 'echo "✅ DEPLOY SUCCESSFUL (v2.33-Debug)"'
+$C += 'echo "✅ DEPLOY SUCCESSFUL (v2.35-Neural-Patch)"'
 
 $REMOTE_COMMANDS = $C `
     -replace '__BASE__', $REMOTE_BASE `
