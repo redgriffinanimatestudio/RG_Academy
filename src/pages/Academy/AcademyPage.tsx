@@ -14,6 +14,7 @@ import CourseCard from '../../components/academy/CourseCard';
 import BecomeMentor from '../../components/academy/BecomeMentor';
 import CurrentOpenings from '../../components/academy/CurrentOpenings';
 import NeuralSearch from '../../components/academy/NeuralSearch';
+import NeuralPathfinder from '../../components/academy/NeuralPathfinder';
 
 export default function AcademyPage() {
   const { lang } = useParams();
@@ -100,6 +101,7 @@ export default function AcademyPage() {
         />
 
         <AcademyHero />
+        <NeuralPathfinder />
 
         <div className="space-y-16">
           <AcademyFilters 
