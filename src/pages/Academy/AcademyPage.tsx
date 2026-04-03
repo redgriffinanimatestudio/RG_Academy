@@ -15,6 +15,7 @@ import BecomeMentor from '../../components/academy/BecomeMentor';
 import CurrentOpenings from '../../components/academy/CurrentOpenings';
 import NeuralSearch from '../../components/academy/NeuralSearch';
 import NeuralPathfinder from '../../components/academy/NeuralPathfinder';
+import NeuralRoadmap from '../../components/dashboard/NeuralRoadmap';
 
 export default function AcademyPage() {
   const { lang } = useParams();
@@ -33,6 +34,7 @@ export default function AcademyPage() {
     sortBy: 'popular'
   });
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [activePathId, setActivePathId] = useState<string | null>(null);
 
   const userRoles = profile?.roles || [];
   const isLecturer = userRoles.includes('lecturer') || userRoles.includes('admin');
@@ -101,7 +103,41 @@ export default function AcademyPage() {
         />
 
         <AcademyHero />
-        <NeuralPathfinder />
+         
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <AnimatePresence mode="wait">
+               {!activePathId ? (
+                  <motion.div
+                     key="pathfinder"
+                     initial={{ opacity: 0, y: 20 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     exit={{ opacity: 0, scale: 0.95 }}
+                  >
+                     <NeuralPathfinder onComplete={(id) => setActivePathId(id)} />
+                  </motion.div>
+               ) : (
+                  <motion.div
+                     key="roadmap"
+                     initial={{ opacity: 0, scale: 1.05 }}
+                     animate={{ opacity: 1, scale: 1 }}
+                     className="space-y-12"
+                  >
+                     <NeuralRoadmap 
+                        activePathId={activePathId} 
+                        completedNodeIds={[]} 
+                     />
+                     <div className="flex justify-center">
+                        <button 
+                           onClick={() => setActivePathId(null)}
+                           className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 hover:text-primary transition-colors py-4 px-8 border border-white/5 rounded-full hover:border-primary/20"
+                        >
+                           ← Reset Training Cycle
+                        </button>
+                     </div>
+                  </motion.div>
+               )}
+            </AnimatePresence>
+         </div>
 
         <div className="space-y-16">
           <AcademyFilters 

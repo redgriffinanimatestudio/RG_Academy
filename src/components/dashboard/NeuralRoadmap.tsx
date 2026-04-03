@@ -17,6 +17,27 @@ import {
 import { MASTER_PLAN_DATA, SovereignPath, RoadmapNode } from '../../data/MasterPlanData';
 import { useTranslation } from 'react-i18next';
 
+const TypingText = ({ text, className = "" }: { text: string; className?: string }) => {
+  return (
+    <motion.span
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className={className}
+    >
+      {text.split("").map((char, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: i * 0.02, duration: 0.01 }}
+        >
+          {char}
+        </motion.span>
+      ))}
+    </motion.span>
+  );
+};
+
 interface NeuralRoadmapProps {
   activePathId: string;
   completedNodeIds: string[];
@@ -28,7 +49,7 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
   const [selectedNode, setSelectedNode] = useState<RoadmapNode | null>(null);
 
   return (
-    <div className="space-y-12">
+    <div className="min-h-[calc(100dvh-5rem)] md:min-h-screen py-2 md:py-12 space-y-8 md:space-y-12">
       <header className="flex items-center justify-between">
          <div className="space-y-1">
             <div className="flex items-center gap-3">
@@ -46,18 +67,18 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
          </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-12 flex-1">
         {/* Left Matrix: The Tree */}
-        <div className="lg:col-span-2 space-y-16 relative">
-           <div className="absolute left-[23px] top-8 bottom-8 w-px bg-gradient-to-b from-primary/40 via-white/5 to-transparent pointer-events-none" />
+        <div className="lg:col-span-2 space-y-10 md:space-y-16 relative">
+           <div className="absolute left-[19px] md:left-[23px] top-6 md:top-8 bottom-6 md:bottom-8 w-px bg-gradient-to-b from-primary/40 via-white/5 to-transparent pointer-events-none" />
            
            {path.phases.map((phase, pIdx) => (
              <div key={phase.name} className="space-y-8 relative">
-                <div className="flex items-center gap-6 group">
-                   <div className="size-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-primary/40 group-hover:text-primary transition-colors relative z-10 backdrop-blur-md">
-                      <span className="text-xs font-black italic">0{pIdx + 1}</span>
+                <div className="flex items-center gap-4 md:gap-6 group">
+                   <div className="size-10 md:size-12 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-primary/40 group-hover:text-primary transition-colors relative z-10 backdrop-blur-md">
+                      <span className="text-[10px] md:text-xs font-black italic">0{pIdx + 1}</span>
                    </div>
-                   <h3 className="text-sm font-black uppercase tracking-[0.3em] text-white/40">{t(phase.name)}</h3>
+                   <h3 className="text-[10px] md:text-sm font-black uppercase tracking-[0.3em] text-white/40">{t(phase.name)}</h3>
                 </div>
 
                 <div className="ml-12 lg:ml-16 flex flex-col md:grid md:grid-cols-2 gap-4">
@@ -69,7 +90,7 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                        <button
                          key={node.id}
                          onClick={() => setSelectedNode(node)}
-                         className={`p-6 rounded-[2rem] border transition-all text-left relative overflow-hidden group ${
+                         className={`p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border transition-all text-left relative overflow-hidden group ${
                            isCompleted 
                             ? 'bg-primary/5 border-primary/20 shadow-lg shadow-primary/5' 
                             : isSelected ? 'bg-white/10 border-white/20' : 'bg-white/[0.02] border-white/5 hover:bg-white/5 hover:border-white/10'
@@ -77,9 +98,9 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                        >
                          {isCompleted && <div className="absolute top-0 right-0 p-4 text-primary"><CheckCircle2 size={16} /></div>}
                          
-                         <div className="space-y-3 relative z-10">
-                            <span className={`text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] ${isCompleted ? 'text-primary' : 'text-white/20'}`}>Node_{node.id}</span>
-                            <h4 className={`text-base md:text-sm font-black uppercase tracking-tight italic ${isCompleted ? 'text-white' : 'text-white/60'}`}>{t(`node_${node.id}`, node.name)}</h4>
+                         <div className="space-y-2 md:space-y-3 relative z-10">
+                            <span className={`text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] ${isCompleted ? 'text-primary' : 'text-white/20'}`}>Node_{node.id}</span>
+                            <h4 className={`text-xs md:text-sm font-black uppercase tracking-tight italic ${isCompleted ? 'text-white' : 'text-white/60'}`}>{t(`node_${node.id}`, node.name)}</h4>
                             
                             <div className="flex items-center gap-4 opacity-40">
                                <div className="flex items-center gap-1">
@@ -107,18 +128,18 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
              {selectedNode ? (
                <motion.div 
                  key={selectedNode.id}
-                 initial={{ opacity: 0, x: 20 }}
-                 animate={{ opacity: 1, x: 0 }}
-                 exit={{ opacity: 0, x: 20 }}
-                 className="sticky top-12 p-10 rounded-[3rem] bg-white/[0.03] border border-white/5 backdrop-blur-3xl space-y-8"
+                 initial={{ opacity: 0, scale: 0.95 }}
+                 animate={{ opacity: 1, scale: 1 }}
+                 exit={{ opacity: 0, scale: 0.95 }}
+                 className="sticky top-4 md:top-12 p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] bg-white/[0.03] border border-white/5 backdrop-blur-3xl space-y-6 md:space-y-8"
                >
-                  <div className="space-y-2">
-                     <span className="text-[9px] font-black uppercase tracking-[0.4em] text-primary">{t('node_intelligence')}</span>
-                     <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white italic">{t(`node_${selectedNode.id}`, selectedNode.name)}</h3>
+                  <div className="space-y-1 md:space-y-2 text-center lg:text-left">
+                     <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.4em] text-primary">{t('node_intelligence')}</span>
+                     <h3 className="text-xl md:text-3xl font-black uppercase tracking-tighter text-white italic"><TypingText text={t(`node_${selectedNode.id}`, selectedNode.name)} /></h3>
                   </div>
 
-                  <p className="text-xs text-white/40 leading-relaxed font-medium italic">
-                     {t(`node_${selectedNode.id}_desc`, selectedNode.description)}
+                  <p className="text-[10px] md:text-xs text-white/40 leading-relaxed font-medium italic">
+                     <TypingText text={t(`node_${selectedNode.id}_desc`, selectedNode.description)} />
                   </p>
 
                   <div className="space-y-6 pt-6 border-t border-white/5">

@@ -7,7 +7,8 @@ import {
   Layout, 
   Palette, 
   Compass, 
-  Target 
+  Target,
+  PenTool
 } from 'lucide-react';
 
 export interface RoadmapNode {
@@ -23,6 +24,7 @@ export interface RoadmapNode {
 
 export interface SovereignPath {
   id: string;
+  disciplineId: string;
   name: string;
   description: string;
   icon: any;
@@ -35,6 +37,7 @@ export interface SovereignPath {
 export const MASTER_PLAN_DATA: SovereignPath[] = [
   {
     id: 'digital_architect',
+    disciplineId: 'archviz',
     name: 'Digital Architect (ArchViz)',
     description: 'Transform architecture into high-stakes visual narratives from blueprint to photorealistic rendering.',
     icon: Building2,
@@ -66,6 +69,7 @@ export const MASTER_PLAN_DATA: SovereignPath[] = [
   },
   {
     id: 'environment_artist',
+    disciplineId: 'world_gen',
     name: 'Environment Artist (World_Builder)',
     description: 'Constructing cinematic game worlds and procedural landscapes for next-gen interactive nodes.',
     icon: Globe,
@@ -94,6 +98,7 @@ export const MASTER_PLAN_DATA: SovereignPath[] = [
   },
   {
     id: 'vfx_artist',
+    disciplineId: 'vfx_sim',
     name: 'VFX Artist (Technical Director)',
     description: 'Bending the laws of physics. Mastering simulations, particle flow, and cinematic destruction.',
     icon: Zap,
@@ -115,6 +120,74 @@ export const MASTER_PLAN_DATA: SovereignPath[] = [
         name: 'phase_applied',
         nodes: [
           { id: 'simulation_node', name: 'Destruction_Sim_Matrix', phase: 'applied', duration: '120h', difficulty: 'master', software: ['Houdini', 'Nuke'], description: 'Advanced rigid body dynamics and cinematic compositing.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'character_animator',
+    disciplineId: 'char_anim',
+    name: 'Breathe_Life: Character Animation',
+    description: 'Master the art of soulful movement, performance, and advanced rigging nodes.',
+    icon: Target,
+    phases: [
+      {
+        name: 'phase_genesis',
+        nodes: [
+          { id: 'acting_theory', name: 'Acting_For_Animators', phase: 'genesis', duration: '50h', difficulty: 'beginner', description: 'Mastering timing, weight, and emotional arcs.' },
+          { id: 'rig_logic', name: 'Standard_Rigging_Nodes', phase: 'genesis', duration: '40h', difficulty: 'specialist', description: 'Foundation of bipedal and quadrupedal limb mechanics.' }
+        ]
+      },
+      {
+        name: 'phase_tech',
+        nodes: [
+          { id: 'maya_perf', name: 'Maya: Performance_Mastery', phase: 'tech', duration: '150h', difficulty: 'specialist', software: ['Maya'], description: 'Industrial character performance and facial expression sync.' },
+          { id: 'mobu_rig', name: 'MotionBuilder: Retargeting', phase: 'tech', duration: '80h', difficulty: 'master', software: ['MotionBuilder'], description: 'Handling high-density motion capture data.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'motion_designer',
+    disciplineId: 'motion_design',
+    name: 'Neural_Flow: Motion Design',
+    description: 'Architecting cinematic title sequences, sleek branding, and high-stakes visual communication.',
+    icon: Layers,
+    phases: [
+      {
+        name: 'phase_genesis',
+        nodes: [
+          { id: 'typo_motion', name: 'Typography_In_Motion', phase: 'genesis', duration: '40h', difficulty: 'beginner', description: 'Kinetic text, readability, and high-concept layout.' },
+          { id: 'color_theory_flow', name: 'Industrial_Color_Flow', phase: 'genesis', duration: '30h', difficulty: 'specialist', description: 'The psychology of palettes in high-end advertising.' }
+        ]
+      },
+      {
+        name: 'phase_tech',
+        nodes: [
+          { id: 'ae_industrial', name: 'AfterEffects: Pure_Flow', phase: 'tech', duration: '120h', difficulty: 'specialist', software: ['After Effects'], description: 'Mastering expressions, scripts, and compositing layers.' },
+          { id: 'c4d_sync', name: 'Cinema4D: Abstract_Nodes', phase: 'tech', duration: '140h', difficulty: 'master', software: ['Cinema 4D'], description: '3D motion design, MoGraph, and complex abstract sims.' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'concept_artist',
+    disciplineId: 'concept_art',
+    name: 'Genesis: Concept & Design',
+    description: 'The foundation of all high-end visuals. Designing the soul of digital entities and worlds.',
+    icon: PenTool,
+    phases: [
+      {
+        name: 'phase_genesis',
+        nodes: [
+          { id: 'anatomy_art', name: 'Anatomy: Human_Nodes', phase: 'genesis', duration: '50h', difficulty: 'beginner', description: 'Industrial focus on skeletal and muscle structure for animation.' },
+          { id: 'light_color', name: 'Light_Color_Matrix', phase: 'genesis', duration: '40h', difficulty: 'specialist', description: 'Theory of lighting, mood, and digital matte painting nodes.' }
+        ]
+      },
+      {
+        name: 'phase_tech',
+        nodes: [
+          { id: 'ps_mastery', name: 'Photoshop: Industrial_Core', phase: 'tech', duration: '120h', difficulty: 'specialist', software: ['Photoshop'], description: 'High-end concept workflow, layers, and brushing techniques.' }
         ]
       }
     ]
