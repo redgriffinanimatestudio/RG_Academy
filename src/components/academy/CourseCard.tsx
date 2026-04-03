@@ -32,14 +32,14 @@ export default function CourseCard({ course, lang }: CourseCardProps) {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      whileHover={{ y: -5 }}
-      className="group criativo-card !p-0 overflow-hidden card-glow relative"
+      whileHover={{ y: -8, scale: 1.02 }}
+      className="group bg-[#0a0a0a] rounded-[2.5rem] sm:rounded-[3.5rem] overflow-hidden border border-white/5 relative transition-all hover:border-primary/40 hover:shadow-[0_0_80px_rgba(var(--primary-rgb),0.1)]"
     >
-      <Link to={`/aca/${lang}/course/${course.slug}`} className="block p-4 sm:p-5 lg:p-6">
-        <div className="relative aspect-video overflow-hidden rounded-2xl bg-white/[0.02]">
+      <Link to={`/aca/${lang}/course/${course.slug}`} className="block">
+        <div className="relative aspect-[16/10] overflow-hidden bg-white/[0.02]">
           {!imageLoaded && !imageError && (
             <div className="absolute inset-0 skeleton-loading" />
           )}
@@ -52,86 +52,98 @@ export default function CourseCard({ course, lang }: CourseCardProps) {
             <img 
               src={course.thumbnail} 
               alt={course.title} 
-              className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-110 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+              className={`w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1 ${imageLoaded ? 'opacity-70 contrast-125 saturate-150' : 'opacity-0'}`}
               onLoad={() => setImageLoaded(true)}
               onError={() => setImageError(true)}
               referrerPolicy="no-referrer"
             />
           )}
           
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-bg-dark shadow-2xl shadow-primary/40 transform scale-75 group-hover:scale-100 transition-transform duration-500">
-              <PlayCircle size={32} fill="currentColor" />
-            </div>
+          {/* Node Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+          
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-[6px]">
+             <div className="size-24 bg-primary/20 rounded-full flex items-center justify-center border border-primary/20 backdrop-blur-3xl">
+               <div className="size-16 bg-primary rounded-full flex items-center justify-center text-bg-dark shadow-[0_0_40px_rgba(var(--primary-rgb),0.6)] transform scale-75 group-hover:scale-100 transition-transform duration-500">
+                  <PlayCircle size={32} fill="currentColor" />
+               </div>
+             </div>
           </div>
 
-          <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-            <div className="px-2.5 py-1 glass-premium text-white text-[9px] font-black uppercase tracking-widest rounded-lg border border-white/10 shadow-xl">
+          <div className="absolute top-8 left-8 flex flex-wrap gap-3">
+            <div className="px-4 py-1.5 glass-premium text-white text-[9px] font-black uppercase tracking-[0.3em] rounded-xl border border-white/10 backdrop-blur-3xl shadow-2xl">
               {course.category?.name || course.categoryId}
             </div>
             {course.lod && (
-              <div className="px-2.5 py-1 bg-primary text-bg-dark text-[9px] font-black uppercase tracking-widest rounded-lg shadow-xl shadow-primary/20">
-                LOD {course.lod}
+              <div className="px-4 py-1.5 bg-primary text-bg-dark text-[9px] font-black uppercase tracking-[0.3em] rounded-xl shadow-xl shadow-primary/30 animate-pulse">
+                LOD_{course.lod}_SYNC
               </div>
             )}
           </div>
         </div>
         
-        <div className="pt-5 space-y-4 text-left">
-          <h3 className="text-lg lg:text-xl font-black tracking-tight text-white group-hover:text-primary transition-colors line-clamp-2 uppercase leading-tight">
-            {course.title}
-          </h3>
-          
-          <div className="flex items-center gap-3">
-            <div className="size-9 rounded-xl overflow-hidden border border-white/10 bg-white/5 ring-4 ring-white/[0.02]">
-              <img 
-                src={course.lecturerAvatar || "https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png"} 
-                alt={course.lecturerName} 
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer" 
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[8px] font-black uppercase tracking-widest text-white/20 leading-none mb-1">{t('instructor')}</span>
-              <p className="text-[10px] lg:text-xs text-white/60 font-black uppercase tracking-wider leading-none">{course.lecturerName}</p>
+        <div className="p-10 space-y-8">
+          <div className="space-y-4">
+            <h3 className="text-2xl lg:text-3xl font-black tracking-tighter text-white group-hover:text-primary transition-all line-clamp-2 uppercase italic leading-[0.9] group-hover:-translate-y-1">
+              {course.title}
+            </h3>
+            <div className="flex items-center gap-3">
+               <div className="size-1.5 rounded-full bg-primary shadow-[0_0_10px_#00f5d4]" />
+               <span className="text-[9px] font-black uppercase tracking-[0.5em] text-white/20">Operational_Access_Active</span>
             </div>
           </div>
-
-          <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-white/20">
-            <div className="flex items-center gap-1.5 px-2 py-1 bg-white/5 rounded-lg border border-white/5">
-              <Star size={12} className="text-primary" fill="currentColor" />
-              <span className="text-white">{course.rating}</span>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="size-12 rounded-[1.5rem] overflow-hidden border border-white/10 bg-white/5 p-0.5 group-hover:border-primary/40 transition-colors">
+                <img 
+                  src={course.lecturerAvatar || "https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png"} 
+                  alt={course.lecturerName} 
+                  className="w-full h-full object-cover rounded-[1.2rem]"
+                  referrerPolicy="no-referrer" 
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[8px] font-black uppercase tracking-[0.3em] text-white/20 mb-1 leading-none">Authorization_Lvl_4</span>
+                <p className="text-[12px] text-white/60 font-black uppercase tracking-wider leading-none italic">{course.lecturerName}</p>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Users size={12} />
-              <span>{course.studentsCount.toLocaleString()}</span>
-            </div>
-            <div className="ml-auto px-2 py-1 glass-premium rounded-lg text-primary text-[8px]">
+            <div className="px-4 py-2 glass-premium rounded-xl text-primary text-[9px] font-black border border-primary/20 backdrop-blur-xl">
               {t(course.level)}
             </div>
           </div>
 
-          {course.softwareStack && course.softwareStack.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {course.softwareStack.slice(0, 4).map((sw, i) => (
-                <div key={i} className="px-2 py-0.5 bg-white/[0.03] rounded-md text-[7px] font-black uppercase tracking-tighter text-white/30 border border-white/5">
-                  {sw.name}
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-2">
+          <div className="flex items-center gap-10 pt-2 pb-2">
             <div className="flex flex-col">
-              <span className="text-[8px] font-black uppercase tracking-widest text-white/20 leading-none mb-1">{t('investment')}</span>
-              <div className="flex items-baseline gap-1">
-                <span className="text-xs font-black text-primary">$</span>
-                <span className="text-xl lg:text-2xl font-black text-white">{course.price}</span>
+               <span className="text-[8px] font-black uppercase tracking-widest text-white/10 mb-2">Efficiency</span>
+               <div className="flex items-center gap-2">
+                 <Star size={16} className="text-primary" fill="currentColor" />
+                 <span className="text-sm font-black text-white tabular-nums tracking-tighter">{course.rating}</span>
+               </div>
+            </div>
+            <div className="flex flex-col">
+               <span className="text-[8px] font-black uppercase tracking-widest text-white/10 mb-2">Network_Size</span>
+               <div className="flex items-center gap-2">
+                 <Users size={16} className="text-white/20" />
+                 <span className="text-sm font-black text-white/60 tabular-nums uppercase tracking-tighter">{course.studentsCount.toLocaleString()}</span>
+               </div>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-white/5 flex items-center justify-between">
+            <div className="flex flex-col">
+              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 mb-2">Assessment_Yield</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-sm font-black text-primary">$</span>
+                <span className="text-3xl font-black text-white tracking-widest tabular-nums">{course.price}</span>
               </div>
             </div>
-            <div className="size-10 lg:size-12 bg-white/5 text-white flex items-center justify-center rounded-xl group-hover:bg-primary group-hover:text-bg-dark transition-all duration-500 border border-white/5 group-hover:shadow-lg group-hover:shadow-primary/20">
-              <ChevronRight size={20} className="group-hover:translate-x-0.5 transition-transform" />
-            </div>
+            <button className="relative group/btn flex items-center justify-center">
+               <div className="absolute -inset-4 bg-primary/10 rounded-full scale-0 group-hover/btn:scale-100 transition-transform duration-500 blur-xl opacity-50" />
+               <div className="size-16 bg-white/5 text-white flex items-center justify-center rounded-[1.8rem] group-hover/btn:bg-primary group-hover/btn:text-bg-dark transition-all duration-700 border border-white/10 group-hover/btn:border-primary group-hover/btn:shadow-[0_0_30px_rgba(var(--primary-rgb),0.3)]">
+                  <ChevronRight size={28} className="group-hover/btn:translate-x-1.5 transition-transform" />
+               </div>
+            </button>
           </div>
         </div>
       </Link>

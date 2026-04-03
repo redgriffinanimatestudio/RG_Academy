@@ -22,36 +22,36 @@ export default function AcademyFilters({
   const { t } = useTranslation();
 
   return (
-    <header className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <header className="space-y-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="space-y-4">
-          <div className="flex items-center gap-2 text-primary font-black uppercase tracking-[0.3em] text-[10px]">
-            <GraduationCap size={14} />
-            {t('academy_workshops')}
+          <div className="flex items-center gap-3 text-primary font-black uppercase tracking-[0.4em] text-[10px]">
+            <div className="size-2 rounded-full bg-primary animate-ping" />
+            NODE_DIRECTORY_04
           </div>
-          <h2 className="text-4xl font-black tracking-tighter text-white leading-none uppercase">
-            Browse <span className="text-primary italic">Workshops.</span>
+          <h2 className="text-4xl sm:text-6xl font-black tracking-tighter text-white leading-none uppercase italic">
+            Search <span className="text-primary tracking-normal">The_Vault.</span>
           </h2>
         </div>
         
         <div className="flex flex-col gap-4 w-full md:w-auto">
-          <div className="flex gap-4">
-            <div className="relative flex-1 md:w-80">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={20} />
+          <div className="flex gap-4 p-2 bg-white/[0.02] border border-white/5 rounded-[2rem] backdrop-blur-3xl shadow-2xl">
+            <div className="relative flex-1 md:w-96 group">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" size={20} />
               <input
                 type="text"
-                placeholder={t('search_workshops')}
+                placeholder={t('search_workshops_code')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/5 rounded-2xl focus:border-primary/40 transition-all font-medium text-white placeholder:text-white/20 outline-none"
+                className="w-full pl-16 pr-6 py-5 bg-transparent border-none rounded-2xl focus:ring-0 transition-all font-black uppercase tracking-widest text-xs text-white placeholder:text-white/10 outline-none"
               />
             </div>
             <button 
               onClick={() => setShowFilters(!showFilters)}
-              className={`px-6 rounded-2xl flex items-center gap-3 font-black uppercase tracking-widest text-[10px] transition-all border ${showFilters ? 'bg-primary text-bg-dark border-primary' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
+              className={`px-8 rounded-2xl flex items-center gap-3 font-black uppercase tracking-widest text-[10px] transition-all border ${showFilters ? 'bg-primary text-bg-dark border-primary' : 'bg-white/5 text-white/40 border-white/10 hover:border-white/20 hover:bg-white/10'}`}
             >
               <Filter size={18} />
-              {t('filters')}
+              {t('matrix_filters')}
             </button>
           </div>
         </div>
@@ -60,20 +60,23 @@ export default function AcademyFilters({
       <AnimatePresence>
         {showFilters && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
+            initial={{ height: 0, opacity: 0, scale: 0.98 }}
+            animate={{ height: 'auto', opacity: 1, scale: 1 }}
+            exit={{ height: 0, opacity: 0, scale: 0.98 }}
+            transition={{ type: "spring", duration: 0.5 }}
             className="overflow-hidden"
           >
-            <div className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">Skill Level</h4>
+            <div className="p-10 rounded-[3rem] bg-black border border-white/5 grid grid-cols-1 md:grid-cols-3 gap-12 shadow-2xl relative">
+              <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'linear-gradient(45deg, #fff 25%, transparent 25%, transparent 50%, #fff 50%, #fff 75%, transparent 75%, transparent)', backgroundSize: '4px 4px' }} />
+              
+              <div className="space-y-6 relative z-10">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Skill_Authorization</h4>
                 <div className="flex flex-wrap gap-2">
                   {['all', 'beginner', 'intermediate', 'advanced', 'expert'].map((lvl) => (
                     <button
                       key={lvl}
                       onClick={() => setFilters({ ...filters, level: lvl })}
-                      className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${filters.level === lvl ? 'bg-primary text-bg-dark' : 'bg-white/5 text-white/40 hover:text-white'}`}
+                      className={`px-4 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] transition-all border ${filters.level === lvl ? 'bg-primary text-bg-dark border-primary shadow-lg shadow-primary/20' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
                     >
                       {lvl}
                     </button>
@@ -81,52 +84,59 @@ export default function AcademyFilters({
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">Max Price: ${filters.priceRange[1]}</h4>
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="200" 
-                  step="10"
-                  value={filters.priceRange[1]}
-                  onChange={(e) => setFilters({ ...filters, priceRange: [0, parseInt(e.target.value)] })}
-                  className="w-full accent-primary bg-white/10 rounded-lg appearance-none h-1"
-                />
+              <div className="space-y-6 relative z-10">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary italic">Investment_Cap: ${filters.priceRange[1]}</h4>
+                <div className="px-2">
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="200" 
+                    step="10"
+                    value={filters.priceRange[1]}
+                    onChange={(e) => setFilters({ ...filters, priceRange: [0, parseInt(e.target.value)] })}
+                    className="w-full accent-primary bg-white/10 rounded-lg appearance-none h-1 cursor-pointer"
+                  />
+                </div>
               </div>
 
-              <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">Sort By</h4>
-                <select 
-                  value={filters.sortBy}
-                  onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/60 focus:outline-none focus:border-primary cursor-pointer appearance-none"
-                >
-                  <option value="popular">Most Popular</option>
-                  <option value="rating">Highest Rated</option>
-                  <option value="price_low">Price: Low to High</option>
-                  <option value="price_high">Price: High to Low</option>
-                </select>
+              <div className="space-y-6 relative z-10">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Sort_Algorithm</h4>
+                <div className="relative">
+                  <select 
+                    value={filters.sortBy}
+                    onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-[10px] font-black uppercase tracking-widest text-white/60 focus:outline-none focus:border-primary/40 cursor-pointer appearance-none transition-all"
+                  >
+                    <option value="popular">Priority: Popularity</option>
+                    <option value="rating">Priority: Efficiency</option>
+                    <option value="price_low">Budget: Descending</option>
+                    <option value="price_high">Budget: Ascending</option>
+                  </select>
+                  <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-white/20">
+                    <GraduationCap size={14} />
+                  </div>
+                </div>
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="flex items-center gap-3 overflow-x-auto pb-4 no-scrollbar">
+      <div className="flex items-center gap-4 overflow-x-auto pb-4 no-scrollbar border-b border-white/5">
         <button
           onClick={() => setSelectedCategory('all_workshops')}
-          className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all border ${
-            selectedCategory === 'all_workshops' ? 'bg-primary text-bg-dark border-primary' : 'bg-white/5 text-white/40 border-white/5 hover:text-white'
+          className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap transition-all border shrink-0 ${
+            selectedCategory === 'all_workshops' ? 'bg-primary text-bg-dark border-primary shadow-lg shadow-primary/20' : 'bg-white/5 text-white/40 border-white/5 hover:text-white hover:bg-white/10'
           }`}
         >
-          {t('all_workshops')}
+          {t('all_workshops_node')}
         </button>
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => setSelectedCategory(cat.id)}
-            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all border ${
-              selectedCategory === cat.id ? 'bg-primary text-bg-dark border-primary' : 'bg-white/5 text-white/40 border-white/5 hover:text-white'
+            className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap transition-all border shrink-0 ${
+              selectedCategory === cat.id ? 'bg-primary text-bg-dark border-primary shadow-lg shadow-primary/20' : 'bg-white/5 text-white/40 border-white/5 hover:text-white hover:bg-white/10'
             }`}
           >
             {t(cat.name)}

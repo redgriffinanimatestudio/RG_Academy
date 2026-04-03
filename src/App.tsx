@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import Academy from './pages/Academy/AcademyPage';
 import CourseDetail from './pages/CourseDetail';
 import Learn from './pages/Learn';
+import CourseBuilder from './pages/Academy/CourseBuilder';
 import Studio from './pages/Studio/StudioPage';
 import NeuralStudio from './pages/Studio/NeuralStudio';
 import Community from './pages/Community/CommunityPage';
@@ -96,6 +97,7 @@ export default function App() {
             <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><TopicPage /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/course/:slug" element={<LanguageWrapper><Layout><CourseDetail /></Layout></LanguageWrapper>} />
+            <Route path="/aca/:lang/workshop" element={<LanguageWrapper><Layout><CourseBuilder /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/messages" element={<LanguageWrapper><Layout><Messages /></Layout></LanguageWrapper>} />
             <Route path="/aca/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
