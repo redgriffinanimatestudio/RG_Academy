@@ -108,10 +108,10 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
                     exit={{ opacity: 0, y: -20 }}
                     className="space-y-8 md:space-y-12 text-center"
                   >
-                    <div className="space-y-4 md:space-y-6">
+                     <div className="space-y-4 md:space-y-6">
                        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">{t('pathfinder_welcome')}</span>
-                       <h2 className="text-3xl md:text-6xl font-black uppercase tracking-tighter text-white italic leading-[0.9]"><TypingText text={t('pathfinder_welcome_title', 'Design Your Creative Career.')} /></h2>
-                       <p className="text-sm md:text-xl text-white/50 max-w-2xl mx-auto leading-relaxed font-medium">
+                       <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-white italic leading-[1]"><TypingText text={t('pathfinder_welcome_title', 'Design Your Creative Career.')} /></h2>
+                       <p className="text-base md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed font-medium">
                           {t('pathfinder_guide_desc')}
                        </p>
                     </div>
@@ -150,10 +150,10 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
                         <button 
                           key={v.id}
                           onClick={() => handleVisionSelect(v.id)}
-                          className="p-4 md:p-8 rounded-2xl md:rounded-3xl bg-white/[0.02] border border-white/5 text-left transition-all hover:bg-white/[0.05] hover:border-primary/30 group relative"
+                          className="p-5 md:p-8 rounded-2xl md:rounded-3xl bg-white/[0.02] border border-white/5 text-left transition-all hover:bg-white/[0.05] hover:border-primary/30 group relative flex flex-col justify-center"
                         >
-                           <h4 className="text-[10px] md:text-xl font-black uppercase tracking-tight text-white italic group-hover:text-primary transition-colors leading-tight">{v.label}</h4>
-                           <p className="hidden md:block text-[10px] font-black uppercase tracking-widest text-white/20 mt-2 italic">{v.sub}</p>
+                           <h4 className="text-sm md:text-xl font-black uppercase tracking-tight text-white italic group-hover:text-primary transition-colors leading-tight">{v.label}</h4>
+                           <p className="text-[10px] md:text-xs text-white/50 mt-2 font-medium leading-relaxed">{v.sub}</p>
                         </button>
                       ))}
                     </div>
@@ -177,11 +177,11 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
                          <button 
                            key={d.id}
                            onClick={() => handleDisciplineSelect(d)}
-                           className="p-4 md:p-8 rounded-2xl md:rounded-[2.5rem] bg-white/[0.02] border border-white/5 text-left transition-all hover:bg-white/[0.05] hover:border-white/10 relative group overflow-hidden"
+                           className="p-5 md:p-8 rounded-2xl md:rounded-[2.5rem] bg-white/[0.02] border border-white/5 text-left transition-all hover:bg-white/[0.05] hover:border-white/10 relative group overflow-hidden flex flex-col items-start"
                          >
-                            <d.icon className={`size-5 md:size-8 mb-3 md:mb-6 ${d.color} transition-transform group-hover:scale-125`} />
-                            <h4 className="text-[10px] md:text-lg font-black uppercase tracking-tight text-white italic leading-tight">{t(d.i18nKey)}</h4>
-                            <p className="hidden md:block text-[9px] text-white/20 uppercase tracking-widest mt-3 leading-relaxed italic">{t(`${d.i18nKey}_desc`, d.description)}</p>
+                            <d.icon className={`size-6 md:size-8 mb-3 md:mb-6 ${d.color} transition-transform group-hover:scale-125`} />
+                            <h4 className="text-xs md:text-lg font-black uppercase tracking-tight text-white italic leading-tight mb-2">{t(d.i18nKey)}</h4>
+                            <p className="text-[9px] md:text-xs text-white/50 font-medium leading-relaxed">{t(`${d.i18nKey}_desc`, d.description)}</p>
                          </button>
                        ))}
                     </div>
