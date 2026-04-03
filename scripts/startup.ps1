@@ -3,19 +3,19 @@
 
 Write-Host "🚀 Starting RG Academy Unified Environment..." -ForegroundColor Cyan
 
-# 1. Check Docker PostgreSQL
-Write-Host "`n[1/3] Checking Docker PostgreSQL (rg-academy-db)..." -ForegroundColor Yellow
+# 1. Check Docker MySQL
+Write-Host "`n[1/3] Checking Docker MySQL (rg-academy-db)..." -ForegroundColor Yellow
 $container = docker ps -q -f name=rg-academy-db
 if (-not $container) {
     Write-Host "⚠️  Container 'rg-academy-db' is not running. Attempting to start..." -ForegroundColor Gray
-    docker compose up -d postgres
+    docker compose up -d mysql
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "❌ FAILED: Could not start PostgreSQL container. Please ensure Docker Desktop is running." -ForegroundColor Red
+        Write-Host "❌ FAILED: Could not start MySQL container. Please ensure Docker Desktop is running." -ForegroundColor Red
         exit 1
     }
-    Write-Host "✅ PostgreSQL container started." -ForegroundColor Green
+    Write-Host "✅ MySQL container started." -ForegroundColor Green
 } else {
-    Write-Host "✅ PostgreSQL container is already running." -ForegroundColor Green
+    Write-Host "✅ MySQL container is already running." -ForegroundColor Green
 }
 
 # 2. Prisma Database Push

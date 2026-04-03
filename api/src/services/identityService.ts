@@ -163,10 +163,20 @@ export const identityService = {
            linkedInUrl: profileData.linkedInUrl,
            telegramHandle: profileData.telegramHandle,
            portfolioUrl: profileData.portfolioUrl,
-           gender: profileData.gender || 'none',
+           gender: profileData.gender,
            dateOfBirth: profileData.dateOfBirth && !isNaN(Date.parse(profileData.dateOfBirth)) 
              ? new Date(profileData.dateOfBirth) 
-             : undefined
+             : undefined,
+           ageCategory: profileData?.dateOfBirth && !isNaN(Date.parse(profileData.dateOfBirth)) ? (() => {
+                const birthDate = new Date(profileData.dateOfBirth);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; }
+                if (age < 13) return 'child';
+                if (age < 18) return 'teen';
+                return 'adult';
+              })() : 'adult'
         };
 
         await tx.profile.upsert({

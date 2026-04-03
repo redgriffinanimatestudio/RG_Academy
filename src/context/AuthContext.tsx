@@ -11,9 +11,10 @@ interface AuthContextType {
   setActiveRole: (role: UserRole) => Promise<void>;
   refreshProfile: () => Promise<void>;
   logout: () => Promise<void>;
-  login: (login: string, pass: string) => Promise<void>;
-  register: (data: any) => Promise<void>;
-  socialAuth: (data: any) => Promise<void>;
+  login: (login: string, pass: string) => Promise<any>;
+  register: (data: any) => Promise<any>;
+  socialAuth: (data: any) => Promise<any>;
+  onboard: (data: any) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -114,8 +115,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (loginStr: string, pass: string) => {
     setLoading(true);
     try {
-      await authService.login(loginStr, pass);
+      const result = await authService.login(loginStr, pass);
       await initAuth();
+      return result;
     } finally {
       setLoading(false);
     }
@@ -129,8 +131,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const mappedProfile = mapProfile(result.user);
         setProfile(mappedProfile);
         setActiveRoleState(mappedProfile.role as UserRole);
+        return result;
       } else {
         await initAuth();
+        return null;
       }
     } finally {
       setLoading(false);
@@ -145,8 +149,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const mappedProfile = mapProfile(result.user);
         setProfile(mappedProfile);
         setActiveRoleState(mappedProfile.role as UserRole);
+        return result;
       } else {
         await initAuth();
+        return null;
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onboard = async (data: any) => {
+    setLoading(true);
+    try {
+      const result = await authService.onboard(data);
+      if (result && result.user) {
+        const mappedProfile = mapProfile(result.user);
+        setProfile(mappedProfile);
+        setActiveRoleState(mappedProfile.role as UserRole);
+        return result;
+      } else {
+        await initAuth();
+        return null;
       }
     } finally {
       setLoading(false);
@@ -184,7 +208,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       logout,
       login,
       register,
-      socialAuth
+      socialAuth,
+      onboard
     }}>
       {children}
     </AuthContext.Provider>

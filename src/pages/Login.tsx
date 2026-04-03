@@ -42,7 +42,7 @@ const Login: React.FC = () => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { lang = 'eng' } = useParams();
   const navigate = useNavigate();
-  const { login, register, socialAuth } = useAuth();
+  const { login, register, socialAuth, onboard, user } = useAuth();
 
   // Registration Form State with Session Persistence
   const [formData, setFormData] = useState(() => {
@@ -166,7 +166,7 @@ const Login: React.FC = () => {
     setError('');
     try {
       const signature = Buffer.from(`SIGNED_BY_${formData.email}_AT_${Date.now()}`).toString('base64');
-      await register({
+      const payload = {
         ...formData,
         role: formData.selectedRole,
         profileData: {
@@ -180,7 +180,15 @@ const Login: React.FC = () => {
           dateOfBirth: formData.dateOfBirth
         },
         signature
-      });
+      };
+
+      if (user && (user.id || user.uid)) {
+        console.log("[AUTH] Authenticated node detected. Executing ONBOARDING PROTOCOL.");
+        await onboard(payload);
+      } else {
+        console.log("[AUTH] No active session. Executing NEW NODE REGISTRATION.");
+        await register(payload);
+      }
       setIsRegistered(true);
       sessionStorage.removeItem('rg_reg_data');
       sessionStorage.removeItem('rg_reg_step');

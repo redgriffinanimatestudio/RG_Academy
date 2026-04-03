@@ -86,6 +86,18 @@ export const authService = {
     }
   },
 
+  async onboard(data: any): Promise<AuthResponse> {
+    try {
+      const { data: apiResponse } = await apiClient.post('/auth/onboarding', data);
+      const { data: result } = apiResponse;
+      // Result contains updated user info, save it
+      this.saveSession(localStorage.getItem('auth_token') || '', result.user);
+      return result;
+    } catch (e: any) {
+      throw new Error(e.response?.data?.error || 'Onboarding failed');
+    }
+  },
+
   saveSession(token: string, user: any) {
     localStorage.setItem('auth_token', token);
     localStorage.setItem('rg_user', JSON.stringify(user));
