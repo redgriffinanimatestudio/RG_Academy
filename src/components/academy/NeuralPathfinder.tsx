@@ -42,7 +42,7 @@ interface NeuralPathfinderProps {
 
 export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) {
   const { t } = useTranslation();
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(-1);
   const [vision, setVision] = useState<string | null>(null);
   const [selectedDiscipline, setSelectedDiscipline] = useState<Discipline | null>(null);
   const [completed, setCompleted] = useState(false);
@@ -100,6 +100,34 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
 
            <div className="w-full max-w-4xl mx-auto">
               <AnimatePresence mode="wait">
+                {step === -1 && (
+                  <motion.div 
+                    key="step-1"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="space-y-8 md:space-y-12 text-center"
+                  >
+                    <div className="space-y-4 md:space-y-6">
+                       <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">{t('pathfinder_welcome')}</span>
+                       <h2 className="text-3xl md:text-6xl font-black uppercase tracking-tighter text-white italic leading-[0.9]"><TypingText text={t('pathfinder_welcome_title', 'Design Your Creative Career.')} /></h2>
+                       <p className="text-sm md:text-xl text-white/50 max-w-2xl mx-auto leading-relaxed font-medium">
+                          {t('pathfinder_guide_desc')}
+                       </p>
+                    </div>
+                    
+                    <div className="flex flex-col items-center gap-6">
+                       <button 
+                          onClick={() => setStep(0)}
+                          className="h-20 md:h-24 px-12 md:px-20 bg-white text-bg-dark rounded-2xl md:rounded-[2.5rem] font-black uppercase tracking-[0.3em] text-[11px] md:text-sm hover:bg-primary transition-all shadow-[0_50px_100px_-20px_rgba(255,255,255,0.1)] active:scale-95"
+                       >
+                          {t('pathfinder_start_button')}
+                       </button>
+                       <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Discovery Cycle: ~45 Seconds</p>
+                    </div>
+                  </motion.div>
+                )}
+
                 {step === 0 && (
                   <motion.div 
                     key="step0"
@@ -158,7 +186,7 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
                        ))}
                     </div>
                     <button onClick={() => setStep(0)} className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors flex items-center gap-2">
-                       <ChevronLeft size={12} /> Back_ToVision
+                       <ChevronLeft size={12} /> {t('terminal_back_vision', 'Back_To_Vision')}
                     </button>
                   </motion.div>
                 )}
@@ -210,6 +238,9 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
                           className="h-16 md:h-24 w-full bg-white text-bg-dark rounded-xl md:rounded-[2.5rem] font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-[10px] md:text-sm hover:bg-primary hover:scale-[1.02] active:scale-95 transition-all shadow-[0_40px_100px_-20px_rgba(255,255,255,0.1)] flex items-center justify-center gap-4"
                         >
                            <TypingText text={t('terminal_generate_roadmap')} /> <ChevronRight size={16} />
+                        </button>
+                        <button onClick={() => setStep(1)} className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors flex items-center gap-2 justify-center md:justify-start">
+                           <ChevronLeft size={12} /> {t('terminal_back_craft', 'Back_To_Craft')}
                         </button>
                     </div>
                   </motion.div>
@@ -264,6 +295,9 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
                            {t('terminal_mastery_sequence')} <ArrowRight size={18} />
                         </button>
                      </div>
+                     <button onClick={() => setStep(-1)} className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors flex items-center gap-2">
+                        <ChevronLeft size={12} /> {t('terminal_back_greeting', 'Back_To_Greeting')}
+                     </button>
                   </motion.div>
                 )}
               </AnimatePresence>
