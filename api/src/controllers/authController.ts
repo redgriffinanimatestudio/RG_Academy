@@ -287,7 +287,12 @@ export const authController = {
       return success(res, { available: !user });
     } catch (e: any) {
       console.error('❌ [AUTH] CheckEmail Failure:', e);
-      return error(res, 'Validation failed: Identification query error', 500, { message: e.message, stack: e.stack });
+      // Temporary Debug: Exposure of Prisma error to identify Hostinger migration issues
+      return error(res, `Prisma Conflict: ${e.message}`, 500, { 
+        code: e.code, 
+        meta: e.meta,
+        stack: e.stack 
+      });
     }
   },
 

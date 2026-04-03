@@ -77,7 +77,15 @@ Write-Host '📦 Creating Archive...' -ForegroundColor Yellow
 Copy-Item -Recurse 'dist' ($BUILD_TEMP + '/dist')
 Copy-Item 'server-dist.cjs' ($BUILD_TEMP + '/server-dist.cjs')
 Copy-Item 'index.js' ($BUILD_TEMP + '/index.js')
-"v2.33-Neural-Fixed" | Out-File -FilePath ($BUILD_TEMP + '/VERSION') -Encoding utf8
+"v2.33-Neural-Debug" | Out-File -FilePath ($BUILD_TEMP + '/VERSION') -Encoding utf8
+
+# Generate .env locally for security (avoid remote printf mangling)
+$REMOTE_ENV = "DATABASE_URL=mysql://${REMOTE_DB_USER}:${REMOTE_DB_PASS}@localhost:3306/${REMOTE_DB_NAME}`n"
+$REMOTE_ENV += "JWT_SECRET=super_secret_2026`n"
+$REMOTE_ENV += "PORT=3000`n"
+$REMOTE_ENV += "NODE_ENV=production"
+$REMOTE_ENV | Out-File -FilePath ($BUILD_TEMP + '/.env') -Encoding utf8
+
 (Get-Content 'package.json') -replace '"type":\s*"module",\s*', '' | Out-File -FilePath ($BUILD_TEMP + '/package.json') -Encoding utf8
 if (Test-Path 'prisma') { Copy-Item -Recurse 'prisma' ($BUILD_TEMP + '/prisma') }
 
@@ -95,7 +103,7 @@ $RemotePath = $SSH_USER + '@' + $SSH_HOST + ':' + $REMOTE_BASE + '/'
 scp -P $SSH_PORT $DEPLOY_ZIP $RemotePath
 
 # [6/6] Finalize Remote
-Write-Host '⚡ Finalizing v2.33 (Neural Identity Sync)...' -ForegroundColor Yellow
+Write-Host '⚡ Finalizing v2.33 (Neural Identity Debug)...' -ForegroundColor Yellow
 
 $C = 'cd __BASE__' + "`n"
 $C += 'echo "--- RESOURCE CLEANUP ---"' + "`n"
@@ -106,10 +114,9 @@ $C += 'rm -rf nodejs/dist public_html/dist 2>/dev/null' + "`n"
 $C += 'unzip -o "__ZIP__" -d nodejs/' + "`n"
 $C += 'unzip -o "__ZIP__" -d public_html/' + "`n"
 $C += 'mv public_html/dist/* public_html/ 2>/dev/null ' + $OR + ' true' + "`n"
-$C += 'printf "DATABASE_URL=mysql://__DBU__:__DBP__@127.0.0.1:3306/__DBN__\nJWT_SECRET=super_secret_2026\nPORT=3000\nNODE_ENV=production" > nodejs/.env' + "`n"
 $C += 'mkdir -p tmp ' + $AND + ' touch tmp/restart.txt' + "`n"
 $C += 'rm "__ZIP__"' + "`n"
-$C += 'echo "✅ DEPLOY SUCCESSFUL (v2.33)"'
+$C += 'echo "✅ DEPLOY SUCCESSFUL (v2.33-Debug)"'
 
 $REMOTE_COMMANDS = $C `
     -replace '__BASE__', $REMOTE_BASE `
