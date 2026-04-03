@@ -5,6 +5,7 @@ import Academy from './pages/Academy/AcademyPage';
 import CourseDetail from './pages/CourseDetail';
 import Learn from './pages/Learn';
 import Studio from './pages/Studio/StudioPage';
+import NeuralStudio from './pages/Studio/NeuralStudio';
 import Community from './pages/Community/CommunityPage';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -107,6 +108,7 @@ export default function App() {
             <Route path="/studio/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/messages" element={<LanguageWrapper><Layout><Messages /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
+            <Route path="/studio/:lang/neural" element={<LanguageWrapper><Layout><NeuralStudio /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/finance" element={<LanguageWrapper><Layout><Finance /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/profile/:id" element={<LanguageWrapper><Layout><SpecialistProfile /></Layout></LanguageWrapper>} />
             <Route path="/studio/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />

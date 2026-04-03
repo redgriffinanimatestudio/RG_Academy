@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { CreditCard } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { CreditCard, Cpu, Zap, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { networkingService } from '../../services/networkingService';
 import { useAuth } from '../../context/AuthContext';
@@ -25,6 +26,7 @@ const MOCK_PROJECTS = [
 export default function StudioPage() {
   const { t } = useTranslation();
   const { lang } = useParams();
+  const navigate = useNavigate();
   const { profile } = useAuth();
   const [activeTab, setActiveTab] = useState<'browse' | 'manage'>('browse');
   const [selectedProject, setSelectedProject] = useState<any>(null);
@@ -62,6 +64,42 @@ export default function StudioPage() {
   return (
     <div className="space-y-12 py-8">
       <StudioSynergyHeader hasSynergyCE={hasSynergyCE} />
+
+      {/* 🚀 NEURAL ENGINE CTA */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        onClick={() => navigate(`/studio/${lang}/neural`)}
+        className="group relative cursor-pointer overflow-hidden p-8 rounded-[3rem] glass-pro-max border border-white/5 hover:border-primary/40 transition-all duration-700 metallic-glow"
+      >
+        <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:opacity-10 transition-opacity">
+            <Cpu size={200} className="text-primary neural-pulse" />
+        </div>
+        
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="size-2 bg-primary rounded-full shadow-[0_0_8px_#00ff9d]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Experimental Node Active</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-white">
+                Launch <span className="text-primary italic text-data-glow">Neural Engine</span>
+            </h2>
+            <p className="text-white/40 font-bold max-w-md leading-relaxed">
+                Experience high-performance AI synthesis. Direct ComfyUI integration for industrial creative identity generation.
+            </p>
+          </div>
+          <div className="flex items-center gap-6">
+             <div className="text-right hidden sm:block">
+                <div className="text-[10px] font-black uppercase text-white/20">Compute Intensity</div>
+                <div className="text-xl font-black text-white italic">PRO MAX</div>
+             </div>
+             <div className="size-16 rounded-full bg-primary text-bg-dark flex items-center justify-center group-hover:scale-110 transition-transform shadow-[0_0_30px_rgba(0,255,157,0.4)]">
+                <ArrowRight size={24} />
+             </div>
+          </div>
+        </div>
+      </motion.div>
       
       <StudioFilters 
         activeTab={activeTab} setActiveTab={setActiveTab}

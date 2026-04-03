@@ -22,7 +22,7 @@ export const ACADEMY_CATEGORIES = [
 export const STUDIO_CATEGORIES = [
   { name: 'prod_services', icon: Video, subcategories: [{ name: 'anim_prod' }, { name: 'vfx_post' }] },
   { name: 'talent_network', icon: UserPlus, subcategories: [{ name: 'creative_talent' }, { name: 'technical_talent' }] },
-  { name: 'studio_solutions', icon: Cpu, subcategories: [{ name: 'infrastructure' }] }
+  { name: 'studio_solutions', icon: Cpu, subcategories: [{ name: 'infrastructure' }, { name: 'neural_engine' }] }
 ];
 
 export const COMMUNITY_CATEGORIES = [

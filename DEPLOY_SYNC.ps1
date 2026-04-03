@@ -91,20 +91,28 @@ $REMOTE_ENV | Out-File -FilePath ($BUILD_TEMP + '/.env') -Encoding utf8
 if (Test-Path 'prisma') { Copy-Item -Recurse 'prisma' ($BUILD_TEMP + '/prisma') }
 
 New-Item -ItemType Directory -Force ($BUILD_TEMP + '/node_modules') | Out-Null
-if (Test-Path 'node_modules/@prisma') { Copy-Item -Recurse 'node_modules/@prisma' ($BUILD_TEMP + '/node_modules/') }
-if (Test-Path 'node_modules/.prisma') { Copy-Item -Recurse 'node_modules/.prisma' ($BUILD_TEMP + '/node_modules/') }
+Write-Host '🧹 Optimizing Prisma for Linux...' -ForegroundColor Cyan
+if (Test-Path 'node_modules/@prisma') { 
+    Copy-Item -Recurse 'node_modules/@prisma' ($BUILD_TEMP + '/node_modules/') 
+    # Remove Windows/Node-native binaries to save space (leaving only .so or generic)
+    Get-ChildItem -Path ($BUILD_TEMP + '/node_modules/@prisma') -Recurse -Include *.exe, *.dll.node, *.tmp* | Remove-Item -Force
+}
+if (Test-Path 'node_modules/.prisma') { 
+    Copy-Item -Recurse 'node_modules/.prisma' ($BUILD_TEMP + '/node_modules/') 
+    Get-ChildItem -Path ($BUILD_TEMP + '/node_modules/.prisma') -Recurse -Include *.exe, *.dll.node, *.tmp* | Remove-Item -Force
+}
 
 if (Test-Path $DEPLOY_ZIP) { Remove-Item $DEPLOY_ZIP }
 Compress-Archive -Path ($BUILD_TEMP + '/*') -DestinationPath $DEPLOY_ZIP
 
 # [5/6] Upload
-Write-Host '🚀 Uploading to Hostinger...' -ForegroundColor Yellow
+Write-Host '🚀 Uploading to Hostinger (Optimized v2.36)...' -ForegroundColor Yellow
 $RemotePath = $SSH_USER + '@' + $SSH_HOST + ':' + $REMOTE_BASE + '/'
 # Note: scp will ask for password if keys are not set
 scp -P $SSH_PORT $DEPLOY_ZIP $RemotePath
 
 # [6/6] Finalize Remote
-Write-Host '⚡ Finalizing v2.35 (Neural Schema Patch)...' -ForegroundColor Yellow
+Write-Host '⚡ Finalizing v2.36 (Neural Sync + Schema Patch)...' -ForegroundColor Yellow
 
 $C = 'cd __BASE__' + "`n"
 $C += 'echo "--- RESOURCE CLEANUP ---"' + "`n"
@@ -115,11 +123,11 @@ $C += 'rm -rf nodejs/dist public_html/dist 2>/dev/null' + "`n"
 $C += 'unzip -o "__ZIP__" -d nodejs/' + "`n"
 $C += 'unzip -o "__ZIP__" -d public_html/' + "`n"
 $C += 'mv public_html/dist/* public_html/ 2>/dev/null ' + $OR + ' true' + "`n"
-$C += 'echo "--- APPLYING SCHEMA PATCH v2.35 ---"' + "`n"
+$C += 'echo "--- APPLYING SCHEMA PATCH v2.36 ---"' + "`n"
 $C += 'mysql -u __DBU__ -p"__DBP__" __DBN__ < nodejs/update_v2.35.sql ' + $OR + ' echo "⚠️ SQL Patch Warning: Partial failure or columns already exist."' + "`n"
 $C += 'mkdir -p tmp ' + $AND + ' touch tmp/restart.txt' + "`n"
 $C += 'rm "__ZIP__"' + "`n"
-$C += 'echo "✅ DEPLOY SUCCESSFUL (v2.35-Neural-Patch)"'
+$C += 'echo "✅ DEPLOY SUCCESSFUL (v2.36-Neural-Optimized)"'
 
 $REMOTE_COMMANDS = $C `
     -replace '__BASE__', $REMOTE_BASE `

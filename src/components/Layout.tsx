@@ -89,7 +89,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       const roleParam = sub.isPerspective ? `&perspective=${sub.perspectiveRole}` : '';
       navigate(`${location.pathname}?view=${viewParam}${roleParam}`);
     } else {
-      navigate(`${modePrefix}/${lang || 'eng'}/topic/${sub.name}`);
+      if (sub.name === 'neural_engine') {
+        navigate(`/studio/${lang || 'eng'}/neural`);
+      } else {
+        navigate(`${modePrefix}/${lang || 'eng'}/topic/${sub.name}`);
+      }
     }
   };
 
