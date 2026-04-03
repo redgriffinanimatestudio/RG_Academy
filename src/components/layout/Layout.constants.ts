@@ -39,6 +39,7 @@ export const DASHBOARD_MENUS: Record<string, any[]> = {
       { name: 'career_trajectory', icon: Target, subcategories: [{ name: 'skill_tree' }, { name: 'market_sync' }] }, 
       { name: 'certificate_vault', icon: ShieldCheck }, 
       { name: 'ai_mentor_node', icon: Zap },
+      { name: 'master_plan_roadmap', icon: Map },
       { name: 'workshop_archive', icon: Video }
     ] 
   }],

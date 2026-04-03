@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { StatCard, SectionHeader, GlassCard } from '../../../components/dashboard/shared/DashboardUI';
 import { academyService } from '../../../services/academyService';
+import NeuralRoadmap from '../../../components/dashboard/NeuralRoadmap';
 
 interface StudentDashboardProps {
   data?: any;
@@ -100,6 +101,7 @@ export default function StudentDashboard({
         >
           {activeView === 'overview' && <OverviewModule stats={stats} techStack={techStack} pipelines={activePipelines} certs={certifications} />}
           {activeView === 'career_trajectory' && <TrajectoryModule techStack={techStack} />}
+          {activeView === 'master_plan_roadmap' && <NeuralRoadmap activePathId="digital_architect" completedNodeIds={['art_hist']} />}
           {activeView === 'certificate_vault' && <VaultModule certs={certifications} />}
           {activeView === 'ai_mentor_node' && <AIMentorModule user={user} />}
           {activeView === 'workshop_archive' && <ArchiveModule />}
