@@ -67,22 +67,23 @@ if (Test-Path 'dist') {
 
 npx esbuild server.ts --bundle --platform=node --format=cjs --outfile=server-dist.cjs --external:fsevents --external:canvas --external:sharp --external:prisma --external:@prisma/client
 
-# [3/6] Export DB
-Write-Host '🗄️ Exporting Database...' -ForegroundColor Yellow
-docker exec $DB_CONTAINER mysqldump -u$LOCAL_DB_USER -p$LOCAL_DB_PASS $LOCAL_DB > $SQL_DUMP
+# [3/6] Export DB (SKIPPED - DOCKER DOWN)
+Write-Host '⚠️ Skipping Database Export (Docker Down)...' -ForegroundColor Red
+# docker exec $DB_CONTAINER mysqldump -u$LOCAL_DB_USER -p$LOCAL_DB_PASS $LOCAL_DB > $SQL_DUMP
+if (-Not (Test-Path $SQL_DUMP)) { New-Item -ItemType File -Path $SQL_DUMP -Value "-- Empty dump (Sync skipped)" | Out-Null }
 
 # [4/6] Creating Archive
 Write-Host '📦 Creating Archive...' -ForegroundColor Yellow
 Copy-Item -Recurse 'dist' ($BUILD_TEMP + '/dist')
 Copy-Item 'server-dist.cjs' ($BUILD_TEMP + '/server-dist.cjs')
 Copy-Item 'index.js' ($BUILD_TEMP + '/index.js')
+"v2.33-Neural-Fixed" | Out-File -FilePath ($BUILD_TEMP + '/VERSION') -Encoding utf8
 (Get-Content 'package.json') -replace '"type":\s*"module",\s*', '' | Out-File -FilePath ($BUILD_TEMP + '/package.json') -Encoding utf8
 if (Test-Path 'prisma') { Copy-Item -Recurse 'prisma' ($BUILD_TEMP + '/prisma') }
 
 New-Item -ItemType Directory -Force ($BUILD_TEMP + '/node_modules') | Out-Null
 if (Test-Path 'node_modules/@prisma') { Copy-Item -Recurse 'node_modules/@prisma' ($BUILD_TEMP + '/node_modules/') }
 if (Test-Path 'node_modules/.prisma') { Copy-Item -Recurse 'node_modules/.prisma' ($BUILD_TEMP + '/node_modules/') }
-if (Test-Path 'node_modules/prisma') { Copy-Item -Recurse 'node_modules/prisma' ($BUILD_TEMP + '/node_modules/') }
 
 if (Test-Path $DEPLOY_ZIP) { Remove-Item $DEPLOY_ZIP }
 Compress-Archive -Path ($BUILD_TEMP + '/*') -DestinationPath $DEPLOY_ZIP
@@ -90,26 +91,25 @@ Compress-Archive -Path ($BUILD_TEMP + '/*') -DestinationPath $DEPLOY_ZIP
 # [5/6] Upload
 Write-Host '🚀 Uploading to Hostinger...' -ForegroundColor Yellow
 $RemotePath = $SSH_USER + '@' + $SSH_HOST + ':' + $REMOTE_BASE + '/'
-scp -P $SSH_PORT $DEPLOY_ZIP $SQL_DUMP $RemotePath
+# Note: scp will ask for password if keys are not set
+scp -P $SSH_PORT $DEPLOY_ZIP $RemotePath
 
 # [6/6] Finalize Remote
-Write-Host '⚡ Finalizing v2.32 (Neural Identity Sync)...' -ForegroundColor Yellow
+Write-Host '⚡ Finalizing v2.33 (Neural Identity Sync)...' -ForegroundColor Yellow
 
 $C = 'cd __BASE__' + "`n"
 $C += 'echo "--- RESOURCE CLEANUP ---"' + "`n"
 $C += 'pkill -u __USER__ node ' + $OR + ' true' + "`n"
-$C += 'sleep 3' + "`n"
-$C += 'NODE_PATH=$(which node 2>/dev/null ' + $OR + ' echo "/opt/alt/alt-nodejs20/root/usr/bin/node")' + "`n"
-$C += 'mkdir -p nodejs public_html' + "`n"
-$C += 'rm -rf nodejs/dist public_html/dist' + "`n"
+$C += 'sleep 2' + "`n"
+$C += 'mkdir -p nodejs public_html logs' + "`n"
+$C += 'rm -rf nodejs/dist public_html/dist 2>/dev/null' + "`n"
 $C += 'unzip -o "__ZIP__" -d nodejs/' + "`n"
 $C += 'unzip -o "__ZIP__" -d public_html/' + "`n"
 $C += 'mv public_html/dist/* public_html/ 2>/dev/null ' + $OR + ' true' + "`n"
-$C += 'if [ -f "__SQL__" ]; then mysql -u __DBU__ -p"__DBP__" __DBN__ < __SQL__; fi' + "`n"
-$C += 'printf "DATABASE_URL=mysql://__DBU__:__DBP__@145.79.26.219:3306/__DBN__\nJWT_SECRET=super_secret_2026\nPORT=3000\nNODE_ENV=production" > nodejs/.env' + "`n"
+$C += 'printf "DATABASE_URL=mysql://__DBU__:__DBP__@127.0.0.1:3306/__DBN__\nJWT_SECRET=super_secret_2026\nPORT=3000\nNODE_ENV=production" > nodejs/.env' + "`n"
 $C += 'mkdir -p tmp ' + $AND + ' touch tmp/restart.txt' + "`n"
-$C += 'rm "__ZIP__" "__SQL__"' + "`n"
-$C += 'echo "✅ DEPLOY SUCCESSFUL"'
+$C += 'rm "__ZIP__"' + "`n"
+$C += 'echo "✅ DEPLOY SUCCESSFUL (v2.33)"'
 
 $REMOTE_COMMANDS = $C `
     -replace '__BASE__', $REMOTE_BASE `
