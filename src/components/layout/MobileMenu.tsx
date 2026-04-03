@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-do
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  X, Search, GraduationCap, Box, Users, ChevronDown, ChevronRight, LogIn, LogOut, Settings, Globe, Shield, ShoppingCart, Target 
+  X, Search, GraduationCap, Box, Users, ChevronDown, ChevronRight, LogIn, LogOut, Settings, Globe, Shield, ShoppingCart, Target, Cpu 
 } from 'lucide-react';
 import { PERSPECTIVES } from './Layout.constants';
 import { useAuth } from '../../context/AuthContext';
@@ -31,7 +31,7 @@ export default function MobileMenu({
   handleSetSub, activeSubName, modeColor, modeBg, modePrefix, cardClass,
   changeLanguage, currentLangCode, LANGUAGES
 }: MobileMenuProps) {
-  const { profile, activeRole, logout } = useAuth();
+  const { profile, activeRole, setActiveRole, logout } = useAuth();
   const { data: platformData } = usePlatform();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -130,29 +130,67 @@ export default function MobileMenu({
               </div>
 
 
-              {isDashboard && (
-                <div className="space-y-4 pt-4 border-t border-white/5">
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 px-2 mb-4">Command Perspectives</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {PERSPECTIVES.map((p) => {
-                      const isActive = (searchParams.get('perspective') === p.id) || (!searchParams.get('perspective') && p.id === 'admin');
-                      return (
-                        <Link
-                          key={p.id}
-                          to={getPerspectiveUrl(p.id)}
-                          onClick={onClose}
-                          className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${
-                            isActive 
-                              ? 'bg-white/10 border-white/20 text-white shadow-lg' 
-                              : 'bg-white/[0.02] border-white/5 text-white/40 hover:bg-white/5'
-                          }`}
-                        >
-                          <p.icon size={14} style={{ color: isActive ? p.color : 'inherit' }} />
-                          <span className="text-[9px] font-black uppercase tracking-widest truncate">{p.label}</span>
-                        </Link>
-                      );
-                    })}
+              {profile && (
+                <div className="space-y-6 pt-4 border-t border-white/5">
+                  <div className="flex items-center justify-between px-2 mb-4">
+                    <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20">Evolution Matrix</p>
+                    <div className="flex items-center gap-2">
+                        <div className="size-1 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[7px] font-bold text-emerald-500/60 uppercase tracking-widest">Neural Sync Active</span>
+                    </div>
                   </div>
+
+                  {/* 🧬 Identity Evolution Card */}
+                  <div className="relative group/evolution p-5 rounded-[2rem] bg-white/[0.03] border border-white/5 overflow-hidden transition-all hover:bg-white/[0.05] hover:border-white/10">
+                    <div className={`absolute top-0 right-0 p-4 opacity-5 group-hover/evolution:opacity-10 transition-opacity`}>
+                        <Target size={40} className={modeColor} />
+                    </div>
+                    
+                    <div className="flex flex-col gap-4 relative z-10">
+                      <div className="flex items-center gap-4">
+                        <div className={`size-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center ${modeColor}`}>
+                          {activeRole === 'admin' ? <Shield size={22} /> : activeRole === 'lecturer' ? <GraduationCap size={22} /> : activeRole === 'student' ? <Cpu size={22} /> : <Users size={22} />}
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-0.5">Current Role</span>
+                          <span className="text-sm font-black uppercase text-white truncate">{activeRole || 'Genesis'}</span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest">
+                          <span className="text-white/20">Experience Level</span>
+                          <span className={modeColor}>Level 01 Matrix</span>
+                        </div>
+                        <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                          <motion.div 
+                            initial={{ width: 0 }} 
+                            animate={{ width: profile.balance > 0 ? '60%' : '20%' }} 
+                            className={`h-full ${modeBg.replace('bg-', 'bg-')} shadow-[0_0_10px_rgba(0,245,212,0.3)]`} 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ⚡ Identity Switcher (Quick Access) */}
+                  {profile.roles && profile.roles.length > 1 && (
+                    <div className="grid grid-cols-1 gap-2 pt-2">
+                      <p className="text-[8px] font-black uppercase tracking-widest text-white/20 px-2">Switch Identity Path</p>
+                      <div className="flex flex-wrap gap-2 px-2">
+                        {profile.roles.filter((r: string) => r !== activeRole).map((r: string) => (
+                           <button 
+                             key={r}
+                             onClick={() => setActiveRole(r as any)}
+                             className="px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-[8px] font-black uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2"
+                           >
+                             <div className="size-1 rounded-full bg-white/20" />
+                             {r}
+                           </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

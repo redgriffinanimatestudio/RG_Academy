@@ -14,25 +14,37 @@ interface StatCardProps {
 
 export const StatCard = ({ label, value, icon: Icon, sub, trend, color = '#378add', className = '' }: StatCardProps) => (
   <motion.div 
-    whileHover={{ y: -10, scale: 1.02 }}
+    whileHover={{ y: -10 }}
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className={`p-10 rounded-[3rem] glass-industrial border border-white/5 space-y-4 group/stat hover:border-white/20 transition-all duration-500 shadow-2xl relative overflow-hidden ${className}`}
+    className={`p-10 rounded-[3rem] bg-[#0a0a0a]/80 backdrop-blur-3xl border border-white/5 space-y-4 group/stat hover:border-white/20 transition-all duration-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden ${className}`}
   >
-    <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:scale-110 group-hover:rotate-12 transition-all duration-700">
+    {/* ⚡ Neural Energy Pulse */}
+    <div className="absolute -inset-1 opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-transparent animate-pulse" />
+    </div>
+
+    <div className="absolute top-0 right-0 p-8 opacity-[0.05] group-hover:opacity-[0.1] group-hover:scale-110 group-hover:rotate-12 transition-all duration-700">
         <Icon size={120} style={{ color }} />
     </div>
     
     <div className="flex items-center justify-between relative z-10">
         <div className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 group-hover:text-white/40 transition-colors italic">{label}</div>
-        {trend === 'positive' && <div className="text-[8px] font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 shadow-sm shadow-emerald-500/10">↑ THRUST_LOG</div>}
+        {trend === 'positive' && (
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20">
+                <div className="size-1 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Symmetry High</span>
+            </div>
+        )}
     </div>
     
-    <div className="text-5xl font-black text-white tracking-tighter italic text-glow drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">{value}</div>
+    <div className="text-5xl font-black text-white tracking-tighter italic text-glow drop-shadow-[0_0_20px_rgba(255,255,255,0.1)] relative z-10">
+        {value}
+    </div>
     
     {sub && (
-      <div className="flex items-center gap-2 text-[9px] font-bold text-white/10 uppercase tracking-widest italic pt-2 group-hover:text-white/30 transition-colors">
-          <div className="size-1.5 rounded-full animate-pulse" style={{ backgroundColor: color }} /> {sub}
+      <div className="flex items-center gap-2 text-[9px] font-bold text-white/10 uppercase tracking-widest italic pt-2 group-hover:text-white/30 transition-colors relative z-10">
+          <div className="size-1.5 rounded-full shadow-[0_0_8px_currentColor]" style={{ backgroundColor: color, color }} /> {sub}
       </div>
     )}
   </motion.div>
@@ -48,13 +60,13 @@ export const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) =
   <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
     <header className="space-y-3">
       <div className="flex items-center gap-3">
-        <div className="h-[1px] w-12 bg-primary" />
+        <div className="h-[1px] w-12 bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]" />
         <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary/60 italic">Node Overview</span>
       </div>
-      <h2 className="text-5xl font-black uppercase tracking-tighter text-white italic leading-none lg:text-6xl">{title}</h2>
+      <h2 className="text-5xl font-black uppercase tracking-tighter text-white italic leading-none lg:text-7xl drop-shadow-[0_0_30px_rgba(255,255,255,0.05)]">{title}</h2>
       {subtitle && (
         <div className="text-white/20 text-[11px] font-black uppercase tracking-[0.4em] mt-2 flex items-center gap-3 italic">
-          <div className="size-1.5 rounded-full bg-primary/40 animate-pulse" />
+          <div className="size-1.5 rounded-full bg-primary/40 animate-pulse shadow-[0_0_8px_#00f5d4]" />
           {subtitle}
         </div>
       )}
@@ -84,14 +96,19 @@ export const GlassCard = ({ children, className = '', variant = 'glass', style, 
       onClick={onClick}
       className={`
         p-10 rounded-[3.5rem] border border-white/5 shadow-2xl relative overflow-hidden group
-        ${variant === 'dark' ? 'bg-[#050505]' : (variant === 'premium' ? 'glass-industrial matrix-grid-bg' : 'bg-white/[0.02]')} 
+        ${variant === 'dark' ? 'bg-[#050505]/90' : (variant === 'premium' ? 'bg-black/40 backdrop-blur-3xl' : 'bg-white/[0.015] backdrop-blur-2xl')} 
         ${onClick ? 'cursor-pointer' : ''}
         ${className}
       `}
     >
+      {/* 🔮 Matrix Grid Overlay (Premium Only) */}
       {isPremium && (
-        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
       )}
+      
+      {/* 🌈 Hover Glow Effect */}
+      <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+      
       <div className="relative z-10">
         {children}
       </div>

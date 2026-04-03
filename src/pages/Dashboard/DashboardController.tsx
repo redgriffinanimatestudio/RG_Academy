@@ -122,9 +122,17 @@ export default function DashboardController() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent transition-all duration-300">
+    <div className="min-h-screen bg-[#050505] transition-all duration-700 relative overflow-x-hidden">
+      {/* 🔮 Global Neural Grid & Radial Glows */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '100px 100px' }} />
+        <div className="absolute inset-0 bg-gradient-to-tr from-rose-900/10 via-transparent to-emerald-900/10" />
+        <div className="absolute top-0 right-0 size-[800px] bg-cyan-500/5 blur-[120px] -translate-y-1/2 translate-x-1/2 rounded-full" />
+        <div className="absolute bottom-0 left-0 size-[800px] bg-primary/5 blur-[120px] translate-y-1/2 -translate-x-1/2 rounded-full" />
+      </div>
+
       {/* Dynamic Content Wrapper: fluid padding and scaling */}
-      <div className="mx-auto w-full max-w-[1920px] px-4 sm:px-6 lg:px-8 xl:px-10 py-4 sm:py-8 lg:py-12">
+      <div className="mx-auto w-full max-w-[1920px] px-4 sm:px-6 lg:px-8 xl:px-10 py-4 sm:py-8 lg:py-12 relative z-10">
         
         {/* Identity Switcher - Horizontal Scroll on Mobile */}
         <div className="mb-6 sm:mb-10 overflow-x-auto no-scrollbar pb-2 sm:pb-0">
@@ -145,7 +153,7 @@ export default function DashboardController() {
         </div>
 
         {/* Responsive Dashboard View */}
-        <div className="animate-in fade-in duration-700">
+        <div className="animate-in fade-in slide-in-from-bottom-2 duration-1000">
           {DashboardView}
         </div>
       </div>

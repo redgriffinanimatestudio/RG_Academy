@@ -5,7 +5,7 @@ import {
   TrendingUp, Briefcase, CheckCircle2, Rocket, 
   Shield, Box, ChevronRight, Activity, BookOpen,
   Map, Lightbulb, History, MessageSquare, Send, Sparkles, AlertCircle,
-  ShieldCheck, Users, Target, Lock
+  ShieldCheck, Users, Target, Lock, UserCheck
 } from 'lucide-react';
 import { StatCard, SectionHeader, GlassCard } from '../../../components/dashboard/shared/DashboardUI';
 import { academyService } from '../../../services/academyService';
@@ -34,13 +34,59 @@ export default function StudentDashboard({
 
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-24">
-      <header>
-        <h1 className="text-4xl font-black uppercase tracking-tight text-white italic">
-           Student <span className="text-primary">{activeView === 'overview' ? 'Nexus Hub' : activeView.replace('_', ' ')}</span>
-        </h1>
-        <div className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mt-2 flex items-center gap-2">
-          <div className="size-1.5 rounded-full bg-primary animate-ping" />
-          Trajectory: Student-Node-Alpha-v5 • Status: Synchronized
+      <header className="relative">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="lg:col-span-7 space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 flex items-center gap-2">
+                <div className="size-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_#00f5d4]" />
+                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Neural Sync Active</span>
+              </div>
+              <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Latency: 14ms</span>
+            </div>
+            
+            <h1 className="text-6xl lg:text-8xl font-black uppercase tracking-tighter text-white italic leading-[0.8] drop-shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+               Student <span className="text-primary truncate">{activeView === 'overview' ? 'Nexus Hub' : activeView.replace('_', ' ')}</span>
+            </h1>
+
+            <div className="flex flex-wrap gap-6 items-center pt-4">
+              <div className="flex flex-col">
+                <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Protocol Version</span>
+                <span className="text-xs font-bold text-white uppercase italic">Alpha v5.37</span>
+              </div>
+              <div className="h-8 w-[1px] bg-white/5" />
+              <div className="flex flex-col">
+                <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Global Rank</span>
+                <span className="text-xs font-bold text-emerald-500 uppercase italic">Top 3% Specialist</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5">
+            <GlassCard variant="premium" className="!p-8 border-primary/20 relative group/matrix overflow-hidden">
+               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover/matrix:opacity-20 transition-opacity">
+                  <Target size={120} />
+               </div>
+               <div className="flex items-center gap-6 relative z-10">
+                  <div className="size-20 rounded-3xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shadow-[0_0_30px_rgba(0,245,212,0.2)]">
+                     <Cpu size={40} className="neural-pulse" />
+                  </div>
+                  <div className="space-y-2 flex-1">
+                     <div className="flex justify-between items-end">
+                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest italic">Evolution Progress</span>
+                        <span className="text-xs font-black text-white uppercase italic">Level 24</span>
+                     </div>
+                     <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                        <motion.div initial={{ width: 0 }} animate={{ width: '74%' }} className="h-full bg-gradient-to-r from-primary to-cyan-400 shadow-[0_0_15px_#00f5d4]" />
+                     </div>
+                     <div className="flex justify-between text-[8px] font-black text-primary/60 uppercase tracking-[0.2em] italic">
+                        <span>XP: 14,200 / 20,000</span>
+                        <span>Next Node: Architect</span>
+                     </div>
+                  </div>
+               </div>
+            </GlassCard>
+          </div>
         </div>
       </header>
 
@@ -229,54 +275,97 @@ function AIMentorModule({ user }: any) {
   const [msg, setMsg] = useState('');
   
   return (
-    <div className="lg:h-[700px] flex flex-col lg:flex-row gap-8">
-      <div className="lg:w-[400px] shrink-0 space-y-6">
-         <GlassCard className="h-full bg-primary/5 border-primary/20 flex flex-col justify-between p-10">
-            <div className="space-y-6">
-               <div className="size-16 bg-primary rounded-3xl flex items-center justify-center text-bg-dark shadow-[0_0_40px_rgba(var(--primary-rgb),0.3)]">
-                  <Sparkles size={32} />
+    <div className="lg:h-[750px] flex flex-col lg:flex-row gap-8">
+      <div className="lg:w-[420px] shrink-0 space-y-6">
+         <GlassCard className="h-full bg-primary/5 border-primary/20 flex flex-col justify-between p-12 relative overflow-hidden group">
+            {/* 🧿 Background Glow */}
+            <div className="absolute -top-24 -left-24 size-64 bg-primary/10 blur-[80px] rounded-full" />
+            
+            <div className="space-y-8 relative z-10">
+               <div className="size-20 bg-primary rounded-[2.5rem] flex items-center justify-center text-bg-dark shadow-[0_0_50px_rgba(0,245,212,0.4)] transition-transform group-hover:scale-110">
+                  <Sparkles size={38} className="animate-pulse" />
                </div>
-               <div className="space-y-2">
-                  <h3 className="text-2xl font-black uppercase tracking-tighter italic leading-none">RG <span className="text-primary">Oracle.</span></h3>
-                  <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.3em]">AI Trajectory Sync: ACTIVE</p>
+               <div className="space-y-3">
+                  <h3 className="text-4xl font-black uppercase tracking-tighter italic leading-none">Red <span className="text-primary">Oracle.</span></h3>
+                  <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.4em] flex items-center gap-2">
+                    <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                    AI Intelligence Node v7.2
+                  </p>
                </div>
-               <p className="text-[13px] text-zinc-400 font-medium leading-relaxed italic border-l-2 border-primary/20 pl-6 py-2">
-                  "Hello, {user?.displayName || 'Seeker'}. I am the platform's collective intelligence. Ask me about your roadmap, technical roadblocks, or career optimization."
-               </p>
+               <div className="p-6 bg-black/40 rounded-3xl border border-white/5 italic">
+                <p className="text-[14px] text-zinc-300 leading-relaxed font-medium">
+                    "Greetings, {user?.displayName || 'Citizen'}. Analysis of your neural trajectory indicates a 94% compatibility with Senior VFX workflows. How shall we optimize today?"
+                </p>
+               </div>
             </div>
-            <div className="space-y-4 pt-10">
-               <div className="text-[9px] font-black uppercase tracking-widest text-primary/60 border border-primary/10 px-4 py-2 rounded-xl text-center">98% Architectural Accuracy</div>
-               <button className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[9px] font-black uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center gap-3">
-                  <Activity size={14} /> View Data Insights
+            <div className="space-y-4 pt-12 relative z-10">
+               <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-center">
+                    <span className="block text-white/20 text-[8px] font-black uppercase tracking-widest mb-1">Knowledge Nodes</span>
+                    <span className="block text-white font-black italic">14.2k</span>
+                  </div>
+                  <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-center">
+                    <span className="block text-white/20 text-[8px] font-black uppercase tracking-widest mb-1">Global Precision</span>
+                    <span className="block text-primary font-black italic">99.8%</span>
+                  </div>
+               </div>
+               <button className="w-full py-5 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center gap-3 group/btn">
+                  <Activity size={16} className="group-hover/btn:text-primary transition-colors" /> View Full Analytics
                </button>
             </div>
          </GlassCard>
       </div>
 
-      <GlassCard className="flex-1 bg-[#0a0a0a] !p-0 flex flex-col overflow-hidden relative">
-         <div className="flex-1 p-10 overflow-y-auto space-y-8 no-scrollbar">
-            <div className="flex gap-6">
-               <div className="size-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0"><Sparkles size={18} /></div>
-               <div className="max-w-[70%] p-6 bg-primary/5 rounded-[2rem] rounded-tl-none border border-primary/10">
-                  <p className="text-xs text-zinc-300 leading-relaxed font-medium">Platform analysis complete. I see you've recently finished **Maya Foundations**. Would you like to proceed to **Advanced Rigging** or explore **Unreal Material Editor** next?</p>
+      <GlassCard className="flex-1 bg-[#070707]/90 !p-0 flex flex-col overflow-hidden relative border border-white/5 shadow-2xl">
+         {/* 📟 Terminal Overlay */}
+         <div className="absolute inset-0 pointer-events-none opacity-[0.03] z-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+         <div className="absolute inset-0 pointer-events-none z-20 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]" />
+         
+         <div className="flex-1 p-12 overflow-y-auto space-y-10 no-scrollbar relative z-10 font-mono">
+            {/* AI Response */}
+            <div className="flex gap-8">
+               <div className="size-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 shadow-[0_0_15px_rgba(0,245,212,0.2)]">
+                  <Cpu size={22} />
+               </div>
+               <div className="max-w-[85%] space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Oracle Node</span>
+                    <div className="h-[1px] flex-1 bg-primary/20" />
+                  </div>
+                  <div className="p-8 bg-primary/5 rounded-[2.5rem] rounded-tl-none border border-primary/10">
+                    <p className="text-[14px] text-zinc-300 leading-relaxed">System scan complete. I've detected a significant performance delta in your **Material Shader** nodes. We are missing **Ray-Traced Refraction** mastery. Shall we initialize Training Phase 3?</p>
+                  </div>
                </div>
             </div>
-            <div className="flex gap-6 justify-end">
-               <div className="max-w-[70%] p-6 bg-white/5 rounded-[2rem] rounded-tr-none border border-white/10">
-                  <p className="text-xs text-zinc-300 leading-relaxed font-medium">Analyze my Unreal Engine skills and tell me what's missing for a Lead role.</p>
+
+            {/* User Response */}
+            <div className="flex gap-8 justify-end">
+               <div className="max-w-[80%] space-y-4 text-right">
+                  <div className="flex items-center gap-3 justify-end">
+                    <div className="h-[1px] flex-1 bg-white/10" />
+                    <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Authorized User</span>
+                  </div>
+                  <div className="p-8 bg-white/5 rounded-[2.5rem] rounded-tr-none border border-white/10">
+                    <p className="text-[14px] text-zinc-300 leading-relaxed font-mono">Initialize Training Node: Ray-Traced Optix v4. Check potential bottlenecks.</p>
+                  </div>
                </div>
-               <div className="size-10 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white/40 shrink-0"><Users size={18} /></div>
+               <div className="size-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white/40 shrink-0">
+                  <UserCheck size={22} />
+               </div>
             </div>
          </div>
 
-         <div className="p-8 bg-black/40 border-t border-white/5">
-            <div className="relative">
+         <div className="p-10 bg-black/60 border-t border-white/5 relative z-30">
+            <div className="relative group/input">
+               <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-white/20 group-focus-within/input:text-primary transition-colors">
+                  <Send size={18} />
+               </div>
                <input 
                  value={msg} onChange={(e) => setMsg(e.target.value)}
-                 className="w-full bg-[#111] border border-white/10 rounded-[2rem] py-6 pl-8 pr-32 text-xs font-medium text-white placeholder:text-white/20 outline-none focus:border-primary/40 transition-all"
-                 placeholder="Input node query..." 
+                 className="w-full bg-[#111]/80 backdrop-blur-xl border border-white/10 rounded-[2.2rem] py-7 pl-16 pr-36 text-sm font-medium text-white placeholder:text-white/10 outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all font-mono"
+                 placeholder="Input node identity query..." 
                />
-               <button className="absolute right-4 top-1/2 -translate-y-1/2 px-8 py-3 bg-primary text-bg-dark rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg active:scale-95">Send</button>
+               <button className="absolute right-4 top-1/2 -translate-y-1/2 px-10 py-4 bg-primary text-bg-dark rounded-2xl text-[11px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary/20 hover:shadow-primary/40 active:scale-95">Execute</button>
             </div>
          </div>
       </GlassCard>
