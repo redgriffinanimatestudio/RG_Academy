@@ -48,8 +48,8 @@ export default function Sidebar({
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <Box size={40} className={modeColor} />
                 </div>
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2 text-data-glow">Genesis Guide</h4>
-                <p className="text-[11px] font-bold text-white mb-4 leading-relaxed">Join the Red Griffin Creative Ecosystem to unlock professional nodes.</p>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2 text-data-glow">{t('origins_codex') || 'Origins Codex'}</h4>
+                <p className="text-[11px] font-bold text-white mb-4 leading-relaxed">Join the Red Griffin Sovereignty to unlock sacred Vessels.</p>
                 <div className="space-y-2">
                   <div 
                     onClick={onOpenGuide}

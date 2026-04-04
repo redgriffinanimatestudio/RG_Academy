@@ -193,16 +193,33 @@ const Login: React.FC = () => {
         <div className="bg-[#0f0f0f] border border-white/5 rounded-[3rem] p-10 lg:p-14 shadow-2xl space-y-10">
           
           <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center size-20 rounded-[2rem] bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 text-primary shadow-2xl shadow-primary/20">
+            <div className="inline-flex items-center justify-center size-20 rounded-[2rem] bg-gradient-to-br from-red-700/20 to-red-700/5 border border-red-700/20 text-red-600 shadow-2xl shadow-red-700/20">
               {mode === 'fast' ? <Zap size={36} /> : mode === 'register' ? <UserPlus size={36} /> : <LogIn size={36} />}
             </div>
             <div className="space-y-1">
               <h2 className="text-4xl font-black uppercase tracking-tight text-white italic">
-                {mode === 'onboarding' ? 'Finalize Profile' : mode === 'fast' ? 'Fast Access' : mode === 'register' ? 'Join Grid' : 'Welcome back'}
+                {mode === 'onboarding' ? t('finalize_profile') : mode === 'fast' ? t('fast_access') : mode === 'register' ? t('identity_forge') : t('node_connect')}
               </h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">Red Griffin Ecosystem Node</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">{t('reg_protocol')}</p>
             </div>
           </div>
+
+          {/* Sub-Header Branding Area (Sovereignty Verification Zone) */}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 backdrop-blur-sm flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="size-10 rounded-2xl bg-red-600/10 flex items-center justify-center border border-red-600/20">
+                <Shield size={18} className="text-red-600" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="text-[10px] font-black text-white/40 uppercase tracking-widest">{t('crimson_sanctum')}</div>
+                <div className="text-[9px] font-black text-red-600 uppercase tracking-tighter">{t('vessel_v3_active')}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="size-2 rounded-full bg-red-600 animate-pulse shadow-[0_0_10px_#dc2626]" />
+              <div className="text-[8px] font-black text-red-600 uppercase tracking-widest">{t('neural_sync_active')}</div>
+            </div>
+          </motion.div>
 
           {/* Mode Switcher */}
           {mode !== 'onboarding' && (

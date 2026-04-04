@@ -99,6 +99,22 @@ const resources = {
       verified_mentors: 'Verified Mentors',
       artist_tiers: 'Artist Tiers',
       my_dashboard: 'My Dashboard',
+      
+      // Sovereignty Mythology (Registration)
+      node_connect: 'Vessel Resonator',
+      identity_forge: 'Identity Forge',
+      reg_protocol: 'RED GRIFFIN EDICT V5.2',
+      join_grid: 'ENTER THE SOVEREIGNTY',
+      neural_sync_active: 'Aether Sync Active',
+      establish_identity: 'Seal the Covenant',
+      vessel_v3_active: 'Vessel Resonance v3.11',
+      crimson_sanctum: 'Crimson Sanctum',
+      celestial_weave: 'Celestial Weave',
+      blood_codec: 'Blood-Codec Ritual',
+      aether_signature: 'Aether Signature',
+      void_cipher: 'Void Cipher',
+      soul_sigil: 'Soul Sigil',
+      altar_connect: 'Altar Connect',
 
       // Dashboard Roles & Menus
       learning_dashboard: 'Learning Dashboard',
@@ -527,6 +543,22 @@ const resources = {
       verified_mentors: 'Верифицированные менторы',
       artist_tiers: 'Уровни художников',
       my_dashboard: 'Мой Дашборд',
+      
+      // Мифология Суверенитета (Регистрация)
+      node_connect: 'Резонатор Сосуда',
+      identity_forge: 'Кузница Сущности',
+      reg_protocol: 'ЭДИКТ КРАСНОГО ГРИФОНА V5.2',
+      join_grid: 'ВОЙТИ В СУВЕРЕНИТЕТ',
+      neural_sync_active: 'Эфирный Синхрон Активен',
+      establish_identity: 'Скрепить Завет',
+      vessel_v3_active: 'Резонанс Сосуда v3.11',
+      crimson_sanctum: 'Малиновый Санктум',
+      celestial_weave: 'Неbesnoye сплетение',
+      blood_codec: 'Ритуал Кровавого Кодека',
+      aether_signature: 'Эфирный Сигнатура',
+      void_cipher: 'Шифр Пустоты',
+      soul_sigil: 'Печать Души',
+      altar_connect: 'Связь с Алтарем',
 
       // Dashboard Roles & Menus
       learning_dashboard: 'Панель Обучения',
