@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { MASTER_PLAN_DATA, SovereignPath, RoadmapNode } from '../../data/MasterPlanData';
 import { useTranslation } from 'react-i18next';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const TypingText = ({ text, className = "" }: { text: string; className?: string }) => {
   return (
@@ -45,6 +46,8 @@ interface NeuralRoadmapProps {
 
 export default function NeuralRoadmap({ activePathId, completedNodeIds }: NeuralRoadmapProps) {
   const { t } = useTranslation();
+  const { lang } = useParams();
+  const navigate = useNavigate();
   const path = MASTER_PLAN_DATA.find(p => p.id === activePathId) || MASTER_PLAN_DATA[0];
   const [selectedNode, setSelectedNode] = useState<RoadmapNode | null>(null);
 
@@ -166,8 +169,12 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                      </div>
                   </div>
 
-                  <button className={`w-full h-16 rounded-2xl font-black uppercase tracking-[0.4em] text-[10px] transition-all flex items-center justify-center gap-3 ${selectedNode.workshopId ? 'bg-primary text-bg-dark hover:brightness-125' : 'bg-white text-bg-dark hover:bg-white/90'}`}>
-                     {selectedNode.workshopId ? t('terminal_initiate_workshop', 'Initialize_Workshop_Sync') : t('terminal_mastery_sequence')} <Sparkles size={14} />
+                  <button 
+                     onClick={() => selectedNode.workshopId && navigate(`/aca/${lang || 'eng'}/course/${selectedNode.workshopId}`)}
+                     className={`w-full h-16 rounded-2xl font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-[10px] md:text-xs transition-all flex items-center justify-center gap-3 ${selectedNode.workshopId ? 'bg-primary text-bg-dark hover:scale-[1.02] shadow-[0_20px_50px_-20px_rgba(var(--primary-rgb),0.5)]' : 'bg-white/5 border border-white/10 text-white/40 cursor-not-allowed'}`}
+                     disabled={!selectedNode.workshopId}
+                  >
+                     {selectedNode.workshopId ? t('roadmap_start_learning', 'Start_Learning') : t('roadmap_in_development', 'Module_In_Development')} <Sparkles size={14} className={selectedNode.workshopId ? '' : 'opacity-0'} />
                   </button>
                </motion.div>
              ) : (

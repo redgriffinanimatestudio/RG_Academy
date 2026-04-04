@@ -84,8 +84,8 @@ export const MASTER_PLAN_DATA: SovereignPath[] = [
       {
         name: 'phase_tech',
         nodes: [
-          { id: 'ue5_engine', name: 'UE5: Neural_Engine', phase: 'tech', duration: '150h', difficulty: 'specialist', software: ['Unreal Engine 5'], description: 'Mastering Nanite, Lumen, and Blueprint logic.' },
-          { id: 'substance_3d', name: 'Substance: PBR_Mastery', phase: 'tech', duration: '80h', difficulty: 'master', software: ['Substance Painter/Designer'], description: 'Procedural texturing and industrial PBR workflows.' }
+          { id: 'env_ue5_core', name: 'UE5: Nanite_Lumen Core', phase: 'tech', duration: '120h', difficulty: 'specialist', software: ['Unreal Engine'], description: 'Mastering the industrial standards for real-time high-fidelity environments.', workshopId: 'unreal-engine-masterclass' },
+          { id: 'env_procedural', name: 'Houdini: Procedural_Gen', phase: 'tech', duration: '90h', difficulty: 'master', software: ['Houdini'], description: 'Building procedural tools and assets for infinite world generation.' }
         ]
       },
       {

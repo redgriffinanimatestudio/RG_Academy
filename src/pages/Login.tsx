@@ -173,7 +173,8 @@ const Login: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      const signature = Buffer.from(`SIGNED_BY_${formData.email}_AT_${Date.now()}`).toString('base64');
+      // Browser-native base64 encoding (Buffer.from is not available in browsers)
+      const signature = btoa(unescape(encodeURIComponent(`SIGNED_BY_${formData.email}_AT_${Date.now()}`)));
       const payload = {
         ...formData,
         role: formData.selectedRole,
@@ -199,7 +200,8 @@ const Login: React.FC = () => {
       sessionStorage.removeItem('rg_reg_data');
       sessionStorage.removeItem('rg_reg_step');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Registration failed');
+      console.error('❌ [REGISTRATION] Failure during final submission:', err);
+      setError(err.response?.data?.error || 'Registration failed: Internal Server Error or Connection Issue');
     } finally {
       setIsLoading(false);
     }
