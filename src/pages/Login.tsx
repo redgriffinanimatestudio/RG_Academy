@@ -243,39 +243,13 @@ const Login: React.FC = () => {
           <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none select-none">
             <Binary size={500} className="text-white -rotate-12 translate-x-[-100px]" />
           </div>
-          <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-12 relative">
-            <div className="relative group/zap inline-block">
-                <div className="absolute inset-0 bg-red-600 blur-3xl opacity-20 group-hover/zap:opacity-50 transition-opacity" />
-                <div className="size-20 rounded-[2.5rem] bg-red-700 flex items-center justify-center relative shadow-[0_0_50px_rgba(185,28,28,0.4)] transition-transform group-hover/zap:scale-110 duration-700">
-                   <Zap size={38} className="text-white fill-white animate-pulse" />
-                </div>
-            </div>
+          {/* Sidebar content removed - moved to Main Content as per UI/UX optimization */}
+          <div className="hidden lg:block relative space-y-12 opacity-20 hover:opacity-40 transition-opacity duration-1000">
             <div className="space-y-4">
-              <h1 className="text-5xl sm:text-6xl font-black uppercase tracking-tighter text-white leading-[0.9] italic">
-                Red<br/><span className="text-red-700">Griffin</span> Academy
-              </h1>
-              <div className="flex items-center gap-3">
-                  <div className="h-[2px] w-8 bg-red-600" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.6em] text-white/30">Neural Hub v2.37</p>
-              </div>
+              <div className="h-[2px] w-12 bg-red-600/30" />
+              <p className="text-[10px] font-black uppercase tracking-[1em] text-white/10 italic">Red Griffin Sanctum</p>
             </div>
-            <div className="space-y-6 pt-6">
-              {[
-                { icon: Shield, color: 'text-red-600', label: 'Identity Protocol', desc: 'Secure Node Access' },
-                { icon: Globe, color: 'text-emerald-500', label: 'Global Grid', desc: 'Synchronized Network' }
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-5">
-                  <div className="size-11 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover/item:border-white/20 transition-all">
-                      <item.icon size={20} className={item.color} />
-                  </div>
-                  <div className="space-y-0.5">
-                      <span className="block text-[10px] font-black uppercase tracking-widest text-white/60">{item.label}</span>
-                      <span className="block text-[9px] font-bold text-white/20 uppercase tracking-widest">{item.desc}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Main Content */}
@@ -294,10 +268,10 @@ const Login: React.FC = () => {
                 </div>
                 <div className="space-y-4">
                   <h2 className="text-5xl font-black uppercase tracking-tighter text-white">Congratulations</h2>
-                  <p className="text-[12px] font-black uppercase tracking-[0.5em] text-emerald-500 italic">Identity Synchronized Successfuly</p>
+                  <p className="text-[12px] font-black uppercase tracking-[0.5em] text-emerald-500 italic">Identity Resonated Successfully</p>
                 </div>
                 <div className="flex flex-col items-center gap-4">
-                  <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Handshaking Secure Tunnel...</span>
+                  <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Opening Secure Altar...</span>
                   <div className="w-56 h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
                     <motion.div initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 2.5 }} className="h-full bg-emerald-500 shadow-[0_0_15px_#10b981]" />
                   </div>
@@ -305,8 +279,8 @@ const Login: React.FC = () => {
               </motion.div>
             ) : (
               <motion.div key="form-container" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex-1 flex flex-col h-full">
-                <div className="flex items-center gap-6 mb-16">
-                  <div className={`p-4 rounded-[1.8rem] transition-all duration-700 ${mode === 'login' ? 'bg-red-700 text-white shadow-[0_0_50px_rgba(185,28,28,0.5)]' : 'bg-white/5 text-white/40 hover:text-white'}`}>
+                <div className="flex items-center gap-6 mb-12">
+                  <div className={`p-4 rounded-[1.8rem] transition-all duration-700 ${mode === 'login' ? 'bg-red-700 text-white shadow-[0_0_50px_rgba(185,28,28,0.5)]' : 'bg-white/10 text-white/40 hover:text-white'}`}>
                     <LogIn size={26} />
                   </div>
                   <div>
@@ -317,27 +291,49 @@ const Login: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Sub-Header Branding Area (Blue Rectangle Zone) */}
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 p-6 rounded-3xl bg-white/[0.02] border border-white/5 backdrop-blur-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="size-10 rounded-2xl bg-red-600/10 flex items-center justify-center border border-red-600/20">
+                      <Shield size={18} className="text-red-600" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <span className="block text-[9px] font-black uppercase tracking-widest text-white/60">Blood-Codec Ritual</span>
+                      <span className="block text-[8px] font-bold text-white/20 uppercase tracking-widest italic">Secure Vessel Access</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="size-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                      <Globe size={18} className="text-emerald-500" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <span className="block text-[9px] font-black uppercase tracking-widest text-white/60">Celestial Weave</span>
+                      <span className="block text-[8px] font-bold text-white/20 uppercase tracking-widest italic">Attuned Network</span>
+                    </div>
+                  </div>
+                </motion.div>
+
                 <AnimatePresence mode="wait">
                   {mode === 'login' ? (
                     <motion.div key="login-shard" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10 flex-1 flex flex-col justify-center">
                       {isLoading ? (
                         <div className="py-20 flex flex-col items-center justify-center space-y-8">
-                          <Preloader message="Authenticating Node..." size="md" />
-                          <div className="text-[10px] font-black uppercase text-red-500/40 tracking-[0.4em] animate-pulse">Establishing Uplink</div>
+                          <Preloader message="Communing with Soul Sigil..." size="md" />
+                          <div className="text-[10px] font-black uppercase text-red-500/40 tracking-[0.4em] animate-pulse">Establishing Aetheric Link</div>
                         </div>
                       ) : (
                         <form onSubmit={handleLogin} className="space-y-8">
                           <div className="space-y-6">
-                            <InputWithStatus id="login-email" label="Access Key" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} placeholder="NODE_ID@PROTOCOL" hint="Unified identification string" status={emailStatus} icon={<User size={18} />} required />
-                            <InputWithStatus id="login-password" label="Encryption Key" type="password" value={formData.password} onChange={(e) => handleInputChange('password', e.target.value)} placeholder="••••••••" hint="Neural secure passkey" icon={<Lock size={18} />} required />
+                            <InputWithStatus id="login-email" label="Soul Sigil" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} placeholder="VESSEL_ID@PROTOCOL" hint="Unified essence signature" status={emailStatus} icon={<User size={18} />} required />
+                            <InputWithStatus id="login-password" label="Void Cipher" type="password" value={formData.password} onChange={(e) => handleInputChange('password', e.target.value)} placeholder="••••••••" hint="Aetheric secure passkey" icon={<Lock size={18} />} required />
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <button type="submit" disabled={isLoading} className="bg-red-700 text-white py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-red-600 transition-all hover:scale-[1.02] shadow-[0_0_40px_rgba(185,28,28,0.3)] flex items-center justify-center gap-3 group relative overflow-hidden">
-                              <span className="relative z-10">Authorize Node</span>
+                              <span className="relative z-10">Attune Vessel</span>
                               <ChevronRight size={16} className="relative z-10 group-hover:translate-x-1 transition-transform" />
                             </button>
                             <button type="button" onClick={() => setMode('register')} className="bg-white/5 border border-white/5 text-white/50 py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-3">
-                               Forge Identity <UserPlus size={16} />
+                               Awaken Essence <UserPlus size={16} />
                             </button>
                           </div>
                         </form>
