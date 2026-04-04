@@ -114,20 +114,23 @@ scp -P $SSH_PORT $DEPLOY_ZIP $RemotePath
 # [6/6] Finalize Remote
 Write-Host '⚡ Finalizing v2.36 (Neural Sync + Schema Patch)...' -ForegroundColor Yellow
 
-$C = 'cd __BASE__' + "`n"
+$C = 'cd __BASE__ ' + $OR + ' (echo "❌ FAILED TO ENTER __BASE__" ' + $AND + ' exit 1)' + "`n"
+$C += 'echo "--- REMOTE DIAGNOSTICS ---"' + "`n"
+$C += 'pwd' + "`n"
+$C += 'ls -la __ZIP__ ' + $OR + ' echo "⚠️ __ZIP__ MISSING"' + "`n"
 $C += 'echo "--- RESOURCE CLEANUP ---"' + "`n"
 $C += 'pkill -u __USER__ node ' + $OR + ' true' + "`n"
 $C += 'sleep 2' + "`n"
 $C += 'mkdir -p nodejs public_html logs' + "`n"
 $C += 'rm -rf nodejs/dist public_html/dist 2>/dev/null' + "`n"
-$C += 'unzip -o "__ZIP__" -d nodejs/' + "`n"
-$C += 'unzip -o "__ZIP__" -d public_html/' + "`n"
+$C += 'unzip -q -o "__ZIP__" -d nodejs/' + "`n"
+$C += 'unzip -q -o "__ZIP__" -d public_html/' + "`n"
 $C += 'mv public_html/dist/* public_html/ 2>/dev/null ' + $OR + ' true' + "`n"
 $C += 'echo "--- APPLYING SCHEMA PATCH v2.36 ---"' + "`n"
 $C += 'mysql -u __DBU__ -p"__DBP__" __DBN__ < nodejs/update_v2.35.sql ' + $OR + ' echo "⚠️ SQL Patch Warning: Partial failure or columns already exist."' + "`n"
 $C += 'mkdir -p tmp ' + $AND + ' touch tmp/restart.txt' + "`n"
 $C += 'rm "__ZIP__"' + "`n"
-$C += 'echo "✅ DEPLOY SUCCESSFUL (v2.36-Neural-Optimized)"'
+$C += 'echo "✅ DEPLOY SUCCESSFUL (v2.36-Mythology-Synchronized)"'
 
 $REMOTE_COMMANDS = $C `
     -replace '__BASE__', $REMOTE_BASE `
