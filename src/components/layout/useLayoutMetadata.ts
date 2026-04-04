@@ -26,7 +26,10 @@ export function useLayoutMetadata(profile: any, activeRole: string | null) {
   const baseCategories = isCommunity ? COMMUNITY_CATEGORIES : (isStudio ? STUDIO_CATEGORIES : ACADEMY_CATEGORIES);
 
   const navData = useMemo(() => {
-    if (!profile || !activeRole) return { dashboardCategories: [], baseCategories };
+    // If the user just logged in but role isn't set, default to student for visualization
+    const effectiveRole = activeRole || (profile ? 'student' : null);
+    
+    if (!profile || !effectiveRole) return { dashboardCategories: [], baseCategories };
     
     let dashboardCategories: any[] = [];
 
@@ -50,9 +53,9 @@ export function useLayoutMetadata(profile: any, activeRole: string | null) {
           subcategories: expandedSubcategories
         }
       ];
-    } else if (DASHBOARD_MENUS[activeRole]) {
+    } else if (DASHBOARD_MENUS[effectiveRole]) {
       // IF ROLE: Map its dashboard structure
-      const roleHub = DASHBOARD_MENUS[activeRole][0];
+      const roleHub = DASHBOARD_MENUS[effectiveRole][0];
       dashboardCategories = [
         {
           ...roleHub,

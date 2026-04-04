@@ -68,6 +68,22 @@ export default function AcademyPage() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+  
+  const handlePathComplete = async (id: string) => {
+    setActivePathId(id);
+    
+    // Industrial Oversight: If user is logged in, persist the choice
+    if (profile) {
+      try {
+        console.log(`[Academy] Persisting chosen path: ${id} for student ecosystem.`);
+        await academyService.updateUserPath(id);
+        // We don't necessarily NEED a full reload here, just active state is fine
+        // but we assume the backend now has it.
+      } catch (err) {
+        console.error("Failed to synchronize soul path with master grid:", err);
+      }
+    }
+  };
 
   const safeCourses = Array.isArray(courses) ? courses : [];
 
@@ -112,9 +128,9 @@ export default function AcademyPage() {
                      initial={{ opacity: 0, y: 20 }}
                      animate={{ opacity: 1, y: 0 }}
                      exit={{ opacity: 0, scale: 0.95 }}
-                  >
-                     <NeuralPathfinder onComplete={(id) => setActivePathId(id)} />
-                  </motion.div>
+                   >
+                      <NeuralPathfinder onComplete={handlePathComplete} />
+                   </motion.div>
                ) : (
                   <motion.div
                      key="roadmap"
@@ -125,6 +141,7 @@ export default function AcademyPage() {
                      <NeuralRoadmap 
                         activePathId={activePathId} 
                         completedNodeIds={[]} 
+                        isGuest={!profile}
                      />
                      <div className="flex justify-center">
                         <button 

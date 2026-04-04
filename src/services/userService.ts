@@ -33,7 +33,15 @@ export interface UserProfile {
   isSupport: boolean;
   isAdmin: boolean;
   balance: number; // Phase 6.2 Ledger
+  isOnboarded?: boolean;
   bio?: string;
+  country?: string | null;
+  citizenship?: string | null;
+  linkedInUrl?: string | null;
+  telegramHandle?: string | null;
+  portfolioUrl?: string | null;
+  gender?: string | null;
+  dateOfBirth?: string | Date | null;
   createdAt: any;
   updatedAt?: any;
 }

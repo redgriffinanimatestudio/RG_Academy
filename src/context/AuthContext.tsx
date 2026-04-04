@@ -51,6 +51,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isSupport: dbUser.isSupport,
       balance: dbUser.balance || 0, // Phase 6.2 Financial Bridge
       isOnboarded: dbUser.isOnboarded, // v2.29 Legal Protocol flag
+      bio: dbUser.profile?.bio,
+      country: dbUser.profile?.country,
+      citizenship: dbUser.profile?.citizenship,
+      linkedInUrl: dbUser.profile?.linkedInUrl,
+      telegramHandle: dbUser.profile?.telegramHandle,
+      portfolioUrl: dbUser.profile?.portfolioUrl,
+      gender: dbUser.profile?.gender,
+      dateOfBirth: dbUser.profile?.dateOfBirth,
       createdAt: dbUser.createdAt
     };
     console.log("[AUTH] Mapped Profile:", profile);

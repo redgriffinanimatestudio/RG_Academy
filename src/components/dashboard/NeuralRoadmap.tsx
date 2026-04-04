@@ -7,11 +7,10 @@ import {
   Circle, 
   CheckCircle2, 
   Lock, 
-  Map, 
+  Compass,
   Clock, 
   Cpu, 
   CpuIcon,
-  Compass,
   Sparkles
 } from 'lucide-react';
 import { MASTER_PLAN_DATA, SovereignPath, RoadmapNode } from '../../data/MasterPlanData';
@@ -40,11 +39,12 @@ const TypingText = ({ text, className = "" }: { text: string; className?: string
 };
 
 interface NeuralRoadmapProps {
-  activePathId: string;
-  completedNodeIds: string[];
+  activePathId?: string;
+  completedNodeIds?: string[];
+  isGuest?: boolean;
 }
 
-export default function NeuralRoadmap({ activePathId, completedNodeIds }: NeuralRoadmapProps) {
+export default function NeuralRoadmap({ activePathId, completedNodeIds = [], isGuest = false }: NeuralRoadmapProps) {
   const { t } = useTranslation();
   const { lang } = useParams();
   const navigate = useNavigate();
@@ -53,13 +53,14 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
 
   return (
     <div className="min-h-[calc(100dvh-5rem)] md:min-h-screen py-2 md:py-12 space-y-8 md:space-y-12">
-      <header className="flex items-center justify-between">
-         <div className="space-y-1">
-            <div className="flex items-center gap-3">
-               <Map className="size-4 text-primary" />
+      <header className="flex flex-col md:flex-row items-center justify-between gap-6">
+         <div className="space-y-1 text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start gap-3">
+               <Compass className="size-4 text-primary" />
                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60">Neural_Roadmap_v4.1</span>
+               {isGuest && <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[8px] font-black uppercase text-white/40 tracking-widest italic">{t('guest_preview')}</span>}
             </div>
-            <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white italic">{t('master_plan_active_sovereignty')}.</h2>
+            <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-white italic">{isGuest ? 'Sovereignty Preview' : t('master_plan_active_sovereignty')}.</h2>
          </div>
          <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center gap-4">
             <path.icon className="size-6 text-primary" />
@@ -170,11 +171,17 @@ export default function NeuralRoadmap({ activePathId, completedNodeIds }: Neural
                   </div>
 
                   <button 
-                     onClick={() => selectedNode.workshopId && navigate(`/aca/${lang || 'eng'}/course/${selectedNode.workshopId}`)}
-                     className={`w-full h-16 rounded-2xl font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-[10px] md:text-xs transition-all flex items-center justify-center gap-3 ${selectedNode.workshopId ? 'bg-primary text-bg-dark hover:scale-[1.02] shadow-[0_20px_50px_-20px_rgba(var(--primary-rgb),0.5)]' : 'bg-white/5 border border-white/10 text-white/40 cursor-not-allowed'}`}
-                     disabled={!selectedNode.workshopId}
+                     onClick={() => {
+                        if (isGuest) {
+                           navigate(`/aca/${lang || 'eng'}/login`);
+                        } else if (selectedNode.workshopId) {
+                           navigate(`/aca/${lang || 'eng'}/course/${selectedNode.workshopId}`);
+                        }
+                     }}
+                     className={`w-full h-16 rounded-2xl font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-[10px] md:text-xs transition-all flex items-center justify-center gap-3 ${selectedNode.workshopId || isGuest ? 'bg-primary text-bg-dark hover:scale-[1.02] shadow-[0_20px_50px_-20px_rgba(var(--primary-rgb),0.5)]' : 'bg-white/5 border border-white/10 text-white/40 cursor-not-allowed'}`}
+                     disabled={!selectedNode.workshopId && !isGuest}
                   >
-                     {selectedNode.workshopId ? t('roadmap_start_learning', 'Start_Learning') : t('roadmap_in_development', 'Module_In_Development')} <Sparkles size={14} className={selectedNode.workshopId ? '' : 'opacity-0'} />
+                     {isGuest ? 'Resonate with the Grid' : selectedNode.workshopId ? t('roadmap_start_learning', 'Start_Learning') : t('roadmap_in_development', 'Module_In_Development')} <Sparkles size={14} className={selectedNode.workshopId || isGuest ? '' : 'opacity-0'} />
                   </button>
                </motion.div>
              ) : (

@@ -9,6 +9,13 @@ export interface Profile {
   bio?: string;
   avatar?: string;
   location?: string;
+  country?: string | null;
+  citizenship?: string | null;
+  linkedInUrl?: string | null;
+  telegramHandle?: string | null;
+  portfolioUrl?: string | null;
+  gender?: string | null;
+  dateOfBirth?: string | Date | null;
   skills: { name: string }[];
   portfolio: any[];
   roles: string[];

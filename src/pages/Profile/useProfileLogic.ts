@@ -24,7 +24,7 @@ export function useProfileLogic() {
 
   const handleStartChat = async () => {
     if (!user || !id) {
-      alert.showError('Please login to send messages');
+      alert.showAlert({ type: 'error', message: 'Please login to send messages' });
       return;
     }
 
@@ -34,14 +34,14 @@ export function useProfileLogic() {
       const validation = await networkingService.validateChatAccess(id, token);
 
       if (!validation.canMessage) {
-        alert.showError(validation.error || 'Access denied');
+        alert.showAlert({ type: 'error', message: validation.error || 'Access denied' });
         return;
       }
 
       const prefix = isStudio ? '/studio' : '/aca';
       navigate(`${prefix}/${lang || 'eng'}/messages?userId=${id}`);
     } catch (e) {
-      alert.showError('Failed to validate messaging rights');
+      alert.showAlert({ type: 'error', message: 'Failed to validate messaging rights' });
     } finally {
       setIsValidating(false);
     }
@@ -79,14 +79,21 @@ export function useProfileLogic() {
           id: currentUid,
           userId: currentUid,
           bio: (currentUserProfile as any).bio || t('default_bio', 'Professional CG Specialist in the Red Griffin Ecosystem.'),
-          location: 'Remote',
+          location: currentUserProfile.country || 'Remote',
           skills: [],
           portfolio: [],
           roles: currentUserProfile.roles || [],
           user: {
             displayName: currentUserProfile.displayName || 'User',
             photoURL: currentUserProfile.photoURL || undefined
-          }
+          },
+          country: currentUserProfile.country,
+          citizenship: currentUserProfile.citizenship,
+          linkedInUrl: currentUserProfile.linkedInUrl,
+          telegramHandle: currentUserProfile.telegramHandle,
+          portfolioUrl: currentUserProfile.portfolioUrl,
+          gender: currentUserProfile.gender,
+          dateOfBirth: currentUserProfile.dateOfBirth
         });
         setLoading(false);
         return;

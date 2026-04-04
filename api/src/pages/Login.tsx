@@ -10,6 +10,8 @@ import { useTranslation } from 'react-i18next';
 
 const Login: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'register' | 'fast' | 'onboarding'>('login');
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [redirectCountdown, setRedirectCountdown] = useState(3);
   const [loginInput, setLoginInput] = useState('admin');
   const [password, setPassword] = useState('admin');
   const [phone, setPhone] = useState('');
@@ -50,13 +52,24 @@ const Login: React.FC = () => {
   const { lang } = useParams();
   const { t } = useTranslation();
 
+  useEffect(() => {
+    let timer: any;
+    if (loginSuccess && redirectCountdown > 0) {
+      timer = setTimeout(() => setRedirectCountdown(prev => prev - 1), 1000);
+    } else if (loginSuccess && redirectCountdown === 0) {
+      navigate(`/${lang || 'eng'}/dashboard`);
+      window.location.reload();
+    }
+    return () => clearTimeout(timer);
+  }, [loginSuccess, redirectCountdown, navigate, lang]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
     try {
       await login(loginInput, password);
-      navigate(`/${lang || 'eng'}`);
+      setLoginSuccess(true);
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
     } finally {
@@ -113,8 +126,7 @@ const Login: React.FC = () => {
       if (data.data.user.role === 'guest') {
         setMode('onboarding');
       } else {
-        navigate(`/${lang || 'eng'}`);
-        window.location.reload(); 
+        setLoginSuccess(true);
       }
     } catch (err: any) {
       setError(err.message || 'Authorization rejected');
@@ -148,8 +160,7 @@ const Login: React.FC = () => {
       
       if (!res.ok) throw new Error(data.error || 'Onboarding failed');
 
-      navigate(`/${lang || 'eng'}`);
-      window.location.reload();
+      setLoginSuccess(true);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -169,7 +180,7 @@ const Login: React.FC = () => {
         remoteId: `remote_${Date.now()}`
       };
       await socialAuth(mockData);
-      navigate(`/${lang || 'eng'}`);
+      setLoginSuccess(true);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -241,7 +252,32 @@ const Login: React.FC = () => {
           )}
 
           <AnimatePresence mode="wait">
-            {mode === 'onboarding' ? (
+            {loginSuccess ? (
+              <motion.div 
+                key="success"
+                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+                className="flex-1 flex flex-col items-center justify-center text-center space-y-10 py-10"
+              >
+                <div className="relative">
+                  <motion.div initial={{ rotate: -180, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} className="size-32 rounded-full border-2 border-emerald-500/20 flex items-center justify-center relative">
+                    <div className="size-24 rounded-full bg-emerald-500/10 flex items-center justify-center relative">
+                      <Shield size={48} className="text-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.5)]" />
+                    </div>
+                    <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute inset-0 rounded-full border-2 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)] opacity-20" />
+                  </motion.div>
+                </div>
+                <div className="space-y-4">
+                  <h2 className="text-5xl font-black uppercase tracking-tighter text-white italic">Congratulations</h2>
+                  <p className="text-[12px] font-black uppercase tracking-[0.5em] text-emerald-500 italic">Identity Resonated Successfully</p>
+                </div>
+                <div className="flex flex-col items-center gap-4">
+                  <span className="text-[10px] font-black text-white/30 uppercase tracking-widest italic">Opening Secure Altar in {redirectCountdown}...</span>
+                  <div className="w-56 h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                    <motion.div initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 3 }} className="h-full bg-emerald-500 shadow-[0_0_15px_#10b981]" />
+                  </div>
+                </div>
+              </motion.div>
+            ) : mode === 'onboarding' ? (
               <motion.form 
                 key="onboarding"
                 initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}

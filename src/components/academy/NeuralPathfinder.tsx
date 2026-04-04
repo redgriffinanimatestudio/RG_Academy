@@ -78,14 +78,17 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
       <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary/10 to-transparent blur-[140px] opacity-20" />
 
       <div className="w-full max-w-6xl mx-auto space-y-6 md:space-y-16 relative z-10">
-        <header className="space-y-2 md:space-y-4">
+        <header className="space-y-4 relative">
            <div className="flex items-center gap-3">
-              <div className="size-1.5 md:size-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-primary/60">{t('terminal_title')}</span>
+              <div className="size-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_#00f5d4]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60">{t('terminal_title')}</span>
            </div>
-           <div className="space-y-1 md:space-y-2">
-              <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-white italic">Synchronize Your_Soul.</h2>
-              <p className="text-[11px] md:text-sm text-white/20 font-medium italic max-w-2xl leading-relaxed">
+           <div className="space-y-2">
+              <h2 className="text-4xl md:text-7xl font-black uppercase tracking-tighter text-white italic leading-none">
+                Synchronize <span className="text-primary italic">Your Soul.</span>
+              </h2>
+              <div className="h-0.5 w-32 bg-primary/20 rounded-full" />
+              <p className="text-xs md:text-sm text-white/40 font-medium italic max-w-2xl leading-relaxed">
                  <TypingText text={t('terminal_background_desc', 'The Matrix is complex. Let us map your internal aspirations to the industrial roadmaps of tomorrow. Step-by-step into your digital sovereignty.')} />
               </p>
            </div>
@@ -246,40 +249,53 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
                   </motion.div>
                 )}
 
-                {step === 3 && (
+                 {step === 3 && (
                   <motion.div 
                     key="step3"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="space-y-16 text-center"
+                    className="space-y-16 text-center relative py-12"
                   >
-                     <div className="space-y-4">
-                        <Zap className="size-12 lg:size-16 text-primary mx-auto animate-pulse" />
-                        <h2 className="text-4xl lg:text-6xl font-black uppercase tracking-widest text-white italic">{t('terminal_synchronized')}</h2>
-                        <p className="text-[10px] lg:text-xs text-white/20 font-black uppercase tracking-[0.3em]">{t('master_plan_syncing')}</p>
+                     {/* 🌌 Crimson Aura */}
+                     <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full animate-pulse pointer-events-none" />
+
+                     <div className="space-y-6 relative z-10">
+                        <motion.div 
+                          initial={{ rotate: -180, scale: 0.5 }}
+                          animate={{ rotate: 0, scale: 1 }}
+                          className="size-24 lg:size-32 bg-primary/10 border border-primary/30 rounded-full flex items-center justify-center mx-auto shadow-[0_0_50px_rgba(0,245,212,0.2)]"
+                        >
+                          <Zap className="size-10 lg:size-16 text-primary animate-pulse" />
+                        </motion.div>
+                        <h2 className="text-5xl lg:text-7xl font-black uppercase tracking-widest text-white italic">{t('terminal_synchronized')}</h2>
+                        <div className="flex flex-col items-center gap-2">
+                          <span className="text-[10px] lg:text-xs text-primary font-black uppercase tracking-[0.5em]">{t('master_plan_syncing')}</span>
+                          <div className="h-0.5 w-48 bg-primary/20 rounded-full overflow-hidden">
+                             <motion.div animate={{ x: [-200, 200] }} transition={{ repeat: Infinity, duration: 2 }} className="h-full w-1/2 bg-primary" />
+                          </div>
+                        </div>
                      </div>
 
-                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 relative z-10">
                         {selectedDiscipline?.levels.map((level, i) => (
-                          <div key={level} className="p-4 md:p-10 rounded-2xl md:rounded-[3rem] bg-white/[0.03] border border-white/5 space-y-3 md:space-y-6 hover:border-primary/20 transition-all group">
-                             <span className="text-[8px] md:text-[10px] font-black text-primary uppercase tracking-[0.4em]">Checkpoint_0{i + 1}</span>
-                             <h4 className="text-xs md:text-2xl font-black uppercase tracking-tighter text-white italic group-hover:text-primary transition-colors">{level}</h4>
-                             <div className="h-1 md:h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                                <motion.div initial={{ width: 0 }} animate={{ width: `${(i + 1) * 33}%` }} className="h-full bg-primary" />
+                          <div key={level} className="p-6 md:p-10 rounded-2xl md:rounded-[3rem] bg-white/[0.03] border border-white/5 space-y-4 md:space-y-6 hover:border-primary/20 transition-all group backdrop-blur-xl">
+                             <span className="text-[9px] md:text-[10px] font-black text-primary/40 uppercase tracking-[0.4em]">Node_0{i + 1}</span>
+                             <h4 className="text-sm md:text-2xl font-black uppercase tracking-tighter text-white italic group-hover:text-primary transition-colors">{level}</h4>
+                             <div className="h-1 md:h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                <motion.div initial={{ width: 0 }} animate={{ width: `${(i + 1) * 33}%` }} className="h-full bg-primary shadow-[0_0_10px_#00f5d4]" />
                              </div>
-                             <p className="text-[7px] md:text-[8px] font-black uppercase tracking-[0.2em] text-white/20">{t('node_sync_confirmed')}</p>
+                             <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/10 group-hover:text-white/40 transition-colors italic">{t('node_sync_confirmed')}</p>
                           </div>
                         ))}
                      </div>
 
-                     <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">
+                     <div className="flex flex-col md:flex-row items-center justify-center gap-6 relative z-10 pt-8">
                         <button onClick={handleReset} className="h-16 md:h-20 w-full md:w-auto px-12 bg-white/5 border border-white/10 rounded-2xl md:rounded-[2rem] font-black uppercase tracking-[0.3em] text-[10px] text-white/40 hover:text-white hover:bg-white/10 transition-all">
                            {t('terminal_reset')}
                         </button>
                         <button 
                            onClick={() => {
                               if (selectedDiscipline && onComplete) {
-                                 // Simple mapping: char_anim -> character_animator, world_gen -> environment_artist, etc.
                                  const mapping: { [key: string]: string } = {
                                     'char_anim': 'character_animator',
                                     'world_gen': 'environment_artist',
@@ -290,13 +306,14 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
                                  onComplete(mapping[selectedDiscipline.id] || 'environment_artist');
                               }
                            }}
-                           className="h-16 md:h-20 w-full md:w-auto px-16 bg-primary text-bg-dark rounded-2xl md:rounded-[2rem] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-xs hover:brightness-125 transition-all shadow-[0_30px_80px_-20px_rgba(var(--primary-rgb),0.5)] flex items-center justify-center gap-4"
+                           className="h-16 md:h-20 w-full md:w-auto px-16 bg-primary text-bg-dark rounded-2xl md:rounded-[2rem] font-black uppercase tracking-[0.3em] text-[11px] md:text-sm hover:brightness-125 transition-all shadow-[0_30px_80px_-20px_rgba(0,245,212,0.4)] flex items-center justify-center gap-4 group"
                         >
-                           {t('terminal_mastery_sequence')} <ArrowRight size={18} />
+                           <TypingText text={t('terminal_mastery_sequence')} /> 
+                           <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
                         </button>
                      </div>
-                     <button onClick={() => setStep(-1)} className="text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors flex items-center gap-2">
-                        <ChevronLeft size={12} /> {t('terminal_back_greeting', 'Back_To_Greeting')}
+                     <button onClick={() => setStep(-1)} className="text-[10px] font-black text-white/10 hover:text-white/40 transition-colors uppercase tracking-[0.4em] italic">
+                        ← {t('terminal_back_greeting', 'Back_To_Greeting')}
                      </button>
                   </motion.div>
                 )}

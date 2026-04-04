@@ -215,7 +215,7 @@ export default function MobileMenu({
                         >
                           {section?.categories?.map((cat: any) => {
                             // Phase 25: Dashboard Flattening (Direct Tool Access)
-                            const isDashboardSection = section.id === 'dashboards';
+                            const isDashboardSection = section.id === 'dashboards' || section.id === 'preview_roadmap';
                             const subItems = cat.subcategories || [];
                             
                             // If it's a dashboard, we don't want the Hub header (avoids the 'dot' artifact)

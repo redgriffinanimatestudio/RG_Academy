@@ -18,6 +18,7 @@ import { ALL_COUNTRIES } from '../utils/countries';
 import { useTranslation } from 'react-i18next';
 import apiClient from '../services/apiClient';
 import Preloader from '../components/Preloader';
+import { SocialAuthButtons } from '../components/auth/SocialAuthButtons';
 
 // v2.30 Neural Architecture Decoupling: Registration Shards
 import IdentitySidebar from '../components/auth/registration/IdentitySidebar';
@@ -37,7 +38,7 @@ const Login: React.FC = () => {
   const [showTreeModal, setShowTreeModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
-  const [redirectCountdown, setRedirectCountdown] = useState(5);
+  const [redirectCountdown, setRedirectCountdown] = useState(2);
   
   const { t, i18n: i18nInstance } = useTranslation();
   const { lang = 'eng' } = useParams();
@@ -98,7 +99,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (!formData.email) { setEmailStatus('none'); return; }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) && formData.email !== 'admin') {
         setEmailStatus('error');
         setEmailError('Invalid Node Pattern (Email)');
         return;
@@ -256,25 +257,80 @@ const Login: React.FC = () => {
         <div className="flex-1 p-8 sm:p-20 relative z-10 flex flex-col min-h-[650px] bg-black/20">
           <AnimatePresence mode="wait">
             {loginSuccess ? (
-              <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col items-center justify-center text-center space-y-10">
+              <motion.div 
+                key="success" 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                animate={{ opacity: 1, scale: 1 }} 
+                exit={{ opacity: 0 }} 
+                className="flex-1 flex flex-col items-center justify-center text-center space-y-12 relative overflow-hidden py-20"
+              >
+                {/* 🌌 Crimson Aura Background */}
+                <div className="absolute inset-0 bg-red-600/5 blur-[120px] rounded-full animate-pulse pointer-events-none" />
+                
                 <div className="relative">
-                  <motion.div initial={{ rotate: -180, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} className="size-32 rounded-full border-2 border-emerald-500/20 flex items-center justify-center relative">
-                    <div className="size-24 rounded-full bg-emerald-500/10 flex items-center justify-center relative">
-                      <CheckCircle2 size={48} className="text-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.5)]" />
+                  <motion.div 
+                    initial={{ rotate: -180, opacity: 0 }} 
+                    animate={{ rotate: 0, opacity: 1 }} 
+                    transition={{ type: "spring", damping: 10 }}
+                    className="size-40 rounded-full border-2 border-red-500/20 flex items-center justify-center relative"
+                  >
+                    <div className="size-32 rounded-full bg-gradient-to-tr from-red-600/20 to-emerald-500/10 flex items-center justify-center relative shadow-[0_0_50px_rgba(220,38,38,0.2)]">
+                      <CheckCircle2 size={64} className="text-emerald-400 shadow-[0_0_40px_rgba(52,211,153,0.6)]" />
                     </div>
-                    <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute inset-0 rounded-full border-2 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)] opacity-20" />
+                    {/* Pulsing Halos */}
+                    <motion.div 
+                      animate={{ scale: [1, 1.4, 1], opacity: [0.2, 0.1, 0.2] }} 
+                      transition={{ repeat: Infinity, duration: 3 }} 
+                      className="absolute inset-[-20px] rounded-full border border-red-500/30 opacity-20" 
+                    />
+                     <motion.div 
+                      animate={{ scale: [1, 1.6, 1], opacity: [0.1, 0, 0.1] }} 
+                      transition={{ repeat: Infinity, duration: 4, delay: 0.5 }} 
+                      className="absolute inset-[-40px] rounded-full border border-emerald-500/20 opacity-10" 
+                    />
                   </motion.div>
-                  <Sparkles size={32} className="absolute -top-4 -right-4 text-yellow-500 animate-bounce" />
+                  <motion.div
+                    animate={{ y: [0, -10, 0], opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute -top-8 -right-8"
+                  >
+                    <Sparkles size={40} className="text-yellow-500" />
+                  </motion.div>
                 </div>
-                <div className="space-y-4">
-                  <h2 className="text-5xl font-black uppercase tracking-tighter text-white">Congratulations</h2>
-                  <p className="text-[12px] font-black uppercase tracking-[0.5em] text-emerald-500 italic">Identity Resonated Successfully</p>
+
+                <div className="space-y-6 relative z-10">
+                  <motion.h2 
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-6xl md:text-7xl font-black uppercase tracking-tighter text-white italic"
+                  >
+                    Congratulations
+                  </motion.h2>
+                  <motion.p 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="text-[14px] font-black uppercase tracking-[0.8em] text-emerald-400/80 drop-shadow-[0_0_10px_rgba(52,211,153,0.3)]"
+                  >
+                    Identity Resonated Successfully
+                  </motion.p>
                 </div>
-                <div className="flex flex-col items-center gap-4">
-                  <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">Opening Secure Altar...</span>
-                  <div className="w-56 h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
-                    <motion.div initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 2.5 }} className="h-full bg-emerald-500 shadow-[0_0_15px_#10b981]" />
+
+                <div className="flex flex-col items-center gap-6 pt-10">
+                  <div className="flex items-center gap-3">
+                    <div className="size-2 bg-red-600 rounded-full animate-ping" />
+                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] italic">Opening Crimson Sanctum...</span>
                   </div>
+                  <div className="w-72 h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5 shadow-inner">
+                    <motion.div 
+                      initial={{ width: 0 }} 
+                      animate={{ width: '100%' }} 
+                      transition={{ duration: 3, ease: "easeInOut" }} 
+                      className="h-full bg-gradient-to-r from-red-600 to-emerald-500 shadow-[0_0_20px_rgba(220,38,38,0.5)]" 
+                    />
+                  </div>
+                  <span className="text-[10px] font-bold text-white/10 uppercase tracking-widest italic animate-pulse">Neural Synchronization Active</span>
                 </div>
               </motion.div>
             ) : (
@@ -336,6 +392,8 @@ const Login: React.FC = () => {
                                Awaken Essence <UserPlus size={16} />
                             </button>
                           </div>
+
+                          <SocialAuthButtons className="pt-6" />
                         </form>
                       )}
                     </motion.div>

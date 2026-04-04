@@ -4,8 +4,8 @@ import {
   GraduationCap, Clock, Star, Zap, Award, Cpu, 
   TrendingUp, Briefcase, CheckCircle2, Rocket, 
   Shield, Box, ChevronRight, Activity, BookOpen,
-  Map, Lightbulb, History, MessageSquare, Send, Sparkles, AlertCircle,
-  ShieldCheck, Users, Target, Lock, UserCheck
+  Lightbulb, History, MessageSquare, Send, Sparkles, AlertCircle,
+  ShieldCheck, Users, Target, Lock, UserCheck, Compass
 } from 'lucide-react';
 import { StatCard, SectionHeader, GlassCard } from '../../../components/dashboard/shared/DashboardUI';
 import { academyService } from '../../../services/academyService';
@@ -101,7 +101,7 @@ export default function StudentDashboard({
         >
           {activeView === 'overview' && <OverviewModule stats={stats} techStack={techStack} pipelines={activePipelines} certs={certifications} />}
           {activeView === 'career_trajectory' && <TrajectoryModule techStack={techStack} />}
-          {activeView === 'master_plan_roadmap' && <NeuralRoadmap activePathId="digital_architect" completedNodeIds={['art_hist']} />}
+          {activeView === 'master_plan_roadmap' && <NeuralRoadmap activePathId={user?.chosenPathId || 'generalist'} completedNodeIds={[]} />}
           {activeView === 'certificate_vault' && <VaultModule certs={certifications} />}
           {activeView === 'ai_mentor_node' && <AIMentorModule user={user} />}
           {activeView === 'workshop_archive' && <ArchiveModule />}
@@ -183,7 +183,7 @@ function TrajectoryModule({ techStack }: any) {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {[
           { label: 'Foundations', status: 'completed', icon: BookOpen, desc: 'Intro to CG & Maya Basics' },
-          { label: 'Technical Artist', status: 'current', icon: Map, desc: 'Unreal Engine Logic & Scripting' },
+          { label: 'Technical Artist', status: 'current', icon: Compass, desc: 'Unreal Engine Logic & Scripting' },
           { label: 'Lead Developer', status: 'locked', icon: Box, desc: 'Advanced Pipeline Architecture' },
           { label: 'Director Hub', status: 'locked', icon: ShieldCheck, desc: 'Creative Vision & Leadership' }
         ].map((node, i) => (

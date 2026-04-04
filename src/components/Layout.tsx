@@ -95,6 +95,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         navigate(`${modePrefix}/${lang || 'eng'}/topic/${sub.name}`);
       }
     }
+    // Ensures mobile vertical menu automatically closes after transition
+    setIsMobileMenuOpen(false);
   };
 
   const mobileSections = React.useMemo(() => {
@@ -103,7 +105,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       { id: 'studio', label: t('studio'), path: `/studio/${lang || 'eng'}`, icon: Box, active: isStudio, categories: STUDIO_CATEGORIES, color: 'text-primary-hover' }
     ];
 
-    if (isDashboardPage && dashboardCategories.length > 0) {
+    if ((isDashboardPage || profile) && dashboardCategories.length > 0) {
       // Inject ONLY Dashboard-specific sections at the top
       sections.unshift({
         id: 'dashboards',
@@ -116,8 +118,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       });
     }
 
+    // Phase 40: Guest Sovereignty Preview (Manual Injection)
+    if (!profile && isAcademy && !isDashboardPage) {
+      sections.push({
+        id: 'preview_roadmap',
+        label: 'Sovereignty Path',
+        path: `/aca/${lang || 'eng'}`,
+        icon: GraduationCap,
+        active: false,
+        categories: [{
+          name: 'path_preview',
+          icon: LayoutDashboard,
+          subcategories: [{ name: 'master_plan' }]
+        }],
+        color: 'text-primary'
+      });
+    }
+
     return sections;
-  }, [lang, isAcademy, isStudio, isDashboardPage, dashboardCategories, modePrefix, modeColor, t]);
+  }, [lang, isAcademy, isStudio, isDashboardPage, dashboardCategories, modePrefix, modeColor, t, profile]);
 
 
   const isPublicPage = path.includes('/login') || path.includes('/register') || path === `/${lang}` || path === `/${lang}/` || path === '/';

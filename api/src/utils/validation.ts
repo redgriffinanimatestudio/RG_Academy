@@ -6,7 +6,7 @@ export const RegisterSchema = z.object({
   body: z.object({
     email: z.string().email(),
     displayName: z.string().min(2).max(50),
-    role: z.enum(['student', 'lecturer', 'client', 'executor', 'admin', 'hr', 'finance', 'support', 'chief_manager', 'manager', 'moderator']).default('student'),
+    role: z.enum(['student', 'lecturer', 'client', 'executor', 'admin', 'hr', 'finance', 'support', 'chief_manager', 'manager', 'moderator', 'artist', 'engineer', 'client_ceo', 'partner', 'community', 'user']).default('student'),
     password: z.string().min(6).optional(),
     phone: z.string().optional(),
     provider: z.string().optional(),

@@ -307,7 +307,8 @@ export const authController = {
   async onboarding(req: AuthRequest, res: Response) {
     try {
       const onboardingSchema = z.object({
-        role: z.enum(['student', 'client', 'executor']),
+        role: z.enum(['student', 'lecturer', 'client', 'executor', 'admin', 'hr', 'finance', 'support', 'chief_manager', 'manager', 'moderator', 'artist', 'engineer', 'client_ceo', 'partner', 'community']),
+        chosenPathId: z.string().optional(),
         signature: z.string().optional(),
         profileData: z.object({
           bio: z.string().optional(),
@@ -321,14 +322,14 @@ export const authController = {
         }).optional()
       });
 
-      const { role, profileData, signature } = onboardingSchema.parse(req.body);
+      const { role, chosenPathId, profileData, signature } = onboardingSchema.parse(req.body);
       const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
       if (!user) return error(res, 'User not found', 404);
 
       console.log(`[ONBOARDING] Node ${user.email} synchronizing profile as [${role}]`);
 
       const result = await identityService.finalizeOnboarding(user.id, user.email!, {
-        role, profileData, signature
+        role, chosenPathId, profileData, signature
       });
 
       return success(res, { 

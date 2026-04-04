@@ -159,6 +159,7 @@ model Profile {
   experienceLevel String?
   primarySoftware String?
   learningGoal    String?
+  chosenPathId    String?         // Permanent Sovereignty Path (Generalist, VFX, etc.)
   portfolioUrl    String?
 
   // --- Executor Fields ---

@@ -566,7 +566,12 @@ const resources = {
       skip_sync: 'ASCEND & RESONATE',
       node_online: 'VESSEL ATTUNED',
       establishing_conn: 'COMMUNING WITH THE ANCIENTS...',
-      sync_success: 'RESONANCE NOMINAL'
+      sync_success: 'RESONANCE NOMINAL',
+
+      // Social Resonance
+      social_resonate_google: 'Resonate via Google',
+      social_resonate_github: 'Resonate via GitHub',
+      social_sync_divider: 'Aetheric Resonance Sync'
     }
   },
   ru: {
@@ -1121,7 +1126,12 @@ const resources = {
       skip_sync: 'ВОЗНЕСТИСЬ И ПРЕРЕЗОНИРОВАТЬ',
       node_online: 'СОСУД НАСТРОЕН',
       establishing_conn: 'ОБЩЕНИЕ С ДРЕВНИМИ...',
-      sync_success: 'РЕЗОНАНС НОМИНАЛЕН'
+      sync_success: 'РЕЗОНАНС НОМИНАЛЕН',
+
+      // Social Resonance
+      social_resonate_google: 'Резонировать через Google',
+      social_resonate_github: 'Резонировать через GitHub',
+      social_sync_divider: 'Синхронизация Астрального Резонанса'
     }
   },
   tr: {
@@ -1438,7 +1448,12 @@ const resources = {
       course_reviews_desc: 'Derecelendirmeli kurs yorumları',
       leave_review_desc: 'Yorum bırak (tamamladıktan sonra)',
       edit_review_desc: 'Kendi yorumunu düzenle',
-      delete_review_desc: 'Yorumu sil'
+      delete_review_desc: 'Yorumu sil',
+
+      // Social Resonance
+      social_resonate_google: 'Google ile Rezone Ol',
+      social_resonate_github: 'GitHub ile Rezone Ol',
+      social_sync_divider: 'Aetheric Rezonans Senkronizasyonu'
     }
   },
   az: {
@@ -1755,7 +1770,12 @@ const resources = {
       course_reviews_desc: 'Reytinqli kurs rəyləri',
       leave_review_desc: 'Rəy bildir (bitirdikdən sonra)',
       edit_review_desc: 'Öz rəyini redaktə et',
-      delete_review_desc: 'Rəyi sil'
+      delete_review_desc: 'Rəyi sil',
+
+      // Social Resonance
+      social_resonate_google: 'Google ilə rezonans',
+      social_resonate_github: 'GitHub ilə rezonans',
+      social_sync_divider: 'Aetheric Rezonans Sinxronizasiyası'
     }
   }
 };

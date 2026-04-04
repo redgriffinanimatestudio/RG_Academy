@@ -136,7 +136,7 @@ export const identityService = {
     return { user, roles: rolesArray };
   },
 
-  async finalizeOnboarding(userId: string, userEmail: string, { role, profileData, signature }: any) {
+  async finalizeOnboarding(userId: string, userEmail: string, { role, chosenPathId, profileData, signature }: any) {
     return await prisma.$transaction(async (tx) => {
       const updateData: any = {
         role,
@@ -176,7 +176,8 @@ export const identityService = {
                 if (age < 13) return 'child';
                 if (age < 18) return 'teen';
                 return 'adult';
-              })() : 'adult'
+              })() : 'adult',
+            chosenPathId: chosenPathId
         };
 
         await tx.profile.upsert({

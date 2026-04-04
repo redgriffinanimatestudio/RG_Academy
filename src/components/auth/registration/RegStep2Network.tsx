@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Mail, Lock, CheckCircle2, X, Info, ChevronRight } from 'lucide-react';
+import { Mail, Lock, CheckCircle2, X, Info, ChevronRight, Smartphone } from 'lucide-react';
 import { InputWithStatus } from '../InputWithStatus';
 import { PasswordStrengthMeter } from '../PasswordStrengthMeter';
+import { SocialAuthButtons } from '../SocialAuthButtons';
 import { ALL_COUNTRIES } from '../../../utils/countries';
 
 interface RegStep2NetworkProps {
@@ -94,47 +95,59 @@ const RegStep2Network: React.FC<RegStep2NetworkProps> = ({
         required
       />
 
-      <div className="space-y-1">
-         <label className="text-[10px] font-black uppercase text-white/30 px-2">{t('phone_number')}</label>
-         <div className="flex gap-2">
-           <select 
-             className="bg-black/40 border border-white/5 rounded-2xl px-3 text-white text-xs outline-none focus:border-red-500/40"
-             value={formData.phoneCode}
-             onChange={(e) => onChange('phoneCode', e.target.value)}
-           >
-             {ALL_COUNTRIES.map(c => (
-               <option key={c.code} value={c.phone} className="bg-[#0f0f0f]">{c.flag} +{c.phone}</option>
-             ))}
-           </select>
-           <div className="flex-1 relative">
-             <input 
-               type="tel"
-               className={`w-full bg-black/40 border rounded-2xl py-3 px-5 text-white text-sm outline-none transition-all ${phoneStatus === 'error' ? 'border-red-500/50' : phoneStatus === 'success' ? 'border-emerald-500/30' : 'border-white/5 focus:border-red-500/40'}`}
-               placeholder="Phone Number"
-               value={formData.phone}
-               onChange={(e) => onChange('phone', e.target.value)}
-             />
-             <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
-                {phoneStatus === 'success' && <CheckCircle2 size={14} className="text-emerald-500" />}
-                {phoneStatus === 'error' && <X size={14} className="text-red-500" />}
-                {phoneStatus === 'warning' && <Info size={14} className="text-yellow-500" />}
-             </div>
-           </div>
+      <div className="space-y-4">
+         <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-black uppercase text-white/30 px-2 flex items-center gap-2">
+              <Smartphone size={10} className="text-primary" /> {t('phone_number')}
+            </label>
+            <div className="flex gap-2">
+              <select 
+                className="bg-black/60 border border-white/5 rounded-2xl px-4 py-3 text-white text-[11px] font-bold outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+                value={formData.phoneCode}
+                onChange={(e) => onChange('phoneCode', e.target.value)}
+              >
+                {ALL_COUNTRIES.map(c => (
+                  <option key={c.code} value={c.phone} className="bg-[#050505] text-white">
+                    {c.flag} +{c.phone}
+                  </option>
+                ))}
+              </select>
+              <div className="flex-1 relative group">
+                <input 
+                  type="tel"
+                  className={`w-full bg-black/60 border rounded-2xl py-3.5 px-6 text-white text-sm font-medium outline-none transition-all ${phoneStatus === 'error' ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : phoneStatus === 'success' ? 'border-emerald-500/30' : 'border-white/5 focus:border-primary/40 focus:ring-1 focus:ring-primary/20'}`}
+                  placeholder="000 000 00 00"
+                  value={formData.phone}
+                  onChange={(e) => onChange('phone', e.target.value)}
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
+                   {phoneStatus === 'success' && <div className="size-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />}
+                   {phoneStatus === 'error' && <X size={14} className="text-red-500" />}
+                   {phoneStatus === 'warning' && <Info size={14} className="text-yellow-500" />}
+                </div>
+              </div>
+            </div>
          </div>
-         <div className="px-2 flex items-center gap-2 opacity-40 group hover:opacity-100 transition-opacity">
-            <Info size={10} className="text-[#00f3ff]" />
-            <p className="text-[8px] font-black uppercase tracking-widest text-white italic">Future Protocol: SMS confirmation required for node activation.</p>
+         <div className="px-2 flex items-center gap-2 opacity-30 group hover:opacity-100 transition-opacity">
+            <Info size={10} className="text-primary" />
+            <p className="text-[8px] font-bold uppercase tracking-widest text-white/60 italic leading-none">Vessel requires SMS confirmation for neural activation.</p>
          </div>
       </div>
       
-      <button 
-        type="button"
-        onClick={onNext} 
-        disabled={isNextDisabled} 
-        className="w-full bg-red-600 text-white py-3.5 rounded-xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-red-700 transition-all flex items-center justify-center gap-2 group"
-      >
-        {t('security_check_passed')} <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-      </button>
+      <div className="pt-4 space-y-6">
+        <button 
+          type="button"
+          onClick={onNext} 
+          disabled={isNextDisabled} 
+          className="w-full bg-primary text-bg-dark py-4 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] hover:scale-[1.02] active:scale-98 transition-all flex items-center justify-center gap-3 group relative overflow-hidden shadow-xl shadow-primary/10"
+        >
+          <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+          <span className="relative z-10">{t('security_check_passed')}</span>
+          <ChevronRight size={16} className="relative z-10 group-hover:translate-x-1 transition-transform" />
+        </button>
+
+        <SocialAuthButtons />
+      </div>
     </motion.div>
   );
 };

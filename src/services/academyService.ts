@@ -206,5 +206,13 @@ export const academyService = {
   async getLecturerSummary(): Promise<any> {
     const { data } = await apiClient.get(`${API_V1}/lecturer/summary`);
     return data.success ? data.data : null;
+  },
+
+  async updateUserPath(chosenPathId: string): Promise<any> {
+    const { data } = await apiClient.post('/auth/onboarding', { 
+      role: 'student', 
+      chosenPathId 
+    });
+    return data;
   }
 };
