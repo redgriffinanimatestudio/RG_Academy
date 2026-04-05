@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, ChevronLeft, Box } from 'lucide-react';
+import { Box, Home, LayoutDashboard, Database, Users, MessageSquare, Settings, HelpCircle } from 'lucide-react';
 
 interface SidebarProps {
   profile: any;
@@ -37,115 +37,56 @@ export default function Sidebar({
     <div className="hidden md:block relative shrink-0 z-[40]">
       <motion.aside 
         initial={false} 
-        animate={{ width: isSidebarCollapsed ? 70 : 260 }} 
-        className="sticky top-24 sm:top-28 lg:top-32 h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar border-r border-white/5 pr-2 sm:pr-4 glass-pro-max !bg-transparent border-none"
+        animate={{ width: 72 }} 
+        className="sticky top-24 h-[calc(100vh-12rem)] flex flex-col items-center py-8 rounded-[2.5rem] glass-pro-max border-none shadow-xl"
       >
-        <div className="space-y-6 sm:space-y-8">
-          {/* 🧿 Tier 1: Contextual Discovery (Guest only) */}
-          {!profile && !isSidebarCollapsed && (
-            <div className="px-2 mb-8 animate-in fade-in slide-in-from-left duration-700">
-              <div className="p-5 rounded-[2rem] glass-pro-max border border-white/10 relative overflow-hidden group metallic-glow">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <Box size={40} className={modeColor} />
-                </div>
-                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-2 text-data-glow">{t('origins_codex') || 'Origins Codex'}</h4>
-                <p className="text-[11px] font-bold text-white mb-4 leading-relaxed">Join the Red Griffin Sovereignty to unlock sacred Vessels.</p>
-                <div className="space-y-2">
-                  <div 
-                    onClick={onOpenGuide}
-                    className="flex items-center gap-2 text-[9px] font-black uppercase text-primary cursor-pointer hover:translate-x-1 transition-transform"
-                  >
-                    <div className="size-1 rounded-full bg-primary animate-pulse" />
-                    How to start
-                  </div>
-                  <div 
-                    onClick={onOpenGuide}
-                    className="flex items-center gap-2 text-[9px] font-black uppercase text-white/40 hover:text-white transition-all cursor-pointer hover:translate-x-1"
-                  >
-                    <div className="size-1 rounded-full bg-white/10" />
-                    Ecosystem Map
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-          <div className="space-y-2">
+        <div className="flex flex-col items-center gap-6 w-full">
+          {/* 🧿 Navigation Hub */}
+          <div className="flex flex-col items-center gap-4 w-full px-3">
             {sidebarCategories.map((cat) => {
               const isCatActive = activeCatName === cat?.name;
               const Icon = cat?.icon || Box;
+              
               return (
-                <div key={cat?.name || Math.random()} className="space-y-1">
+                <div key={cat?.name || Math.random()} className="relative group">
                   <button 
-                    onClick={() => { if (isSidebarCollapsed) setIsSidebarCollapsed(false); handleSetCategory(cat); }} 
-                    className={`w-full text-left p-2.5 sm:p-3 rounded-xl border transition-all flex items-center relative z-10 ${isSidebarCollapsed ? 'justify-center' : 'justify-between'} ${isCatActive ? (isStudio ? 'border-primary-hover/40 text-white shadow-[0_0_20px_rgba(59,130,246,0.1)]' : 'border-primary/40 text-white shadow-[0_0_20px_rgba(0,245,212,0.1)]') : 'bg-white/[0.02] border-white/5 text-white/40 hover:text-white'}`}
+                    onClick={() => handleSetCategory(cat)} 
+                    className={`size-12 rounded-2xl transition-all flex items-center justify-center relative overflow-hidden backdrop-blur-md shadow-sm border border-border-main ${isCatActive ? 'bg-primary text-white shadow-primary/20 border-primary' : 'bg-bg-card/40 text-text-muted hover:bg-bg-card hover:text-primary transition-colors'}`}
                   >
-                    {isCatActive && (
-                      <motion.div 
-                        layoutId="sidebar-active-indicator"
-                        className="absolute inset-0 bg-white/5 rounded-xl -z-10"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                      />
-                    )}
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <Icon size={16} className={isCatActive ? `${modeColor} neural-pulse` : 'opacity-40'} />
-                      {!isSidebarCollapsed && <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest truncate max-w-[140px] text-data-glow">{t(cat?.name || '')}</span>}
+                    <Icon size={20} className={isCatActive ? 'neural-pulse' : ''} />
+                    
+                    {/* Tooltip */}
+                    <div className="absolute left-16 px-3 py-1.5 bg-bg-dark border border-border-main text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 shadow-2xl">
+                      {t(cat?.name || '')}
                     </div>
-                    {!isSidebarCollapsed && <ChevronDown size={12} className={`transition-transform duration-300 shrink-0 ${isCatActive ? 'rotate-180 opacity-100' : 'opacity-20'}`} />}
                   </button>
-                  
-                  <AnimatePresence initial={false}>
-                    {isCatActive && !isSidebarCollapsed && (
-                      <motion.div 
-                        initial={{ height: 0, opacity: 0 }} 
-                        animate={{ height: 'auto', opacity: 1 }} 
-                        exit={{ height: 0, opacity: 0 }} 
-                        className="overflow-hidden ml-3 pl-3 border-l border-white/5 space-y-1 mt-1"
-                      >
-                        {cat?.subcategories?.map((sub: any) => {
-                          const isSubActive = activeSubName === sub?.name;
-                          const hasDeepNested = sub?.subcategories && sub.subcategories.length > 0;
-                          
-                          return (
-                            <div key={sub?.name || Math.random()} className="space-y-1">
-                              <button 
-                                onClick={() => handleSetSub(sub, cat)} 
-                                className={`w-full text-left px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all flex items-center justify-between ${isSubActive ? (isStudio ? 'text-primary-hover bg-white/5' : 'text-primary bg-white/5') : 'text-white/30 hover:text-white/60'}`}
-                              >
-                                {t(sub?.name || '')}
-                                {hasDeepNested ? (
-                                  <ChevronDown size={10} className={`transition-transform duration-300 ${isSubActive ? 'rotate-180 opacity-100' : 'opacity-20'}`} />
-                                ) : (
-                                  <div className={`size-1 rounded-full ${isSubActive ? (isStudio ? 'bg-primary-hover' : 'bg-primary shadow-[0_0_8px_#00ff9d]') : 'bg-white/10'}`} />
-                                )}
-                              </button>
 
-                              {/* 💎 THIRD LEVEL: Role Specific Sub-items */}
-                              {hasDeepNested && isSubActive && (
-                                <motion.div
-                                  initial={{ height: 0, opacity: 0 }}
-                                  animate={{ height: 'auto', opacity: 1 }}
-                                  className="ml-3 pl-3 border-l border-white/10 space-y-1 py-1"
-                                >
-                                  {sub.subcategories.map((deep: any) => (
-                                    <button
-                                      key={deep.name}
-                                      className="w-full text-left px-3 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest text-white/20 hover:text-primary transition-colors flex items-center gap-2"
-                                    >
-                                      <div className="size-1 rounded-full bg-white/10" />
-                                      {t(deep.name)}
-                                    </button>
-                                  ))}
-                                </motion.div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {/* Active Indicator dot */}
+                  {isCatActive && (
+                    <motion.div 
+                      layoutId="sidebar-dot"
+                      className="absolute -right-1 top-1/2 -translate-y-1/2 size-1.5 bg-emerald-500 rounded-full"
+                    />
+                  )}
                 </div>
               );
             })}
+          </div>
+
+          {/* Separator line */}
+          <div className="w-8 h-[1px] bg-border-main opacity-40 my-2" />
+
+          {/* Support/Settings Hub */}
+          <div className="flex flex-col items-center gap-4 mt-auto pb-2">
+            <button 
+              onClick={onOpenGuide}
+              className="size-12 rounded-2xl bg-bg-card/40 text-text-muted hover:bg-primary/10 hover:text-primary transition-all flex items-center justify-center shadow-sm border border-border-main"
+            >
+              <HelpCircle size={20} />
+            </button>
+            <button className="size-12 rounded-2xl bg-bg-dark text-white hover:bg-primary transition-all flex items-center justify-center shadow-lg border border-border-main">
+              <Settings size={20} />
+            </button>
           </div>
         </div>
       </motion.aside>

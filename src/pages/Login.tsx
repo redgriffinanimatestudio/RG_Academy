@@ -209,56 +209,56 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-2 sm:p-8 font-['Inter'] selection:bg-red-500/30 overflow-x-hidden relative">
+    <div className="min-h-screen bg-bg-dark flex items-center justify-center p-2 sm:p-8 font-['Inter'] selection:bg-emerald-500/30 overflow-x-hidden relative">
       <div className="absolute inset-0 opacity-[0.1] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '100px 100px' }} />
       
       <motion.div 
         variants={shakeVariants}
         animate={isShaking ? "shake" : { opacity: 1, scale: 1 }}
         initial={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-7xl bg-[#0a0a0a]/95 backdrop-blur-3xl border border-white/5 rounded-[2rem] sm:rounded-[4.5rem] overflow-hidden shadow-[0_0_150px_rgba(0,0,0,0.8)] flex flex-col lg:flex-row relative group z-10"
+        className="w-full max-w-7xl bg-bg-card backdrop-blur-3xl border border-border-main rounded-[2rem] sm:rounded-[4.5rem] overflow-hidden shadow-2xl flex flex-col lg:flex-row relative group z-10"
       >
-        <div className="absolute inset-0 bg-gradient-to-tr from-red-600/5 via-transparent to-emerald-600/5 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-600/5 via-transparent to-primary/5 pointer-events-none" />
         
         {/* Sidebar */}
-        <div className="lg:w-[480px] p-8 sm:p-16 border-b lg:border-r lg:border-b-0 border-white/5 relative z-10 flex flex-col justify-center bg-black/30 overflow-hidden">
+        <div className="lg:w-[480px] p-8 sm:p-16 border-b lg:border-r lg:border-b-0 border-border-main relative z-10 flex flex-col justify-center bg-bg-dark/20 overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none select-none">
-            <Binary size={500} className="text-white -rotate-12 translate-x-[-100px]" />
+            <Binary size={500} className="text-ink -rotate-12 translate-x-[-100px]" />
           </div>
           {/* Sidebar content removed - moved to Main Content as per UI/UX optimization */}
           <div className="hidden lg:block relative space-y-12 opacity-20 hover:opacity-40 transition-opacity duration-1000">
             <div className="space-y-4">
               <div className="h-[2px] w-12 bg-red-600/30" />
-              <p className="text-[10px] font-black uppercase tracking-[1em] text-white/10 italic">Red Griffin Sanctum</p>
+              <p className="text-[10px] font-black uppercase tracking-[1em] text-text-muted opacity-20 italic">Red Griffin Sanctum</p>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-8 sm:p-20 relative z-10 flex flex-col min-h-[650px] bg-black/20">
+        <div className="flex-1 p-8 sm:p-20 relative z-10 flex flex-col min-h-[650px] bg-bg-card/20">
           <AnimatePresence mode="wait">
             <motion.div key="form-container" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex-1 flex flex-col h-full">
               <div className="flex items-center gap-6 mb-12">
-                <div className={`p-4 rounded-[1.8rem] transition-all duration-700 ${mode === 'login' ? 'bg-red-700 text-white shadow-[0_0_50px_rgba(185,28,28,0.5)]' : 'bg-white/10 text-white/40 hover:text-white'}`}>
+                <div className={`p-4 rounded-[1.8rem] transition-all duration-700 ${mode === 'login' ? 'bg-primary text-white shadow-2xl shadow-primary/20' : 'bg-border-main text-text-muted hover:text-ink'}`}>
                   <LogIn size={26} />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-black uppercase text-white tracking-[0.2em] leading-tight">
+                  <h2 className="text-3xl font-black uppercase text-ink tracking-[0.2em] leading-tight">
                     {mode === 'login' ? t('node_connect') : t('identity_forge')}
                   </h2>
-                  <p className="text-[11px] font-black uppercase tracking-[0.6em] text-white/20 italic">{t('reg_protocol')}</p>
+                  <p className="text-[11px] font-black uppercase tracking-[0.6em] text-text-muted opacity-40 italic">{t('reg_protocol')}</p>
                 </div>
               </div>
 
               {/* Sub-Header Branding Area (Blue Rectangle Zone) */}
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 p-6 rounded-3xl bg-white/[0.02] border border-white/5 backdrop-blur-sm">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 p-6 rounded-3xl bg-bg-dark/5 border border-border-main backdrop-blur-sm">
                 <div className="flex items-center gap-4">
-                  <div className="size-10 rounded-2xl bg-red-600/10 flex items-center justify-center border border-red-600/20">
-                    <Shield size={18} className="text-red-600" />
+                  <div className="size-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                    <Shield size={18} className="text-emerald-500" />
                   </div>
                   <div className="space-y-0.5">
-                    <span className="block text-[9px] font-black uppercase tracking-widest text-white/60">Blood-Codec Ritual</span>
-                    <span className="block text-[8px] font-bold text-white/20 uppercase tracking-widest italic">Secure Vessel Access</span>
+                    <span className="block text-[9px] font-black uppercase tracking-widest text-text-muted">Blood-Codec Ritual</span>
+                    <span className="block text-[8px] font-bold text-text-muted opacity-40 uppercase tracking-widest italic">Secure Vessel Access</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -266,8 +266,8 @@ const Login: React.FC = () => {
                     <Globe size={18} className="text-emerald-500" />
                   </div>
                   <div className="space-y-0.5">
-                    <span className="block text-[9px] font-black uppercase tracking-widest text-white/60">Celestial Weave</span>
-                    <span className="block text-[8px] font-bold text-white/20 uppercase tracking-widest italic">Attuned Network</span>
+                    <span className="block text-[9px] font-black uppercase tracking-widest text-text-muted">Celestial Weave</span>
+                    <span className="block text-[8px] font-bold text-text-muted opacity-40 uppercase tracking-widest italic">Attuned Network</span>
                   </div>
                 </div>
               </motion.div>
@@ -287,11 +287,11 @@ const Login: React.FC = () => {
                           <InputWithStatus id="login-password" label="Void Cipher" type="password" value={formData.password} onChange={(e) => handleInputChange('password', e.target.value)} placeholder="••••••••" hint="Aetheric secure passkey" icon={<Lock size={18} />} required />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                          <button type="submit" disabled={isLoading} className="bg-red-700 text-white py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-red-600 transition-all hover:scale-[1.02] shadow-[0_0_40px_rgba(185,28,28,0.3)] flex items-center justify-center gap-3 group relative overflow-hidden">
+                          <button type="submit" disabled={isLoading} className="bg-primary text-white py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-emerald-600 transition-all hover:scale-[1.02] shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 group relative overflow-hidden">
                             <span className="relative z-10">Attune Vessel</span>
                             <ChevronRight size={16} className="relative z-10 group-hover:translate-x-1 transition-transform" />
                           </button>
-                          <button type="button" onClick={() => setMode('register')} className="bg-white/5 border border-white/5 text-white/50 py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-3">
+                          <button type="button" onClick={() => setMode('register')} className="bg-bg-card border border-border-main text-text-muted py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-border-main hover:text-ink transition-all flex items-center justify-center gap-3">
                              Awaken Essence <UserPlus size={16} />
                           </button>
                         </div>
@@ -305,10 +305,10 @@ const Login: React.FC = () => {
                     <div className="flex items-center justify-between px-2">
                       {[1, 2, 3, 4, 5].map(s => (
                         <div key={s} className="flex items-center gap-2">
-                          <div className={`size-7 sm:size-8 rounded-full flex items-center justify-center text-[10px] font-black border-2 transition-all duration-700 ${regStep >= s ? 'bg-red-700 border-red-700 shadow-[0_0_15px_rgba(185,28,28,0.4)] text-white' : 'border-white/10 text-white/20'}`}>
+                          <div className={`size-7 sm:size-8 rounded-full flex items-center justify-center text-[10px] font-black border-2 transition-all duration-700 ${regStep >= s ? 'bg-primary border-primary shadow-lg shadow-primary/20 text-white' : 'border-border-main text-text-muted opacity-30'}`}>
                             {s}
                           </div>
-                          {s < 5 && <div className={`h-[2px] w-4 lg:w-10 transition-all duration-700 ${regStep > s ? 'bg-red-700' : 'bg-white/5'}`} />}
+                          {s < 5 && <div className={`h-[2px] w-4 lg:w-10 transition-all duration-700 ${regStep > s ? 'bg-primary' : 'bg-border-main'}`} />}
                         </div>
                       ))}
                     </div>
@@ -331,7 +331,7 @@ const Login: React.FC = () => {
                       </form>
                     </div>
                     <div className="text-center pt-8 border-t border-white/5 mt-auto">
-                      <button type="button" onClick={() => { if (regStep > 1) setRegStep(regStep - 1); else { setMode('login'); setError(''); } }} className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 hover:text-red-600 transition-all flex items-center justify-center gap-3 mx-auto py-2 group">
+                      <button type="button" onClick={() => { if (regStep > 1) setRegStep(regStep - 1); else { setMode('login'); setError(''); } }} className="text-[10px] font-black uppercase tracking-[0.3em] text-text-muted hover:text-primary transition-all flex items-center justify-center gap-3 mx-auto py-2 group">
                         <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> {t('go_back')}
                       </button>
                     </div>
@@ -340,28 +340,28 @@ const Login: React.FC = () => {
               </AnimatePresence>
 
               {error && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-6 bg-red-950/20 border border-red-900/50 rounded-[2rem] relative overflow-hidden">
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-6 bg-emerald-500/5 border border-emerald-500/20 rounded-[2rem] relative overflow-hidden">
                   <div className="relative z-10 flex items-start gap-4">
-                    <div className="size-10 rounded-2xl bg-red-900/30 flex items-center justify-center text-red-500 shrink-0"><Shield size={20} className="animate-pulse" /></div>
+                    <div className="size-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0"><Shield size={20} className="animate-pulse" /></div>
                     <div className="space-y-1">
-                      <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500">Security Fault Detected</h4>
-                      <p className="text-[11px] font-bold text-white/80 leading-relaxed uppercase">{error}</p>
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">Security Fault Detected</h4>
+                      <p className="text-[11px] font-bold text-ink leading-relaxed uppercase">{error}</p>
                     </div>
                   </div>
                 </motion.div>
               )}
 
               {(mode === 'login' || (mode === 'register' && regStep === 1)) && (
-                <div className="pt-12 mt-auto border-t border-white/5 space-y-6">
+                <div className="pt-12 mt-auto border-t border-border-main space-y-6">
                   <div className="relative flex items-center justify-center">
-                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
-                    <span className="relative bg-black px-6 text-[10px] font-black uppercase tracking-[0.5em] text-white/10 italic">External Handshake</span>
+                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border-main"></div></div>
+                    <span className="relative bg-bg-card px-6 text-[10px] font-black uppercase tracking-[0.5em] text-text-muted opacity-30 italic">External Handshake</span>
                   </div>
                   <div className="grid grid-cols-2 gap-5">
-                    <button onClick={async () => { try { const res: any = await socialAuth({ provider: 'github' } as any); if (res?.user?.isOnboarded === false) { setMode('register'); setRegStep(1); } } catch(e) {} }} className="py-5 rounded-[1.5rem] bg-white/[0.02] border border-white/5 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 hover:bg-white/5 hover:text-white transition-all">
+                    <button onClick={async () => { try { const res: any = await socialAuth({ provider: 'github' } as any); if (res?.user?.isOnboarded === false) { setMode('register'); setRegStep(1); } } catch(e) {} }} className="py-5 rounded-[1.5rem] bg-bg-card border border-border-main flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-text-muted hover:bg-border-main hover:text-ink transition-all">
                       <Github size={20} /> GitHub
                     </button>
-                    <button onClick={async () => { try { const res: any = await socialAuth({ provider: 'google' } as any); if (res?.user?.isOnboarded === false) { setMode('register'); setRegStep(1); } } catch(e) {} }} className="py-5 rounded-[1.5rem] bg-white/[0.02] border border-white/5 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 hover:bg-white/5 hover:text-white transition-all">
+                    <button onClick={async () => { try { const res: any = await socialAuth({ provider: 'google' } as any); if (res?.user?.isOnboarded === false) { setMode('register'); setRegStep(1); } } catch(e) {} }} className="py-5 rounded-[1.5rem] bg-bg-card border border-border-main flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-text-muted hover:bg-border-main hover:text-ink transition-all">
                       <Globe size={20} /> Google
                     </button>
                   </div>

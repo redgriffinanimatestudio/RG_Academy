@@ -61,17 +61,17 @@ export default function Studio() {
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                  <h3 className="text-sm sm:text-xl font-black uppercase tracking-tight text-white italic truncate text-data-glow">Subcontracting Hub</h3>
+                  <h3 className="text-sm sm:text-xl font-black uppercase tracking-tight text-ink italic truncate text-data-glow">Subcontracting Hub</h3>
                   <span className="px-2 py-0.5 bg-sky-500 text-bg-dark text-[7px] sm:text-[8px] font-black uppercase tracking-widest rounded shadow-lg shadow-primary/20 neural-pulse">Production Synergy</span>
                 </div>
-                <p className="text-[9px] sm:text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1 italic truncate">
+                <p className="text-[9px] sm:text-[10px] text-text-muted opacity-40 font-bold uppercase tracking-widest mt-1 italic truncate">
                   "Может нанимать других и сам браться за работу — идеальный баланс субподряда"
                 </p>
               </div>
             </div>
             
             <div className="flex flex-wrap justify-center md:justify-end gap-3 sm:gap-4 w-full md:w-auto">
-              <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all text-white metallic-glow">
+              <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 sm:px-6 py-3 bg-bg-card border border-border-main rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-border-main transition-all text-ink metallic-glow">
                 <Sparkles size={14} className="text-sky-400" /> <span className="sm:inline">Delegate Tasks</span>
               </button>
               <button 
@@ -94,26 +94,26 @@ export default function Studio() {
             <Briefcase size={14} />
             {t('studio_collab')}
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tighter text-white leading-none uppercase">
+          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tighter text-ink leading-none uppercase">
             {t('build_impossible').split('.')[0]} <br />
             <span className="text-primary italic text-data-glow">{t('build_impossible').split('.')[1] || 'IMPOSSIBLE.'}</span>
           </h1>
-          <p className="text-sm sm:text-lg text-white/40 max-w-xl font-medium mx-auto lg:mx-0">
+          <p className="text-sm sm:text-lg text-text-muted opacity-60 max-w-xl font-medium mx-auto lg:mx-0">
             {t('studio_desc')}
           </p>
         </div>
         <div className="flex flex-col gap-4 w-full lg:w-auto">
           <div className="flex flex-col sm:flex-row gap-4">
-            <div className="p-1 bg-white/10 rounded-2xl border border-white/5 flex flex-1">
+            <div className="p-1 bg-bg-card border border-border-main rounded-2xl flex flex-1">
               <button 
                 onClick={() => setActiveTab('browse')}
-                className={`flex-1 px-4 sm:px-6 py-3 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'browse' ? 'bg-primary text-bg-dark shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                className={`flex-1 px-4 sm:px-6 py-3 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'browse' ? 'bg-primary text-bg-dark shadow-lg shadow-primary/20' : 'text-text-muted hover:text-ink'}`}
               >
                 Browse Projects
               </button>
               <button 
                 onClick={() => setActiveTab('manage')}
-                className={`flex-1 px-4 sm:px-6 py-3 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'manage' ? 'bg-primary text-bg-dark shadow-lg shadow-primary/20' : 'text-white/40 hover:text-white'}`}
+                className={`flex-1 px-4 sm:px-6 py-3 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'manage' ? 'bg-primary text-bg-dark shadow-lg shadow-primary/20' : 'text-text-muted hover:text-ink'}`}
               >
                 My Projects
               </button>
@@ -131,16 +131,16 @@ export default function Studio() {
           
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1 group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors" size={18} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted opacity-20 group-focus-within:text-primary transition-colors" size={18} />
               <input
                 type="text" placeholder="Search projects..." value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="glass-pro-max w-full pl-12 pr-4 py-4 !bg-white/5 rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium text-white placeholder:text-white/20 outline-none border-white/5 focus:border-primary/40"
+                className="glass-pro-max w-full pl-12 pr-4 py-4 !bg-bg-card/5 rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium text-ink placeholder:text-text-muted opacity-20 outline-none border-border-main focus:border-primary/40"
               />
             </div>
             <button 
               onClick={() => setShowFilters(!showFilters)}
-              className={`px-6 py-4 rounded-2xl flex items-center justify-center gap-3 font-black uppercase tracking-widest text-[10px] transition-all border ${showFilters ? 'bg-primary text-bg-dark border-primary' : 'bg-white/10 text-white/60 border-white/5 hover:border-white/20'}`}
+              className={`px-6 py-4 rounded-2xl flex items-center justify-center gap-3 font-black uppercase tracking-widest text-[10px] transition-all border ${showFilters ? 'bg-primary text-bg-dark border-primary' : 'bg-bg-card text-text-muted border-border-main hover:border-primary/20'}`}
             >
               <Filter size={18} /> {t('filters')}
             </button>
@@ -160,8 +160,8 @@ export default function Studio() {
               { l: 'Your Active Bids', v: '0', i: Clock, c: 'text-sky-400' },
               { l: 'Success Rate', v: '100%', i: CheckCircle, c: 'text-emerald-400' }
             ].map((s, i) => (
-              <div key={i} className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between group hover:border-white/10 transition-all">
-                <div className="space-y-1"><p className="text-[9px] font-black uppercase tracking-widest text-white/20">{s.l}</p><p className="text-xl font-black text-white">{s.v}</p></div>
+              <div key={i} className="p-6 rounded-2xl bg-bg-card/10 border border-border-main flex items-center justify-between group hover:border-primary/20 transition-all">
+                <div className="space-y-1"><p className="text-[9px] font-black uppercase tracking-widest text-text-muted opacity-20">{s.l}</p><p className="text-xl font-black text-ink">{s.v}</p></div>
                 <s.i size={20} className={`${s.c} opacity-20 group-hover:opacity-100 transition-opacity`} />
               </div>
             ))}
@@ -203,10 +203,10 @@ export default function Studio() {
       {activeTab === 'manage' ? (
         <div className="space-y-8 sm:space-y-12">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">Project Management</h2>
-            <select className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-white outline-none cursor-pointer appearance-none">
-              <option className="bg-bg-card text-white">Active Projects</option>
-              <option className="bg-bg-card text-white">Completed</option>
+            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-ink">Project Management</h2>
+            <select className="bg-bg-card border border-border-main rounded-xl px-4 py-2 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-ink outline-none cursor-pointer appearance-none">
+              <option className="bg-bg-card text-ink">Active Projects</option>
+              <option className="bg-bg-card text-ink">Completed</option>
             </select>
           </div>
           <div className="overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0"><KanbanBoard /></div>
@@ -263,7 +263,7 @@ export default function Studio() {
       <div className="fixed bottom-8 right-8 z-40">
         <button 
           onClick={() => setShowCheckout(true)}
-          className="size-14 bg-white text-bg-dark rounded-2xl flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all group border-4 border-primary/20"
+          className="size-14 bg-ink text-bg-main rounded-2xl flex items-center justify-center shadow-2xl hover:scale-110 active:scale-[0.98] transition-all group border-4 border-primary/20"
         >
           <CreditCard size={22} className="group-hover:rotate-12 transition-transform" />
           <div className="absolute -top-1 -right-1 size-5 bg-primary text-bg-dark text-[9px] font-black flex items-center justify-center rounded-full border-2 border-bg-dark">1</div>

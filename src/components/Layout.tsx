@@ -149,10 +149,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [profile, authLoading, isDashboardPage, isProfile, isPublicPage, lang]);
 
-  if (authLoading) return <div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center"><Preloader message="Initializing Red Griffin..." size="lg" /></div>;
+  if (authLoading) return <div className="min-h-screen bg-bg-dark flex items-center justify-center"><Preloader message="Initializing Red Griffin..." size="lg" /></div>;
   
   if (!profile && (isDashboardPage || isProfile) && !isPublicPage) {
-    return <div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center">
+    return <div className="min-h-screen bg-bg-dark flex items-center justify-center">
       <div className="size-12 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
     </div>;
   }
@@ -177,7 +177,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className={`min-h-screen font-sans text-slate-900 bg-[#f0f2f5] transition-colors duration-500 touch-manipulation relative overflow-x-hidden`}>
+    <div className={`min-h-screen font-sans text-ink bg-bg-dark transition-colors duration-500 touch-manipulation relative overflow-x-hidden`}>
       {showBanner && (
         <div className={`${modeBg} text-white py-2.5 px-6 text-center text-[10px] font-black uppercase tracking-[0.3em] relative z-[60] shadow-sm`}>
           <span>{isStudio ? t('studio_collab') : t('academy_workshops')}</span>

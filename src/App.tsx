@@ -26,13 +26,15 @@ import { AlertProvider } from './components/Alert';
 import GlobalSearchOverlay from './components/search/GlobalSearchOverlay';
 import { AuthProvider } from './context/AuthContext';
 import { PlatformProvider } from './context/PlatformContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { useSyncManager } from './services/syncManager';
 import { useTranslation } from 'react-i18next';
 import Terms from './pages/Terms';
 import { CookieConsent } from './components/common/CookieConsent';
+import { GeoRedirect } from './components/common/GeoRedirect';
 import './i18n';
 
-const LANGUAGES = ['eng', 'ru', 'tr', 'az', 'es', 'fr', 'de', 'it'];
+const LANGUAGES = ['eng', 'ru', 'tr', 'az', 'es', 'fr', 'de', 'it', 'thai'];
 
 function SyncHandler({ children }: { children: React.ReactNode }) {
   useSyncManager();
@@ -69,68 +71,71 @@ function RedirectWithLang({ to }: { to: string }) {
 export default function App() {
   return (
     <Router>
-      <AuthProvider>
-        <PlatformProvider>
-          <SyncHandler>
-            <AlertProvider>
-              <GlobalSearchOverlay />
-              <CookieConsent />
-              <Routes>
-                <Route path="/" element={<Navigate to="/eng" replace />} />
-                {/* Main Routes */}
-                <Route path="/:lang" element={<LanguageWrapper><Layout><Home /></Layout></LanguageWrapper>} />
-                <Route path="/:lang/dev" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
-                <Route path="/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
-                <Route path="/:lang/finance" element={<LanguageWrapper><Layout><Finance /></Layout></LanguageWrapper>} />
-                
-                {/* Redirect legacy specific routes to unified dashboard */}
-                <Route path="/:lang/admin" element={<RedirectWithLang to="/dashboard" />} />
-                <Route path="/:lang/chief-manager" element={<RedirectWithLang to="/dashboard" />} />
-                <Route path="/:lang/manager" element={<RedirectWithLang to="/dashboard" />} />
-                <Route path="/:lang/staff" element={<RedirectWithLang to="/dashboard" />} />
-                <Route path="/:lang/moderator" element={<RedirectWithLang to="/dashboard" />} />
-                <Route path="/:lang/hr" element={<RedirectWithLang to="/dashboard" />} />
-                <Route path="/:lang/finance" element={<RedirectWithLang to="/dashboard" />} />
-                <Route path="/:lang/support" element={<RedirectWithLang to="/dashboard" />} />
+      <ThemeProvider>
+        <AuthProvider>
+          <PlatformProvider>
+            <SyncHandler>
+              <AlertProvider>
+                <GlobalSearchOverlay />
+                <CookieConsent />
+                <GeoRedirect />
+                <Routes>
+                  <Route path="/" element={<div className="bg-bg-dark min-h-screen" />} />
+                  {/* Main Routes */}
+                  <Route path="/:lang" element={<LanguageWrapper><Layout><Home /></Layout></LanguageWrapper>} />
+                  <Route path="/:lang/dev" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
+                  <Route path="/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
+                  <Route path="/:lang/finance" element={<LanguageWrapper><Layout><Finance /></Layout></LanguageWrapper>} />
+                  
+                  {/* Redirect legacy specific routes to unified dashboard */}
+                  <Route path="/:lang/admin" element={<RedirectWithLang to="/dashboard" />} />
+                  <Route path="/:lang/chief-manager" element={<RedirectWithLang to="/dashboard" />} />
+                  <Route path="/:lang/manager" element={<RedirectWithLang to="/dashboard" />} />
+                  <Route path="/:lang/staff" element={<RedirectWithLang to="/dashboard" />} />
+                  <Route path="/:lang/moderator" element={<RedirectWithLang to="/dashboard" />} />
+                  <Route path="/:lang/hr" element={<RedirectWithLang to="/dashboard" />} />
+                  <Route path="/:lang/finance" element={<RedirectWithLang to="/dashboard" />} />
+                  <Route path="/:lang/support" element={<RedirectWithLang to="/dashboard" />} />
 
-            {/* Academy Routes */}
-            <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />
-            <Route path="/aca/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><TopicPage /></Layout></LanguageWrapper>} />
-            <Route path="/aca/:lang/course/:slug" element={<LanguageWrapper><Layout><CourseDetail /></Layout></LanguageWrapper>} />
-            <Route path="/aca/:lang/workshop" element={<LanguageWrapper><Layout><CourseBuilder /></Layout></LanguageWrapper>} />
-            <Route path="/aca/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
-            <Route path="/aca/:lang/messages" element={<LanguageWrapper><Layout><Messages /></Layout></LanguageWrapper>} />
-            <Route path="/aca/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
-            <Route path="/aca/:lang/profile/:id" element={<LanguageWrapper><Layout><SpecialistProfile /></Layout></LanguageWrapper>} />
-            <Route path="/aca/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
-            
-            {/* Studio Routes */}
-            <Route path="/studio/:lang" element={<LanguageWrapper><Layout><Studio /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/service/:serviceSlug" element={<LanguageWrapper><Layout><ServicePage /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/messages" element={<LanguageWrapper><Layout><Messages /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/neural" element={<LanguageWrapper><Layout><NeuralStudio /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/finance" element={<LanguageWrapper><Layout><Finance /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/profile/:id" element={<LanguageWrapper><Layout><SpecialistProfile /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
-            <Route path="/studio/:lang/trajectory" element={<LanguageWrapper><Layout><TrajectoryPage /></Layout></LanguageWrapper>} />
+              {/* Academy Routes */}
+              <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />
+              <Route path="/aca/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><TopicPage /></Layout></LanguageWrapper>} />
+              <Route path="/aca/:lang/course/:slug" element={<LanguageWrapper><Layout><CourseDetail /></Layout></LanguageWrapper>} />
+              <Route path="/aca/:lang/workshop" element={<LanguageWrapper><Layout><CourseBuilder /></Layout></LanguageWrapper>} />
+              <Route path="/aca/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
+              <Route path="/aca/:lang/messages" element={<LanguageWrapper><Layout><Messages /></Layout></LanguageWrapper>} />
+              <Route path="/aca/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
+              <Route path="/aca/:lang/profile/:id" element={<LanguageWrapper><Layout><SpecialistProfile /></Layout></LanguageWrapper>} />
+              <Route path="/aca/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
+              
+              {/* Studio Routes */}
+              <Route path="/studio/:lang" element={<LanguageWrapper><Layout><Studio /></Layout></LanguageWrapper>} />
+              <Route path="/studio/:lang/service/:serviceSlug" element={<LanguageWrapper><Layout><ServicePage /></Layout></LanguageWrapper>} />
+              <Route path="/studio/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
+              <Route path="/studio/:lang/messages" element={<LanguageWrapper><Layout><Messages /></Layout></LanguageWrapper>} />
+              <Route path="/studio/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
+              <Route path="/studio/:lang/neural" element={<LanguageWrapper><Layout><NeuralStudio /></Layout></LanguageWrapper>} />
+              <Route path="/studio/:lang/finance" element={<LanguageWrapper><Layout><Finance /></Layout></LanguageWrapper>} />
+              <Route path="/studio/:lang/profile/:id" element={<LanguageWrapper><Layout><SpecialistProfile /></Layout></LanguageWrapper>} />
+              <Route path="/studio/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
+              <Route path="/studio/:lang/trajectory" element={<LanguageWrapper><Layout><TrajectoryPage /></Layout></LanguageWrapper>} />
 
-            {/* Other */}
-            <Route path="/learn/:lang/:slug" element={<LanguageWrapper><Learn /></LanguageWrapper>} />
-            <Route path="/:lang/privacy" element={<LanguageWrapper><Layout><InfoPage /></Layout></LanguageWrapper>} />
-            <Route path="/:lang/terms" element={<LanguageWrapper><Terms /></LanguageWrapper>} />
-            
-            {/* Review Terminal */}
-            <Route path="/review/:lang/:projectId" element={<LanguageWrapper><AssetReview /></LanguageWrapper>} />
-            <Route path="/review/:lang/:projectId/:taskId" element={<LanguageWrapper><AssetReview /></LanguageWrapper>} />
-            
-            <Route path="*" element={<Navigate to="/eng" replace />} />
-          </Routes>
-        </AlertProvider>
-      </SyncHandler>
-    </PlatformProvider>
-  </AuthProvider>
+              {/* Other */}
+              <Route path="/learn/:lang/:slug" element={<LanguageWrapper><Learn /></LanguageWrapper>} />
+              <Route path="/:lang/privacy" element={<LanguageWrapper><Layout><InfoPage /></Layout></LanguageWrapper>} />
+              <Route path="/:lang/terms" element={<LanguageWrapper><Terms /></LanguageWrapper>} />
+              
+              {/* Review Terminal */}
+              <Route path="/review/:lang/:projectId" element={<LanguageWrapper><AssetReview /></LanguageWrapper>} />
+              <Route path="/review/:lang/:projectId/:taskId" element={<LanguageWrapper><AssetReview /></LanguageWrapper>} />
+              
+              <Route path="*" element={<Navigate to="/eng" replace />} />
+            </Routes>
+          </AlertProvider>
+        </SyncHandler>
+      </PlatformProvider>
+    </AuthProvider>
+  </ThemeProvider>
 </Router>
   );
 }

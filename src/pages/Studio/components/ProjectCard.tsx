@@ -55,7 +55,7 @@ export default function ProjectCard({ project, t, onViewDetails }: ProjectCardPr
         {matchScore > 0 && (
           <div className="absolute top-0 right-0 z-30">
             <div className="flex flex-col items-end">
-              <span className="text-[7px] font-black uppercase tracking-[0.3em] text-white/20 mb-1 neural-pulse">Sync Match</span>
+              <span className="text-[7px] font-black uppercase tracking-[0.3em] text-text-muted opacity-20 mb-1 neural-pulse">Sync Match</span>
               <div className={`px-4 py-1.5 rounded-full text-[10px] font-black flex items-center gap-2 border shadow-lg transition-all ${
                 matchScore >= 80 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-emerald-500/10' : 
                 'bg-primary/10 border-primary/20 text-primary shadow-primary/10'
@@ -68,42 +68,42 @@ export default function ProjectCard({ project, t, onViewDetails }: ProjectCardPr
 
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-3">
-            <h3 className="font-black text-3xl tracking-tighter text-white uppercase leading-none group-hover:text-primary transition-colors text-data-glow">{project.title}</h3>
+            <h3 className="font-black text-3xl tracking-tighter text-ink uppercase leading-none group-hover:text-primary transition-colors text-data-glow">{project.title}</h3>
             {project.urgency === 'urgent' && (
               <span className="px-2 py-0.5 bg-primary text-bg-dark text-[8px] font-black uppercase tracking-widest rounded flex items-center gap-1 shadow-[0_0_15px_rgba(0,245,212,0.4)]">
                 <Zap size={8} fill="currentColor" /> {t('urgent')}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 text-white/40 font-bold uppercase tracking-widest text-[9px] italic">
-            <Building2 size={12} className="text-white/20" />
-            {t('posted_by')} <span className="text-white/80">{project.client?.displayName || 'Protocol Terminal'}</span>
+          <div className="flex items-center gap-2 text-text-muted opacity-40 font-bold uppercase tracking-widest text-[9px] italic">
+            <Building2 size={12} className="text-text-muted opacity-20" />
+            {t('posted_by')} <span className="text-ink">{project.client?.displayName || 'Protocol Terminal'}</span>
           </div>
         </div>
         
         <div className="flex flex-wrap gap-2">
           {tags.map((tag: string) => (
-            <span key={tag} className="px-3 py-1 rounded-lg bg-white/5 text-[9px] font-black uppercase tracking-widest text-white/40 border border-white/5 group-hover:border-white/20 transition-all hover:text-white hover:bg-white/10 italic">
+            <span key={tag} className="px-3 py-1 rounded-lg bg-bg-card text-[9px] font-black uppercase tracking-widest text-text-muted opacity-40 border border-border-main group-hover:border-primary/20 transition-all hover:text-ink hover:bg-border-main italic">
               #{tag}
             </span>
           ))}
         </div>
 
-        <p className="text-sm text-white/50 font-medium leading-relaxed line-clamp-3">
+        <p className="text-sm text-text-muted opacity-60 font-medium leading-relaxed line-clamp-3">
           {project.description}
         </p>
 
-        <div className="flex items-center justify-between pt-8 mt-6 border-t border-white/5">
+        <div className="flex items-center justify-between pt-8 mt-6 border-t border-border-main">
           <div className="flex flex-col">
-            <span className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">{t('budget_range')}</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-text-muted opacity-20 mb-1">{t('budget_range')}</span>
             <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-black text-white italic tracking-tighter leading-none text-data-glow">${project.budget.toLocaleString()}</span>
-              <span className="text-[8px] font-bold text-white/20 uppercase tracking-widest">USD</span>
+              <span className="text-3xl font-black text-ink italic tracking-tighter leading-none text-data-glow">${project.budget.toLocaleString()}</span>
+              <span className="text-[8px] font-bold text-text-muted opacity-20 uppercase tracking-widest">USD</span>
             </div>
           </div>
           <button 
             onClick={() => onViewDetails(project)}
-            className="metallic-glow flex items-center gap-3 bg-white/5 px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-primary hover:text-bg-dark transition-all border border-white/10 hover:border-transparent group/btn overflow-hidden"
+            className="metallic-glow flex items-center gap-3 bg-bg-card px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-ink hover:bg-primary hover:text-bg-dark transition-all border border-border-main hover:border-transparent group/btn overflow-hidden"
           >
             <span className="relative z-10 flex items-center gap-2">
               {t('view_details')} 

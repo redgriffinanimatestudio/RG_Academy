@@ -4,62 +4,83 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", sans-serif;
   
-  --color-primary: var(--primary, #10b981);
-  --color-primary-hover: var(--primary-hover, #059669);
-  --color-bg-dark: var(--bg-main, #f0f2f5);
-  --color-bg-card: var(--bg-card, rgba(255, 255, 255, 0.8));
-  --color-ink: #111827;
+  --color-primary: #10b981;
+  --color-primary-hover: #059669;
+  
+  /* Theme Variables */
+  --color-bg-dark: var(--bg-main);
+  --color-bg-card: var(--bg-card);
+  --color-ink: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-border-main: var(--border-main);
+  --color-switcher-bg: var(--switcher-bg);
 
-  /* Soft Glass Theme Node 2026 */
   --matrix-accent: #10b981;
-  --matrix-bg-glow: rgba(16, 185, 129, 0.05);
   --glass-blur: blur(24px);
   --glass-pro-blur: blur(40px);
-  --metallic-linear: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.4) 100%);
+}
+
+:root {
+  --bg-main: #ffffff;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --text-main: #0a0a0a;
+  --text-muted: #4a4a4a;
+  --border-main: rgba(0, 0, 0, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --switcher-bg: #f5f5f5;
+  --shadow-main: 0 10px 30px -10px rgba(0,0,0,0.05);
+  --card-shadow: 0 30px 60px -12px rgba(0,0,0,0.08);
+}
+
+[data-theme='dark'] {
+  --bg-main: #050505;
+  --bg-card: rgba(18, 18, 18, 0.8);
+  --text-main: #f0f0f0;
+  --text-muted: #a0a0a0;
+  --border-main: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(10, 10, 10, 0.8);
+  --switcher-bg: #1a1a1a;
+  --shadow-main: 0 10px 40px -10px rgba(0,0,0,0.5);
+  --card-shadow: 0 30px 60px -12px rgba(0,0,0,0.6);
 }
 
 @layer base {
-  .theme-academy {
-    --primary: #10b981;
-    --primary-hover: #059669;
-    --bg-main: #f4f7fa;
-    --bg-card: rgba(255, 255, 255, 0.8);
+  * {
+    @apply border-border-main transition-colors duration-300;
   }
 
-  .theme-studio {
-    --primary: #0ea5e9; /* Sky Blue for Studio */
-    --primary-hover: #0284c7;
-    --bg-main: #f8fafc;
-    --bg-card: rgba(255, 255, 255, 0.9);
-  }
-
-  .theme-matrix {
-    --primary: #10b981;
-    --primary-hover: #059669;
-    --bg-main: #f0f2f5;
-    --bg-card: rgba(255, 255, 255, 0.6);
-  }
-  
   body {
-    @apply bg-[#f0f2f5] text-slate-900 font-sans antialiased transition-colors duration-500 overflow-x-hidden;
+    @apply bg-bg-dark text-ink font-sans antialiased overflow-x-hidden;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-black tracking-tighter;
+    @apply font-display text-ink;
+    letter-spacing: -0.05em;
+    line-height: 0.9;
+  }
+  
+  p {
+    @apply leading-relaxed;
+    letter-spacing: -0.01em;
+  }
+  
+  .theme-transitioning * {
+    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease !important;
+  }
+
+  .criativo-card {
+    @apply bg-bg-card backdrop-blur-xl border border-border-main p-8 transition-all hover:shadow-2xl rounded-[2rem];
+    box-shadow: var(--card-shadow);
+  }
+  
+  .criativo-gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-cyan-500 font-bold;
   }
 }
 
 @layer components {
   .criativo-btn {
-    @apply px-8 py-4 bg-primary text-bg-dark font-black uppercase tracking-widest text-xs transition-all hover:bg-primary-hover hover:scale-105 active:scale-95;
-  }
-  
-  .criativo-card {
-    @apply bg-white/60 backdrop-blur-xl border border-white/40 p-8 transition-all hover:border-primary/40 hover:shadow-2xl shadow-sm rounded-[2rem];
-  }
-  
-  .criativo-gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-cyan-500;
+    @apply px-8 py-4 bg-primary text-white font-black uppercase tracking-widest text-xs transition-all hover:bg-primary-hover hover:scale-105 active:scale-95;
   }
 
   .glass-panel {
@@ -112,11 +133,10 @@
   /* UI SOFT MOD - DESIGN DNA */
   .glass-pro-max {
     backdrop-filter: var(--glass-pro-blur) saturate(180%) contrast(100%);
-    background: linear-gradient(165deg, rgba(255, 255, 255, 0.7) 0%, rgba(245, 245, 245, 0.4) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 
-      inset 0 1px 1px rgba(255, 255, 255, 0.8),
-      0 20px 40px -10px rgba(0, 0, 0, 0.05);
+    background: var(--glass-bg);
+    border: 1px solid var(--border-main);
+    box-shadow: var(--shadow-main);
+    @apply text-ink;
   }
 
   .metallic-glow {

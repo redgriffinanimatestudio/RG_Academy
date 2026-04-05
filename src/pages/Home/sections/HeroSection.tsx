@@ -1,24 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, LayoutDashboard } from 'lucide-react';
-import { Link } from 'react-router-dom';
-
-const HERO_SLIDES = [
-  {
-    title: 'We are Red Griffin',
-    accent: 'Studio',
-    desc: 'High-end CGI, Animation, and Digital Solutions for the modern industry.',
-    image: 'https://picsum.photos/seed/studio-hero/1920/1080',
-    link: '/studio'
-  },
-  {
-    title: 'Master your',
-    accent: 'Craft',
-    desc: 'Professional workshops led by industry veterans from around the globe.',
-    image: 'https://picsum.photos/seed/academy-hero/1920/1080',
-    link: '/aca'
-  }
-];
+import { Play, Sparkles, GraduationCap, ChevronRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface HeroSectionProps {
   t: (key: string) => string;
@@ -28,113 +11,146 @@ interface HeroSectionProps {
   handleLoginRedirect: () => void;
 }
 
-const HeroSection: React.FC<HeroSectionProps> = ({ t, lang, user, getDashboardLink, handleLoginRedirect }) => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+const HeroSection: React.FC<HeroSectionProps> = ({ t, lang, user, handleLoginRedirect }) => {
+  const [hoveredPath, setHoveredPath] = useState<'studio' | 'academy' | null>(null);
+  const navigate = useNavigate();
+
+  const paths = [
+    {
+      id: 'studio' as const,
+      title: t('studio'),
+      subtitle: 'Production & Solutions',
+      desc: 'High-end CGI, Animation, and Digital Solutions for the modern industry.',
+      icon: Sparkles,
+      color: 'from-emerald-500/20 to-cyan-500/20',
+      borderColor: 'border-emerald-500/30',
+      bgImage: 'https://picsum.photos/seed/rg-studio-v4/1920/1080',
+      link: `/studio/${lang || 'eng'}`
+    },
+    {
+      id: 'academy' as const,
+      title: t('academy'),
+      subtitle: 'Mastery & Evolution',
+      desc: 'Professional workshops led by industry veterans from around the globe.',
+      icon: GraduationCap,
+      color: 'from-blue-500/20 to-primary/20',
+      borderColor: 'border-primary/30',
+      bgImage: 'https://picsum.photos/seed/rg-academy-v4/1920/1080',
+      link: `/aca/${lang || 'eng'}`
+    }
+  ];
 
   return (
-    <section className="relative h-[85vh] min-h-[600px] overflow-hidden rounded-[3rem] mx-4 mt-4">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentSlide}
-          initial={{ opacity: 0, scale: 1.1 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-0"
-        >
-          <img 
-            src={HERO_SLIDES[currentSlide].image} 
-            alt="" 
-            className="w-full h-full object-cover grayscale brightness-50" 
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-bg-dark via-bg-dark/40 to-transparent" />
-        </motion.div>
-      </AnimatePresence>
+    <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden px-4 py-12">
+      {/* Background Atmosphere */}
+      <div className="absolute inset-0 z-0">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={hoveredPath || 'default'}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.15 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0"
+          >
+            <img 
+              src={hoveredPath ? paths.find(p => p.id === hoveredPath)?.bgImage : 'https://picsum.photos/seed/rg-grid/1920/1080'} 
+              className="w-full h-full object-cover grayscale"
+              alt=""
+            />
+          </motion.div>
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-bg-dark/95 backdrop-blur-sm" />
+      </div>
 
-      <div className="absolute inset-0 flex flex-col justify-center px-12 md:px-24">
-        <div className="max-w-4xl space-y-8 relative z-10">
+      {/* Main Content */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto space-y-16">
+        <div className="text-center space-y-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-4 text-primary font-black uppercase tracking-[0.4em] text-[10px]"
+            className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-border-main bg-bg-card/50 backdrop-blur-md"
           >
-            <div className="w-12 h-[1px] bg-primary" />
-            {t('master_cg')}
+            <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">{t('creative_ecosystem')}</span>
           </motion.div>
           
-          <motion.h1 
-            key={`h1-${currentSlide}`}
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.85] uppercase"
+          <motion.h1
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-5xl md:text-8xl font-black tracking-tighter uppercase leading-[0.85] text-ink"
           >
-            {HERO_SLIDES[currentSlide].title} <br />
-            <span className="text-primary italic">{HERO_SLIDES[currentSlide].accent}.</span>
+            Which <span className="text-primary italic">Path</span> <br />
+            Do you want to <span className="text-primary underline decoration-emerald-500/30 underline-offset-8">select?</span>
           </motion.h1>
-          
-          <motion.p 
-            key={`p-${currentSlide}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-base sm:text-lg md:text-xl text-white/50 max-w-xl font-medium leading-relaxed"
-          >
-            {HERO_SLIDES[currentSlide].desc}
-          </motion.p>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-start sm:items-center gap-6 pt-4"
-          >
-            <Link to={`${HERO_SLIDES[currentSlide].link}/${lang || 'eng'}`} className="flex items-center gap-4 group">
-              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-primary flex items-center justify-center transition-transform group-hover:scale-110 shadow-xl shadow-primary/20">
-                <Play size={20} className="text-bg-dark fill-current ml-1 sm:size-24" />
-              </div>
-              <div className="text-left">
-                <div className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-white/40">{t('about_us')}</div>
-                <div className="text-xs sm:text-sm font-black uppercase tracking-widest text-white group-hover:text-primary transition-colors">Start Experience</div>
-              </div>
-            </Link>
-
-            {user ? (
-              <Link 
-                to={getDashboardLink()}
-                className="w-full sm:w-auto flex items-center justify-center gap-3 bg-primary text-bg-dark px-6 sm:px-10 py-4 sm:py-5 rounded-2xl font-black uppercase tracking-widest text-[9px] sm:text-[10px] hover:scale-105 transition-all shadow-2xl shadow-primary/20 active:scale-95"
-              >
-                <LayoutDashboard size={16} />
-                {t('my_dashboard')}
-              </Link>
-            ) : (
-              <button 
-                onClick={handleLoginRedirect}
-                className="w-full sm:w-auto flex items-center justify-center gap-3 bg-white text-bg-dark px-6 sm:px-10 py-4 sm:py-5 rounded-2xl font-black uppercase tracking-widest text-[9px] sm:text-[10px] hover:bg-neutral-100 transition-all shadow-2xl active:scale-95"
-              >
-                <img src="https://www.google.com/favicon.ico" alt="" className="w-4 h-4" />
-                {t('join_ecosystem')}
-              </button>
-            )}
-          </motion.div>
         </div>
-      </div>
 
-      {/* Slider Navigation */}
-      <div className="absolute bottom-6 right-6 sm:bottom-12 sm:right-12 flex items-center gap-4 scale-75 sm:scale-100">
-        <div className="flex gap-2">
-          {HERO_SLIDES.map((_, i) => (
-            <button 
-              key={i} 
-              onClick={() => setCurrentSlide(i)}
-              className={`h-1 transition-all duration-500 rounded-full ${currentSlide === i ? 'w-12 bg-primary' : 'w-4 bg-white/20 hover:bg-white/40'}`} 
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+          {paths.map((path, idx) => (
+            <motion.button
+              key={path.id}
+              initial={{ opacity: 0, x: idx === 0 ? -40 : 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 + idx * 0.1 }}
+              onMouseEnter={() => setHoveredPath(path.id)}
+              onMouseLeave={() => setHoveredPath(null)}
+              onClick={() => navigate(path.link)}
+              className={`relative h-[400px] md:h-[500px] group rounded-[3rem] border-2 ${path.borderColor} overflow-hidden bg-bg-card hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 active:scale-[0.98] text-left`}
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${path.color} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
+              
+              <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="size-16 rounded-2xl bg-bg-dark flex items-center justify-center text-primary border border-border-main group-hover:scale-110 transition-transform duration-500">
+                    <path.icon size={32} />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">{path.subtitle}</div>
+                    <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-ink leading-none">{path.title}</h2>
+                  </div>
+                </div>
+
+                <div className="space-y-8">
+                  <p className="text-text-muted font-medium max-w-xs text-sm md:text-base leading-relaxed opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                    {path.desc}
+                  </p>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="px-8 py-4 bg-ink text-bg-main rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 group-hover:bg-primary group-hover:text-bg-dark transition-colors">
+                      Enter Sector <ChevronRight size={16} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Decorative Corner */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 -mr-16 -mt-16 rounded-full group-hover:scale-150 transition-transform duration-1000" />
+            </motion.button>
           ))}
         </div>
-        <div className="h-8 w-[1px] bg-white/10 mx-2" />
-        <div className="text-[10px] font-black text-white/40 uppercase tracking-widest">
-          0{currentSlide + 1} / 0{HERO_SLIDES.length}
-        </div>
+
+        {/* Auth Quick Action */}
+        {!user && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="flex flex-col items-center gap-4 pt-8"
+          >
+            <div className="h-[1px] w-24 bg-border-main" />
+            <button 
+              onClick={handleLoginRedirect}
+              className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted hover:text-primary transition-colors flex items-center gap-2 group"
+            >
+              Sync with Ecosystem <ChevronRight size={12} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          </motion.div>
+        )}
       </div>
+
+      {/* Grid Overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03]" 
+           style={{ backgroundImage: 'radial-gradient(var(--border-main) 1px, transparent 0)', backgroundSize: '40px 40px' }} />
     </section>
   );
 };

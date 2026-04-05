@@ -67,39 +67,39 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, lang, t }) => {
         </div>
         
         <div className="flex-1 space-y-4 text-left">
-          <h3 className="text-2xl font-black tracking-tighter text-white group-hover:text-primary transition-colors line-clamp-2 uppercase italic text-data-glow">
+          <h3 className="text-2xl font-black tracking-tighter text-ink group-hover:text-primary transition-colors line-clamp-2 uppercase italic text-data-glow">
             {course.title}
           </h3>
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-full border border-primary/20 overflow-hidden shadow-lg shadow-primary/5 p-0.5">
               <img src={course.lecturerAvatar || "https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png"} alt={course.lecturerName} referrerPolicy="no-referrer" className="w-full h-full object-cover rounded-full" />
             </div>
-            <p className="text-[10px] text-white/40 font-black uppercase tracking-widest italic">{t('by')} <span className="text-white/80">{course.lecturerName}</span></p>
+            <p className="text-[10px] text-text-muted opacity-40 font-black uppercase tracking-widest italic">{t('by')} <span className="text-ink">{course.lecturerName}</span></p>
           </div>
 
-          <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.1em] text-white/20">
+          <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.1em] text-text-muted opacity-20">
             <div className="flex items-center gap-1.5 group/stat">
               <Star size={14} className="text-primary neural-pulse" fill="currentColor" />
-              <span className="text-white">{course.rating}</span>
+              <span className="text-text-muted">{course.rating}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Users size={14} />
               <span>{course.studentsCount.toLocaleString()}</span>
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-lg border border-white/5">
-              <span className="text-white/60">{t(course.level)}</span>
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-bg-card border border-border-main rounded-lg">
+              <span className="text-text-muted opacity-60">{t(course.level)}</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-6 border-t border-white/5">
+          <div className="flex items-center justify-between pt-6 border-t border-border-main">
             <div className="flex flex-col">
-              <span className="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">{t('sync_price')}</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-text-muted opacity-20 mb-1">{t('sync_price')}</span>
               <div className="flex items-baseline gap-1">
-                 <span className="text-3xl font-black text-white italic tracking-tighter text-data-glow">${course.price}</span>
-                 <span className="text-[8px] font-bold text-white/20">USD</span>
+                 <span className="text-3xl font-black text-ink italic tracking-tighter text-data-glow">${course.price}</span>
+                 <span className="text-[8px] font-bold text-text-muted opacity-20">USD</span>
               </div>
             </div>
-            <div className="metallic-glow size-14 bg-white/5 text-white rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-bg-dark transition-all border border-white/10 group-hover:shadow-[0_0_20px_rgba(0,245,212,0.4)]">
+            <div className="metallic-glow size-14 bg-bg-card text-text-muted rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-bg-dark transition-all border border-border-main group-hover:shadow-[0_0_20px_rgba(0,245,212,0.4)]">
               <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
             </div>
           </div>

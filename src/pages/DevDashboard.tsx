@@ -80,40 +80,40 @@ const DevDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-zinc-300 font-sans pt-24 pb-20">
+    <div className="min-h-screen bg-bg-dark text-ink font-sans pt-24 pb-20 tracking-tight">
       {/* Master Header */}
       <div className="max-w-[1920px] mx-auto px-8 mb-12">
-        <div className="flex items-center justify-between bg-indigo-500/10 border border-indigo-500/20 rounded-[2rem] p-8 relative overflow-hidden">
-          <div className="relative z-10 space-y-2">
-            <div className="flex items-center gap-3 text-indigo-400 font-black uppercase tracking-[0.4em] text-[10px]">
+        <div className="flex items-center justify-between bg-bg-card border border-border-main rounded-[3rem] p-10 relative overflow-hidden shadow-sm">
+          <div className="relative z-10 space-y-3">
+            <div className="flex items-center gap-3 text-emerald-600 font-black uppercase tracking-[0.4em] text-[10px]">
               <Zap size={14} fill="currentColor" />
               Development Access Mode
             </div>
-            <h1 className="text-4xl font-black tracking-tighter text-white uppercase leading-none">
-              Master Control <span className="text-indigo-400 italic">Engine.</span>
+            <h1 className="text-5xl font-black tracking-tighter text-ink uppercase leading-none">
+              Master Control <span className="text-emerald-500 italic">Engine.</span>
             </h1>
-            <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Logged in as System Developer · All Roles Active</p>
+            <p className="text-text-muted text-[10px] font-bold uppercase tracking-widest">Logged in as System Developer · All Roles Active</p>
           </div>
           <div className="relative z-10 flex gap-4">
-            <button className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase hover:bg-white/10 transition-all flex items-center gap-2">
-              <Terminal size={14} /> CLI Console
+            <button className="px-8 py-4 bg-bg-card border border-border-main rounded-2xl text-[10px] font-black uppercase text-ink hover:bg-bg-dark hover:shadow-md transition-all flex items-center gap-3">
+              <Terminal size={16} /> CLI Console
             </button>
             <button 
               onClick={handleDeploy}
               disabled={isDeploying}
-              className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase shadow-xl transition-all flex items-center gap-2 ${isDeploying ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-indigo-500 text-white shadow-indigo-500/20 hover:scale-105'}`}
+              className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase shadow-2xl transition-all flex items-center gap-3 ${isDeploying ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-emerald-500 text-white shadow-emerald-200 hover:scale-105 active:scale-95'}`}
             >
-              {isDeploying ? <div className="size-3 border-2 border-zinc-500 border-t-transparent animate-spin rounded-full" /> : <Rocket size={14} />}
+              {isDeploying ? <div className="size-4 border-2 border-slate-400 border-t-transparent animate-spin rounded-full" /> : <Rocket size={16} />}
               {isDeploying ? 'Deploying...' : 'Deploy Changes'}
             </button>
           </div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 blur-[100px] -mr-48 -mt-48 rounded-full" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 blur-[100px] -mr-48 -mt-48 rounded-full" />
         </div>
       </div>
 
       {/* Main Navigation Tabs */}
-      <div className="max-w-[1920px] mx-auto px-8 mb-8">
-        <div className="flex items-center gap-2 border-b border-white/5">
+      <div className="max-w-[1920px] mx-auto px-8 mb-10">
+        <div className="flex items-center gap-4 border-b border-border-main">
           {[
             { id: 'matrix', label: 'Roles Matrix', icon: Layers },
             { id: 'combinations', label: 'User Combinations', icon: Sparkles },
@@ -124,13 +124,13 @@ const DevDashboard: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-8 py-4 flex items-center gap-3 text-[10px] font-black uppercase tracking-widest border-b-2 transition-all ${
+              className={`px-10 py-5 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 transition-all ${
                 activeTab === tab.id
-                  ? 'border-indigo-500 text-white bg-indigo-500/5'
-                  : 'border-transparent text-white/40 hover:text-white hover:bg-white/5'
+                  ? 'border-emerald-500 text-ink bg-emerald-50/50'
+                  : 'border-transparent text-text-muted hover:text-ink hover:bg-bg-card'
               }`}
             >
-              <tab.icon size={14} />
+              <tab.icon size={16} />
               {tab.label}
             </button>
           ))}
@@ -142,7 +142,7 @@ const DevDashboard: React.FC = () => {
           {/* ROLES MATRIX VIEW */}
           {activeTab === 'matrix' && (
             <motion.div key="matrix" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-              <div className="bg-[#0a0a0a] border border-white/5 rounded-[2.5rem] p-10 shadow-2xl">
+              <div className="bg-bg-card backdrop-blur-3xl border border-border-main rounded-[3rem] p-12 shadow-sm">
                 <RolePermissionMatrix />
               </div>
             </motion.div>
@@ -151,7 +151,7 @@ const DevDashboard: React.FC = () => {
           {/* USER COMBINATIONS VIEW */}
           {activeTab === 'combinations' && (
             <motion.div key="combinations" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-              <div className="bg-[#0a0a0a] border border-white/5 rounded-[2.5rem] p-10 shadow-2xl">
+              <div className="bg-bg-card backdrop-blur-3xl border border-border-main rounded-[3rem] p-12 shadow-sm">
                 <RoleCombinationMatrix />
               </div>
             </motion.div>
@@ -165,31 +165,31 @@ const DevDashboard: React.FC = () => {
                   <button
                     key={r.id}
                     onClick={() => setActiveRoleTab(r.id)}
-                    className={`flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border transition-all ${
+                    className={`flex flex-col items-center justify-center gap-4 p-5 rounded-[2rem] border transition-all ${
                       activeRoleTab === r.id
-                        ? 'bg-white text-black border-white shadow-xl scale-105'
-                        : 'bg-[#0a0a0a] border-white/5 text-white/40 hover:border-white/20 hover:text-white'
+                        ? 'bg-emerald-500 text-white border-emerald-500 shadow-2xl shadow-emerald-200 scale-105'
+                        : 'bg-bg-card border-border-main text-text-muted hover:border-emerald-500/20 hover:text-emerald-600 shadow-sm'
                     }`}
                   >
-                    <r.icon size={18} style={{ color: activeRoleTab === r.id ? '' : r.color }} />
-                    <span className="text-[8px] font-black uppercase tracking-widest text-center leading-tight">{r.label.split(' ')[0]}</span>
+                    <r.icon size={22} style={{ color: activeRoleTab === r.id ? 'white' : r.color }} />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-center leading-tight">{r.label?.split(' ')[0]}</span>
                   </button>
                 ))}
               </div>
 
-              <div className="bg-transparent border border-white/5 rounded-[3rem] p-10 min-h-[600px] relative overflow-hidden">
+              <div className="bg-bg-card backdrop-blur-2xl border border-border-main rounded-[4rem] p-12 min-h-[600px] relative overflow-hidden shadow-inner">
                 <div className="relative z-10 w-full">
                     {activeRoleTab === 'admin' && <AdminDashboard activeRole="admin" setActiveRole={() => {}} />}
                     {activeRoleTab === 'manager' && <ManagerDashboard />}
                     {activeRoleTab === 'chief_manager' && <ManagerDashboard />}
                     {activeRoleTab === 'moderator' && <ModeratorDashboard />}
-                    {activeRoleTab === 'hr' && <HRDashboard />}
-                    {activeRoleTab === 'finance' && <FinanceDashboard />}
-                    {activeRoleTab === 'support' && <SupportDashboard />}
+                    {activeRoleTab === 'hr' && <HRDashboard view="overview" />}
+                    {activeRoleTab === 'finance' && <FinanceDashboard view="overview" />}
+                    {activeRoleTab === 'support' && <SupportDashboard view="overview" />}
                     {activeRoleTab === 'agency' && <AgencyDashboard />}
                     {activeRoleTab === 'student' && <StudentDashboard user={user} view="overview" />}
-                    {activeRoleTab === 'executor' && <ExecutorDashboard user={user} />}
-                    {activeRoleTab === 'client' && <ClientDashboard />}
+                    {activeRoleTab === 'executor' && <ExecutorDashboard user={user} view="overview" />}
+                    {activeRoleTab === 'client' && <ClientDashboard view="overview" />}
                 </div>
               </div>
             </motion.div>
@@ -198,23 +198,23 @@ const DevDashboard: React.FC = () => {
           {/* API INTERACTIVE (FULL CONNECTED LIST) */}
           {activeTab === 'api' && (
             <motion.div key="api" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-              <div className="bg-[#0a0a0a] border border-white/5 rounded-[2.5rem] p-10 shadow-2xl">
+              <div className="bg-bg-card backdrop-blur-3xl border border-border-main rounded-[3rem] p-12 shadow-sm">
                 <div className="flex items-center justify-between mb-12">
-                  <h3 className="text-2xl font-black uppercase tracking-tight text-white flex items-center gap-3">
-                    <Terminal size={24} className="text-indigo-400" /> API Reference
+                  <h3 className="text-3xl font-black uppercase tracking-tight text-ink flex items-center gap-4">
+                    <Terminal size={32} className="text-emerald-500" /> API Reference
                   </h3>
                 </div>
                 <div className="space-y-4">
                   {API_ENDPOINTS.map((group, gIdx) => (
                     <div key={gIdx} className="space-y-4">
-                      <h4 className="text-xs font-black uppercase tracking-[0.3em] text-white/40 border-l-2 border-indigo-500 pl-4">{group.tag}</h4>
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-600 border-l-4 border-emerald-500 pl-6 my-8">{group.tag}</h4>
                       {group.endpoints.map((ep, eIdx) => (
-                        <div key={eIdx} className="bg-white/[0.01] border border-white/5 p-4 rounded-xl flex items-center justify-between">
-                           <div className="flex items-center gap-6">
-                              <span className="text-[10px] font-black text-indigo-400 font-mono w-16">{ep.method}</span>
-                              <span className="text-xs font-mono text-zinc-400">{ep.path}</span>
+                        <div key={eIdx} className="bg-bg-dark border border-border-main p-6 rounded-2xl flex items-center justify-between hover:shadow-md transition-shadow group">
+                           <div className="flex items-center gap-8">
+                              <span className="px-3 py-1 bg-emerald-50 text-[10px] font-black text-emerald-600 rounded-lg group-hover:bg-emerald-500 group-hover:text-white transition-colors">{ep.method}</span>
+                              <span className="text-sm font-mono text-text-muted">{ep.path}</span>
                            </div>
-                           <span className="text-[9px] font-black uppercase text-white/20">{ep.desc}</span>
+                           <span className="text-[10px] font-black uppercase text-text-muted">{ep.desc}</span>
                         </div>
                       ))}
                     </div>
@@ -227,10 +227,10 @@ const DevDashboard: React.FC = () => {
           {/* SYSTEM HEALTH VIEW */}
           {activeTab === 'system' && (
             <motion.div key="system" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+               <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                  {['Nodes: 14', 'Sync: 12ms', 'Load: 32%', 'Auth: OK'].map((s, i) => (
-                   <div key={i} className="bg-[#0a0a0a] border border-white/5 rounded-3xl p-8 text-center">
-                      <span className="text-lg font-black text-white italic">{s}</span>
+                   <div key={i} className="bg-bg-card border border-border-main rounded-[2.5rem] p-10 text-center shadow-sm hover:shadow-xl transition-shadow">
+                      <span className="text-2xl font-black text-ink italic tracking-tighter">{s}</span>
                    </div>
                  ))}
                </div>

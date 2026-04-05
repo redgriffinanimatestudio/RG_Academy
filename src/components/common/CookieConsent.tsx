@@ -12,7 +12,7 @@ export const CookieConsent: React.FC = () => {
   useEffect(() => {
     const consent = localStorage.getItem('rg_cookie_consent');
     if (!consent) {
-      const timer = setTimeout(() => setIsVisible(true), 2000);
+      const timer = setTimeout(() => setIsVisible(true), 1500);
       return () => clearTimeout(timer);
     }
   }, []);
@@ -29,35 +29,41 @@ export const CookieConsent: React.FC = () => {
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-6 left-6 right-6 z-[9999] flex justify-center pointer-events-none"
+          className="fixed bottom-8 left-8 right-8 z-[9999] flex justify-center"
         >
-          <div className="w-full max-w-4xl bg-[#0a0a0a]/90 border border-white/10 rounded-[2rem] p-6 backdrop-blur-3xl shadow-3xl pointer-events-auto flex flex-col md:flex-row items-center gap-6 border-glow">
-            <div className="size-14 rounded-2xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0 shadow-lg shadow-red-600/10">
-              <Cookie size={28} />
+          <div className="w-full max-w-5xl bg-bg-card border border-border-main rounded-[2.5rem] p-8 backdrop-blur-3xl shadow-3xl flex flex-col md:flex-row items-center gap-8 relative overflow-hidden group">
+            {/* Ambient Glow */}
+            <div className="absolute -top-24 -left-24 size-48 bg-emerald-500/10 blur-[100px] pointer-events-none" />
+            
+            <div className="size-16 rounded-[1.25rem] bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 shrink-0 shadow-xl shadow-emerald-500/5 transition-transform group-hover:scale-110">
+              <ShieldCheck size={32} />
             </div>
             
-            <div className="flex-1 space-y-1 text-center md:text-left">
-              <h4 className="text-sm font-black uppercase tracking-widest text-white flex items-center justify-center md:justify-start gap-2">
-                Grid Data Protocol <ShieldCheck size={14} className="text-red-500" />
-              </h4>
-              <p className="text-[11px] font-medium text-white/40 leading-relaxed max-w-2xl">
-                Red Griffin utilizes essential cookies and telemetry nodes to optimize your interface and secure your session. By continuing your traversal through our ecosystem, you acknowledge our tracking protocols. 
-                <a href={`/${lang}/privacy`} className="text-red-500 hover:underline ml-1 font-bold">Review Documentation</a>.
+            <div className="flex-1 space-y-2 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-3">
+                <h4 className="text-xs font-black uppercase tracking-[0.4em] text-ink">
+                  Grid Data Protocol 
+                </h4>
+                <div className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 text-[8px] font-black uppercase tracking-widest border border-emerald-500/20">Secure</div>
+              </div>
+              <p className="text-[12px] font-medium text-text-muted leading-relaxed max-w-2xl">
+                Red Griffin utilizes essential telemetry nodes and session cookies to optimize your terminal interface and secure regional synchronization. By navigating our ecosystem, you acknowledge our tracking protocols. 
+                <a href={`/${lang}/privacy`} className="text-emerald-600 hover:text-emerald-500 underline ml-1 font-bold">Access Documentation</a>.
               </p>
             </div>
 
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex items-center gap-4 shrink-0">
               <button 
                 onClick={() => setIsVisible(false)}
-                className="px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors"
+                className="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted hover:text-ink transition-colors"
               >
                 Declined
               </button>
               <button 
                 onClick={handleAccept}
-                className="px-8 py-3 bg-red-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-700 transition-all flex items-center gap-2 shadow-lg shadow-red-600/20 group"
+                className="px-10 py-4 bg-emerald-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-3 shadow-2xl shadow-emerald-500/20 active:scale-95 group"
               >
-                Acknowledge <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                Acknowledge <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>
