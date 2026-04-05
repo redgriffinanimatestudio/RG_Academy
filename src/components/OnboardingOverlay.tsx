@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { RoleTree } from './RoleTree';
 import { useAuth } from '../context/AuthContext';
 import { Sparkles, Shield, Rocket, Loader2 } from 'lucide-react';
-import { SoulSelection } from './onboarding/SoulSelection';
+import NeuralPathfinder from './academy/NeuralPathfinder';
 import apiClient from '../services/apiClient';
 
 export const OnboardingOverlay: React.FC = () => {
@@ -114,20 +114,19 @@ export const OnboardingOverlay: React.FC = () => {
               </motion.div>
             ) : (
               <motion.div key="main-onboarding" className="space-y-12">
-                <div className="text-center space-y-4">
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[9px] font-black uppercase tracking-[0.3em]">
-                    <Sparkles size={12} /> Identity Required
+                {step === 'role' && (
+                  <div className="text-center space-y-4">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[9px] font-black uppercase tracking-[0.3em]">
+                      <Sparkles size={12} /> Identity Required
+                    </div>
+                    <h2 className="text-4xl lg:text-6xl font-black uppercase tracking-tighter text-white italic leading-none">
+                      Initialize Your <span className="text-primary">Node Path</span>
+                    </h2>
+                    <p className="max-w-xl mx-auto text-xs font-bold text-white/30 uppercase tracking-widest leading-relaxed">
+                      Your profile is currently on a neutral frequency. To access the ecosystem hubs, you must select your primary evolution branch.
+                    </p>
                   </div>
-                  <h2 className="text-4xl lg:text-6xl font-black uppercase tracking-tighter text-white italic leading-none">
-                    {step === 'role' ? 'Initialize Your ' : 'Manifest Your '}
-                    <span className="text-primary">{step === 'role' ? 'Node Path' : 'Soul Identity'}</span>
-                  </h2>
-                  <p className="max-w-xl mx-auto text-xs font-bold text-white/30 uppercase tracking-widest leading-relaxed">
-                    {step === 'role' 
-                      ? 'Your profile is currently on a neutral frequency. To access the ecosystem hubs, you must select your primary evolution branch.'
-                      : 'Select the sacred path that resonates with your creative soul. This will define your Vessels and Mastery.'}
-                  </p>
-                </div>
+                )}
 
                 <div className="relative">
                   {isLoading && (
@@ -154,10 +153,12 @@ export const OnboardingOverlay: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                       >
-                        <SoulSelection 
-                          onSelect={(pathId) => finalizeOnboarding(selectedRole!, pathId)} 
-                          isLoading={isLoading} 
-                        />
+                        <div className="relative z-[100] mt-[-2rem] mb-[-4rem]">
+                           <NeuralPathfinder 
+                              isDashboard={true} 
+                              onComplete={(pathId) => finalizeOnboarding(selectedRole!, pathId)} 
+                           />
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>

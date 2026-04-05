@@ -38,9 +38,10 @@ const TypingText = ({ text, className = "" }: { text: string; className?: string
 
 interface NeuralPathfinderProps {
   onComplete?: (pathId: string) => void;
+  isDashboard?: boolean;
 }
 
-export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) {
+export default function NeuralPathfinder({ onComplete, isDashboard = false }: NeuralPathfinderProps) {
   const { t } = useTranslation();
   const [step, setStep] = useState(-1);
   const [vision, setVision] = useState<string | null>(null);
@@ -72,10 +73,10 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
   };
 
   return (
-    <section className="min-h-[calc(100dvh-5rem)] md:min-h-screen py-6 md:py-24 px-4 md:px-8 relative overflow-hidden bg-[#050505] flex items-center justify-center">
+    <section className={`${isDashboard ? 'py-4' : 'min-h-[calc(100dvh-5rem)] md:min-h-screen py-6 md:py-24 px-4 md:px-8'} relative overflow-hidden bg-transparent flex items-center justify-center`}>
       {/* Background Neural Grid */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
-      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary/10 to-transparent blur-[140px] opacity-20" />
+      {!isDashboard && <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '60px 60px' }} />}
+      {!isDashboard && <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary/10 to-transparent blur-[140px] opacity-20" />}
 
       <div className="w-full max-w-6xl mx-auto space-y-6 md:space-y-16 relative z-10">
         <header className="space-y-4 relative">
@@ -94,7 +95,7 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
            </div>
         </header>
 
-        <div className="p-6 md:p-20 bg-[#080808]/80 border border-white/5 rounded-[2.5rem] md:rounded-[4rem] backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,1)] relative overflow-hidden group">
+        <div className={`p-6 md:p-20 ${isDashboard ? 'bg-transparent border-0 md:p-8' : 'bg-[#080808]/80 border border-white/5 rounded-[2.5rem] md:rounded-[4rem] backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,1)]'} relative overflow-hidden group`}>
            <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('/scanlines.png')] bg-repeat" />
            
            <div className="absolute top-0 right-0 p-6 md:p-12 text-primary/10 group-hover:scale-110 transition-transform duration-700">
@@ -296,14 +297,16 @@ export default function NeuralPathfinder({ onComplete }: NeuralPathfinderProps) 
                         <button 
                            onClick={() => {
                               if (selectedDiscipline && onComplete) {
+                                 // Map to predefined MASTER PLAN DATA
                                  const mapping: { [key: string]: string } = {
-                                    'char_anim': 'character_animator',
-                                    'world_gen': 'environment_artist',
-                                    'vfx_sim': 'vfx_artist',
-                                    'archviz': 'digital_architect',
-                                    'motion_design': 'motion_designer'
+                                    'char_anim': 'character_td',
+                                    'world_gen': 'environment_vfx',
+                                    'vfx_sim': 'environment_vfx',
+                                    'archviz': 'generalist',
+                                    'motion_design': 'lookdev_lighting',
+                                    'tech_art': 'technical_director'
                                  };
-                                 onComplete(mapping[selectedDiscipline.id] || 'environment_artist');
+                                 onComplete(mapping[selectedDiscipline.id] || 'generalist');
                               }
                            }}
                            className="h-16 md:h-20 w-full md:w-auto px-16 bg-primary text-bg-dark rounded-2xl md:rounded-[2rem] font-black uppercase tracking-[0.3em] text-[11px] md:text-sm hover:brightness-125 transition-all shadow-[0_30px_80px_-20px_rgba(0,245,212,0.4)] flex items-center justify-center gap-4 group"

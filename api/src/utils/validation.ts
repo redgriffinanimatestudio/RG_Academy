@@ -13,9 +13,9 @@ export const RegisterSchema = z.object({
     profileData: z.object({
       country: z.string().optional(),
       citizenship: z.string().optional(),
-      linkedInUrl: z.string().url().optional().or(z.literal('')),
+      linkedInUrl: z.string().optional().or(z.literal('')),
       telegramHandle: z.string().optional(),
-      portfolioUrl: z.string().url().optional().or(z.literal('')),
+      portfolioUrl: z.string().optional().or(z.literal('')),
       bio: z.string().optional(),
       gender: z.enum(['male', 'female', 'other', 'none']).optional(),
       dateOfBirth: z.string().optional(), // ISO string from frontend
