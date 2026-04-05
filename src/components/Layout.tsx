@@ -149,11 +149,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [profile, authLoading, isDashboardPage, isProfile, isPublicPage, lang]);
 
-  if (authLoading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center"><Preloader message="Initializing Red Griffin..." size="lg" /></div>;
+  if (authLoading) return <div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center"><Preloader message="Initializing Red Griffin..." size="lg" /></div>;
   
   if (!profile && (isDashboardPage || isProfile) && !isPublicPage) {
-    return <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-      <div className="size-12 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+    return <div className="min-h-screen bg-[#f0f2f5] flex items-center justify-center">
+      <div className="size-12 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
     </div>;
   }
 
@@ -177,11 +177,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className={`min-h-screen font-sans text-white transition-colors duration-500 touch-manipulation`}>
+    <div className={`min-h-screen font-sans text-slate-900 bg-[#f0f2f5] transition-colors duration-500 touch-manipulation relative overflow-x-hidden`}>
       {showBanner && (
-        <div className={`${modeBg} text-bg-dark py-2 px-4 text-center text-[10px] font-black uppercase tracking-widest relative z-[60]`}>
+        <div className={`${modeBg} text-white py-2.5 px-6 text-center text-[10px] font-black uppercase tracking-[0.3em] relative z-[60] shadow-sm`}>
           <span>{isStudio ? t('studio_collab') : t('academy_workshops')}</span>
-          <button onClick={() => setShowBanner(false)} className="absolute right-4 top-1/2 -translate-y-1/2"><X size={14} /></button>
+          <button onClick={() => setShowBanner(false)} className="absolute right-6 top-1/2 -translate-y-1/2 hover:scale-110 transition-transform"><X size={14} /></button>
         </div>
       )}
 
@@ -201,8 +201,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         currentLangCode={lang || 'eng'} LANGUAGES={LANGUAGES}
       />
 
-      <main className="mx-auto max-w-[1920px] px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-12">
-        <div className="flex flex-col md:flex-row gap-4 sm:gap-6 lg:gap-8">
+      <main className="mx-auto max-w-[1920px] px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-10 lg:py-16">
+        <div className="flex flex-col md:flex-row gap-8 sm:gap-10 lg:gap-14 items-start">
           {(isAcademy || isStudio || isCommunity || isDashboardPage) && !isPublicPage && (
             <div className="hidden md:block shrink-0">
               <Sidebar 

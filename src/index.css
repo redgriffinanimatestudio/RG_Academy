@@ -2,46 +2,46 @@
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", sans-serif;
+  --font-display: "Outfit", sans-serif;
   
-  --color-primary: var(--primary, #00f5d4);
-  --color-primary-hover: var(--primary-hover, #00d1b5);
-  --color-bg-dark: var(--bg-main, #050505);
-  --color-bg-card: var(--bg-card, #0a0a0a);
-  --color-ink: #ffffff;
+  --color-primary: var(--primary, #10b981);
+  --color-primary-hover: var(--primary-hover, #059669);
+  --color-bg-dark: var(--bg-main, #f0f2f5);
+  --color-bg-card: var(--bg-card, rgba(255, 255, 255, 0.8));
+  --color-ink: #111827;
 
-  /* Matrix Theme Node 2026 */
-  --matrix-accent: #00ff9d;
-  --matrix-bg-glow: rgba(0, 255, 157, 0.05);
-  --glass-blur: blur(40px);
-  --glass-pro-blur: blur(60px);
-  --metallic-linear: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.05) 100%);
+  /* Soft Glass Theme Node 2026 */
+  --matrix-accent: #10b981;
+  --matrix-bg-glow: rgba(16, 185, 129, 0.05);
+  --glass-blur: blur(24px);
+  --glass-pro-blur: blur(40px);
+  --metallic-linear: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0.4) 100%);
 }
 
 @layer base {
   .theme-academy {
-    --primary: #00f5d4;
-    --primary-hover: #00d1b5;
-    --bg-main: #050505;
-    --bg-card: #0a0a0a;
+    --primary: #10b981;
+    --primary-hover: #059669;
+    --bg-main: #f4f7fa;
+    --bg-card: rgba(255, 255, 255, 0.8);
   }
 
   .theme-studio {
-    --primary: #3b82f6; /* Blue for Studio */
-    --primary-hover: #2563eb;
-    --bg-main: #1a1a1e; /* Lighter gray */
-    --bg-card: #252529;
+    --primary: #0ea5e9; /* Sky Blue for Studio */
+    --primary-hover: #0284c7;
+    --bg-main: #f8fafc;
+    --bg-card: rgba(255, 255, 255, 0.9);
   }
 
   .theme-matrix {
-    --primary: var(--matrix-accent);
-    --primary-hover: #00e08a;
-    --bg-main: #020202;
-    --bg-card: rgba(10, 10, 10, 0.4);
+    --primary: #10b981;
+    --primary-hover: #059669;
+    --bg-main: #f0f2f5;
+    --bg-card: rgba(255, 255, 255, 0.6);
   }
   
   body {
-    @apply bg-bg-dark text-ink font-sans antialiased transition-colors duration-500 overflow-x-hidden;
+    @apply bg-[#f0f2f5] text-slate-900 font-sans antialiased transition-colors duration-500 overflow-x-hidden;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -55,11 +55,11 @@
   }
   
   .criativo-card {
-    @apply bg-bg-card border border-white/5 p-8 transition-all hover:border-primary/20 hover:bg-white/5;
+    @apply bg-white/60 backdrop-blur-xl border border-white/40 p-8 transition-all hover:border-primary/40 hover:shadow-2xl shadow-sm rounded-[2rem];
   }
   
   .criativo-gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-emerald-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-cyan-500;
   }
 
   .glass-panel {
@@ -109,14 +109,14 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  /* UI PRO MAX - DESIGN DNA */
+  /* UI SOFT MOD - DESIGN DNA */
   .glass-pro-max {
-    backdrop-filter: var(--glass-pro-blur) saturate(220%) contrast(110%);
-    background: linear-gradient(165deg, rgba(20, 20, 20, 0.7) 0%, rgba(5, 5, 5, 0.85) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: var(--glass-pro-blur) saturate(180%) contrast(100%);
+    background: linear-gradient(165deg, rgba(255, 255, 255, 0.7) 0%, rgba(245, 245, 245, 0.4) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     box-shadow: 
-      inset 0 1px 1px rgba(255, 255, 255, 0.05),
-      0 30px 60px -12px rgba(0, 0, 0, 0.7);
+      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+      0 20px 40px -10px rgba(0, 0, 0, 0.05);
   }
 
   .metallic-glow {
