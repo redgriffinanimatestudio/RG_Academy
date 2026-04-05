@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "concurrently -n \"SERVER,DB\" -c \"blue,green\" \"tsx server.ts\" \"npx prisma studio\"",
+    "dev": "concurrently -n \"SERVER,DB\" -c \"blue,green\" \"tsx server.ts\" \"npx prisma studio --port 5556\"",
     "build": "vite build",
     "postinstall": "prisma generate",
     "hostinger:deploy": "npm install && npx prisma migrate deploy && npm run build",

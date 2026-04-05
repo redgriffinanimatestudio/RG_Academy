@@ -27,7 +27,6 @@ import RegStep2Network from '../components/auth/registration/RegStep2Network';
 import RegStep3Identity from '../components/auth/registration/RegStep3Identity';
 import RegStep4Specs from '../components/auth/registration/RegStep4Specs';
 import RegStep5Legal from '../components/auth/registration/RegStep5Legal';
-import RegSuccess from '../components/auth/registration/RegSuccess';
 
 const Login: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -37,8 +36,6 @@ const Login: React.FC = () => {
   });
   const [showTreeModal, setShowTreeModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [redirectCountdown, setRedirectCountdown] = useState(2);
   
   const { t, i18n: i18nInstance } = useTranslation();
   const { lang = 'eng' } = useParams();
@@ -86,7 +83,6 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
-  const [loginSuccess, setLoginSuccess] = useState(false);
 
   // Sync language with URL
   useEffect(() => {
@@ -156,10 +152,7 @@ const Login: React.FC = () => {
         setMode('register');
         setRegStep(1);
       } else {
-        setLoginSuccess(true);
-        setTimeout(() => {
-            navigate(`/${lang}/dashboard`);
-        }, 3000);
+        navigate(`/${lang}/dashboard`);
       }
     } catch (err: any) {
       setIsShaking(true);
@@ -197,9 +190,9 @@ const Login: React.FC = () => {
       } else {
         await register(payload);
       }
-      setIsRegistered(true);
       sessionStorage.removeItem('rg_reg_data');
       sessionStorage.removeItem('rg_reg_step');
+      navigate(`/${lang}/dashboard`);
     } catch (err: any) {
       console.error('❌ [REGISTRATION] Failure during final submission:', err);
       setError(err.response?.data?.error || 'Registration failed: Internal Server Error or Connection Issue');
@@ -207,18 +200,6 @@ const Login: React.FC = () => {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    let timer: any;
-    if (isRegistered && redirectCountdown > 0) {
-      timer = setTimeout(() => {
-        setRedirectCountdown(prev => prev - 1);
-      }, 1000);
-    } else if (isRegistered && redirectCountdown === 0) {
-      navigate(`/${lang}/dashboard`);
-    }
-    return () => clearTimeout(timer);
-  }, [isRegistered, redirectCountdown, navigate, lang]);
 
   const shakeVariants = {
     shake: {
@@ -256,218 +237,137 @@ const Login: React.FC = () => {
         {/* Main Content */}
         <div className="flex-1 p-8 sm:p-20 relative z-10 flex flex-col min-h-[650px] bg-black/20">
           <AnimatePresence mode="wait">
-            {loginSuccess ? (
-              <motion.div 
-                key="success" 
-                initial={{ opacity: 0, scale: 0.9 }} 
-                animate={{ opacity: 1, scale: 1 }} 
-                exit={{ opacity: 0 }} 
-                className="flex-1 flex flex-col items-center justify-center text-center space-y-12 relative overflow-hidden py-20"
-              >
-                {/* 🌌 Crimson Aura Background */}
-                <div className="absolute inset-0 bg-red-600/5 blur-[120px] rounded-full animate-pulse pointer-events-none" />
-                
-                <div className="relative">
-                  <motion.div 
-                    initial={{ rotate: -180, opacity: 0 }} 
-                    animate={{ rotate: 0, opacity: 1 }} 
-                    transition={{ type: "spring", damping: 10 }}
-                    className="size-40 rounded-full border-2 border-red-500/20 flex items-center justify-center relative"
-                  >
-                    <div className="size-32 rounded-full bg-gradient-to-tr from-red-600/20 to-emerald-500/10 flex items-center justify-center relative shadow-[0_0_50px_rgba(220,38,38,0.2)]">
-                      <CheckCircle2 size={64} className="text-emerald-400 shadow-[0_0_40px_rgba(52,211,153,0.6)]" />
-                    </div>
-                    {/* Pulsing Halos */}
-                    <motion.div 
-                      animate={{ scale: [1, 1.4, 1], opacity: [0.2, 0.1, 0.2] }} 
-                      transition={{ repeat: Infinity, duration: 3 }} 
-                      className="absolute inset-[-20px] rounded-full border border-red-500/30 opacity-20" 
-                    />
-                     <motion.div 
-                      animate={{ scale: [1, 1.6, 1], opacity: [0.1, 0, 0.1] }} 
-                      transition={{ repeat: Infinity, duration: 4, delay: 0.5 }} 
-                      className="absolute inset-[-40px] rounded-full border border-emerald-500/20 opacity-10" 
-                    />
-                  </motion.div>
-                  <motion.div
-                    animate={{ y: [0, -10, 0], opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="absolute -top-8 -right-8"
-                  >
-                    <Sparkles size={40} className="text-yellow-500" />
-                  </motion.div>
+            <motion.div key="form-container" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex-1 flex flex-col h-full">
+              <div className="flex items-center gap-6 mb-12">
+                <div className={`p-4 rounded-[1.8rem] transition-all duration-700 ${mode === 'login' ? 'bg-red-700 text-white shadow-[0_0_50px_rgba(185,28,28,0.5)]' : 'bg-white/10 text-white/40 hover:text-white'}`}>
+                  <LogIn size={26} />
                 </div>
-
-                <div className="space-y-6 relative z-10">
-                  <motion.h2 
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                    className="text-6xl md:text-7xl font-black uppercase tracking-tighter text-white italic"
-                  >
-                    Congratulations
-                  </motion.h2>
-                  <motion.p 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                    className="text-[14px] font-black uppercase tracking-[0.8em] text-emerald-400/80 drop-shadow-[0_0_10px_rgba(52,211,153,0.3)]"
-                  >
-                    Identity Resonated Successfully
-                  </motion.p>
+                <div>
+                  <h2 className="text-3xl font-black uppercase text-white tracking-[0.2em] leading-tight">
+                    {mode === 'login' ? t('node_connect') : t('identity_forge')}
+                  </h2>
+                  <p className="text-[11px] font-black uppercase tracking-[0.6em] text-white/20 italic">{t('reg_protocol')}</p>
                 </div>
+              </div>
 
-                <div className="flex flex-col items-center gap-6 pt-10">
-                  <div className="flex items-center gap-3">
-                    <div className="size-2 bg-red-600 rounded-full animate-ping" />
-                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] italic">Opening Crimson Sanctum...</span>
+              {/* Sub-Header Branding Area (Blue Rectangle Zone) */}
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 p-6 rounded-3xl bg-white/[0.02] border border-white/5 backdrop-blur-sm">
+                <div className="flex items-center gap-4">
+                  <div className="size-10 rounded-2xl bg-red-600/10 flex items-center justify-center border border-red-600/20">
+                    <Shield size={18} className="text-red-600" />
                   </div>
-                  <div className="w-72 h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5 shadow-inner">
-                    <motion.div 
-                      initial={{ width: 0 }} 
-                      animate={{ width: '100%' }} 
-                      transition={{ duration: 3, ease: "easeInOut" }} 
-                      className="h-full bg-gradient-to-r from-red-600 to-emerald-500 shadow-[0_0_20px_rgba(220,38,38,0.5)]" 
-                    />
+                  <div className="space-y-0.5">
+                    <span className="block text-[9px] font-black uppercase tracking-widest text-white/60">Blood-Codec Ritual</span>
+                    <span className="block text-[8px] font-bold text-white/20 uppercase tracking-widest italic">Secure Vessel Access</span>
                   </div>
-                  <span className="text-[10px] font-bold text-white/10 uppercase tracking-widest italic animate-pulse">Neural Synchronization Active</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="size-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                    <Globe size={18} className="text-emerald-500" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="block text-[9px] font-black uppercase tracking-widest text-white/60">Celestial Weave</span>
+                    <span className="block text-[8px] font-bold text-white/20 uppercase tracking-widest italic">Attuned Network</span>
+                  </div>
                 </div>
               </motion.div>
-            ) : (
-              <motion.div key="form-container" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex-1 flex flex-col h-full">
-                <div className="flex items-center gap-6 mb-12">
-                  <div className={`p-4 rounded-[1.8rem] transition-all duration-700 ${mode === 'login' ? 'bg-red-700 text-white shadow-[0_0_50px_rgba(185,28,28,0.5)]' : 'bg-white/10 text-white/40 hover:text-white'}`}>
-                    <LogIn size={26} />
-                  </div>
-                  <div>
-                    <h2 className="text-3xl font-black uppercase text-white tracking-[0.2em] leading-tight">
-                      {mode === 'login' ? t('node_connect') : t('identity_forge')}
-                    </h2>
-                    <p className="text-[11px] font-black uppercase tracking-[0.6em] text-white/20 italic">{t('reg_protocol')}</p>
-                  </div>
-                </div>
 
-                {/* Sub-Header Branding Area (Blue Rectangle Zone) */}
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 p-6 rounded-3xl bg-white/[0.02] border border-white/5 backdrop-blur-sm">
-                  <div className="flex items-center gap-4">
-                    <div className="size-10 rounded-2xl bg-red-600/10 flex items-center justify-center border border-red-600/20">
-                      <Shield size={18} className="text-red-600" />
+              <AnimatePresence mode="wait">
+                {mode === 'login' ? (
+                  <motion.div key="login-shard" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10 flex-1 flex flex-col justify-center">
+                    {isLoading ? (
+                      <div className="py-20 flex flex-col items-center justify-center space-y-8">
+                        <Preloader message="Communing with Soul Sigil..." size="md" />
+                        <div className="text-[10px] font-black uppercase text-red-500/40 tracking-[0.4em] animate-pulse">Establishing Aetheric Link</div>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleLogin} className="space-y-8">
+                        <div className="space-y-6">
+                          <InputWithStatus id="login-email" label="Soul Sigil" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} placeholder="VESSEL_ID@PROTOCOL" hint="Unified essence signature" status={emailStatus} icon={<User size={18} />} required />
+                          <InputWithStatus id="login-password" label="Void Cipher" type="password" value={formData.password} onChange={(e) => handleInputChange('password', e.target.value)} placeholder="••••••••" hint="Aetheric secure passkey" icon={<Lock size={18} />} required />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                          <button type="submit" disabled={isLoading} className="bg-red-700 text-white py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-red-600 transition-all hover:scale-[1.02] shadow-[0_0_40px_rgba(185,28,28,0.3)] flex items-center justify-center gap-3 group relative overflow-hidden">
+                            <span className="relative z-10">Attune Vessel</span>
+                            <ChevronRight size={16} className="relative z-10 group-hover:translate-x-1 transition-transform" />
+                          </button>
+                          <button type="button" onClick={() => setMode('register')} className="bg-white/5 border border-white/5 text-white/50 py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-3">
+                             Awaken Essence <UserPlus size={16} />
+                          </button>
+                        </div>
+
+                        <SocialAuthButtons className="pt-6" />
+                      </form>
+                    )}
+                  </motion.div>
+                ) : (
+                  <motion.div key="register-shard" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-10 flex-1 flex flex-col">
+                    <div className="flex items-center justify-between px-2">
+                      {[1, 2, 3, 4, 5].map(s => (
+                        <div key={s} className="flex items-center gap-2">
+                          <div className={`size-7 sm:size-8 rounded-full flex items-center justify-center text-[10px] font-black border-2 transition-all duration-700 ${regStep >= s ? 'bg-red-700 border-red-700 shadow-[0_0_15px_rgba(185,28,28,0.4)] text-white' : 'border-white/10 text-white/20'}`}>
+                            {s}
+                          </div>
+                          {s < 5 && <div className={`h-[2px] w-4 lg:w-10 transition-all duration-700 ${regStep > s ? 'bg-red-700' : 'bg-white/5'}`} />}
+                        </div>
+                      ))}
                     </div>
-                    <div className="space-y-0.5">
-                      <span className="block text-[9px] font-black uppercase tracking-widest text-white/60">Blood-Codec Ritual</span>
-                      <span className="block text-[8px] font-bold text-white/20 uppercase tracking-widest italic">Secure Vessel Access</span>
+                    <div className={`flex flex-col lg:flex-row gap-6 sm:gap-12 flex-1 ${regStep > 1 ? 'items-stretch' : 'items-center'}`}>
+                      {regStep > 1 && <IdentitySidebar role={formData.selectedRole} step={regStep} />}
+                      <form onSubmit={(e) => { e.preventDefault(); if (regStep < 5) setRegStep(regStep + 1); else handleRegisterFinal(); }} className="flex-1 flex flex-col">
+                        <div className="flex-1">
+                          {regStep === 1 ? (
+                            <RegStep1Role onSelect={(id) => { handleInputChange('selectedRole', id); setRegStep(2); }} />
+                          ) : regStep === 2 ? (
+                            <RegStep2Network formData={formData} onChange={handleInputChange} emailStatus={emailStatus} emailError={emailError} passStrength={passStrength} passConfirmStatus={passConfirmStatus} phoneStatus={phoneStatus} onNext={() => setRegStep(3)} />
+                          ) : regStep === 3 ? (
+                            <RegStep3Identity formData={formData} onChange={handleInputChange} onNext={() => setRegStep(4)} lang={lang} />
+                          ) : regStep === 4 ? (
+                            <RegStep4Specs formData={formData} onChange={handleInputChange} onNext={() => setRegStep(5)} onSkip={() => setRegStep(5)} />
+                          ) : regStep === 5 ? (
+                            <RegStep5Legal formData={formData} lang={lang} termsAccepted={termsAccepted} onToggleTerms={() => setTermsAccepted(!termsAccepted)} onFinalize={handleRegisterFinal} isLoading={isLoading} />
+                          ) : null}
+                        </div>
+                      </form>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="size-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                      <Globe size={18} className="text-emerald-500" />
+                    <div className="text-center pt-8 border-t border-white/5 mt-auto">
+                      <button type="button" onClick={() => { if (regStep > 1) setRegStep(regStep - 1); else { setMode('login'); setError(''); } }} className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 hover:text-red-600 transition-all flex items-center justify-center gap-3 mx-auto py-2 group">
+                        <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> {t('go_back')}
+                      </button>
                     </div>
-                    <div className="space-y-0.5">
-                      <span className="block text-[9px] font-black uppercase tracking-widest text-white/60">Celestial Weave</span>
-                      <span className="block text-[8px] font-bold text-white/20 uppercase tracking-widest italic">Attuned Network</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {error && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-6 bg-red-950/20 border border-red-900/50 rounded-[2rem] relative overflow-hidden">
+                  <div className="relative z-10 flex items-start gap-4">
+                    <div className="size-10 rounded-2xl bg-red-900/30 flex items-center justify-center text-red-500 shrink-0"><Shield size={20} className="animate-pulse" /></div>
+                    <div className="space-y-1">
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500">Security Fault Detected</h4>
+                      <p className="text-[11px] font-bold text-white/80 leading-relaxed uppercase">{error}</p>
                     </div>
                   </div>
                 </motion.div>
+              )}
 
-                <AnimatePresence mode="wait">
-                  {mode === 'login' ? (
-                    <motion.div key="login-shard" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10 flex-1 flex flex-col justify-center">
-                      {isLoading ? (
-                        <div className="py-20 flex flex-col items-center justify-center space-y-8">
-                          <Preloader message="Communing with Soul Sigil..." size="md" />
-                          <div className="text-[10px] font-black uppercase text-red-500/40 tracking-[0.4em] animate-pulse">Establishing Aetheric Link</div>
-                        </div>
-                      ) : (
-                        <form onSubmit={handleLogin} className="space-y-8">
-                          <div className="space-y-6">
-                            <InputWithStatus id="login-email" label="Soul Sigil" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} placeholder="VESSEL_ID@PROTOCOL" hint="Unified essence signature" status={emailStatus} icon={<User size={18} />} required />
-                            <InputWithStatus id="login-password" label="Void Cipher" type="password" value={formData.password} onChange={(e) => handleInputChange('password', e.target.value)} placeholder="••••••••" hint="Aetheric secure passkey" icon={<Lock size={18} />} required />
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <button type="submit" disabled={isLoading} className="bg-red-700 text-white py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-red-600 transition-all hover:scale-[1.02] shadow-[0_0_40px_rgba(185,28,28,0.3)] flex items-center justify-center gap-3 group relative overflow-hidden">
-                              <span className="relative z-10">Attune Vessel</span>
-                              <ChevronRight size={16} className="relative z-10 group-hover:translate-x-1 transition-transform" />
-                            </button>
-                            <button type="button" onClick={() => setMode('register')} className="bg-white/5 border border-white/5 text-white/50 py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-3">
-                               Awaken Essence <UserPlus size={16} />
-                            </button>
-                          </div>
-
-                          <SocialAuthButtons className="pt-6" />
-                        </form>
-                      )}
-                    </motion.div>
-                  ) : (
-                    <motion.div key="register-shard" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-10 flex-1 flex flex-col">
-                      <div className="flex items-center justify-between px-2">
-                        {[1, 2, 3, 4, 5].map(s => (
-                          <div key={s} className="flex items-center gap-2">
-                            <div className={`size-7 sm:size-8 rounded-full flex items-center justify-center text-[10px] font-black border-2 transition-all duration-700 ${regStep >= s ? 'bg-red-700 border-red-700 shadow-[0_0_15px_rgba(185,28,28,0.4)] text-white' : 'border-white/10 text-white/20'}`}>
-                              {s}
-                            </div>
-                            {s < 5 && <div className={`h-[2px] w-4 lg:w-10 transition-all duration-700 ${regStep > s ? 'bg-red-700' : 'bg-white/5'}`} />}
-                          </div>
-                        ))}
-                      </div>
-                      <div className={`flex flex-col lg:flex-row gap-6 sm:gap-12 flex-1 ${regStep > 1 ? 'items-stretch' : 'items-center'}`}>
-                        {regStep > 1 && !isRegistered && <IdentitySidebar role={formData.selectedRole} step={regStep} />}
-                        <form onSubmit={(e) => { e.preventDefault(); if (regStep < 5) setRegStep(regStep + 1); else handleRegisterFinal(); }} className="flex-1 flex flex-col">
-                          <div className="flex-1">
-                            {regStep === 1 ? (
-                              <RegStep1Role onSelect={(id) => { handleInputChange('selectedRole', id); setRegStep(2); }} />
-                            ) : regStep === 2 ? (
-                              <RegStep2Network formData={formData} onChange={handleInputChange} emailStatus={emailStatus} emailError={emailError} passStrength={passStrength} passConfirmStatus={passConfirmStatus} phoneStatus={phoneStatus} onNext={() => setRegStep(3)} />
-                            ) : regStep === 3 ? (
-                              <RegStep3Identity formData={formData} onChange={handleInputChange} onNext={() => setRegStep(4)} lang={lang} />
-                            ) : regStep === 4 ? (
-                              <RegStep4Specs formData={formData} onChange={handleInputChange} onNext={() => setRegStep(5)} onSkip={() => setRegStep(5)} />
-                            ) : regStep === 5 ? (
-                              <RegStep5Legal formData={formData} lang={lang} termsAccepted={termsAccepted} onToggleTerms={() => setTermsAccepted(!termsAccepted)} onFinalize={handleRegisterFinal} isLoading={isLoading} />
-                            ) : isRegistered && (
-                              <RegSuccess redirectCountdown={redirectCountdown} onEnterHub={() => navigate(`/${lang}/dashboard`)} />
-                            )}
-                          </div>
-                        </form>
-                      </div>
-                      <div className="text-center pt-8 border-t border-white/5 mt-auto">
-                        <button type="button" onClick={() => { if (regStep > 1) setRegStep(regStep - 1); else { setMode('login'); setError(''); } }} className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 hover:text-red-600 transition-all flex items-center justify-center gap-3 mx-auto py-2 group">
-                          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> {t('go_back')}
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {error && (
-                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8 p-6 bg-red-950/20 border border-red-900/50 rounded-[2rem] relative overflow-hidden">
-                    <div className="relative z-10 flex items-start gap-4">
-                      <div className="size-10 rounded-2xl bg-red-900/30 flex items-center justify-center text-red-500 shrink-0"><Shield size={20} className="animate-pulse" /></div>
-                      <div className="space-y-1">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-red-500">Security Fault Detected</h4>
-                        <p className="text-[11px] font-bold text-white/80 leading-relaxed uppercase">{error}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {(mode === 'login' || (mode === 'register' && regStep === 1)) && (
-                  <div className="pt-12 mt-auto border-t border-white/5 space-y-6">
-                    <div className="relative flex items-center justify-center">
-                      <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
-                      <span className="relative bg-black px-6 text-[10px] font-black uppercase tracking-[0.5em] text-white/10 italic">External Handshake</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-5">
-                      <button onClick={async () => { try { const res: any = await socialAuth({ provider: 'github' } as any); if (res?.user?.isOnboarded === false) { setMode('register'); setRegStep(1); } } catch(e) {} }} className="py-5 rounded-[1.5rem] bg-white/[0.02] border border-white/5 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 hover:bg-white/5 hover:text-white transition-all">
-                        <Github size={20} /> GitHub
-                      </button>
-                      <button onClick={async () => { try { const res: any = await socialAuth({ provider: 'google' } as any); if (res?.user?.isOnboarded === false) { setMode('register'); setRegStep(1); } } catch(e) {} }} className="py-5 rounded-[1.5rem] bg-white/[0.02] border border-white/5 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 hover:bg-white/5 hover:text-white transition-all">
-                        <Globe size={20} /> Google
-                      </button>
-                    </div>
+              {(mode === 'login' || (mode === 'register' && regStep === 1)) && (
+                <div className="pt-12 mt-auto border-t border-white/5 space-y-6">
+                  <div className="relative flex items-center justify-center">
+                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
+                    <span className="relative bg-black px-6 text-[10px] font-black uppercase tracking-[0.5em] text-white/10 italic">External Handshake</span>
                   </div>
-                )}
-              </motion.div>
-            )}
+                  <div className="grid grid-cols-2 gap-5">
+                    <button onClick={async () => { try { const res: any = await socialAuth({ provider: 'github' } as any); if (res?.user?.isOnboarded === false) { setMode('register'); setRegStep(1); } } catch(e) {} }} className="py-5 rounded-[1.5rem] bg-white/[0.02] border border-white/5 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 hover:bg-white/5 hover:text-white transition-all">
+                      <Github size={20} /> GitHub
+                    </button>
+                    <button onClick={async () => { try { const res: any = await socialAuth({ provider: 'google' } as any); if (res?.user?.isOnboarded === false) { setMode('register'); setRegStep(1); } } catch(e) {} }} className="py-5 rounded-[1.5rem] bg-white/[0.02] border border-white/5 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 hover:bg-white/5 hover:text-white transition-all">
+                      <Globe size={20} /> Google
+                    </button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
           </AnimatePresence>
         </div>
       </motion.div>

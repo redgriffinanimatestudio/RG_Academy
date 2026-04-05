@@ -36,7 +36,8 @@ git add .
 try {
     git commit -m $CommitMsg 2>$null
     git push origin main 2>$null
-} catch {
+}
+catch {
     Write-Host '⚠️ Git sync skipped, continuing...' -ForegroundColor Gray
 }
 
@@ -71,7 +72,8 @@ npx esbuild server.ts --bundle --platform=node --format=cjs --outfile=server-dis
 if (docker ps -q -f name=$DB_CONTAINER) {
     Write-Host "🛢️ Exporting Database from $DB_CONTAINER..." -ForegroundColor Yellow
     docker exec $DB_CONTAINER mysqldump --no-tablespaces -u$LOCAL_DB_USER -p$LOCAL_DB_PASS $LOCAL_DB > $SQL_DUMP
-} else {
+}
+else {
     Write-Host '⚠️ Skipping Database Export (Local DB Container Not Found)...' -ForegroundColor Red
     if (-Not (Test-Path $SQL_DUMP)) { 
         "-- Empty dump (Container Down)" | Out-File -FilePath $SQL_DUMP -Encoding utf8 
