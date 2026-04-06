@@ -186,12 +186,20 @@ async function startServer() {
         index: false
       }));
       app.get('*', (req, res) => {
-        // Only fallback to index.html if it's not an API call
-        if (!req.path.startsWith('/api')) {
+        // Phase 31.5: MIME Type Rescue
+        // If the request is for an asset (has an extension) but reached here, it's a 404.
+        // Falling back to index.html for assets causes "MIME type mismatch" errors in browser.
+        const isAsset = /\.(js|css|png|jpg|jpeg|gif|svg|ico|json|woff|woff2|ttf|otf|map)$/i.test(req.path);
+        
+        if (isAsset || req.path.startsWith('/api')) {
+          res.status(404).json({ 
+            success: false, 
+            error: isAsset ? 'Static asset not found' : 'API endpoint not found',
+            path: req.path
+          });
+        } else {
           res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
           res.sendFile(path.join(distPath, 'index.html'));
-        } else {
-          res.status(404).json({ error: 'API endpoint not found' });
         }
       });
     } else {

@@ -21,7 +21,7 @@ const Home: React.FC = () => {
   };
 
   const getDashboardLink = () => {
-    if (profile?.roles.includes('admin')) return `/admin/${lang}`;
+    if (profile?.roles?.includes('admin')) return `/${lang}/admin`;
     return `/aca/${lang}/dashboard`;
   };
 

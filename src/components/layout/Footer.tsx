@@ -115,8 +115,8 @@ export default function Footer({
             <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-primary italic underline underline-offset-8 decoration-primary/20">{t('academy')}</h4>
             <ul className="space-y-5 text-[11px] font-black uppercase tracking-[0.15em] text-white/30 italic">
               <li><Link to={`/aca/${lang || 'eng'}`} className="hover:text-white transition-colors">{t('workshops')}</Link></li>
-              <li><Link to={`/aca/${lang || 'eng'}/mentors`} className="hover:text-white transition-colors">Mentorship</Link></li>
-              <li><Link to={`/aca/${lang || 'eng'}/certs`} className="hover:text-white transition-colors">Certification</Link></li>
+              <li><button className="text-left hover:text-white/40 transition-colors cursor-not-allowed opacity-50" title="Coming Soon">Mentorship</button></li>
+              <li><button className="text-left hover:text-white/40 transition-colors cursor-not-allowed opacity-50" title="Coming Soon">Certification</button></li>
             </ul>
           </div>
           
@@ -125,25 +125,25 @@ export default function Footer({
             <ul className="space-y-5 text-[11px] font-black uppercase tracking-[0.15em] text-white/30 italic">
               <li><Link to={`/studio/${lang || 'eng'}`} className="hover:text-white transition-colors">{t('hire_talent')}</Link></li>
               <li><Link to={`/studio/${lang || 'eng'}/contracts`} className="hover:text-white transition-colors">Escrow Logic</Link></li>
-              <li><Link to={`/studio/${lang || 'eng'}/gigs`} className="hover:text-white transition-colors">Brave Gigs</Link></li>
+              <li><button className="text-left hover:text-white/40 transition-colors cursor-not-allowed opacity-50" title="Coming Soon">Brave Gigs</button></li>
             </ul>
           </div>
 
           <div className="space-y-8">
             <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-white/60 italic underline underline-offset-8 decoration-white/10">{t('community')}</h4>
             <ul className="space-y-5 text-[11px] font-black uppercase tracking-[0.15em] text-white/30 italic">
-              <li><Link to={`/community/${lang || 'eng'}`} className="hover:text-white transition-colors">{t('blog')}</Link></li>
-              <li><Link to="#" className="hover:text-white transition-colors">Collective</Link></li>
-              <li><Link to="#" className="hover:text-white transition-colors">Registry</Link></li>
+              <li><Link to={`/aca/${lang || 'eng'}/community`} className="hover:text-white transition-colors">{t('blog')}</Link></li>
+              <li><button className="text-left hover:text-white/40 transition-colors cursor-not-allowed opacity-50" title="Coming Soon">Collective</button></li>
+              <li><button className="text-left hover:text-white/40 transition-colors cursor-not-allowed opacity-50" title="Coming Soon">Registry</button></li>
             </ul>
           </div>
 
           <div className="space-y-8">
             <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-white/60 italic underline underline-offset-8 decoration-white/10">{t('legal')}</h4>
             <ul className="space-y-5 text-[11px] font-black uppercase tracking-[0.15em] text-white/30 italic">
-              <li><Link to="#" className="hover:text-white transition-colors">{t('terms')}</Link></li>
-              <li><Link to="#" className="hover:text-white transition-colors">{t('privacy') || 'Privacy'}</Link></li>
-              <li><Link to="#" className="hover:text-white transition-colors">Node-EULA</Link></li>
+              <li><Link to={`/${lang || 'eng'}/terms`} className="hover:text-white transition-colors">{t('terms')}</Link></li>
+              <li><Link to={`/${lang || 'eng'}/privacy`} className="hover:text-white transition-colors">{t('privacy') || 'Privacy'}</Link></li>
+              <li><button className="text-left hover:text-white/40 transition-colors cursor-not-allowed opacity-50" title="Coming Soon">Node-EULA</button></li>
             </ul>
           </div>
         </div>

@@ -116,7 +116,7 @@ export default function App() {
               <Route path="/studio/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
               <Route path="/studio/:lang/neural" element={<LanguageWrapper><Layout><NeuralStudio /></Layout></LanguageWrapper>} />
               <Route path="/studio/:lang/finance" element={<LanguageWrapper><Layout><Finance /></Layout></LanguageWrapper>} />
-              <Route path="/studio/:lang/profile/:id" element={<LanguageWrapper><Layout><SpecialistProfile /></Layout></LanguageWrapper>} />
+              <Route path="/studio/:lang/contracts" element={<LanguageWrapper><Layout><Contracts /></Layout></LanguageWrapper>} />
               <Route path="/studio/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
               <Route path="/studio/:lang/trajectory" element={<LanguageWrapper><Layout><TrajectoryPage /></Layout></LanguageWrapper>} />
 

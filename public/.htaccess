@@ -1,0 +1,29 @@
+# RG ACADEMY - Industrial Grade SPA Routing (.htaccess)
+# Version: 1.1 (Asset Protection + Clean URLs)
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. FIX: Prevent infinite redirect loops
+  RewriteCond %{ENV:REDIRECT_STATUS} ^$
+
+  # 2. FIX: Handle static assets separately
+  # If a .js, .css, .png, .jpg, or .svg file doesn't exist, return 404
+  # This prevents the "MIME type mismatch" blank page bug
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|json|webmanifest|map)$ - [L,R=404]
+
+  # 3. SPA Routing: Fallback for deep-links
+  # If the endpoint is NOT a file and NOT a directory, serve index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# 4. Security: Disable Directory Listing
+Options -Indexes
+
+# 5. Type Safety: Ensure correct MIME types
+AddType application/javascript .js
+AddType text/css .css
