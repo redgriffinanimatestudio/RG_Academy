@@ -141,7 +141,7 @@ export const authController = {
    */
   async register(req: Request, res: Response) {
     try {
-      const { email, displayName, phone, password, role, provider, profileData, signature } = req.body;
+      const { email, displayName, phone, password, role, provider, profileData, signature, selectedPath, metadata } = req.body;
 
       if (!email) return error(res, 'Email is required for registration', 400);
 
@@ -149,10 +149,10 @@ export const authController = {
       let user = await prisma.user.findUnique({ where: { email } });
       if (user) return res.status(400).json({ success: false, error: 'Node already active in grid' });
 
-      console.log(`[AUTH] Industrializing request for: ${email} | Role: ${role}`);
+      console.log(`[AUTH] Industrializing request for: ${email} | Role: ${role} | Path: ${selectedPath}`);
 
       const result = await identityService.registerUser({ 
-        email, displayName, phone, password, role, provider, profileData, signature 
+        email, displayName, phone, password, role, provider, profileData, signature, selectedPath, metadata 
       });
 
       return success(res, { 
@@ -256,12 +256,13 @@ export const authController = {
             primaryRole: 'user',
             roles: JSON.stringify(roles),
             source: 'fast_access',
+            registrationStatus: 'VISITOR',
             isOnboarded: false, // Force protocol steps 2-5
             isStudent: false,
             isClient: false,
             isExecutor: false,
             isAdmin: false,
-            profile: { create: { bio: `Registered via OTP (Pending Onboarding)` } }
+            profile: { create: { bio: `Registered via OTP (Initial Entry)` } }
           }
         });
         console.log(`✨ [AUTH] Created new OTP node for ${phone} (Protocol: Pending)`);
@@ -329,7 +330,8 @@ export const authController = {
       console.log(`[ONBOARDING] Node ${user.email} synchronizing profile as [${role}]`);
 
       const result = await identityService.finalizeOnboarding(user.id, user.email!, {
-        role, chosenPathId, profileData, signature
+        role, chosenPathId, profileData, signature, 
+        registrationStatus: 'ACTIVE' // Activating account after onboarding complete
       });
 
       return success(res, { 
@@ -462,6 +464,28 @@ export const authController = {
       return success(res, { ...user, roles: rolesArray });
     } catch (e) {
       return error(res, 'Failed to sync user', 500);
+    }
+  },
+
+  /**
+   * @swagger
+   * /api/auth/dev/activate:
+   *   post:
+   *     summary: Developer-only account activation (Simulate Admin Approval)
+   *     security:
+   *       - bearerAuth: []
+   */
+  async devActivate(req: AuthRequest, res: Response) {
+    try {
+      // In production, this would be restricted by admin role
+      const userId = req.user!.id;
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: { registrationStatus: 'ACTIVE' }
+      });
+      return success(res, { message: 'Industrial Node Activated', user });
+    } catch (e: any) {
+      return error(res, 'Activation failed', 500);
     }
   }
 };

@@ -10,6 +10,7 @@ import {
 import { StatCard, SectionHeader, GlassCard } from '../../../components/dashboard/shared/DashboardUI';
 import { academyService } from '../../../services/academyService';
 import NeuralRoadmap from '../../../components/dashboard/NeuralRoadmap';
+import { executeSkill } from '../../../services/ai';
 
 interface StudentDashboardProps {
   data?: any;
@@ -32,6 +33,31 @@ export default function StudentDashboard({
 
   // Normalize mapping for view strings from Layout metadata
   const activeView = view === 'student' ? 'overview' : (view.includes('nexus') ? 'overview' : view);
+
+  // --- AI TRAJECTORY LOGIC ---
+  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeView === 'career_trajectory' && !aiAnalysis && techStack.length > 0) {
+      const runAnalysis = async () => {
+        setAiLoading(true);
+        try {
+          const result = await executeSkill('trajectoryAnalysis', {
+            techStack: techStack.map((s: any) => ({ name: s.name, lod: s.lod })),
+            currentRank: 'Specialist', // Placeholder from UI
+            goal: 'Senior Technical Artist' // Placeholder from UI
+          });
+          setAiAnalysis(result);
+        } catch (error) {
+          console.error("AI Analysis failed:", error);
+        } finally {
+          setAiLoading(false);
+        }
+      };
+      runAnalysis();
+    }
+  }, [activeView, techStack]);
 
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-24">
@@ -100,7 +126,7 @@ export default function StudentDashboard({
            transition={{ duration: 0.4 }}
         >
           {activeView === 'overview' && <OverviewModule stats={stats} techStack={techStack} pipelines={activePipelines} certs={certifications} />}
-          {activeView === 'career_trajectory' && <TrajectoryModule techStack={techStack} />}
+          {activeView === 'career_trajectory' && <TrajectoryModule techStack={techStack} aiAnalysis={aiAnalysis} aiLoading={aiLoading} />}
           {activeView === 'master_plan_roadmap' && <NeuralRoadmap activePathId={user?.chosenPathId || 'generalist'} completedNodeIds={[]} />}
           {activeView === 'certificate_vault' && <VaultModule certs={certifications} />}
           {activeView === 'ai_mentor_node' && <AIMentorModule user={user} />}
@@ -133,22 +159,25 @@ function OverviewModule({ stats, techStack, pipelines, certs }: any) {
           <SectionHeader title="Skill Symmetry Matrix" subtitle="Current proficiency levels across architectural nodes" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {techStack.map((skill: any, idx: number) => (
-              <GlassCard key={idx} className="group hover:bg-white/[0.04] transition-all">
-                <div className="space-y-6">
+              <div key={idx} className="neural-panel p-8 group hover:bg-white/[0.02] transition-all relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-[0.02] group-hover:opacity-10 transition-opacity">
+                  <Cpu size={80} />
+                </div>
+                <div className="space-y-6 relative z-10">
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                      <span className="text-[12px] font-black text-ink uppercase group-hover:text-primary transition-colors">{skill.name}</span>
-                      <p className="text-[8px] font-bold text-text-muted uppercase tracking-widest font-mono italic">Node Ver: 4.02</p>
+                      <span className="text-[12px] font-black text-ink uppercase group-hover:text-primary transition-colors tracking-tighter">{skill.name}</span>
+                      <p className="text-[8px] font-bold text-text-muted uppercase tracking-widest font-mono italic">Node.Architecture.v7</p>
                     </div>
-                    <div className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-lg text-[10px] font-black text-primary uppercase">
+                    <div className="px-3 py-1 bg-primary/5 border border-primary/10 rounded-lg text-[10px] font-black text-primary uppercase">
                       LOD {Math.round(skill.lod)}
                     </div>
                   </div>
-                  <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, (skill.lod / 500) * 100)}%` }} className="h-full bg-primary" />
+                  <div className="w-full h-0.5 bg-white/5 rounded-full overflow-hidden">
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, (skill.lod / 500) * 100)}%` }} className="h-full bg-primary shadow-[0_0_10px_rgba(16,185,129,0.3)]" />
                   </div>
                 </div>
-              </GlassCard>
+              </div>
             ))}
           </div>
         </div>
@@ -176,10 +205,10 @@ function OverviewModule({ stats, techStack, pipelines, certs }: any) {
 }
 
 // 🗺️ TRAJECTORY: CAREER MAP
-function TrajectoryModule({ techStack }: any) {
+function TrajectoryModule({ techStack, aiAnalysis, aiLoading }: any) {
   return (
     <div className="space-y-12">
-      <SectionHeader title="Neural Career Trajectory" subtitle="The algorithmic path to seniority in VFX & Technical Art" />
+      <SectionHeader title="Professional Career Trajectory" subtitle="The algorithmic path to seniority in VFX & Technical Art" />
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {[
           { label: 'Foundations', status: 'completed', icon: BookOpen, desc: 'Intro to CG & Maya Basics' },
@@ -187,8 +216,8 @@ function TrajectoryModule({ techStack }: any) {
           { label: 'Lead Developer', status: 'locked', icon: Box, desc: 'Advanced Pipeline Architecture' },
           { label: 'Director Hub', status: 'locked', icon: ShieldCheck, desc: 'Creative Vision & Leadership' }
         ].map((node, i) => (
-          <GlassCard key={i} className={`relative overflow-hidden group ${node.status === 'current' ? 'border-primary shadow-2xl shadow-primary/10' : ''}`}>
-            <div className={`absolute top-0 right-0 p-8 opacity-[0.03] rotate-12 group-hover:scale-110 transition-transform`}>
+          <div key={i} className={`neural-panel p-8 relative overflow-hidden group trajectory-pulse ${node.status === 'current' ? 'border-primary/40 shadow-2xl shadow-primary/5' : ''}`}>
+            <div className={`absolute top-0 right-0 p-8 opacity-[0.02] rotate-12 group-hover:scale-110 transition-transform`}>
                <node.icon size={120} />
             </div>
             <div className="relative z-10 space-y-6 pt-4 pb-2">
@@ -205,7 +234,7 @@ function TrajectoryModule({ techStack }: any) {
                  </span>
                </div>
             </div>
-          </GlassCard>
+          </div>
         ))}
       </div>
       
@@ -213,9 +242,38 @@ function TrajectoryModule({ techStack }: any) {
         <div className="absolute top-0 right-0 p-12 opacity-5"><TrendingUp size={200} /></div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
            <div className="space-y-8">
-              <h3 className="text-2xl font-black uppercase tracking-tighter italic text-ink">Skill <span className="text-primary">Ecosystem.</span></h3>
-              <p className="text-text-muted text-sm leading-relaxed font-medium">Your current trajectory is optimized for **Technical Environment Art**. To reach the next node, we recommend completing the "VDB Simulation" workshop.</p>
-              <button className="px-10 py-4 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20">Analyze Potential</button>
+              <h3 className="text-2xl font-black uppercase tracking-tighter italic text-ink">Skill <span className="text-primary">Matrix.</span></h3>
+              {aiLoading ? (
+                <div className="space-y-4 py-8">
+                  <div className="flex items-center gap-3">
+                    <Sparkles size={18} className="text-primary animate-spin" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary italic">Analyzing Skill Matrix...</span>
+                  </div>
+                  <div className="h-[2px] w-full bg-white/5 overflow-hidden rounded-full">
+                    <motion.div initial={{ x: '-100%' }} animate={{ x: '100%' }} transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }} className="h-full w-1/3 bg-primary" />
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6 animate-in fade-in duration-1000">
+                  <p className="text-text-muted text-sm leading-relaxed font-medium">
+                    {aiAnalysis?.insight || `Analysis of your career trajectory indicates a high compatibility with Technical Environment Art workflows.`}
+                  </p>
+                  <div className="p-6 bg-primary/5 border border-primary/20 rounded-3xl space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="size-1.5 rounded-full bg-primary animate-pulse" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-ink italic">Gap Analysis Detected</span>
+                    </div>
+                    <p className="text-xs text-ink/70 font-bold uppercase">{aiAnalysis?.delta || "Material Shader Logic Optimization"}</p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[9px] font-black uppercase text-text-muted tracking-[0.3em]">Recommended Module:</span>
+                    <div className="text-lg font-black text-primary uppercase italic">{aiAnalysis?.recommendation || "VDB Simulation Workshop"}</div>
+                  </div>
+                </div>
+              )}
+              <button className={`px-10 py-4 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20 ${aiLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+                {aiLoading ? 'Reasoning...' : 'Analyze Potential'}
+              </button>
            </div>
            <div className="space-y-6">
               {techStack.slice(0, 3).map((skill: any, i: number) => (

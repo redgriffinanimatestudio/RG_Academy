@@ -18,14 +18,30 @@
   --matrix-accent: #10b981;
   --glass-blur: blur(24px);
   --glass-pro-blur: blur(40px);
+
+  /* Industrial Design Tokens (awesome-design-md) */
+  --canvas-industrial: #08090a;
+  --surface-industrial: #121316;
+  --border-industrial: rgba(255, 255, 255, 0.08);
+  --border-industrial-luminous: rgba(255, 255, 255, 0.15);
+  --text-industrial: #f7f8f8;
+  --accent-raycast: #FF6363;
+  --accent-bmw-blue: #1c69d4;
+
+  /* Neural Industrialization V2 (BMW/Linear) */
+  --canvas-neural: #040404;
+  --surface-neural: #0a0a0a;
+  --border-neural: rgba(255, 255, 255, 0.04);
+  --border-neural-active: rgba(255, 255, 255, 0.12);
+  --glow-neural: rgba(16, 185, 129, 0.15);
 }
 
 :root {
   --bg-main: #fcfcfc;
   --bg-card: rgba(255, 255, 255, 0.7);
   --text-main: #0c0c0c;
-  --text-muted: #666666;
-  --border-main: rgba(0, 0, 0, 0.04);
+  --text-muted: #555555;
+  --border-main: rgba(0, 0, 0, 0.08);
   --glass-bg: rgba(255, 255, 255, 0.4);
   --switcher-bg: #f0f0f0;
   --grid-color: rgba(16, 185, 129, 0.05);
@@ -58,7 +74,20 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-display text-ink;
     letter-spacing: -0.05em;
-    line-height: 0.9;
+    line-height: 1.05;
+    font-weight: 300; /* BMW Industrial Weight */
+  }
+
+  /* Linear-style precision typography */
+  .text-precision {
+    letter-spacing: 0.1px;
+    line-height: 1.13;
+  }
+
+  /* Raycast-style monospaced data */
+  .text-geist {
+    font-family: 'JetBrains Mono', 'Geist Mono', monospace;
+    letter-spacing: 0.2px;
   }
   
   p {
@@ -96,6 +125,20 @@
     background: linear-gradient(135deg, var(--glass-bg), var(--bg-main));
     border: 1px solid var(--border-main);
     box-shadow: var(--shadow-main);
+  }
+
+  .glass-pro-max {
+    @apply bg-bg-card backdrop-blur-[40px] border border-white/10 shadow-2xl;
+    background: linear-gradient(160deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+  }
+
+  [data-theme='light'] .glass-pro-max {
+    background: linear-gradient(160deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%);
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .text-gradient-primary {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-emerald-400 to-cyan-500;
   }
 
   .matrix-grid-bg {
@@ -181,14 +224,139 @@
     box-shadow: 0 0 40px rgba(0, 245, 212, 0.15);
   }
 
-  .skeleton-loading {
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.05) 75%);
-    background-size: 200% 100%;
+  .skeleton-pulse {
     animation: skeleton-pulse 1.5s infinite;
   }
 
   @keyframes skeleton-pulse {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
+  }
+
+  /* --- NEURAL GATEWAY EXTENSIONS --- */
+  .gateway-perspective {
+    perspective: 2000px;
+    transform-style: preserve-3d;
+  }
+
+  .neural-card-3d {
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    transform-style: preserve-3d;
+  }
+
+  .neural-card-3d:hover {
+    transform: rotateY(8deg) rotateX(2deg) translateZ(20px);
+  }
+
+  .neural-line-pulse {
+    stroke-dasharray: 12;
+    animation: neural-dash 20s linear infinite;
+  }
+
+  @keyframes neural-dash {
+    to { stroke-dashoffset: -1000; }
+  }
+
+  .carousel-snap {
+    scroll-snap-type: x mandatory;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .carousel-snap::-webkit-scrollbar {
+    display: none;
+  }
+
+  .carousel-item {
+    scroll-snap-align: center;
+  }
+
+  .data-glow-primary {
+    filter: drop-shadow(0 0 15px var(--primary));
+  }
+
+  /* --- INDUSTRIAL & PRO MAX COMPONENTS --- */
+  .industrial-panel {
+    background: var(--canvas-industrial);
+    border: 1px solid var(--border-industrial);
+    border-radius: 0; /* BMW Zero-Radius Standard */
+    position: relative;
+    overflow: hidden;
+  }
+
+  .industrial-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+  }
+
+  .precision-border {
+    border: 1px solid var(--border-industrial);
+    transition: border-color 0.15s ease-out;
+  }
+
+  .precision-border:hover {
+    border-color: var(--border-industrial-luminous);
+  }
+
+  .raycast-accent {
+    color: var(--accent-raycast);
+    text-shadow: 0 0 10px rgba(255, 99, 99, 0.3);
+  }
+
+  .bmw-accent-bg {
+    background: var(--accent-bmw-blue);
+  }
+
+  .glass-industrial-max {
+    background: rgba(8, 9, 10, 0.85);
+    backdrop-filter: blur(40px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.8);
+  }
+
+  /* --- NEURAL PRO MAX COMPONENTS --- */
+  .neural-canvas {
+    background: var(--canvas-neural);
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(28, 105, 212, 0.03) 0%, transparent 50%);
+  }
+
+  .neural-panel {
+    background: var(--surface-neural);
+    border: 0.5px solid var(--border-neural);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.8);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .neural-panel:hover {
+    border-color: var(--border-neural-active);
+    background: rgba(15, 15, 15, 0.8);
+  }
+
+  .trajectory-pulse {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .trajectory-pulse::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 200%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.05), transparent);
+    animation: pulse-sweep 8s infinite linear;
+  }
+
+  @keyframes pulse-sweep {
+    to { transform: translateX(100%); }
+  }
+
+  /* BMW-style zero-radius toggle */
+  .industrial-toggle {
+    @apply relative inline-flex h-6 w-11 items-center border-0.5 border-white/5 bg-white/5 transition-all;
   }
 }

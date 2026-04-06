@@ -22,6 +22,8 @@ import DevDashboard from './pages/DevDashboard';
 import TrajectoryPage from './pages/Trajectory';
 import AssetReview from './pages/AssetReview';
 import Finance from './pages/Finance';
+import WelcomeWaitlist from './pages/Dashboard/WelcomeWaitlist';
+import RouteGuard from './components/auth/RouteGuard';
 import { AlertProvider } from './components/Alert';
 import GlobalSearchOverlay from './components/search/GlobalSearchOverlay';
 import { AuthProvider } from './context/AuthContext';
@@ -80,12 +82,17 @@ export default function App() {
                 <CookieConsent />
                 <GeoRedirect />
                 <Routes>
-                  <Route path="/" element={<div className="bg-bg-dark min-h-screen" />} />
+                  {/* Public Entrance with Guard (Root Redirection) */}
+                  <Route path="/" element={<RouteGuard><div className="bg-bg-dark min-h-screen" /></RouteGuard>} />
+                  
                   {/* Main Routes */}
-                  <Route path="/:lang" element={<LanguageWrapper><Layout><Home /></Layout></LanguageWrapper>} />
+                  <Route path="/:lang" element={<LanguageWrapper><Layout><RouteGuard><Home /></RouteGuard></Layout></LanguageWrapper>} />
                   <Route path="/:lang/dev" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
                   <Route path="/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
+                  <Route path="/:lang/dashboard/welcome-waitlist" element={<LanguageWrapper><WelcomeWaitlist /></LanguageWrapper>} />
                   <Route path="/:lang/finance" element={<LanguageWrapper><Layout><Finance /></Layout></LanguageWrapper>} />
+                  <Route path="/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
+                  <Route path="/:lang/register" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
                   
                   {/* Redirect legacy specific routes to unified dashboard */}
                   <Route path="/:lang/admin" element={<RedirectWithLang to="/dashboard" />} />
@@ -106,7 +113,7 @@ export default function App() {
               <Route path="/aca/:lang/messages" element={<LanguageWrapper><Layout><Messages /></Layout></LanguageWrapper>} />
               <Route path="/aca/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
               <Route path="/aca/:lang/profile/:id" element={<LanguageWrapper><Layout><SpecialistProfile /></Layout></LanguageWrapper>} />
-              <Route path="/aca/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
+              <Route path="/aca/:lang/login" element={<LanguageWrapper><Layout><RouteGuard><Login /></RouteGuard></Layout></LanguageWrapper>} />
               
               {/* Studio Routes */}
               <Route path="/studio/:lang" element={<LanguageWrapper><Layout><Studio /></Layout></LanguageWrapper>} />
@@ -117,7 +124,7 @@ export default function App() {
               <Route path="/studio/:lang/neural" element={<LanguageWrapper><Layout><NeuralStudio /></Layout></LanguageWrapper>} />
               <Route path="/studio/:lang/finance" element={<LanguageWrapper><Layout><Finance /></Layout></LanguageWrapper>} />
               <Route path="/studio/:lang/contracts" element={<LanguageWrapper><Layout><Contracts /></Layout></LanguageWrapper>} />
-              <Route path="/studio/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
+              <Route path="/studio/:lang/login" element={<LanguageWrapper><Layout><RouteGuard><Login /></RouteGuard></Layout></LanguageWrapper>} />
               <Route path="/studio/:lang/trajectory" element={<LanguageWrapper><Layout><TrajectoryPage /></Layout></LanguageWrapper>} />
 
               {/* Other */}

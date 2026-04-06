@@ -9,6 +9,7 @@ const router = Router();
 
 // Dev backdoor
 router.post('/dev/auth', validate(LoginSchema), authController.devLogin);
+router.post('/dev/activate', authMiddleware, authController.devActivate);
 router.post('/login', validate(LoginSchema), authController.login);
 
 // Registration

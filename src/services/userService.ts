@@ -42,6 +42,8 @@ export interface UserProfile {
   portfolioUrl?: string | null;
   gender?: string | null;
   dateOfBirth?: string | Date | null;
+  registrationStatus?: 'VISITOR' | 'PENDING' | 'ACTIVE';
+  selectedPath?: 'ACADEMY' | 'STUDIO' | 'COMMUNITY' | 'NONE';
   createdAt: any;
   updatedAt?: any;
 }

@@ -1,8 +1,8 @@
+import { Request, Response } from 'express';
 import { AuthRequest } from '../middleware/auth.js';
+import { prisma } from '../utils/prisma';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export const aiController = {

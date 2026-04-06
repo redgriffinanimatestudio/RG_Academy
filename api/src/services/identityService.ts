@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { mapSocialPayload } from '../utils/socialMapper.js';
 
 export const identityService = {
-  async registerUser({ email, displayName, phone, password, role, provider, profileData, signature }: any) {
+  async registerUser({ email, displayName, phone, password, role, provider, profileData, signature, selectedPath, metadata }: any) {
     const roles = role === 'admin' ? ['admin', 'student', 'lecturer'] : [role || 'student'];
     const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
 
@@ -21,7 +21,10 @@ export const identityService = {
           isStudent: role === 'student',
           isClient: role === 'client',
           isExecutor: role === 'executor',
-          isOnboarded: true,
+          isOnboarded: false, // Wait for finalization
+          registrationStatus: 'PENDING',
+          selectedPath: selectedPath || 'NONE',
+          metadata: metadata || {},
           profile: {
             create: {
               bio: profileData?.bio || `Registered via ${provider || 'Auth System'}`,
@@ -89,6 +92,7 @@ export const identityService = {
             primaryRole: 'user',
             roles: JSON.stringify(['user']),
             isOnboarded: false,
+            registrationStatus: 'VISITOR',
             profile: {
               create: {
                 bio: bio || `Social identity synchronized via ${provider}`,
@@ -142,7 +146,8 @@ export const identityService = {
         role,
         primaryRole: role,
         roles: JSON.stringify([role]),
-        isOnboarded: true
+        isOnboarded: true,
+        registrationStatus: 'ACTIVE'
       };
 
       if (role === 'student') updateData.isStudent = true;

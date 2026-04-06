@@ -151,7 +151,7 @@ export default function TrajectoryPage() {
       <div className="space-y-4 text-center relative z-10">
         <div className="size-32 rounded-full border-[3px] border-primary/20 border-b-primary animate-spin shadow-[0_0_80px_rgba(255,54,54,0.4)] mx-auto" />
         <div className="text-[12px] font-black uppercase tracking-[0.8em] text-primary animate-pulse mt-8">Calculating Sentient Growth Matrix...</div>
-        <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Integrating Session Telemetry & AI Pathfinding</p>
+        <p className="text-[10px] font-black text-ink/20 uppercase tracking-widest">Integrating Session Telemetry & AI Pathfinding</p>
       </div>
     </div>
   );
@@ -189,14 +189,14 @@ export default function TrajectoryPage() {
               <h1 className="text-7xl lg:text-9xl font-black uppercase tracking-tighter leading-[0.85]">
                 {data?.title || 'GROWTH VECTOR'}
               </h1>
-              <div className="flex items-center gap-4 text-white/30 text-lg font-medium italic">
+              <div className="flex items-center gap-4 text-ink/30 text-lg font-medium italic">
                 <ChevronRight size={20} className="text-primary" />
                 {data?.description}
               </div>
             </motion.div>
 
-            <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 border-l-primary border-l-4">
-              <p className="text-sm font-bold text-white/60 leading-relaxed uppercase tracking-tighter">
+            <div className="p-6 rounded-3xl bg-white/[0.02] border border-border-main/20 border-l-primary border-l-4">
+              <p className="text-sm font-bold text-ink/60 leading-relaxed uppercase tracking-tighter">
                 <Sparkles size={14} className="inline mr-2 text-primary" />
                 {data?.aiInsight}
               </p>
@@ -205,7 +205,7 @@ export default function TrajectoryPage() {
 
           <div className="flex-1 flex flex-col items-center lg:items-end justify-center">
             <div className="relative group">
-              <div className="size-64 lg:size-80 rounded-full flex items-center justify-center relative bg-black/60 border border-white/5 backdrop-blur-3xl shadow-[0_0_100px_rgba(255,54,54,0.1)]">
+              <div className="size-64 lg:size-80 rounded-full flex items-center justify-center relative bg-black/60 border border-border-main/20 backdrop-blur-3xl shadow-[0_0_100px_rgba(255,54,54,0.1)]">
                 <div className="absolute inset-0 rounded-full border-t-2 border-primary/50 animate-[spin_10s_linear_infinite]" />
                 <div className="absolute inset-4 rounded-full border-b-2 border-primary/20 animate-[spin_15s_linear_infinite_reverse]" />
                 
@@ -218,7 +218,7 @@ export default function TrajectoryPage() {
                 </div>
               </div>
               {/* Status Pips */}
-              <div className="absolute -top-4 -right-4 bg-[#0a0a0a] border border-white/10 px-6 py-4 rounded-full flex items-center gap-4 shadow-2xl backdrop-blur-xl">
+              <div className="absolute -top-4 -right-4 bg-[#0a0a0a] border border-border-main/40 px-6 py-4 rounded-full flex items-center gap-4 shadow-2xl backdrop-blur-xl">
                  <div className="size-3 bg-primary animate-pulse rounded-full shadow-[0_0_10px_#ff3636]" />
                  <span className="text-[10px] font-black uppercase tracking-widest text-white">Live Tracking</span>
               </div>
@@ -235,7 +235,7 @@ export default function TrajectoryPage() {
             </div>
             <button 
               onClick={fetchTrajectory}
-              className="px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/10 transition-all flex items-center gap-3"
+              className="px-6 py-3 bg-ink/5 border border-border-main/40 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white/10 transition-all flex items-center gap-3"
             >
               <RefreshCw size={14} /> Refresh Matrix
             </button>
@@ -257,16 +257,16 @@ export default function TrajectoryPage() {
                     isActive 
                       ? 'bg-primary/10 border-primary shadow-[0_0_50px_rgba(255,54,54,0.2)]' 
                       : node.status === 'completed'
-                      ? 'bg-white/[0.03] border-white/10 opacity-60 grayscale-[0.5]'
+                      ? 'bg-white/[0.03] border-border-main/40 opacity-60 grayscale-[0.5]'
                       : node.status === 'locked'
-                      ? 'bg-white/[0.01] border-white/5 opacity-40 cursor-not-allowed'
-                      : 'bg-white/[0.02] border-white/5 hover:border-white/20'
+                      ? 'bg-white/[0.01] border-border-main/20 opacity-40 cursor-not-allowed'
+                      : 'bg-white/[0.02] border-border-main/20 hover:border-white/20'
                   }`}
                 >
                   <div className="space-y-6 relative z-10">
                     <div className="flex items-center justify-between">
                       <div className={`size-14 rounded-2xl flex items-center justify-center transition-all ${
-                        isActive ? 'bg-primary text-bg-dark scale-110 rotate-3 shadow-[0_0_30px_#ff3636]' : 'bg-white/5 text-white/40'
+                        isActive ? 'bg-primary text-bg-dark scale-110 rotate-3 shadow-[0_0_30px_#ff3636]' : 'bg-ink/5 text-ink/40'
                       }`}>
                          <Icon size={24} strokeWidth={isActive ? 3 : 2} />
                       </div>
@@ -274,16 +274,16 @@ export default function TrajectoryPage() {
                     </div>
                     
                     <div className="space-y-4">
-                      <h3 className={`text-xl font-black uppercase tracking-tight leading-none ${isActive ? 'text-white' : 'text-white/40'}`}>
+                      <h3 className={`text-xl font-black uppercase tracking-tight leading-none ${isActive ? 'text-white' : 'text-ink/40'}`}>
                         {node.title}
                       </h3>
-                      <p className={`text-xs font-medium leading-relaxed ${isActive ? 'text-white/60' : 'text-white/20'}`}>
+                      <p className={`text-xs font-medium leading-relaxed ${isActive ? 'text-ink/60' : 'text-ink/20'}`}>
                         {node.requirement}
                       </p>
                     </div>
                   </div>
 
-                  <div className="pt-6 mt-6 border-t border-white/5 flex items-center justify-between">
+                  <div className="pt-6 mt-6 border-t border-border-main/20 flex items-center justify-between">
                      <div className="flex items-center gap-3">
                         {node.status === 'completed' && <div className="px-3 py-1 bg-primary/20 text-primary text-[8px] font-black uppercase rounded-lg">Verified</div>}
                         {node.status === 'in-progress' && <div className="px-3 py-1 bg-white/10 text-white text-[8px] font-black uppercase rounded-lg animate-pulse">In Progress</div>}
@@ -292,7 +292,7 @@ export default function TrajectoryPage() {
                      {node.link && node.status !== 'locked' && (
                        <button 
                         onClick={() => navigate(node.link!)}
-                        className={`text-[9px] font-black uppercase tracking-widest ${isActive ? 'text-primary hover:underline' : 'text-white/20'}`}
+                        className={`text-[9px] font-black uppercase tracking-widest ${isActive ? 'text-primary hover:underline' : 'text-ink/20'}`}
                        >
                          Jump To Node <ChevronRight size={12} className="inline ml-1" />
                        </button>
@@ -315,7 +315,7 @@ export default function TrajectoryPage() {
         </div>
 
         {/* Industrial Skills Matrix Overlay */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center p-12 lg:p-20 rounded-[4rem] bg-white/[0.01] border border-white/5 backdrop-blur-3xl overflow-hidden relative group">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center p-12 lg:p-20 rounded-[4rem] bg-white/[0.01] border border-border-main/20 backdrop-blur-3xl overflow-hidden relative group">
            <div className="absolute inset-0 bg-primary/2 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
              <div className="size-[500px] rounded-full bg-primary/5 blur-[120px]" />
            </div>
@@ -328,7 +328,7 @@ export default function TrajectoryPage() {
                 <h2 className="text-5xl lg:text-7xl font-black uppercase tracking-tighter leading-none">
                   SENTIENT<br />SKILLS<br />RADAR
                 </h2>
-                <p className="text-white/40 text-lg font-medium leading-[1.8] max-w-md italic">
+                <p className="text-ink/40 text-lg font-medium leading-[1.8] max-w-md italic">
                   Visualizing the divergence between your current neural signature and the specialist target profile.
                 </p>
               </div>
@@ -337,10 +337,10 @@ export default function TrajectoryPage() {
                 {data?.targetSkills.slice(0, 4).map(skill => (
                   <div key={skill.skill} className="space-y-3">
                     <div className="flex justify-between items-end">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{skill.skill}</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-ink/20">{skill.skill}</span>
                       <span className="text-[12px] font-black text-primary">{Math.round((skill.current/skill.target)*100)}%</span>
                     </div>
-                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-1.5 w-full bg-ink/5 rounded-full overflow-hidden">
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${(skill.current/skill.target)*100}%` }}
@@ -368,7 +368,7 @@ export default function TrajectoryPage() {
                 <h3 className="text-5xl lg:text-8xl font-black uppercase tracking-tighter leading-[0.85]">
                   SIMULATION<br />HANDSHAKE
                 </h3>
-                <p className="text-white/30 text-xl font-medium leading-relaxed">
+                <p className="text-ink/30 text-xl font-medium leading-relaxed">
                   The matrix requires proof of mastery. Interface with a synthetic project lead to finalize your specialized trajectory.
                 </p>
              </div>
@@ -381,7 +381,7 @@ export default function TrajectoryPage() {
       </div>
 
       {/* Footer Navigation Hints */}
-      <footer className="mt-20 py-10 border-t border-white/5 flex items-center justify-center gap-12 text-[10px] font-black uppercase tracking-[0.4em] text-white/10">
+      <footer className="mt-20 py-10 border-t border-border-main/20 flex items-center justify-center gap-12 text-[10px] font-black uppercase tracking-[0.4em] text-white/10">
         <div className="flex items-center gap-3"><BookOpen size={14} /> Documentation</div>
         <div className="flex items-center gap-3"><Target size={14} /> Objectives</div>
         <div className="flex items-center gap-3"><Shield size={14} /> Certification</div>

@@ -1,158 +1,124 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Sparkles, GraduationCap, ChevronRight } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Play, ChevronDown, ChevronRight, Monitor, GraduationCap, X, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface HeroSectionProps {
   t: (key: string) => string;
   lang: string | undefined;
-  user: any;
-  getDashboardLink: () => string;
-  handleLoginRedirect: () => void;
+  user?: any;
+  onDiscover: () => void;
 }
 
-const HeroSection: React.FC<HeroSectionProps> = ({ t, lang, user, handleLoginRedirect }) => {
-  const [hoveredPath, setHoveredPath] = useState<'studio' | 'academy' | null>(null);
+export default function HeroSection({ t, lang, user, onDiscover }: HeroSectionProps) {
+  const [showVideo, setShowVideo] = useState(false);
   const navigate = useNavigate();
 
-  const paths = [
-    {
-      id: 'studio' as const,
-      title: t('studio'),
-      subtitle: 'Production & Solutions',
-      desc: 'High-end CGI, Animation, and Digital Solutions for the modern industry.',
-      icon: Sparkles,
-      color: 'from-emerald-500/20 to-cyan-500/20',
-      borderColor: 'border-emerald-500/30',
-      bgImage: 'https://picsum.photos/seed/rg-studio-v4/1920/1080',
-      link: `/studio/${lang || 'eng'}`
-    },
-    {
-      id: 'academy' as const,
-      title: t('academy'),
-      subtitle: 'Mastery & Evolution',
-      desc: 'Professional workshops led by industry veterans from around the globe.',
-      icon: GraduationCap,
-      color: 'from-blue-500/20 to-primary/20',
-      borderColor: 'border-primary/30',
-      bgImage: 'https://picsum.photos/seed/rg-academy-v4/1920/1080',
-      link: `/aca/${lang || 'eng'}`
-    }
-  ];
-
   return (
-    <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden px-4 py-12">
-      {/* Background Atmosphere */}
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4 py-32">
+      {/* Background Ambience */}
       <div className="absolute inset-0 z-0">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={hoveredPath || 'default'}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.15 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-            className="absolute inset-0"
-          >
-            <img 
-              src={hoveredPath ? paths.find(p => p.id === hoveredPath)?.bgImage : 'https://picsum.photos/seed/rg-grid/1920/1080'} 
-              className="w-full h-full object-cover grayscale"
-              alt=""
-            />
-          </motion.div>
-        </AnimatePresence>
-        <div className="absolute inset-0 bg-bg-dark/95 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1635830322729-673ad6552e8f?q=80&w=2600&auto=format&fit=crop')] bg-cover bg-center grayscale opacity-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-bg-dark/50 via-bg-dark to-bg-dark" />
+        {/* Animated Scanlines */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[linear-gradient(rgba(16,185,129,0.1)_1px,transparent_1px)] bg-[length:100%_4px]" />
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto space-y-16">
-        <div className="text-center space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-border-main bg-bg-card/50 backdrop-blur-md"
-          >
-            <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted">{t('creative_ecosystem')}</span>
-          </motion.div>
-          
-          <motion.h1
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-5xl md:text-8xl font-black tracking-tighter uppercase leading-[0.85] text-ink"
-          >
-            Which <span className="text-primary italic">Path</span> <br />
-            Do you want to <span className="text-primary underline decoration-emerald-500/30 underline-offset-8">select?</span>
-          </motion.h1>
-        </div>
+      <div className="relative z-10 w-full max-w-7xl mx-auto text-center space-y-12">
+        <motion.div
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           className="inline-flex items-center gap-3 px-6 py-2 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-xl"
+        >
+          <Sparkles size={14} className="text-primary animate-pulse" />
+          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary italic">Industrial Sovereignty v2.5</span>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-          {paths.map((path, idx) => (
-            <motion.button
-              key={path.id}
-              initial={{ opacity: 0, x: idx === 0 ? -40 : 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + idx * 0.1 }}
-              onMouseEnter={() => setHoveredPath(path.id)}
-              onMouseLeave={() => setHoveredPath(null)}
-              onClick={() => navigate(path.link)}
-              className={`relative h-[400px] md:h-[500px] group rounded-[3rem] border-2 ${path.borderColor} overflow-hidden bg-bg-card hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 active:scale-[0.98] text-left`}
-            >
-              <div className={`absolute inset-0 bg-gradient-to-br ${path.color} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
-              
-              <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-between">
-                <div className="space-y-4">
-                  <div className="size-16 rounded-2xl bg-bg-dark flex items-center justify-center text-primary border border-border-main group-hover:scale-110 transition-transform duration-500">
-                    <path.icon size={32} />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">{path.subtitle}</div>
-                    <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-ink leading-none">{path.title}</h2>
-                  </div>
-                </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="space-y-8"
+        >
+          <h1 className="text-6xl md:text-[10rem] font-black tracking-tighter uppercase leading-[0.82] text-ink selection:bg-primary selection:text-white">
+            Experience <br />
+            The <span className="text-primary italic">Academy.</span>
+          </h1>
+          <p className="max-w-2xl mx-auto text-lg md:text-xl text-text-muted font-medium leading-relaxed opacity-60">
+            The unified platform for High-End CG Production, Strategic Career Development, and Professional Mastery.
+          </p>
+        </motion.div>
 
-                <div className="space-y-8">
-                  <p className="text-text-muted font-medium max-w-xs text-sm md:text-base leading-relaxed opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
-                    {path.desc}
-                  </p>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="px-8 py-4 bg-ink text-bg-main rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 group-hover:bg-primary group-hover:text-bg-dark transition-colors">
-                      Enter Sector <ChevronRight size={16} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Decorative Corner */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 -mr-16 -mt-16 rounded-full group-hover:scale-150 transition-transform duration-1000" />
-            </motion.button>
-          ))}
-        </div>
-
-        {/* Auth Quick Action */}
-        {!user && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="flex flex-col items-center gap-4 pt-8"
-          >
-            <div className="h-[1px] w-24 bg-border-main" />
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-12"
+        >
+          {user ? (
             <button 
-              onClick={handleLoginRedirect}
-              className="text-[10px] font-black uppercase tracking-[0.4em] text-text-muted hover:text-primary transition-colors flex items-center gap-2 group"
+              onClick={() => navigate(`/aca/${lang || 'eng'}/dashboard`)}
+              className="group px-12 py-6 bg-primary text-bg-dark rounded-[2rem] text-[11px] font-black uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/20 flex items-center gap-4"
             >
-              Sync with Ecosystem <ChevronRight size={12} className="group-hover:translate-x-1 transition-transform" />
+              Enter Dashboard <ChevronRight size={18} />
             </button>
-          </motion.div>
-        )}
+          ) : (
+            <button 
+              onClick={onDiscover}
+              className="group px-12 py-6 bg-primary text-bg-dark rounded-[2rem] text-[11px] font-black uppercase tracking-[0.3em] hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/20 flex items-center gap-4"
+            >
+              Discover Your Journey <ChevronDown size={18} className="animate-bounce" />
+            </button>
+          )}
+          
+          <button 
+            onClick={() => setShowVideo(true)}
+            className="group px-12 py-6 bg-bg-card border border-border-main text-ink rounded-[2rem] text-[11px] font-black uppercase tracking-[0.3em] hover:bg-border-main transition-all flex items-center gap-4"
+          >
+            <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-bg-dark transition-colors">
+                <Play size={14} fill="currentColor" />
+            </div>
+            Watch Performance
+          </button>
+        </motion.div>
       </div>
 
-      {/* Grid Overlay */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03]" 
-           style={{ backgroundImage: 'radial-gradient(var(--border-main) 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+      {/* Video Modal */}
+      <AnimatePresence>
+        {showVideo && (
+            <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               className="fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-12 bg-bg-dark/95 backdrop-blur-2xl"
+            >
+                <div className="relative w-full max-w-6xl aspect-video rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl bg-black">
+                    <button 
+                        onClick={() => setShowVideo(false)}
+                        className="absolute top-8 right-8 z-20 size-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all backdrop-blur-xl"
+                    >
+                        <X size={24} />
+                    </button>
+                    <iframe 
+                        className="w-full h-full"
+                        src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+                        title="Red Griffin Demo Roll"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    ></iframe>
+                </div>
+            </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div 
+        animate={{ y: [0, 10, 0] }}
+        transition={{ repeat: Infinity, duration: 2 }}
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 text-primary/30"
+      >
+        <ChevronDown size={32} />
+      </motion.div>
     </section>
   );
-};
-
-export default React.memo(HeroSection);
+}

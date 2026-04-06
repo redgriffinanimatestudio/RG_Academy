@@ -42,7 +42,7 @@ export const InputWithStatus: React.FC<InputWithStatusProps> = ({
   return (
     <div className="space-y-1.5 relative group">
       <div className="flex items-center justify-between px-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-ink/40">
           {label} {required && <span className="text-red-500/50">*</span>}
         </label>
         
@@ -57,7 +57,7 @@ export const InputWithStatus: React.FC<InputWithStatusProps> = ({
 
       <div className="relative">
         {icon && (
-          <div className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-primary transition-colors">
+          <div className="absolute left-6 top-1/2 -translate-y-1/2 text-ink/20 group-focus-within:text-primary transition-colors">
             {icon}
           </div>
         )}
@@ -69,7 +69,7 @@ export const InputWithStatus: React.FC<InputWithStatusProps> = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full bg-black/40 border ${statusColors[status]} rounded-2xl py-3.5 sm:py-4 ${icon ? 'pl-12' : 'px-6'} pr-14 text-xs font-bold outline-none focus:bg-primary/5 transition-all`}
+          className={`w-full bg-ink/5 border border-border-main/40 ${statusColors[status]} rounded-2xl py-3.5 sm:py-4 ${icon ? 'pl-12' : 'px-6'} pr-14 text-xs font-bold outline-none focus:bg-primary/5 transition-all text-ink placeholder:text-ink/30`}
           required={required}
         />
 
@@ -93,7 +93,7 @@ export const InputWithStatus: React.FC<InputWithStatusProps> = ({
             className="absolute z-50 bottom-full left-0 right-0 mb-4 p-4 bg-[#1a1a1a] border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl pointer-events-none"
           >
             <div className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">Recommendation</div>
-            <p className="text-[11px] font-medium text-white/60 leading-relaxed italic">{hint}</p>
+            <p className="text-[11px] font-medium text-ink/60 leading-relaxed italic">{hint}</p>
             <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-[#1a1a1a]" />
           </motion.div>
         )}

@@ -1,6 +1,6 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
+  provider = "prisma-client"
+  output   = "../api/generated/prisma"
 }
 
 generator zod {
@@ -10,7 +10,19 @@ generator zod {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+}
+
+enum RegistrationStatus {
+  VISITOR
+  PENDING
+  ACTIVE
+}
+
+enum SectorPath {
+  ACADEMY
+  STUDIO
+  COMMUNITY
+  NONE
 }
 
 model User {
@@ -44,6 +56,12 @@ model User {
   lastSyncedAt DateTime?
   balance      Float        @default(0) // Financial Bridge Ledger balance
   isOnboarded  Boolean      @default(false) // Whether registration steps 2-5 are complete
+  
+  // v2.60 Ecosystem Integration
+  registrationStatus RegistrationStatus @default(VISITOR)
+  selectedPath       SectorPath         @default(NONE)
+  metadata           Json?               // Store geolocation & consent telemetry
+  
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   

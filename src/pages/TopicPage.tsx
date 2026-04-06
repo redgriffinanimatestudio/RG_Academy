@@ -119,7 +119,7 @@ export default function TopicPage() {
               {HERO_SLIDES[currentSlide].tag}
             </span>
             <div className="h-[1px] w-12 bg-white/20" />
-            <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">{topicName} Series</span>
+            <span className="text-[9px] font-black text-ink/40 uppercase tracking-[0.3em]">{topicName} Series</span>
           </motion.div>
 
           <div className="max-w-2xl space-y-4">
@@ -136,7 +136,7 @@ export default function TopicPage() {
               key={`p-${currentSlide}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-lg text-white/60 font-medium"
+              className="text-lg text-ink/60 font-medium"
             >
               {HERO_SLIDES[currentSlide].desc}
             </motion.p>
@@ -155,7 +155,7 @@ export default function TopicPage() {
 
         <Link 
           to={`/aca/${lang || 'eng'}`} 
-          className="absolute top-8 left-8 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-white/60 hover:text-white transition-all bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/10"
+          className="absolute top-8 left-8 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-ink/60 hover:text-white transition-all bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-border-main/40"
         >
           <ArrowLeft size={14} />
           {t('all_workshops')}
@@ -167,24 +167,24 @@ export default function TopicPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
             <h2 className="text-2xl font-black uppercase tracking-tight text-white">Curated Collection</h2>
-            <p className="text-xs font-bold text-white/20 uppercase tracking-[0.2em]">{filteredCourses.length} Workshops Available</p>
+            <p className="text-xs font-bold text-ink/20 uppercase tracking-[0.2em]">{filteredCourses.length} Workshops Available</p>
           </div>
           
           <div className="flex flex-col gap-4 w-full md:w-auto">
             <div className="flex gap-4">
               <div className="relative flex-1 md:w-80">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={20} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-ink/20" size={20} />
                 <input
                   type="text"
                   placeholder={t('search_workshops')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/5 rounded-2xl focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all font-medium text-white placeholder:text-white/20 outline-none"
+                  className="w-full pl-12 pr-4 py-4 bg-ink/5 border border-border-main/20 rounded-2xl focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all font-medium text-white placeholder:text-ink/20 outline-none"
                 />
               </div>
               <button 
                 onClick={() => setShowFilters(!showFilters)}
-                className={`px-6 rounded-2xl flex items-center gap-3 font-black uppercase tracking-widest text-[10px] transition-all border ${showFilters ? 'bg-primary text-bg-dark border-primary shadow-lg shadow-primary/20' : 'bg-white/5 text-white/40 border-white/5 hover:border-white/20'}`}
+                className={`px-6 rounded-2xl flex items-center gap-3 font-black uppercase tracking-widest text-[10px] transition-all border ${showFilters ? 'bg-primary text-bg-dark border-primary shadow-lg shadow-primary/20' : 'bg-ink/5 text-ink/40 border-border-main/20 hover:border-white/20'}`}
               >
                 <Filter size={18} />
                 {t('filters')}
@@ -202,7 +202,7 @@ export default function TopicPage() {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden"
             >
-              <div className="p-8 rounded-[2.5rem] bg-white/5 border border-white/5 grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              <div className="p-8 rounded-[2.5rem] bg-ink/5 border border-border-main/20 grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                 <div className="space-y-4">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">Skill Level</h4>
                   <div className="flex flex-wrap gap-2">
@@ -210,7 +210,7 @@ export default function TopicPage() {
                       <button
                         key={lvl}
                         onClick={() => setFilters({ ...filters, level: lvl })}
-                        className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${filters.level === lvl ? 'bg-primary text-bg-dark' : 'bg-white/5 text-white/40 hover:text-white'}`}
+                        className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${filters.level === lvl ? 'bg-primary text-bg-dark' : 'bg-ink/5 text-ink/40 hover:text-white'}`}
                       >
                         {lvl}
                       </button>
@@ -227,9 +227,9 @@ export default function TopicPage() {
                     step="10"
                     value={filters.priceRange[1]}
                     onChange={(e) => setFilters({ ...filters, priceRange: [0, parseInt(e.target.value)] })}
-                    className="w-full accent-primary bg-white/10 rounded-lg appearance-none h-1"
+                    className="w-full accent-primary bg-ink/10 rounded-lg appearance-none h-1"
                   />
-                  <div className="flex justify-between text-[8px] font-black text-white/20 uppercase tracking-widest">
+                  <div className="flex justify-between text-[8px] font-black text-ink/20 uppercase tracking-widest">
                     <span>$0</span>
                     <span>$200+</span>
                   </div>
@@ -240,7 +240,7 @@ export default function TopicPage() {
                   <select 
                     value={filters.duration}
                     onChange={(e) => setFilters({ ...filters, duration: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-white/60 focus:outline-none focus:border-primary cursor-pointer appearance-none"
+                    className="w-full bg-ink/5 border border-border-main/40 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-ink/60 focus:outline-none focus:border-primary cursor-pointer appearance-none"
                   >
                     <option value="all" className="bg-bg-card text-white">Any Duration</option>
                     <option value="short" className="bg-bg-card text-white">Short (&lt; 10 hours)</option>
@@ -286,14 +286,14 @@ export default function TopicPage() {
                   </h3>
                   <div className="flex items-center gap-3">
                     <div className="avatar">
-                      <div className="size-10 rounded-full border border-white/5">
+                      <div className="size-10 rounded-full border border-border-main/20">
                         <img src={course.lecturerAvatar} alt={course.lecturer} referrerPolicy="no-referrer" />
                       </div>
                     </div>
-                    <p className="text-sm text-white/40 font-medium">{t('by')} {course.lecturer}</p>
+                    <p className="text-sm text-ink/40 font-medium">{t('by')} {course.lecturer}</p>
                   </div>
 
-                  <div className="flex items-center gap-4 text-xs font-bold text-white/20">
+                  <div className="flex items-center gap-4 text-xs font-bold text-ink/20">
                     <div className="flex items-center gap-1.5">
                       <Star size={14} className="text-primary" fill="currentColor" />
                       <span className="text-white">{course.rating}</span>
@@ -302,17 +302,17 @@ export default function TopicPage() {
                       <Users size={14} />
                       <span>{course.students.toLocaleString()}</span>
                     </div>
-                    <div className="px-2 py-0.5 bg-white/5 rounded-md">
+                    <div className="px-2 py-0.5 bg-ink/5 rounded-md">
                       <span className="text-white uppercase text-[8px] tracking-widest">{t(course.levelKey)}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                  <div className="flex items-center justify-between pt-4 border-t border-border-main/20">
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-white/20">{t('price')}</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-ink/20">{t('price')}</span>
                       <span className="text-2xl font-black text-white">${course.price}</span>
                     </div>
-                    <div className="bg-white/5 text-white p-3 rounded-xl group-hover:bg-primary group-hover:text-bg-dark transition-colors border border-white/5">
+                    <div className="bg-ink/5 text-white p-3 rounded-xl group-hover:bg-primary group-hover:text-bg-dark transition-colors border border-border-main/20">
                       <ChevronRight size={20} />
                     </div>
                   </div>
@@ -324,14 +324,14 @@ export default function TopicPage() {
       </div>
 
       {/* Newsletter / CTA Section */}
-      <section className="bg-white/5 border border-white/5 rounded-[3rem] p-16 flex flex-col items-center text-center space-y-10 relative overflow-hidden">
+      <section className="bg-ink/5 border border-border-main/20 rounded-[3rem] p-16 flex flex-col items-center text-center space-y-10 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full -translate-x-1/2 -translate-y-1/2" />
         <div className="size-24 rounded-[2.5rem] bg-primary/10 flex items-center justify-center text-primary shadow-2xl shadow-primary/5">
           <GraduationCap size={48} />
         </div>
         <div className="space-y-4 max-w-2xl relative z-10">
           <h2 className="text-5xl font-black tracking-tighter uppercase leading-[0.9]">Elevate your <br /><span className="text-primary italic">Craft.</span></h2>
-          <p className="text-xl text-white/40 font-medium leading-relaxed">
+          <p className="text-xl text-ink/40 font-medium leading-relaxed">
             Our academy is constantly expanding. Subscribe to get notified about new workshops in {topicName} 
             and exclusive mentorship opportunities.
           </p>
@@ -340,7 +340,7 @@ export default function TopicPage() {
           <input 
             type="email" 
             placeholder="Enter your professional email" 
-            className="flex-1 bg-white/5 border border-white/10 rounded-2xl p-5 text-white placeholder:text-white/20 font-medium focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all outline-none"
+            className="flex-1 bg-ink/5 border border-border-main/40 rounded-2xl p-5 text-white placeholder:text-ink/20 font-medium focus:border-primary/40 focus:ring-4 focus:ring-primary/5 transition-all outline-none"
           />
           <button className="bg-primary text-bg-dark px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-xl shadow-primary/20">
             Join Waitlist

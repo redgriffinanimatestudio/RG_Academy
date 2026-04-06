@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import apiClient from '../services/apiClient';
 import Preloader from '../components/Preloader';
 import { SocialAuthButtons } from '../components/auth/SocialAuthButtons';
+import { useUserJourney } from '../hooks/useUserJourney';
 
 // v2.30 Neural Architecture Decoupling: Registration Shards
 import IdentitySidebar from '../components/auth/registration/IdentitySidebar';
@@ -41,6 +42,7 @@ const Login: React.FC = () => {
   const { lang = 'eng' } = useParams();
   const navigate = useNavigate();
   const { login, register, socialAuth, onboard, user } = useAuth();
+  const { journey } = useUserJourney();
 
   // Registration Form State with Session Persistence
   const [formData, setFormData] = useState(() => {
@@ -182,6 +184,11 @@ const Login: React.FC = () => {
           gender: formData.gender,
           dateOfBirth: formData.dateOfBirth
         },
+        selectedPath: journey.selectedPath,
+        metadata: {
+          ...journey,
+          registrationSource: 'industrial_forge'
+        },
         signature
       };
 
@@ -250,24 +257,25 @@ const Login: React.FC = () => {
                 </div>
               </div>
 
-              {/* Sub-Header Branding Area (Blue Rectangle Zone) */}
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12 p-6 rounded-3xl bg-bg-dark/5 border border-border-main backdrop-blur-sm">
+              {/* Sub-Header Branding Area (Minimalist Industrial Zone) */}
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-12 p-6 rounded-[2.5rem] bg-ink/5 border border-border-main backdrop-blur-md">
                 <div className="flex items-center gap-4">
-                  <div className="size-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                    <Shield size={18} className="text-emerald-500" />
+                  <div className="size-10 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                    <Shield size={18} className="text-primary" />
                   </div>
                   <div className="space-y-0.5">
-                    <span className="block text-[9px] font-black uppercase tracking-widest text-text-muted">Blood-Codec Ritual</span>
-                    <span className="block text-[8px] font-bold text-text-muted opacity-40 uppercase tracking-widest italic">Secure Vessel Access</span>
+                    <span className="block text-[10px] font-black uppercase tracking-widest text-ink italic">Authorized Access</span>
+                    <span className="block text-[8px] font-bold text-text-muted opacity-60 uppercase tracking-widest">Secure Protocol Node</span>
                   </div>
                 </div>
+                <div className="h-px w-full sm:h-8 sm:w-px bg-border-main opacity-20" />
                 <div className="flex items-center gap-4">
-                  <div className="size-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                    <Globe size={18} className="text-emerald-500" />
+                  <div className="size-10 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                    <Globe size={18} className="text-primary" />
                   </div>
                   <div className="space-y-0.5">
-                    <span className="block text-[9px] font-black uppercase tracking-widest text-text-muted">Celestial Weave</span>
-                    <span className="block text-[8px] font-bold text-text-muted opacity-40 uppercase tracking-widest italic">Attuned Network</span>
+                    <span className="block text-[10px] font-black uppercase tracking-widest text-ink italic">Global Hub</span>
+                    <span className="block text-[8px] font-bold text-text-muted opacity-60 uppercase tracking-widest">Verified Infrastructure</span>
                   </div>
                 </div>
               </motion.div>
@@ -283,16 +291,16 @@ const Login: React.FC = () => {
                     ) : (
                       <form onSubmit={handleLogin} className="space-y-8">
                         <div className="space-y-6">
-                          <InputWithStatus id="login-email" label="Soul Sigil" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} placeholder="VESSEL_ID@PROTOCOL" hint="Unified essence signature" status={emailStatus} icon={<User size={18} />} required />
-                          <InputWithStatus id="login-password" label="Void Cipher" type="password" value={formData.password} onChange={(e) => handleInputChange('password', e.target.value)} placeholder="••••••••" hint="Aetheric secure passkey" icon={<Lock size={18} />} required />
+                          <InputWithStatus id="login-email" label="Account Identity" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} placeholder="name@domain.com" hint="Professional identity signature" status={emailStatus} icon={<User size={18} />} required />
+                          <InputWithStatus id="login-password" label="Security Password" type="password" value={formData.password} onChange={(e) => handleInputChange('password', e.target.value)} placeholder="••••••••" hint="Encrypted secure passkey" icon={<Lock size={18} />} required />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                           <button type="submit" disabled={isLoading} className="bg-primary text-white py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-emerald-600 transition-all hover:scale-[1.02] shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 group relative overflow-hidden">
-                            <span className="relative z-10">Attune Vessel</span>
+                            <span className="relative z-10">Get Access</span>
                             <ChevronRight size={16} className="relative z-10 group-hover:translate-x-1 transition-transform" />
                           </button>
                           <button type="button" onClick={() => setMode('register')} className="bg-bg-card border border-border-main text-text-muted py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-border-main hover:text-ink transition-all flex items-center justify-center gap-3">
-                             Awaken Essence <UserPlus size={16} />
+                             Create Account <UserPlus size={16} />
                           </button>
                         </div>
 
@@ -317,7 +325,7 @@ const Login: React.FC = () => {
                       <form onSubmit={(e) => { e.preventDefault(); if (regStep < 5) setRegStep(regStep + 1); else handleRegisterFinal(); }} className="flex-1 flex flex-col">
                         <div className="flex-1">
                           {regStep === 1 ? (
-                            <RegStep1Role onSelect={(id) => { handleInputChange('selectedRole', id); setRegStep(2); }} />
+                            <RegStep1Role onSelect={(id) => { handleInputChange('selectedRole', id); setRegStep(2); }} selectedId={formData.selectedRole} />
                           ) : regStep === 2 ? (
                             <RegStep2Network formData={formData} onChange={handleInputChange} emailStatus={emailStatus} emailError={emailError} passStrength={passStrength} passConfirmStatus={passConfirmStatus} phoneStatus={phoneStatus} onNext={() => setRegStep(3)} />
                           ) : regStep === 3 ? (
