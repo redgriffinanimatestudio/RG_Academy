@@ -147,6 +147,13 @@ exports.Prisma.UserScalarFieldEnum = {
   isOnboarded: 'isOnboarded',
   registrationStatus: 'registrationStatus',
   selectedPath: 'selectedPath',
+  learningMode: 'learningMode',
+  isVerified: 'isVerified',
+  subscriptionActive: 'subscriptionActive',
+  trialStartedAt: 'trialStartedAt',
+  subscriptionExpiresAt: 'subscriptionExpiresAt',
+  currentSemester: 'currentSemester',
+  facultyId: 'facultyId',
   metadata: 'metadata',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -776,6 +783,7 @@ exports.Prisma.UserOrderByRelevanceFieldEnum = {
   agencyId: 'agencyId',
   remoteId: 'remoteId',
   source: 'source',
+  facultyId: 'facultyId',
   partnerId: 'partnerId'
 };
 
@@ -1253,6 +1261,11 @@ exports.SectorPath = exports.$Enums.SectorPath = {
   STUDIO: 'STUDIO',
   COMMUNITY: 'COMMUNITY',
   NONE: 'NONE'
+};
+
+exports.LearningMode = exports.$Enums.LearningMode = {
+  SOLO: 'SOLO',
+  STALKER: 'STALKER'
 };
 
 exports.QuizQuestionType = exports.$Enums.QuizQuestionType = {

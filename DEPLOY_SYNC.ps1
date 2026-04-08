@@ -89,7 +89,7 @@ Copy-Item 'update_v2.35.sql' ($BUILD_TEMP + '/update_v2.35.sql')
 "v2.35-Neural-Patch" | Out-File -FilePath ($BUILD_TEMP + '/VERSION') -Encoding utf8
 
 # Generate .env locally for security (avoid remote printf mangling)
-$REMOTE_ENV = "DATABASE_URL=mysql://${REMOTE_DB_USER}:${REMOTE_DB_PASS}@localhost:3306/${REMOTE_DB_NAME}`n"
+$REMOTE_ENV = "DATABASE_URL=mysql://${REMOTE_DB_USER}:${REMOTE_DB_PASS}@localhost:3306/${REMOTE_DB}`n"
 $REMOTE_ENV += "JWT_SECRET=super_secret_2026`n"
 $REMOTE_ENV += "PORT=3000`n"
 $REMOTE_ENV += "NODE_ENV=production"

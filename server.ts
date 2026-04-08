@@ -241,13 +241,14 @@ async function startServer() {
 
   app.use(errorHandler);
 
-  server.listen(Number(PORT), () => {
+  // Robust listen for both Port (Number) and Socket Path (String/Passenger)
+  const listenTarget = isNaN(Number(PORT)) ? PORT : Number(PORT);
+
+  server.listen(listenTarget, () => {
     console.log(`\n🚀 ========================================== 🚀`);
-    console.log(`🔥 PLATFORM READY: http://localhost:${PORT}`);
-    console.log(`🌐 FRONTEND:      http://localhost:${PORT}`);
-    console.log(`🔌 BACKEND API:   http://localhost:${PORT}/api`);
-    console.log(`📚 SWAGGER DOCS:  http://localhost:${PORT}/api/docs`);
-    console.log(`💎 PRISMA STUDIO: http://localhost:5555 (if running)`);
+    console.log(`🔥 PLATFORM READY: ${typeof listenTarget === 'string' ? 'Socket' : 'http://localhost'}:${listenTarget}`);
+    console.log(`🔌 BACKEND API:   /api`);
+    console.log(`📚 SWAGGER DOCS:  /api/docs`);
     console.log(`🚀 ========================================== 🚀\n`);
   });
 }

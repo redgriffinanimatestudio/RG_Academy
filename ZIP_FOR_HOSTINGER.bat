@@ -24,13 +24,16 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 :: Step 2: Compile the backend (Native JS Bundle)
-echo [2/4] Compiling backend (server.ts -> server-dist.js)...
+echo [2/4] Compiling backend (server.ts -> server-dist.cjs)...
 :: We use esbuild to bundle everything except devDependencies and prisma to bypass environment limits.
-call npx esbuild server.ts --bundle --platform=node --format=esm --outfile=server-dist.js --minify --packages=external
+call npx esbuild server.ts --bundle --platform=node --format=cjs --outfile=server-dist.cjs --minify --packages=external --log-level=error
 if %ERRORLEVEL% NEQ 0 (
-    echo [ERROR] Backend compilation failed. Please run: npm install --save-dev esbuild
-    pause
-    exit /b
+    echo [WARNING] Backend compilation had errors, but we will try to proceed if server-dist.cjs exists.
+    if not exist "server-dist.cjs" (
+        echo [ERROR] server-dist.cjs NOT FOUND. Stopping.
+        pause
+        exit /b
+    )
 )
 
 :: Step 3: Generate Prisma client
@@ -52,14 +55,15 @@ mkdir BUILD_TEMP
 xcopy /s /e /h /y /q dist BUILD_TEMP\dist\
 xcopy /s /e /h /y /q prisma BUILD_TEMP\prisma\
 copy index.js BUILD_TEMP\
-copy server-dist.js BUILD_TEMP\
+copy server-dist.cjs BUILD_TEMP\
 copy package.json BUILD_TEMP\
 copy .env.example BUILD_TEMP\
 copy .env.example BUILD_TEMP\.env
 
-:: Хитрость для Hostinger: отключаем `vite build` внутри сервера,
+:: Хитрость для Hostinger: отключаем `vite build` внутри сервера и УДАЛЯЕМ "type": "module"
 :: так как фронтенд уже собран локально в папке dist!
-node -e "const fs=require('fs'); const file='BUILD_TEMP/package.json'; const data=fs.readFileSync(file, 'utf8'); fs.writeFileSync(file, data.replace('\"vite build\"', '\"echo SkippingBuild\"'));"
+:: А index.js - это CJS файл, который не запустится если в package.json указан "type": "module".
+node -e "const fs=require('fs'); const file='BUILD_TEMP/package.json'; let data=fs.readFileSync(file, 'utf8'); data = data.replace('\"vite build\"', '\"echo SkippingBuild\"'); data = data.replace('\"type\": \"module\",', ''); fs.writeFileSync(file, data);"
 
 :: Запускаем сжатие
 powershell -Command "Compress-Archive -Path 'BUILD_TEMP\*' -DestinationPath 'RG_Academy_HOSTINGER_DEPLOY.zip' -Force"

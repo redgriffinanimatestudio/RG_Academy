@@ -302,6 +302,14 @@ export const SectorPath: {
 export type SectorPath = (typeof SectorPath)[keyof typeof SectorPath]
 
 
+export const LearningMode: {
+  SOLO: 'SOLO',
+  STALKER: 'STALKER'
+};
+
+export type LearningMode = (typeof LearningMode)[keyof typeof LearningMode]
+
+
 export const QuizQuestionType: {
   MCQ: 'MCQ',
   TRUE_FALSE: 'TRUE_FALSE',
@@ -320,6 +328,10 @@ export const RegistrationStatus: typeof $Enums.RegistrationStatus
 export type SectorPath = $Enums.SectorPath
 
 export const SectorPath: typeof $Enums.SectorPath
+
+export type LearningMode = $Enums.LearningMode
+
+export const LearningMode: typeof $Enums.LearningMode
 
 export type QuizQuestionType = $Enums.QuizQuestionType
 
@@ -6262,10 +6274,12 @@ export namespace Prisma {
 
   export type UserAvgAggregateOutputType = {
     balance: number | null
+    currentSemester: number | null
   }
 
   export type UserSumAggregateOutputType = {
     balance: number | null
+    currentSemester: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -6295,6 +6309,13 @@ export namespace Prisma {
     isOnboarded: boolean | null
     registrationStatus: $Enums.RegistrationStatus | null
     selectedPath: $Enums.SectorPath | null
+    learningMode: $Enums.LearningMode | null
+    isVerified: boolean | null
+    subscriptionActive: boolean | null
+    trialStartedAt: Date | null
+    subscriptionExpiresAt: Date | null
+    currentSemester: number | null
+    facultyId: string | null
     createdAt: Date | null
     updatedAt: Date | null
     partnerId: string | null
@@ -6327,6 +6348,13 @@ export namespace Prisma {
     isOnboarded: boolean | null
     registrationStatus: $Enums.RegistrationStatus | null
     selectedPath: $Enums.SectorPath | null
+    learningMode: $Enums.LearningMode | null
+    isVerified: boolean | null
+    subscriptionActive: boolean | null
+    trialStartedAt: Date | null
+    subscriptionExpiresAt: Date | null
+    currentSemester: number | null
+    facultyId: string | null
     createdAt: Date | null
     updatedAt: Date | null
     partnerId: string | null
@@ -6359,6 +6387,13 @@ export namespace Prisma {
     isOnboarded: number
     registrationStatus: number
     selectedPath: number
+    learningMode: number
+    isVerified: number
+    subscriptionActive: number
+    trialStartedAt: number
+    subscriptionExpiresAt: number
+    currentSemester: number
+    facultyId: number
     metadata: number
     createdAt: number
     updatedAt: number
@@ -6369,10 +6404,12 @@ export namespace Prisma {
 
   export type UserAvgAggregateInputType = {
     balance?: true
+    currentSemester?: true
   }
 
   export type UserSumAggregateInputType = {
     balance?: true
+    currentSemester?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -6402,6 +6439,13 @@ export namespace Prisma {
     isOnboarded?: true
     registrationStatus?: true
     selectedPath?: true
+    learningMode?: true
+    isVerified?: true
+    subscriptionActive?: true
+    trialStartedAt?: true
+    subscriptionExpiresAt?: true
+    currentSemester?: true
+    facultyId?: true
     createdAt?: true
     updatedAt?: true
     partnerId?: true
@@ -6434,6 +6478,13 @@ export namespace Prisma {
     isOnboarded?: true
     registrationStatus?: true
     selectedPath?: true
+    learningMode?: true
+    isVerified?: true
+    subscriptionActive?: true
+    trialStartedAt?: true
+    subscriptionExpiresAt?: true
+    currentSemester?: true
+    facultyId?: true
     createdAt?: true
     updatedAt?: true
     partnerId?: true
@@ -6466,6 +6517,13 @@ export namespace Prisma {
     isOnboarded?: true
     registrationStatus?: true
     selectedPath?: true
+    learningMode?: true
+    isVerified?: true
+    subscriptionActive?: true
+    trialStartedAt?: true
+    subscriptionExpiresAt?: true
+    currentSemester?: true
+    facultyId?: true
     metadata?: true
     createdAt?: true
     updatedAt?: true
@@ -6586,6 +6644,13 @@ export namespace Prisma {
     isOnboarded: boolean
     registrationStatus: $Enums.RegistrationStatus
     selectedPath: $Enums.SectorPath
+    learningMode: $Enums.LearningMode
+    isVerified: boolean
+    subscriptionActive: boolean
+    trialStartedAt: Date | null
+    subscriptionExpiresAt: Date | null
+    currentSemester: number
+    facultyId: string | null
     metadata: JsonValue | null
     createdAt: Date
     updatedAt: Date
@@ -6638,6 +6703,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: boolean
     selectedPath?: boolean
+    learningMode?: boolean
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: boolean
+    subscriptionExpiresAt?: boolean
+    currentSemester?: boolean
+    facultyId?: boolean
     metadata?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -6703,13 +6775,20 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: boolean
     selectedPath?: boolean
+    learningMode?: boolean
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: boolean
+    subscriptionExpiresAt?: boolean
+    currentSemester?: boolean
+    facultyId?: boolean
     metadata?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     partnerId?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "phone" | "displayName" | "photoURL" | "password" | "role" | "primaryRole" | "roles" | "isStudent" | "isLecturer" | "isClient" | "isExecutor" | "isHr" | "isFinance" | "isSupport" | "isAgency" | "isAdmin" | "agencyId" | "remoteId" | "source" | "lastSyncedAt" | "balance" | "isOnboarded" | "registrationStatus" | "selectedPath" | "metadata" | "createdAt" | "updatedAt" | "partnerId", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "phone" | "displayName" | "photoURL" | "password" | "role" | "primaryRole" | "roles" | "isStudent" | "isLecturer" | "isClient" | "isExecutor" | "isHr" | "isFinance" | "isSupport" | "isAgency" | "isAdmin" | "agencyId" | "remoteId" | "source" | "lastSyncedAt" | "balance" | "isOnboarded" | "registrationStatus" | "selectedPath" | "learningMode" | "isVerified" | "subscriptionActive" | "trialStartedAt" | "subscriptionExpiresAt" | "currentSemester" | "facultyId" | "metadata" | "createdAt" | "updatedAt" | "partnerId", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     profile?: boolean | User$profileArgs<ExtArgs>
     achievements?: boolean | User$achievementsArgs<ExtArgs>
@@ -6803,6 +6882,13 @@ export namespace Prisma {
       isOnboarded: boolean
       registrationStatus: $Enums.RegistrationStatus
       selectedPath: $Enums.SectorPath
+      learningMode: $Enums.LearningMode
+      isVerified: boolean
+      subscriptionActive: boolean
+      trialStartedAt: Date | null
+      subscriptionExpiresAt: Date | null
+      currentSemester: number
+      facultyId: string | null
       metadata: Prisma.JsonValue | null
       createdAt: Date
       updatedAt: Date
@@ -7231,6 +7317,13 @@ export namespace Prisma {
     readonly isOnboarded: FieldRef<"User", 'Boolean'>
     readonly registrationStatus: FieldRef<"User", 'RegistrationStatus'>
     readonly selectedPath: FieldRef<"User", 'SectorPath'>
+    readonly learningMode: FieldRef<"User", 'LearningMode'>
+    readonly isVerified: FieldRef<"User", 'Boolean'>
+    readonly subscriptionActive: FieldRef<"User", 'Boolean'>
+    readonly trialStartedAt: FieldRef<"User", 'DateTime'>
+    readonly subscriptionExpiresAt: FieldRef<"User", 'DateTime'>
+    readonly currentSemester: FieldRef<"User", 'Int'>
+    readonly facultyId: FieldRef<"User", 'String'>
     readonly metadata: FieldRef<"User", 'Json'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
@@ -60873,6 +60966,13 @@ export namespace Prisma {
     isOnboarded: 'isOnboarded',
     registrationStatus: 'registrationStatus',
     selectedPath: 'selectedPath',
+    learningMode: 'learningMode',
+    isVerified: 'isVerified',
+    subscriptionActive: 'subscriptionActive',
+    trialStartedAt: 'trialStartedAt',
+    subscriptionExpiresAt: 'subscriptionExpiresAt',
+    currentSemester: 'currentSemester',
+    facultyId: 'facultyId',
     metadata: 'metadata',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
@@ -61676,6 +61776,7 @@ export namespace Prisma {
     agencyId: 'agencyId',
     remoteId: 'remoteId',
     source: 'source',
+    facultyId: 'facultyId',
     partnerId: 'partnerId'
   };
 
@@ -62350,6 +62451,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'LearningMode'
+   */
+  export type EnumLearningModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LearningMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -62360,13 +62475,6 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
     
 
 
@@ -62410,6 +62518,13 @@ export namespace Prisma {
     isOnboarded?: BoolFilter<"User"> | boolean
     registrationStatus?: EnumRegistrationStatusFilter<"User"> | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFilter<"User"> | $Enums.SectorPath
+    learningMode?: EnumLearningModeFilter<"User"> | $Enums.LearningMode
+    isVerified?: BoolFilter<"User"> | boolean
+    subscriptionActive?: BoolFilter<"User"> | boolean
+    trialStartedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    subscriptionExpiresAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    currentSemester?: IntFilter<"User"> | number
+    facultyId?: StringNullableFilter<"User"> | string | null
     metadata?: JsonNullableFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -62472,6 +62587,13 @@ export namespace Prisma {
     isOnboarded?: SortOrder
     registrationStatus?: SortOrder
     selectedPath?: SortOrder
+    learningMode?: SortOrder
+    isVerified?: SortOrder
+    subscriptionActive?: SortOrder
+    trialStartedAt?: SortOrderInput | SortOrder
+    subscriptionExpiresAt?: SortOrderInput | SortOrder
+    currentSemester?: SortOrder
+    facultyId?: SortOrderInput | SortOrder
     metadata?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -62538,6 +62660,13 @@ export namespace Prisma {
     isOnboarded?: BoolFilter<"User"> | boolean
     registrationStatus?: EnumRegistrationStatusFilter<"User"> | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFilter<"User"> | $Enums.SectorPath
+    learningMode?: EnumLearningModeFilter<"User"> | $Enums.LearningMode
+    isVerified?: BoolFilter<"User"> | boolean
+    subscriptionActive?: BoolFilter<"User"> | boolean
+    trialStartedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    subscriptionExpiresAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    currentSemester?: IntFilter<"User"> | number
+    facultyId?: StringNullableFilter<"User"> | string | null
     metadata?: JsonNullableFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -62600,6 +62729,13 @@ export namespace Prisma {
     isOnboarded?: SortOrder
     registrationStatus?: SortOrder
     selectedPath?: SortOrder
+    learningMode?: SortOrder
+    isVerified?: SortOrder
+    subscriptionActive?: SortOrder
+    trialStartedAt?: SortOrderInput | SortOrder
+    subscriptionExpiresAt?: SortOrderInput | SortOrder
+    currentSemester?: SortOrder
+    facultyId?: SortOrderInput | SortOrder
     metadata?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -62641,6 +62777,13 @@ export namespace Prisma {
     isOnboarded?: BoolWithAggregatesFilter<"User"> | boolean
     registrationStatus?: EnumRegistrationStatusWithAggregatesFilter<"User"> | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathWithAggregatesFilter<"User"> | $Enums.SectorPath
+    learningMode?: EnumLearningModeWithAggregatesFilter<"User"> | $Enums.LearningMode
+    isVerified?: BoolWithAggregatesFilter<"User"> | boolean
+    subscriptionActive?: BoolWithAggregatesFilter<"User"> | boolean
+    trialStartedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    subscriptionExpiresAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    currentSemester?: IntWithAggregatesFilter<"User"> | number
+    facultyId?: StringNullableWithAggregatesFilter<"User"> | string | null
     metadata?: JsonNullableWithAggregatesFilter<"User">
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -66632,6 +66775,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -66693,6 +66843,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -66754,6 +66911,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -66815,6 +66979,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -66876,6 +67047,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -66909,6 +67087,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -66941,6 +67126,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -71192,6 +71384,24 @@ export namespace Prisma {
     notIn?: $Enums.SectorPath[]
     not?: NestedEnumSectorPathFilter<$PrismaModel> | $Enums.SectorPath
   }
+
+  export type EnumLearningModeFilter<$PrismaModel = never> = {
+    equals?: $Enums.LearningMode | EnumLearningModeFieldRefInput<$PrismaModel>
+    in?: $Enums.LearningMode[]
+    notIn?: $Enums.LearningMode[]
+    not?: NestedEnumLearningModeFilter<$PrismaModel> | $Enums.LearningMode
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -71515,6 +71725,13 @@ export namespace Prisma {
     isOnboarded?: SortOrder
     registrationStatus?: SortOrder
     selectedPath?: SortOrder
+    learningMode?: SortOrder
+    isVerified?: SortOrder
+    subscriptionActive?: SortOrder
+    trialStartedAt?: SortOrder
+    subscriptionExpiresAt?: SortOrder
+    currentSemester?: SortOrder
+    facultyId?: SortOrder
     metadata?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -71523,6 +71740,7 @@ export namespace Prisma {
 
   export type UserAvgOrderByAggregateInput = {
     balance?: SortOrder
+    currentSemester?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -71552,6 +71770,13 @@ export namespace Prisma {
     isOnboarded?: SortOrder
     registrationStatus?: SortOrder
     selectedPath?: SortOrder
+    learningMode?: SortOrder
+    isVerified?: SortOrder
+    subscriptionActive?: SortOrder
+    trialStartedAt?: SortOrder
+    subscriptionExpiresAt?: SortOrder
+    currentSemester?: SortOrder
+    facultyId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     partnerId?: SortOrder
@@ -71584,6 +71809,13 @@ export namespace Prisma {
     isOnboarded?: SortOrder
     registrationStatus?: SortOrder
     selectedPath?: SortOrder
+    learningMode?: SortOrder
+    isVerified?: SortOrder
+    subscriptionActive?: SortOrder
+    trialStartedAt?: SortOrder
+    subscriptionExpiresAt?: SortOrder
+    currentSemester?: SortOrder
+    facultyId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     partnerId?: SortOrder
@@ -71591,6 +71823,7 @@ export namespace Prisma {
 
   export type UserSumOrderByAggregateInput = {
     balance?: SortOrder
+    currentSemester?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -71685,6 +71918,32 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumSectorPathFilter<$PrismaModel>
     _max?: NestedEnumSectorPathFilter<$PrismaModel>
+  }
+
+  export type EnumLearningModeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LearningMode | EnumLearningModeFieldRefInput<$PrismaModel>
+    in?: $Enums.LearningMode[]
+    notIn?: $Enums.LearningMode[]
+    not?: NestedEnumLearningModeWithAggregatesFilter<$PrismaModel> | $Enums.LearningMode
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumLearningModeFilter<$PrismaModel>
+    _max?: NestedEnumLearningModeFilter<$PrismaModel>
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -72063,17 +72322,6 @@ export namespace Prisma {
     aiReadiness?: SortOrder
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type ProfileScalarRelationFilter = {
     is?: ProfileWhereInput
     isNot?: ProfileWhereInput
@@ -72122,22 +72370,6 @@ export namespace Prisma {
 
   export type ProfileSkillSumOrderByAggregateInput = {
     proficiency?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type SkillOrderByRelevanceInput = {
@@ -74839,6 +75071,18 @@ export namespace Prisma {
     set?: $Enums.SectorPath
   }
 
+  export type EnumLearningModeFieldUpdateOperationsInput = {
+    set?: $Enums.LearningMode
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
   }
@@ -75815,14 +76059,6 @@ export namespace Prisma {
     create?: XOR<SkillCreateWithoutProfilesInput, SkillUncheckedCreateWithoutProfilesInput>
     connectOrCreate?: SkillCreateOrConnectWithoutProfilesInput
     connect?: SkillWhereUniqueInput
-  }
-
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type ProfileUpdateOneRequiredWithoutSkillsNestedInput = {
@@ -78224,6 +78460,24 @@ export namespace Prisma {
     not?: NestedEnumSectorPathFilter<$PrismaModel> | $Enums.SectorPath
   }
 
+  export type NestedEnumLearningModeFilter<$PrismaModel = never> = {
+    equals?: $Enums.LearningMode | EnumLearningModeFieldRefInput<$PrismaModel>
+    in?: $Enums.LearningMode[]
+    notIn?: $Enums.LearningMode[]
+    not?: NestedEnumLearningModeFilter<$PrismaModel> | $Enums.LearningMode
+  }
+
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
@@ -78251,17 +78505,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
-  }
-
-  export type NestedIntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -78350,6 +78593,32 @@ export namespace Prisma {
     _min?: NestedEnumSectorPathFilter<$PrismaModel>
     _max?: NestedEnumSectorPathFilter<$PrismaModel>
   }
+
+  export type NestedEnumLearningModeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LearningMode | EnumLearningModeFieldRefInput<$PrismaModel>
+    in?: $Enums.LearningMode[]
+    notIn?: $Enums.LearningMode[]
+    not?: NestedEnumLearningModeWithAggregatesFilter<$PrismaModel> | $Enums.LearningMode
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumLearningModeFilter<$PrismaModel>
+    _max?: NestedEnumLearningModeFilter<$PrismaModel>
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -78413,22 +78682,6 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type NestedEnumQuizQuestionTypeFilter<$PrismaModel = never> = {
@@ -80279,6 +80532,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -80339,6 +80599,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -80415,6 +80682,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -80475,6 +80749,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -80535,6 +80816,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -80595,6 +80883,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -80671,6 +80966,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -80731,6 +81033,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -80791,6 +81100,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -80851,6 +81167,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -81000,6 +81323,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -81060,6 +81390,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -81199,6 +81536,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -81259,6 +81603,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -81335,6 +81686,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -81395,6 +81753,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -81485,6 +81850,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -81545,6 +81917,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -81673,6 +82052,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -81733,6 +82119,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -82029,6 +82422,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -82089,6 +82489,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -82154,6 +82561,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -82214,6 +82628,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -82290,6 +82711,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -82350,6 +82778,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -82421,6 +82856,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -82481,6 +82923,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -82541,6 +82990,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -82601,6 +83057,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -82677,6 +83140,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -82737,6 +83207,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -82933,6 +83410,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -82993,6 +83477,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -83058,6 +83549,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -83118,6 +83616,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -83328,6 +83833,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -83388,6 +83900,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -83459,6 +83978,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -83519,6 +84045,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -83657,6 +84190,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -83717,6 +84257,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -83793,6 +84340,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -83853,6 +84407,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -83958,6 +84519,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -84018,6 +84586,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -84145,6 +84720,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -84205,6 +84787,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -84310,6 +84899,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -84370,6 +84966,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -84435,6 +85038,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -84495,6 +85105,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -84645,6 +85262,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -84705,6 +85329,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -84776,6 +85407,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -84836,6 +85474,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -85034,6 +85679,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -85094,6 +85746,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -85248,6 +85907,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -85308,6 +85974,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -85632,6 +86305,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -85692,6 +86372,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -85801,6 +86488,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -85861,6 +86555,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -87838,6 +88539,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -87898,6 +88606,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -88013,6 +88728,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -88073,6 +88795,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -88235,6 +88964,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -88295,6 +89031,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -88511,6 +89254,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -88571,6 +89321,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -88727,6 +89484,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -88787,6 +89551,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -88936,6 +89707,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -88996,6 +89774,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -89414,6 +90199,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -89474,6 +90266,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -89613,6 +90412,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -89673,6 +90479,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -89930,6 +90743,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -89990,6 +90810,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -90097,6 +90924,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -90157,6 +90991,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -90601,6 +91442,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -90661,6 +91509,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -90737,6 +91592,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -90797,6 +91659,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -90857,6 +91726,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -90917,6 +91793,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -91034,6 +91917,13 @@ export namespace Prisma {
     isOnboarded?: BoolFilter<"User"> | boolean
     registrationStatus?: EnumRegistrationStatusFilter<"User"> | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFilter<"User"> | $Enums.SectorPath
+    learningMode?: EnumLearningModeFilter<"User"> | $Enums.LearningMode
+    isVerified?: BoolFilter<"User"> | boolean
+    subscriptionActive?: BoolFilter<"User"> | boolean
+    trialStartedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    subscriptionExpiresAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    currentSemester?: IntFilter<"User"> | number
+    facultyId?: StringNullableFilter<"User"> | string | null
     metadata?: JsonNullableFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -91160,6 +92050,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -91220,6 +92117,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -91296,6 +92200,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -91356,6 +92267,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -91569,6 +92487,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -91629,6 +92554,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -91734,6 +92666,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -91794,6 +92733,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -91933,6 +92879,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -91993,6 +92946,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -92090,6 +93050,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -92150,6 +93117,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -92237,6 +93211,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -92297,6 +93278,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -92373,6 +93361,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -92433,6 +93428,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -92493,6 +93495,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -92553,6 +93562,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -92629,6 +93645,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -92689,6 +93712,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -92749,6 +93779,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -92809,6 +93846,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -92885,6 +93929,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -92945,6 +93996,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -95589,6 +96647,13 @@ export namespace Prisma {
     isOnboarded?: boolean
     registrationStatus?: $Enums.RegistrationStatus
     selectedPath?: $Enums.SectorPath
+    learningMode?: $Enums.LearningMode
+    isVerified?: boolean
+    subscriptionActive?: boolean
+    trialStartedAt?: Date | string | null
+    subscriptionExpiresAt?: Date | string | null
+    currentSemester?: number
+    facultyId?: string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -95630,6 +96695,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -95690,6 +96762,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -95750,6 +96829,13 @@ export namespace Prisma {
     isOnboarded?: BoolFieldUpdateOperationsInput | boolean
     registrationStatus?: EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
     selectedPath?: EnumSectorPathFieldUpdateOperationsInput | $Enums.SectorPath
+    learningMode?: EnumLearningModeFieldUpdateOperationsInput | $Enums.LearningMode
+    isVerified?: BoolFieldUpdateOperationsInput | boolean
+    subscriptionActive?: BoolFieldUpdateOperationsInput | boolean
+    trialStartedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentSemester?: IntFieldUpdateOperationsInput | number
+    facultyId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

@@ -25,6 +25,11 @@ enum SectorPath {
   NONE
 }
 
+enum LearningMode {
+  SOLO
+  STALKER
+}
+
 model User {
   id          String  @id @default(cuid())
   email       String? @unique
@@ -60,7 +65,17 @@ model User {
   // v2.60 Ecosystem Integration
   registrationStatus RegistrationStatus @default(VISITOR)
   selectedPath       SectorPath         @default(NONE)
-  metadata           Json? // Store geolocation & consent telemetry
+
+  // v1.2 Learning Modes & Stalker Protocol
+  learningMode          LearningMode @default(SOLO)
+  isVerified            Boolean      @default(false)
+  subscriptionActive    Boolean      @default(false)
+  trialStartedAt        DateTime?
+  subscriptionExpiresAt DateTime?
+  currentSemester       Int          @default(1)
+  facultyId             String? // Path assigned after branching
+
+  metadata Json? // Store geolocation & consent telemetry
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

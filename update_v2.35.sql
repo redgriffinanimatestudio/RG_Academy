@@ -1,5 +1,5 @@
 -- update_v2.35.sql
--- Manual Schema Sync for Red Griffin Academy (v2.35)
+-- Manual Schema Sync for Red Griffin Academy (v2.36 Neural Patch)
 -- Goal: Add missing columns and tables to the production MySQL DB to resolve Prisma (P2022) conflicts.
 
 USE u315573487_db;
@@ -20,7 +20,19 @@ ADD COLUMN IF NOT EXISTS `remoteId` VARCHAR(191) UNIQUE,
 ADD COLUMN IF NOT EXISTS `source` VARCHAR(191) DEFAULT 'local',
 ADD COLUMN IF NOT EXISTS `lastSyncedAt` DATETIME(3),
 ADD COLUMN IF NOT EXISTS `balance` DOUBLE DEFAULT 0,
-ADD COLUMN IF NOT EXISTS `agencyId` VARCHAR(191);
+ADD COLUMN IF NOT EXISTS `agencyId` VARCHAR(191),
+
+-- v2.60 Ecosystem & Learning Modes
+ADD COLUMN IF NOT EXISTS `registrationStatus` ENUM('VISITOR', 'PENDING', 'ACTIVE') DEFAULT 'VISITOR',
+ADD COLUMN IF NOT EXISTS `selectedPath` ENUM('ACADEMY', 'STUDIO', 'COMMUNITY', 'NONE') DEFAULT 'NONE',
+ADD COLUMN IF NOT EXISTS `learningMode` ENUM('SOLO', 'STALKER') DEFAULT 'SOLO',
+ADD COLUMN IF NOT EXISTS `isVerified` BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS `subscriptionActive` BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS `trialStartedAt` DATETIME(3),
+ADD COLUMN IF NOT EXISTS `subscriptionExpiresAt` DATETIME(3),
+ADD COLUMN IF NOT EXISTS `currentSemester` INTEGER DEFAULT 1,
+ADD COLUMN IF NOT EXISTS `facultyId` VARCHAR(191),
+ADD COLUMN IF NOT EXISTS `metadata` JSON;
 
 -- 1.5. Update Profile Table with Phase 5.2 Registration Fields
 ALTER TABLE `Profile` 
