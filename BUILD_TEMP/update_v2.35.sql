@@ -7,7 +7,7 @@ USE u315573487_db;
 -- 0. Normalize phone numbers to a canonical format before availability checks.
 -- This keeps legacy values like "+7 (999) 123-45-67" comparable with new records.
 UPDATE `User`
-SET `phone` = CONCAT('+', REGEXP_REPLACE(`phone`, '[^0-9]', ''))
+SET `phone` = CONCAT('+', REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(TRIM(`phone`), ' ', ''), '-', ''), '(', ''), ')', ''), '+', ''), '.', ''))
 WHERE `phone` IS NOT NULL
   AND `phone` <> '';
 
