@@ -13,7 +13,7 @@ export const networkingController = {
         where: { userId },
         include: {
           user: { select: { id: true, displayName: true, photoURL: true, email: true, role: true } },
-          skills: true,
+          skills: { include: { skill: true } },
           portfolio: { orderBy: { createdAt: 'desc' } }
         }
       });
@@ -28,7 +28,10 @@ export const networkingController = {
         return success(res, { userId, user, skills: [], portfolio: [] });
       }
 
-      return success(res, profile);
+      return success(res, {
+        ...profile,
+        skills: profile.skills.map(s => s.skill.name)
+      });
     } catch (e) {
       return error(res, 'Failed to fetch profile');
     }
@@ -58,10 +61,16 @@ export const networkingController = {
       // Update skills if provided
       if (skills && Array.isArray(skills)) {
         // Disconnect all existing skills
-        await prisma.profile.update({
+        const currentProfile = await prisma.profile.findUnique({
           where: { id: profile.id },
-          data: { skills: { set: [] } }
+          include: { skills: true }
         });
+        
+        if (currentProfile) {
+          await prisma.profileSkill.deleteMany({
+            where: { profileId: currentProfile.id }
+          });
+        }
 
         // Connect or create new skills
         for (const skillName of skills) {
@@ -71,20 +80,28 @@ export const networkingController = {
             update: {}
           });
           
-          await prisma.profile.update({
-            where: { id: profile.id },
-            data: { skills: { connect: { id: skill.id } } }
+          await prisma.profileSkill.create({
+            data: {
+              profileId: profile.id,
+              skillId: skill.id
+            }
           });
         }
       }
 
       // Fetch updated profile
-      profile = await prisma.profile.findUnique({
+      const updatedProfile = await prisma.profile.findUnique({
         where: { userId: targetUserId },
-        include: { skills: true, portfolio: true }
-      }) as any;
+        include: { 
+          skills: { include: { skill: true } }, 
+          portfolio: true 
+        }
+      });
 
-      return success(res, profile);
+      return success(res, updatedProfile ? {
+        ...updatedProfile,
+        skills: updatedProfile.skills.map(s => s.skill.name)
+      } : null);
     } catch (e) {
       console.error(e);
       return error(res, 'Failed to update profile');
@@ -267,7 +284,7 @@ export const networkingController = {
       }
 
       if (skill) {
-        where.skills = { some: { name: { contains: skill as string } } };
+        where.skills = { some: { skill: { name: { contains: skill as string } } } };
       }
 
       const [profiles, total] = await Promise.all([
@@ -275,7 +292,7 @@ export const networkingController = {
           where,
           include: {
             user: { select: { id: true, displayName: true, photoURL: true, role: true } },
-            skills: true
+            skills: { include: { skill: true } }
           },
           skip: (pageNum - 1) * limitNum,
           take: limitNum
@@ -283,7 +300,10 @@ export const networkingController = {
         prisma.profile.count({ where })
       ]);
 
-      return paginate(res, profiles, total, pageNum, limitNum);
+      return paginate(res, profiles.map(p => ({
+        ...p,
+        skills: p.skills.map(s => s.skill.name)
+      })), total, pageNum, limitNum);
     } catch (e) {
       return error(res, 'Failed to search profiles');
     }
@@ -296,10 +316,10 @@ export const networkingController = {
       // Get user's skills
       const profile = await prisma.profile.findUnique({
         where: { userId },
-        include: { skills: true }
+        include: { skills: { include: { skill: true } } }
       });
 
-      const skillNames = profile?.skills.map(s => s.name) || [];
+      const skillNames = profile?.skills.map(s => s.skill.name) || [];
 
       // Find profiles with similar skills that user doesn't follow
       const following = await prisma.connection.findMany({
@@ -311,16 +331,19 @@ export const networkingController = {
       const recommendations = await prisma.profile.findMany({
         where: {
           userId: { notIn: excludeIds },
-          skills: skillNames.length > 0 ? { some: { name: { in: skillNames } } } : undefined
+          skills: skillNames.length > 0 ? { some: { skill: { name: { in: skillNames } } } } : undefined
         },
         include: {
           user: { select: { id: true, displayName: true, photoURL: true, role: true } },
-          skills: true
+          skills: { include: { skill: true } }
         },
         take: 10
       });
 
-      return success(res, recommendations);
+      return success(res, recommendations.map(p => ({
+        ...p,
+        skills: p.skills.map(s => s.skill.name)
+      })));
     } catch (e) {
       return error(res, 'Failed to get recommendations');
     }

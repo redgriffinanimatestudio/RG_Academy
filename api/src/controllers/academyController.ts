@@ -109,6 +109,9 @@ export const academyController = {
         ...c, 
         tags: JSON.parse(c.tags || '[]'),
         softwareStack: JSON.parse(c.softwareStack || '[]'),
+        whatYouWillLearn: JSON.parse(c.whatYouWillLearn || '[]'),
+        requirements: JSON.parse(c.requirements || '[]'),
+        targetAudience: JSON.parse(c.targetAudience || '[]'),
         studentsCount: c._count.enrollments,
         reviewsCount: c._count.reviews
       })), total, pageNum, limitNum);
@@ -146,10 +149,16 @@ export const academyController = {
           _count: { select: { enrollments: true, reviews: true } }
         }
       });
+
+      if (!course) return error(res, 'Course not found', 404);
+
       return success(res, {
         ...course, 
         tags: JSON.parse(course.tags || '[]'),
         softwareStack: JSON.parse(course.softwareStack || '[]'),
+        whatYouWillLearn: JSON.parse(course.whatYouWillLearn || '[]'),
+        requirements: JSON.parse(course.requirements || '[]'),
+        targetAudience: JSON.parse(course.targetAudience || '[]'),
         studentsCount: course._count.enrollments,
         reviewsCount: course._count.reviews
       });
@@ -501,12 +510,11 @@ export const academyController = {
   async updateCourseStatus(req: AuthRequest, res: Response) {
     try {
       const { courseId } = req.params;
-      const { status } = req.body; // Basic status validation can be added
+      const { status } = req.body;
 
       const course = await prisma.course.findUnique({ where: { id: courseId } });
       if (!course) return error(res, 'Course not found', 404);
 
-      // Simple authorization: only lecturer or admin
       if (course.lecturerId !== req.user!.id && req.user!.role !== 'admin') {
         return error(res, 'Unauthorized', 403);
       }
@@ -519,6 +527,206 @@ export const academyController = {
       return success(res, updated);
     } catch (e) {
       return error(res, 'Update failed');
+    }
+  },
+
+  async updateWatchTime(req: AuthRequest, res: Response) {
+    try {
+      const { enrollmentId, lessonId, currentTime, duration, videoId } = req.body;
+      
+      const analyticsId = `${enrollmentId}_${lessonId}`;
+      const watchedSeconds = Math.floor(currentTime);
+      const completionPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+      const isCompleted = completionPercent >= 90;
+
+      const analytics = await prisma.enrollmentAnalytics.upsert({
+        where: { id: analyticsId },
+        update: { 
+          watchTime: watchedSeconds,
+          completedAt: isCompleted ? new Date() : undefined,
+          lastSyncAt: new Date()
+        },
+        create: {
+          id: analyticsId,
+          enrollmentId,
+          lessonId,
+          watchTime: watchedSeconds,
+          completedAt: isCompleted ? new Date() : null
+        }
+      });
+
+      if (isCompleted) {
+        const enrollment = await prisma.enrollment.findUnique({
+          where: { id: enrollmentId }
+        });
+        
+        if (enrollment) {
+          const completedLessons: string[] = JSON.parse(enrollment.completedLessons || '[]');
+          if (!completedLessons.includes(lessonId)) {
+            completedLessons.push(lessonId);
+            
+            const totalLessons = await prisma.lesson.count({
+              where: { courseId: enrollment.courseId }
+            });
+            
+            const progress = totalLessons > 0 
+              ? Math.round((completedLessons.length / totalLessons) * 100) 
+              : 0;
+
+            const isCourseCompleted = progress >= 100;
+            
+            await prisma.enrollment.update({
+              where: { id: enrollmentId },
+              data: {
+                completedLessons: JSON.stringify(completedLessons),
+                progress,
+                status: isCourseCompleted ? 'completed' : 'active',
+                completedAt: isCourseCompleted ? new Date() : undefined
+              }
+            });
+
+            notifyUser(req.user!.id, 'LESSON_COMPLETED', {
+              lessonId,
+              courseId: enrollment.courseId,
+              progress,
+              completedAt: new Date().toISOString()
+            });
+          }
+        }
+      }
+
+      notifyUser(req.user!.id, 'WATCH_TIME_UPDATE', {
+        lessonId,
+        currentTime: watchedSeconds,
+        duration,
+        percentWatched: completionPercent
+      });
+
+      return success(res, { 
+        ...analytics,
+        percentWatched: Math.round(completionPercent),
+        isCompleted
+      });
+    } catch (e) {
+      return error(res, 'Watch time update failed');
+    }
+  },
+
+  async getCourseStatus(req: AuthRequest, res: Response) {
+    try {
+      const { courseId } = req.params;
+      const userId = req.user!.id;
+
+      const enrollment = await prisma.enrollment.findFirst({
+        where: { userId, courseId }
+      });
+
+      if (!enrollment) {
+        return success(res, { status: 'not_started', progress: 0, completedLessons: [] });
+      }
+
+      const totalLessons = await prisma.lesson.count({
+        where: { courseId }
+      });
+
+      const completedLessons: string[] = JSON.parse(enrollment.completedLessons || '[]');
+      const progress = totalLessons > 0 
+        ? Math.round((completedLessons.length / totalLessons) * 100) 
+        : 0;
+
+      let status: 'not_started' | 'in_progress' | 'completed';
+      if (enrollment.status === 'completed' || progress >= 100) {
+        status = 'completed';
+      } else if (progress > 0) {
+        status = 'in_progress';
+      } else {
+        status = 'not_started';
+      }
+
+      return success(res, {
+        status,
+        progress,
+        completedLessons,
+        totalLessons,
+        enrolledAt: enrollment.enrolledAt,
+        completedAt: enrollment.completedAt
+      });
+    } catch (e) {
+      return error(res, 'Failed to get course status');
+    }
+  },
+
+  async getProgressHistory(req: AuthRequest, res: Response) {
+    try {
+      const { courseId } = req.params;
+      const userId = req.user!.id;
+
+      const enrollment = await prisma.enrollment.findFirst({
+        where: { userId, courseId }
+      });
+
+      if (!enrollment) {
+        return success(res, { lessons: [], milestones: [] });
+      }
+
+      const analytics = await prisma.enrollmentAnalytics.findMany({
+        where: { enrollmentId: enrollment.id },
+        orderBy: { lastSyncAt: 'asc' }
+      });
+
+      const lessonMap = new Map<string, { watchTime: number; completedAt: Date | null }>();
+      
+      for (const a of analytics) {
+        const existing = lessonMap.get(a.lessonId);
+        if (!existing || a.lastSyncAt > (existing.completedAt || new Date(0))) {
+          lessonMap.set(a.lessonId, {
+            watchTime: a.watchTime,
+            completedAt: a.completedAt
+          });
+        }
+      }
+
+      const lessons = Array.from(lessonMap.entries()).map(([lessonId, data]) => ({
+        lessonId,
+        watchTime: data.watchTime,
+        completedAt: data.completedAt,
+        completed: !!data.completedAt
+      }));
+
+      const milestones = [];
+      if (enrollment.enrolledAt) {
+        milestones.push({ event: 'enrolled', date: enrollment.enrolledAt });
+      }
+      if (enrollment.completedAt) {
+        milestones.push({ event: 'course_completed', date: enrollment.completedAt });
+      }
+
+      for (const a of analytics) {
+        if (a.completedAt) {
+          const alreadyAdded = milestones.find(m => 
+            m.event === 'lesson_completed' && 
+            new Date(m.date).getTime() === new Date(a.completedAt!).getTime()
+          );
+          if (!alreadyAdded) {
+            milestones.push({ 
+              event: 'lesson_completed', 
+              date: a.completedAt,
+              lessonId: a.lessonId 
+            });
+          }
+        }
+      }
+
+      return success(res, {
+        lessons,
+        milestones: milestones.sort((a, b) => 
+          new Date(a.date).getTime() - new Date(b.date).getTime()
+        ),
+        overallProgress: enrollment.progress,
+        status: enrollment.status
+      });
+    } catch (e) {
+      return error(res, 'Failed to get progress history');
     }
   }
 };

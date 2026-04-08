@@ -123,5 +123,15 @@ export const adminService = {
   async getChiefSummary(): Promise<any> {
     const { data } = await apiClient.get('/v1/admin/chief-summary');
     return data.success ? data.data : data;
+  },
+
+  async getOmniStats(): Promise<any> {
+    const { data } = await apiClient.get('/v1/admin/omni/stats');
+    return data.success ? data.data : data;
+  },
+
+  async getOmniLogs(): Promise<any> {
+    const { data } = await apiClient.get('/v1/admin/omni/logs');
+    return data.success ? data.data : data;
   }
 };

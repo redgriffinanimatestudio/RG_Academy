@@ -113,6 +113,22 @@ export const AddReviewSchema = z.object({
   }),
 });
 
+export const UpdateWatchTimeSchema = z.object({
+  body: z.object({
+    enrollmentId: z.string(),
+    lessonId: z.string(),
+    currentTime: z.coerce.number().nonnegative(),
+    duration: z.coerce.number().positive(),
+    videoId: z.string().optional(),
+  }),
+});
+
+export const GetCourseStatusSchema = z.object({
+  params: z.object({
+    courseId: z.string(),
+  }),
+});
+
 // --- STUDIO SCHEMAS ---
 
 export const CreateProjectSchema = z.object({

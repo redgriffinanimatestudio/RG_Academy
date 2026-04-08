@@ -6,6 +6,11 @@
       "sourceType": "github",
       "computedHash": "81af098a4ce6f0e323c1bd02b8e79df3bbaed57cbf1c4060f58ddc95de5545a1"
     },
+    "audit-website": {
+      "source": "squirrelscan/skills",
+      "sourceType": "github",
+      "computedHash": "82588484b29316f3106185374cc6aedf409c38a0698d49f7034c9b5ec07a1aa7"
+    },
     "chrome-cdp": {
       "source": "pasky/chrome-cdp-skill",
       "sourceType": "github",
@@ -15,6 +20,21 @@
       "source": "eng0ai/eng0-template-skills",
       "sourceType": "github",
       "computedHash": "ec958189c004cf13324b527c2cc62b7aeabfed8d705fcf9a66758c4e717e888f"
+    },
+    "ckm:banner-design": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "computedHash": "2237d5aafec7ab0223a91a9c4a13a8d25a4bd8a29b4ae9f9ea74d2cbfb9c6f91"
+    },
+    "ckm:design-system": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "computedHash": "0206bc1d866ba6a93c6683d28b801314979fd164939d53830a7592ce0fb7a8a2"
+    },
+    "create-llms": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "2eea327b7f6ad67d91addd334a864f545cd5a1474dd8b03f7a00abc70b2715e2"
     },
     "deep-research": {
       "source": "sanjay3290/ai-skills",
@@ -55,6 +75,21 @@
       "source": "anthropics/skills",
       "sourceType": "github",
       "computedHash": "516bd2154eb843a8240e43d5b285229129853114ad7075a5e141e1c08e408c84"
+    },
+    "gh-cli": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "cbe644b0c6760ae2a1eaafa39133920d889331327065d92a131675a665273e56"
+    },
+    "llm-toolkit": {
+      "source": "KalyanKS-NLP/llm-engineer-toolkit",
+      "sourceType": "github",
+      "computedHash": "local-skill"
+    },
+    "markdown-token-optimizer": {
+      "source": "microsoft/github-copilot-for-azure",
+      "sourceType": "github",
+      "computedHash": "c0a4935dcc904da0f50279ca3b2c95bc800a8c217fd5c9bc2f8bdb4e84891dc5"
     },
     "notebooklm": {
       "source": "sanjay3290/ai-skills",
@@ -101,6 +136,11 @@
       "sourceType": "github",
       "computedHash": "075d1fc3156d5593c3e9a559ebb07f82a2991db07125ff9df16ad90270f5c584"
     },
+    "robotgo": {
+      "source": "go-vgo/robotgo",
+      "sourceType": "github",
+      "computedHash": "local-skill"
+    },
     "seo-audit": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
@@ -116,6 +156,16 @@
       "sourceType": "github",
       "computedHash": "9b0c700e635ebbefc78c8bed90b909d469f688dc03da9824b2b3b33d9602f8d9"
     },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "computedHash": "6337038fe1fe6bbe1b9f252ab678ee575859190bab6f0f246f4061824eb40875"
+    },
+    "update-llms": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "c54d9353f00ae1d34dd2804ab771e77545ba1a442337c7ba35f47e3c79866b6a"
+    },
     "vercel-react-best-practices": {
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
@@ -125,6 +175,11 @@
       "source": "vercel-labs/agent-skills",
       "sourceType": "github",
       "computedHash": "c8952fc9127fa0564d0cb71dccb4215a5608ac933b5831104f09173a97a46f85"
+    },
+    "vscode-ext-commands": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "26c40c1adb82b80a88e2e4b11307924e9f5cdc19c5c0cbb2a96aa02535034f70"
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",

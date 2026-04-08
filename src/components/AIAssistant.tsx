@@ -14,12 +14,18 @@ export default function AIAssistant() {
   const handleAsk = async () => {
     if (!prompt.trim()) return;
     setLoading(true);
+    setResponse('');
     try {
       const res = await getGeminiResponse(prompt);
       setResponse(res || t('no_ai_response'));
-    } catch (error) {
-      console.error(error);
-      setResponse(t('ai_error'));
+    } catch (error: any) {
+      console.error('[AI] Error:', error);
+      const errorMsg = error?.message || '';
+      if (errorMsg.includes('image') || errorMsg.includes('vision') || errorMsg.includes('image input')) {
+        setResponse(t('ai_vision_error') || 'Image analysis is not available with the current AI model. Please try text-only queries.');
+      } else {
+        setResponse(t('ai_error'));
+      }
     } finally {
       setLoading(false);
     }

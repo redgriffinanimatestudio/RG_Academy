@@ -10,7 +10,7 @@ import { useAcademyLogic } from './Academy/useAcademyLogic';
 // Modular Components
 import SynergySection from './Academy/components/SynergySection';
 import FilterPanel from './Academy/components/FilterPanel';
-import CourseCard from './Academy/components/CourseCard';
+import CourseGrid from '../components/ui/organisms/CourseGrid';
 
 const HERO_SLIDES = [
   {
@@ -37,8 +37,6 @@ export default function Academy() {
     currentSlide, setCurrentSlide, filters, setFilters,
     filteredCourses, isLecturer, isStudent, studentProgress, lecturerStats
   } = useAcademyLogic();
-
-  if (loading) return <Preloader message="Synchronizing Academy Hub..." size="lg" />;
 
   return (
     <div className="space-y-12 sm:space-y-16 py-4 sm:py-12 animate-in fade-in duration-1000">
@@ -240,13 +238,11 @@ export default function Academy() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-        <AnimatePresence mode="popLayout">
-          {filteredCourses.map((course) => (
-            <CourseCard key={course.id} course={course} lang={lang} t={t} />
-          ))}
-        </AnimatePresence>
-      </div>
+      <CourseGrid 
+        courses={filteredCourses as any} 
+        loading={loading} 
+        skeletonCount={6} 
+      />
 
       <section className="bg-primary rounded-[4rem] p-16 sm:p-24 text-bg-dark flex flex-col lg:flex-row items-center justify-between gap-12 relative overflow-hidden group shadow-2xl">
         <div className="absolute top-0 right-0 p-24 opacity-10 -translate-y-1/2 translate-x-1/4 group-hover:scale-110 transition-all duration-1000 rotate-12">

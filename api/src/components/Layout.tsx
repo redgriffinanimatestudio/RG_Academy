@@ -167,7 +167,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [profile]);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const path = location.pathname.toLowerCase();
   const isDashboardPage = path.includes('/dashboard') || 
@@ -520,7 +520,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 const availableRoles = [...(profile?.roles || [])];
                                 if (profile?.isAdmin) {
                                   ['admin', 'chief_manager', 'manager', 'moderator', 'hr', 'finance', 'support'].forEach(r => {
-                                    if (!availableRoles.includes(r)) availableRoles.push(r);
+                                    const role = r as UserRole;
+                                    if (!availableRoles.includes(role)) availableRoles.push(role);
                                   });
                                 }
                                 return availableRoles.map(r => (

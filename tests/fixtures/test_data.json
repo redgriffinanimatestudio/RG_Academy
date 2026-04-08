@@ -1,0 +1,43 @@
+{
+  "test_users": {
+    "student": {
+      "email": "test.student@example.com",
+      "password": "Test123!",
+      "role": "student"
+    },
+    "executor": {
+      "email": "test.executor@example.com",
+      "password": "Test123!",
+      "role": "executor"
+    },
+    "admin": {
+      "email": "test.admin@example.com",
+      "password": "Test123!",
+      "role": "admin"
+    }
+  },
+  "test_courses": {
+    "course_id": "test-course-001",
+    "course_slug": "test-course",
+    "lesson_id": "test-lesson-001"
+  },
+  "test_enrollments": {
+    "enrollment_id": "test-enrollment-001"
+  },
+  "test_projects": {
+    "project_id": "test-project-001",
+    "project_slug": "test-project"
+  },
+  "test_contracts": {
+    "contract_id": "test-contract-001"
+  },
+  "test_escrows": {
+    "escrow_id": "test-escrow-001"
+  },
+  "test_rooms": {
+    "room_id": "test-room-001"
+  },
+  "test_notifications": {
+    "notification_id": "test-notification-001"
+  }
+}

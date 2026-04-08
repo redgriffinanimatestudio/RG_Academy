@@ -3,7 +3,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence } from 'framer-motion';
 import { networkingService, FeedEvent, SearchIndex } from '../../services/networkingService';
-
+import { useAuth } from '../../context/AuthContext';
 
 // Modular Community Components
 import CommunityHeader from '../../components/community/CommunityHeader';
@@ -21,6 +21,7 @@ interface Alert {
 }
 
 export default function CommunityPage() {
+  const { user } = useAuth();
   const { t } = useTranslation();
   const { lang } = useParams();
   const location = useLocation();
@@ -31,7 +32,7 @@ export default function CommunityPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [showDiscussionFilters, setShowDiscussionFilters] = useState(false);
   const [discussionFilters, setDiscussionFilters] = useState({ category: 'all', sortBy: 'recent' });
-  
+
   const [feed, setFeed] = useState<FeedEvent[]>([]);
   const [recommendations, setRecommendations] = useState<SearchIndex[]>([]);
   const [following, setFollowing] = useState<string[]>([]);
@@ -39,10 +40,9 @@ export default function CommunityPage() {
 
   useEffect(() => {
     loadNetworkingData();
-  }, []);
+  }, [user]);
 
   const loadNetworkingData = async () => {
-    const user = auth.currentUser;
     if (user) {
       const [feedData, recData, followingData] = await Promise.all([
         networkingService.getActivityFeed(user.uid),
@@ -56,7 +56,6 @@ export default function CommunityPage() {
   };
 
   const handleFollow = async (targetId: string) => {
-    const user = auth.currentUser;
     if (!user) return;
     if (following.includes(targetId)) {
       await networkingService.unfollow(user.uid, targetId);
@@ -72,7 +71,10 @@ export default function CommunityPage() {
   const triggerAlert = (type: Alert['type'], titleKey: string, messageKey: string) => {
     const newAlert: Alert = {
       id: Math.random().toString(36).substr(2, 9),
-      type, title: t(titleKey) || titleKey, message: t(messageKey) || messageKey, timestamp: new Date()
+      type,
+      title: t(titleKey) || titleKey,
+      message: t(messageKey) || messageKey,
+      timestamp: new Date()
     };
     setAlerts(prev => [newAlert, ...prev].slice(0, 5));
   };

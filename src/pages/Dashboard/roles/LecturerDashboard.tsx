@@ -4,11 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Video, Plus, BarChart3, Users, Play, ChevronRight, 
   Settings, EyeOff, Eye, LayoutDashboard, Database, 
-  TrendingUp, Activity, Search
+  TrendingUp, Activity, Search, ClipboardList
 } from 'lucide-react';
 import { academyService } from '../../../services/academyService';
 import Preloader from '../../../components/Preloader';
 import NoDataPlaceholder from '../components/NoDataPlaceholder';
+import ReviewQueue from '../components/ReviewQueue';
 
 interface LecturerDashboardProps {
   view: string;
@@ -122,17 +123,27 @@ const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ view, accent, use
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-20">
       {/* 🚀 HUB CONTROLS (Level 2 Nav) */}
-      <div className="flex gap-4">
+      <div className="flex gap-4 flex-wrap">
           <button onClick={() => setView('overview')} className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border ${view === 'overview' ? 'bg-primary text-bg-dark border-primary' : 'bg-white/5 text-white/40 border-white/10 hover:text-white'}`}>
             <LayoutDashboard size={14} /> Overview
           </button>
           <button onClick={() => setView('workshops')} className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border ${view === 'workshops' ? 'bg-primary text-bg-dark border-primary' : 'bg-white/5 text-white/40 border-white/10 hover:text-white'}`}>
             <Database size={14} /> Workshop Registry
           </button>
+          <button onClick={() => setView('review')} className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border ${view === 'review' ? 'bg-cyan-400 text-bg-dark border-cyan-400' : 'bg-white/5 text-white/40 border-white/10 hover:text-white'}`}>
+            <ClipboardList size={14} /> Review Queue
+          </button>
       </div>
 
+      {/* 🔍 REVIEW QUEUE VIEW */}
+      {view === 'review' && (
+        <div className="glass-industrial border border-white/5 rounded-[3.5rem] p-12">
+          <ReviewQueue lecturerId={user?.id || ''} />
+        </div>
+      )}
+
       {/* 🎬 WORKSHOP MANAGEMENT PREVIEW */}
-      <motion.div 
+      {view !== 'review' && <motion.div 
         variants={itemVariants}
         initial="hidden"
         animate="show"
@@ -207,7 +218,7 @@ const LecturerDashboard: React.FC<LecturerDashboardProps> = ({ view, accent, use
             ))}
           </div>
         ) : <NoDataPlaceholder icon={Video} message="Telemetry node offline: No workshops detected." link={`/aca/${lang}/create`} linkText="Initialize Curriculum" />}
-      </motion.div>
+      </motion.div>}
 
       {/* 📊 REVENUE PERFORMANCE TELEMETRY */}
       <motion.div 

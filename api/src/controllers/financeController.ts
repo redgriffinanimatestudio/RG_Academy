@@ -94,11 +94,7 @@ export const financeController = {
           amount: payoutAmount,
           type: 'service_payout',
           status: 'completed',
-          metadata: JSON.stringify({
-            contractId: escrow.contractId,
-            originalAmount: escrow.amount,
-            fee: platformFee
-          })
+          description: `Contract payment: ${escrow.contractId}. Original: ${escrow.amount}, Fee: ${platformFee}`
         }
       });
 
@@ -165,7 +161,7 @@ export const financeController = {
           amount: -amount,
           type: 'withdrawal',
           status: 'pending',
-          metadata: JSON.stringify({ method })
+          description: `Withdrawal via: ${method}`
         }
       });
 

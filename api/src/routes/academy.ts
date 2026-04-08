@@ -9,7 +9,9 @@ import {
   UpdateProgressSchema, 
   AddReviewSchema, 
   CreateModuleSchema, 
-  UpdateAnalyticsSchema 
+  UpdateAnalyticsSchema,
+  UpdateWatchTimeSchema,
+  GetCourseStatusSchema
 } from '../utils/validation.js';
 
 const router = Router();
@@ -74,6 +76,23 @@ router.post('/analytics/sync',
 router.get('/enrollments/:enrollmentId/analytics/:lessonId',
   authMiddleware,
   academyController.getPlaybackPosition
+);
+
+// Video Viewing & Progress
+router.post('/progress/watch',
+  authMiddleware,
+  validate(UpdateWatchTimeSchema),
+  academyController.updateWatchTime
+);
+
+router.get('/courses/:courseId/status',
+  authMiddleware,
+  academyController.getCourseStatus
+);
+
+router.get('/courses/:courseId/history',
+  authMiddleware,
+  academyController.getProgressHistory
 );
 
 // Reviews

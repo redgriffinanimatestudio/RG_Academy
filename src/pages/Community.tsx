@@ -35,7 +35,10 @@ interface Alert {
   timestamp: Date;
 }
 
+import { useAuth } from '../context/AuthContext';
+
 export default function Community() {
+  const { user } = useAuth();
   const { t } = useTranslation();
   const { lang } = useParams();
   const location = useLocation();
@@ -61,7 +64,6 @@ export default function Community() {
   }, []);
 
   const loadNetworkingData = async () => {
-    const user = auth.currentUser;
     if (user) {
       const [feedData, recData, followingData] = await Promise.all([
         networkingService.getActivityFeed(user.uid),
@@ -75,7 +77,6 @@ export default function Community() {
   };
 
   const handleFollow = async (targetId: string) => {
-    const user = auth.currentUser;
     if (!user) return;
 
     if (following.includes(targetId)) {

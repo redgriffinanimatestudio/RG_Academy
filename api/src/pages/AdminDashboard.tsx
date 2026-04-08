@@ -21,6 +21,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import ViewModuleController from '../components/professional/ViewModuleController';
+import apiClient from '../services/apiClient';
 
 const AdminDashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -40,10 +41,6 @@ const AdminDashboard: React.FC = () => {
   React.useEffect(() => {
     if (view === 'dashboard') fetchStats();
   }, [view]);
-  const { activeRole } = useAuth();
-  const { t } = useTranslation();
-  const [searchParams] = useSearchParams();
-  const view = searchParams.get('view') || 'dashboard';
 
   // Identification mapping for Dashboard Titles & Content
   const ROLE_CONTENT = useMemo(() => ({

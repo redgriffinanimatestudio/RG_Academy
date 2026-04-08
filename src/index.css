@@ -357,6 +357,6 @@
 
   /* BMW-style zero-radius toggle */
   .industrial-toggle {
-    @apply relative inline-flex h-6 w-11 items-center border-0.5 border-white/5 bg-white/5 transition-all;
+    @apply relative inline-flex h-6 w-11 items-center border border-[0.5px] border-white/5 bg-white/5 transition-all;
   }
 }

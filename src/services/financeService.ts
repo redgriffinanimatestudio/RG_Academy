@@ -3,7 +3,7 @@ import apiClient from './apiClient';
 export const financeService = {
   // 1. Get My Balance (Unified Telemetry)
   async getMyBalance(): Promise<any> {
-    const { data } = await apiClient.get('/v1/finance/my-balance');
+    const { data } = await apiClient.get('/v1/finance/balance');
     return data.success ? data.data : null;
   },
 

@@ -1,5 +1,5 @@
 import { 
-  Box, Video, UserPlus, Cpu, MessageSquare, Users, GraduationCap, Shield, Target, LayoutDashboard, Zap, DollarSign, LifeBuoy, BarChart3, Binary, Briefcase, ClipboardList, TrendingUp, Landmark, ShieldCheck, HeartPulse, Terminal, Key, Activity, Settings, Database, Filter, Globe, Layers, Lock, Monitor, Share2, Smartphone
+  Box, Video, UserPlus, Cpu, MessageSquare, Users, GraduationCap, Shield, Target, LayoutDashboard, Zap, DollarSign, LifeBuoy, BarChart3, Binary, Briefcase, ClipboardList, TrendingUp, Landmark, ShieldCheck, HeartPulse, Terminal, Key, Activity, Settings, Database, Filter, Globe, Layers, Lock, Monitor, Share2, Smartphone, Map, Brain
 } from 'lucide-react';
 
 export const LANGUAGES = [
@@ -14,7 +14,21 @@ export const LANGUAGES = [
 ];
 
 export const ACADEMY_CATEGORIES = [
-  { name: 'modeling_3d', icon: Box, subcategories: [{ name: 'char_modeling' }, { name: 'env_art' }] },
+  { name: 'ultimate_roadmap', icon: Map, path: '/aca/eng/roadmap', isSpecial: true },
+  { 
+    name: 'modeling_3d', 
+    icon: Box, 
+    subcategories: [
+      { 
+        name: 'hardsurface_modeling', 
+        subcategories: [{ name: 'weapon_design' }, { name: 'vehicle_modeling' }] 
+      }, 
+      { 
+        name: 'organic_sculpting',
+        subcategories: [{ name: 'character_anatomy' }, { name: 'creature_design' }]
+      }
+    ] 
+  },
   { name: 'animation', icon: Video, subcategories: [{ name: 'animation_3d' }, { name: 'animation_2d' }] },
   { name: 'vfx_compositing', icon: Zap, subcategories: [{ name: 'visual_effects' }] }
 ];
@@ -30,6 +44,12 @@ export const COMMUNITY_CATEGORIES = [
   { name: 'showcase', icon: Users, subcategories: [{ name: 'art_gallery' }] }
 ];
 
+export const GUEST_CATEGORIES = [
+  { name: 'prod_services', icon: Video, subcategories: [{ name: 'anim_prod' }, { name: 'vfx_post' }] },
+  { name: 'talent_network', icon: UserPlus, subcategories: [{ name: 'creative_talent' }, { name: 'technical_talent' }] },
+  { name: 'studio_solutions', icon: Cpu, subcategories: [{ name: 'infrastructure' }, { name: 'neural_engine' }] }
+];
+
 export const DASHBOARD_MENUS: Record<string, any[]> = {
   student: [{ 
     name: 'student_learning_dashboard', 
@@ -40,6 +60,7 @@ export const DASHBOARD_MENUS: Record<string, any[]> = {
       { name: 'certificate_vault', icon: ShieldCheck }, 
       { name: 'ai_mentor_node', icon: Zap },
       { name: 'master_plan_roadmap', icon: Map },
+      { name: 'neural_agent_forge', icon: Brain },
       { name: 'workshop_archive', icon: Video }
     ] 
   }],
@@ -51,6 +72,7 @@ export const DASHBOARD_MENUS: Record<string, any[]> = {
       { name: 'user_directory', icon: Users, subcategories: [{ name: 'active_members' }, { name: 'access_control' }] }, 
       { name: 'global_projects', icon: Layers }, 
       { name: 'financial_ledger', icon: DollarSign, subcategories: [{ name: 'revenue_matrix' }, { name: 'payouts' }] },
+      { name: 'neural_agent_forge', icon: Brain },
       { name: 'security_matrix', icon: Lock }
     ] 
   }],

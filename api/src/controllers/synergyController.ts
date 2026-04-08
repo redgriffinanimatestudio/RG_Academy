@@ -75,7 +75,7 @@ export const synergyController = {
 
       const projectsText = projects.map(p => `ID: ${p.id}, Title: ${p.title}, Desc: ${p.description}`).join('; ');
 
-      const prompt = `Based on the student's learned skills: [${skills}], and their achievements: [${userWithSkills.achievements.map(a => a.name).join(', ')}], 
+      const prompt = `Based on the student's learned skills: [${skills}], and their achievements: [${userWithSkills.achievements.map(a => a.title).join(', ')}], 
       recommend the top 3 best matching projects from this list: [${projectsText}]. 
       Explain why each project is a good fit.`;
 

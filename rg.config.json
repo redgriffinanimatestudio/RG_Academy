@@ -1,0 +1,49 @@
+{
+  "tools": {
+    "openclaw": {
+      "displayName": "OpenClaw",
+      "start": "cmd /c \"openclaw gateway --force\"",
+      "stop": "powershell -NoProfile -Command \"Get-Process | Where-Object { $_.Path -like '*openclaw*' -or $_.CommandLine -like '*openclaw*' } | Stop-Process -Force\"",
+      "status": "powershell -NoProfile -Command \"Get-Process | Where-Object { $_.Path -like '*openclaw*' -or $_.CommandLine -like '*openclaw*' } | Select-Object Id,ProcessName,Path\"",
+      "type": "process"
+    },
+    "omniroute": {
+      "displayName": "Omniroute",
+      "start": "cmd /c \"set PORT=4000 && omniroute\"",
+      "stop": "powershell -NoProfile -Command \"Get-Process | Where-Object { $_.Path -like '*omniroute*' -or $_.CommandLine -like '*omniroute*' } | Stop-Process -Force\"",
+      "status": "powershell -NoProfile -Command \"Get-Process | Where-Object { $_.Path -like '*omniroute*' -or $_.CommandLine -like '*omniroute*' } | Select-Object Id,ProcessName,Path\"",
+      "type": "process"
+    },
+    "kilo": {
+      "displayName": "Kilo AI Agent",
+      "start": "cmd /c \"kilo\"",
+      "stop": "powershell -NoProfile -Command \"Get-Process | Where-Object { $_.Path -like '*kilo*' -or $_.CommandLine -like '*kilo*' } | Stop-Process -Force\"",
+      "status": "powershell -NoProfile -Command \"Get-Process | Where-Object { $_.Path -like '*kilo*' -or $_.CommandLine -like '*kilo*' } | Select-Object Id,ProcessName,Path\"",
+      "type": "process"
+    }
+  },
+  "projects": {
+    "rg_academy": {
+      "displayName": "RG Academy",
+      "root": "D:/New folder/RG_Academy",
+      "start": "npm run dev",
+      "stop": "",
+      "status": ""
+    }
+  },
+  "docker": {
+    "displayName": "Docker Compose",
+    "root": "D:/New folder/RG_Academy",
+    "start": "docker compose up -d",
+    "stop": "docker compose down",
+    "status": "docker compose ps"
+  },
+  "health": {
+    "endpoints": [
+      { "name": "Omniroute", "url": "http://localhost:4000", "timeoutMs": 2000 }
+    ]
+  },
+  "logging": {
+    "path": "D:/New folder/RG_Academy/logs/rg-entry.log"
+  }
+}

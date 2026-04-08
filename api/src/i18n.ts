@@ -230,8 +230,6 @@ const resources = {
       ecosystem_desc: 'The ultimate ecosystem for CG artists, studios, and students. Learn, collaborate, and build your legacy in the digital world.',
       skip_sync: 'ASCEND & RESONATE',
       node_online: 'VESSEL ATTUNED',
-      node_connect: 'ALTAR RESONANCE',
-      identity_forge: 'SOUL FORGE',
       origins_codex: 'Origins Codex',
       establishing_conn: 'COMMUNING WITH THE ANCIENTS...',
       we_are: 'WE ARE',
@@ -557,8 +555,6 @@ const resources = {
       my_dashboard: 'Мой Дашборд',
       
       // Мифология Суверенитета (Регистрация)
-      node_connect: 'Резонатор Сосуда',
-      identity_forge: 'Кузница Сущности',
       reg_protocol: 'ЭДИКТ КРАСНОГО ГРИФОНА V5.2',
       join_grid: 'ВОЙТИ В СУВЕРЕНИТЕТ',
       neural_sync_active: 'Эфирный Синхрон Активен',

@@ -1,0 +1,37 @@
+[
+  {
+    "name": "calculate_polycount_limit",
+    "description": "Calculates the maximum budget for a 3D model based on target platform (Mobile/PC/Console).",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "platform": { "type": "string", "enum": ["mobile", "pc", "console_nextgen"], "description": "The deployment target" },
+        "lod_level": { "type": "number", "description": "LOD depth (0-4)" }
+      },
+      "required": ["platform"]
+    }
+  },
+  {
+    "name": "get_texture_resolution_protocol",
+    "description": "Returns the recommended PBR texture resolution for specific asset types.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "asset_type": { "type": "string", "enum": ["character", "environment_large", "prop_small"], "description": "Asset category" },
+        "texel_density": { "type": "number", "description": "Desired texel density (px/cm)" }
+      },
+      "required": ["asset_type"]
+    }
+  },
+  {
+    "name": "search_roadmap_node",
+    "description": "Searches the Ultimate Roadmap for specific learning nodes or phases.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": { "type": "string", "description": "Phase or topic to search" }
+      },
+      "required": ["query"]
+    }
+  }
+]

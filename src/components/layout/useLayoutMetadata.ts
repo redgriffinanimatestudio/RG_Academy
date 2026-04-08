@@ -6,7 +6,8 @@ import {
   STUDIO_CATEGORIES, 
   COMMUNITY_CATEGORIES, 
   DASHBOARD_MENUS,
-  SUPERADMIN_HUB
+  SUPERADMIN_HUB,
+  GUEST_CATEGORIES
 } from './Layout.constants';
 
 export function useLayoutMetadata(profile: any, activeRole: string | null) {
@@ -29,7 +30,10 @@ export function useLayoutMetadata(profile: any, activeRole: string | null) {
     // If the user just logged in but role isn't set, default to student for visualization
     const effectiveRole = activeRole || (profile ? 'student' : null);
     
-    if (!profile || !effectiveRole) return { dashboardCategories: [], baseCategories };
+    if (!profile || !effectiveRole) {
+      // Guest user: show limited categories for public access
+      return { dashboardCategories: [], baseCategories: GUEST_CATEGORIES };
+    }
     
     let dashboardCategories: any[] = [];
 

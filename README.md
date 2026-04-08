@@ -56,6 +56,21 @@ Use the included industrial scripts for production prep:
 - `ZIP_FOR_HOSTINGER.bat`: Packages the entire app for web hosting.
 - `SYNC_CORE.bat`: Synchronizes core assets with the remote environment.
 
+## 🧠 AI Skills
+The project includes specialized skills for AI-driven automation and development:
+
+### Available Skills
+| Skill | Description |
+|-------|-------------|
+| **robotgo** | Cross-platform desktop GUI automation using Go - keyboard/mouse control, screen capture, window management for RPA and testing |
+| **llm-toolkit** | Comprehensive guide to 120+ LLM libraries for training, inference, RAG, agents, evaluation, and more |
+| **docker-compose-orchestration** | Container orchestration with Docker Compose for multi-container applications |
+| **postgres** | PostgreSQL query skill with read-only safety features |
+| **deep-research** | Research and exploration capabilities |
+
+### Adding New Skills
+Skills are stored in `.agents/skills/` and registered in `skills-lock.json`.
+
 ---
 <div align="center">
 © 2026 Red Griffin Academy. All Rights Reserved.

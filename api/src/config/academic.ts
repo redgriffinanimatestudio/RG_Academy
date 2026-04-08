@@ -1,15 +1,3 @@
-import { 
-  GraduationCap, 
-  Box, 
-  Sparkles, 
-  Play, 
-  Cpu, 
-  Briefcase, 
-  Target,
-  FlaskConical,
-  LucideIcon
-} from 'lucide-react';
-
 export interface Specialization {
   id: string;
   nameKey: string;
@@ -26,7 +14,7 @@ export interface Chair {
 export interface Department {
   id: string;
   nameKey: string;
-  icon: LucideIcon;
+  icon: string;
   chairs: Chair[];
 }
 
@@ -34,7 +22,7 @@ export const ACADEMIC_TREE: Department[] = [
   {
     id: 'fundamental_arts',
     nameKey: 'dept_fundamental_arts',
-    icon: FlaskConical,
+    icon: 'FlaskConical',
     chairs: [
       { id: 'drawing_plastic', nameKey: 'chair_drawing_plastic', slug: 'drawing-plastic', specializations: [{ id: 'anatomy', nameKey: 'spec_anatomy', slug: 'anatomy' }] },
       { id: 'composition_design', nameKey: 'chair_composition_design', slug: 'composition-design' },
@@ -45,7 +33,7 @@ export const ACADEMIC_TREE: Department[] = [
   {
     id: 'cg_production',
     nameKey: 'dept_cg_production',
-    icon: Box,
+    icon: 'Box',
     chairs: [
       { id: 'modeling_3d', nameKey: 'chair_modeling_3d', slug: 'modeling-3d', specializations: [{ id: 'hardsurface', nameKey: 'spec_hardsurface', slug: 'hardsurface' }, { id: 'organic', nameKey: 'spec_organic', slug: 'organic' }] },
       { id: 'texturing_lookdev', nameKey: 'chair_texturing_lookdev', slug: 'texturing-lookdev' },
@@ -58,7 +46,7 @@ export const ACADEMIC_TREE: Department[] = [
   {
     id: 'vfx_sim',
     nameKey: 'dept_vfx_sim',
-    icon: Sparkles,
+    icon: 'Sparkles',
     chairs: [
       { id: 'procedural_fx', nameKey: 'chair_procedural_fx', slug: 'procedural-fx' },
       { id: 'matchmove_layout', nameKey: 'chair_matchmove_layout', slug: 'matchmove-layout' },
@@ -69,7 +57,7 @@ export const ACADEMIC_TREE: Department[] = [
   {
     id: 'game_art',
     nameKey: 'dept_game_art',
-    icon: Play,
+    icon: 'Play',
     chairs: [
       { id: 'env_design', nameKey: 'chair_env_design', slug: 'env-design' },
       { id: 'stylized_art', nameKey: 'chair_stylized_art', slug: 'stylized-art' },
@@ -80,7 +68,7 @@ export const ACADEMIC_TREE: Department[] = [
   {
     id: 'ai_coding',
     nameKey: 'dept_ai_coding',
-    icon: Cpu,
+    icon: 'Cpu',
     chairs: [
       { id: 'cs_foundations', nameKey: 'chair_cs_foundations', slug: 'cs-foundations' },
       { id: 'python_ml', nameKey: 'chair_python_ml', slug: 'python-ml' },
@@ -92,7 +80,7 @@ export const ACADEMIC_TREE: Department[] = [
   {
     id: 'prod_mgmt',
     nameKey: 'dept_prod_mgmt',
-    icon: Briefcase,
+    icon: 'Briefcase',
     chairs: [
       { id: 'pipeline_mgmt', nameKey: 'chair_pipeline_mgmt', slug: 'pipeline-mgmt' },
       { id: 'agile_pm', nameKey: 'chair_agile_pm', slug: 'agile-pm' },
@@ -103,7 +91,7 @@ export const ACADEMIC_TREE: Department[] = [
   {
     id: 'prep_school',
     nameKey: 'dept_prep_school',
-    icon: Target,
+    icon: 'Target',
     chairs: [
       { id: 'world_hist', nameKey: 'chair_world_hist', slug: 'world-hist' },
       { id: 'az_hist', nameKey: 'chair_az_hist', slug: 'az-hist' },

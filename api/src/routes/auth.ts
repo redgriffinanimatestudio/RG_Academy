@@ -1,11 +1,15 @@
 import { Router } from 'express';
 import { authController } from '../controllers/authController.js';
+import { logout } from '../controllers/logoutController';
 import { userController } from '../controllers/userController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { LoginSchema, RegisterSchema, SwitchRoleSchema } from '../utils/validation.js';
 
 const router = Router();
+
+// Logout (JWT revoke)
+router.post('/logout', logout);
 
 // Dev backdoor
 router.post('/dev/auth', validate(LoginSchema), authController.devLogin);

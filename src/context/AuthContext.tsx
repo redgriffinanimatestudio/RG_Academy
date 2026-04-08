@@ -61,6 +61,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dateOfBirth: dbUser.profile?.dateOfBirth,
       registrationStatus: dbUser.registrationStatus,
       selectedPath: dbUser.selectedPath,
+      learningMode: dbUser.learningMode,
+      isVerified: dbUser.isVerified,
+      subscriptionActive: dbUser.subscriptionActive,
+      trialStartedAt: dbUser.trialStartedAt,
+      subscriptionExpiresAt: dbUser.subscriptionExpiresAt,
+      currentSemester: dbUser.currentSemester,
+      facultyId: dbUser.facultyId,
       createdAt: dbUser.createdAt
     };
     console.log("[AUTH] Mapped Profile:", profile);

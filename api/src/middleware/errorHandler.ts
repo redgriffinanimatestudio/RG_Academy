@@ -4,14 +4,15 @@ import logger from '../utils/logger.js';
 export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
   const isProduction = process.env.NODE_ENV === 'production';
   const status = err.status || err.statusCode || 500;
-  
-  // Log full error details for internal audit
-  console.error(`--- [${new Date().toISOString()}] SERVER ERROR ---`);
-  console.error('Path:', req.path);
-  console.error('Status:', status);
-  console.error('Message:', err.message);
-  if (err.stack) console.error('Stack:', err.stack);
-  console.error('-------------------------------------------');
+
+  // Централизованное логирование ошибок через winston
+  logger.error('SERVER ERROR', {
+    timestamp: new Date().toISOString(),
+    path: req.path,
+    status,
+    message: err.message,
+    stack: err.stack
+  });
 
   // Sanitize the message for the client in production
   let clientMessage = err.message;

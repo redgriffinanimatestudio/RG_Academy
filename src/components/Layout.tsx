@@ -14,6 +14,7 @@ import MobileMenu from './layout/MobileMenu';
 import BottomNav from './layout/BottomNav';
 import Footer from './layout/Footer';
 import AIAssistant from './AIAssistant';
+import StalkerInterface from './academy/StalkerInterface';
 import ErrorBoundary from './ErrorBoundary';
 import Preloader from './Preloader';
 
@@ -73,7 +74,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [sidebarCategories]);
 
-  const handleSetCategory = (cat: any) => setActiveCatName(cat.name);
+  const handleSetCategory = (cat: any) => {
+    // Guest users: redirect to login when clicking sidebar items
+    if (!profile) {
+      window.location.href = `/${lang || 'eng'}/login`;
+      return;
+    }
+    setActiveCatName(cat.name);
+  };
   const handleSetSub = async (sub: any, parentCat: any) => {
     setActiveSubName(sub.name);
     
@@ -203,17 +211,33 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <main className="mx-auto max-w-[1920px] px-4 sm:px-6 md:px-8 lg:px-12 py-6 sm:py-10 lg:py-16">
         <div className="flex flex-col md:flex-row gap-8 sm:gap-10 lg:gap-14 items-start">
-          {(isAcademy || isStudio || isCommunity || isDashboardPage) && !isPublicPage && (
-            <div className="hidden md:block shrink-0">
-              <Sidebar 
-                profile={profile}
-                sidebarCategories={sidebarCategories} activeCatName={activeCatName} activeSubName={activeSubName}
-                isSidebarCollapsed={isSidebarCollapsed} setIsSidebarCollapsed={setIsSidebarCollapsed}
-                handleSetCategory={handleSetCategory} handleSetSub={handleSetSub}
-                modeColor={modeColor} isStudio={isStudio}
-                onOpenGuide={() => setShowGuide(true)}
-              />
-            </div>
+          {profile ? (
+            (isAcademy || isStudio || isCommunity || isDashboardPage) && !isPublicPage && (
+              <div className="hidden md:block shrink-0">
+                <Sidebar 
+                  profile={profile}
+                  sidebarCategories={sidebarCategories} activeCatName={activeCatName} activeSubName={activeSubName}
+                  isSidebarCollapsed={isSidebarCollapsed} setIsSidebarCollapsed={setIsSidebarCollapsed}
+                  handleSetCategory={handleSetCategory} handleSetSub={handleSetSub}
+                  modeColor={modeColor} isStudio={isStudio}
+                  onOpenGuide={() => setShowGuide(true)}
+                />
+              </div>
+            )
+          ) : (
+            // Guest user: show simplified sidebar for public academy/studio pages
+            (isAcademy || isStudio) && !isPublicPage && (
+              <div className="hidden md:block shrink-0">
+                <Sidebar 
+                  profile={null}
+                  sidebarCategories={sidebarCategories} activeCatName={activeCatName} activeSubName={activeSubName}
+                  isSidebarCollapsed={isSidebarCollapsed} setIsSidebarCollapsed={setIsSidebarCollapsed}
+                  handleSetCategory={handleSetCategory} handleSetSub={handleSetSub}
+                  modeColor={modeColor} isStudio={isStudio}
+                  onOpenGuide={() => setShowGuide(true)}
+                />
+              </div>
+            )
           )}
           <div className="flex-1 min-w-0 w-full overflow-hidden px-1 sm:px-0 pb-24 md:pb-0">
             <ErrorBoundary>
@@ -238,6 +262,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       />
       <BottomNav />
       <AIAssistant />
+      <StalkerInterface />
       <GuideOverlay 
         isOpen={showGuide} 
         onClose={() => setShowGuide(false)} 

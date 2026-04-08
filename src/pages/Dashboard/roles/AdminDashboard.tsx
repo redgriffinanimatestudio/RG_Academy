@@ -9,6 +9,8 @@ import {
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StatCard, SectionHeader, GlassCard } from '../../../components/dashboard/shared/DashboardUI';
+import AdminOmniRouteView from './AdminOmniRouteView';
+import OmniCoreTopology from '../../../components/admin/OmniCoreTopology';
 
 
 import { useAuth } from '../../../context/AuthContext';
@@ -244,6 +246,23 @@ export default function AdminDashboard({ stats, activeRole, setActiveRole }: Adm
     );
   }
 
+  // --- RENDER: OMNIROUTE CORE VIEW ---
+  if (currentView === 'omniroute') {
+    return (
+      <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000 pb-24">
+        <header className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setView('overview')} className="p-4 bg-white/5 border border-white/10 rounded-2xl text-white/40 hover:text-white transition-all">Overview</button>
+            <div className="h-8 w-[1px] bg-white/10 mx-2" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500">Core Matrix Active</span>
+          </div>
+          <button onClick={() => setView('users')} className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-all">Registry Matrix</button>
+        </header>
+        <AdminOmniRouteView />
+      </div>
+    );
+  }
+
   // --- RENDER: OVERVIEW (Default) ---
   const cards = [
     { label: 'Platform Nodes', value: stats?.users || 0, sub: '↑ 12% Growth', icon: Users, color: '#378add', trend: 'positive' },
@@ -276,6 +295,9 @@ export default function AdminDashboard({ stats, activeRole, setActiveRole }: Adm
           </div>
         </div>
         <div className="flex items-center gap-4">
+             <button onClick={() => setView('omniroute')} className="px-10 py-5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-emerald-500 hover:text-bg-dark transition-all flex items-center gap-3 shadow-2xl">
+                <Zap size={16} fill="currentColor" className="animate-pulse" /> OmniCore
+             </button>
              <button onClick={() => setView('users')} className="px-10 py-5 bg-white/5 border border-white/10 text-white rounded-3xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white active:bg-white active:text-bg-dark transition-all flex items-center gap-3 shadow-2xl">
                 <Database size={16} className="text-red-500" /> Registry Matrix
              </button>
@@ -310,6 +332,21 @@ export default function AdminDashboard({ stats, activeRole, setActiveRole }: Adm
            </motion.div>
         ))}
       </div>
+
+      {/* 🚀 OMNICORE VISUAL NEXUS (Industrial Topology) */}
+      <motion.div variants={itemVariants} className="space-y-6">
+        <div className="flex items-center justify-between px-6">
+          <div className="flex items-center gap-4">
+            <Cpu size={24} className="text-primary" />
+            <h3 className="text-2xl font-black uppercase tracking-tight text-white">OmniCore <span className="text-primary italic">Visual Nexus</span></h3>
+          </div>
+          <div className="text-[10px] font-black uppercase text-white/20 tracking-[0.4em] flex items-center gap-2">
+             <div className="size-1.5 rounded-full bg-primary animate-ping" />
+             Topology Sync: Nominal
+          </div>
+        </div>
+        <OmniCoreTopology />
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Activity Nodes Matrix */}
@@ -414,7 +451,7 @@ export default function AdminDashboard({ stats, activeRole, setActiveRole }: Adm
                         <Activity size={24} className="text-primary animate-pulse" />
                         <div>
                             <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/20 italic">Node Latency</h4>
-                            <p className="text-[8px] font-black text-primary/40 uppercase tracking-widest">Global Matrix Sync</p>
+                   <p className="text-[8px] font-black text-primary/40 uppercase tracking-widest">Global Matrix Sync</p>
                         </div>
                     </div>
                     <span className="text-2xl font-black text-primary font-mono drop-shadow-[0_0_12px_#00ff9d]">12.4ms</span>

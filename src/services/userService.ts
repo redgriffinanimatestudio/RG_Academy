@@ -34,6 +34,15 @@ export interface UserProfile {
   isAdmin: boolean;
   balance: number; // Phase 6.2 Ledger
   isOnboarded?: boolean;
+  learningMode?: 'SOLO' | 'STALKER';
+  isVerified?: boolean;
+  emailVerified?: boolean;
+  phone?: string | null;
+  subscriptionActive?: boolean;
+  trialStartedAt?: string | Date | null;
+  subscriptionExpiresAt?: string | Date | null;
+  currentSemester?: number;
+  facultyId?: string | null;
   bio?: string;
   country?: string | null;
   citizenship?: string | null;
@@ -44,6 +53,7 @@ export interface UserProfile {
   dateOfBirth?: string | Date | null;
   registrationStatus?: 'VISITOR' | 'PENDING' | 'ACTIVE';
   selectedPath?: 'ACADEMY' | 'STUDIO' | 'COMMUNITY' | 'NONE';
+  chosenPathId?: string | null;
   createdAt: any;
   updatedAt?: any;
 }

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/auth.js';
+import { isTokenBlacklisted } from '../utils/jwtBlacklist';
 import prisma from '../utils/prisma.js';
 import { error } from '../utils/response.js';
 
@@ -30,6 +31,12 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
   }
 
   const token = authHeader.split(' ')[1];
+
+  // Проверка blacklist
+  if (await isTokenBlacklisted(token)) {
+    return error(res, 'Token revoked', 401);
+  }
+
   const decoded: any = verifyToken(token);
 
   if (!decoded) {

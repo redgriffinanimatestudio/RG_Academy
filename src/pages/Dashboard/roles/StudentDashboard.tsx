@@ -8,6 +8,7 @@ import {
   ShieldCheck, Users, Target, Lock, UserCheck, Compass
 } from 'lucide-react';
 import { StatCard, SectionHeader, GlassCard } from '../../../components/dashboard/shared/DashboardUI';
+import { ProgressBar, CourseProgressCard, ModuleProgress } from '../../../components/progress';
 import { academyService } from '../../../services/academyService';
 import NeuralRoadmap from '../../../components/dashboard/NeuralRoadmap';
 import { executeSkill } from '../../../services/ai';
@@ -27,9 +28,10 @@ export default function StudentDashboard({
   view = 'overview' 
 }: StudentDashboardProps) {
   const stats = data?.stats;
+  const enrollments = data?.enrollments || [];
   const techStack = data?.techStack || [];
   const activePipelines = data?.activePipelines || [];
-  const certifications = data?.certifications || [];
+  const certifications = data?.certificates || [];
 
   // Normalize mapping for view strings from Layout metadata
   const activeView = view === 'student' ? 'overview' : (view.includes('nexus') ? 'overview' : view);
@@ -125,7 +127,7 @@ export default function StudentDashboard({
            exit={{ opacity: 0, y: -10 }}
            transition={{ duration: 0.4 }}
         >
-          {activeView === 'overview' && <OverviewModule stats={stats} techStack={techStack} pipelines={activePipelines} certs={certifications} />}
+          {activeView === 'overview' && <OverviewModule stats={stats} enrollments={enrollments} techStack={techStack} pipelines={activePipelines} certs={certifications} />}
           {activeView === 'career_trajectory' && <TrajectoryModule techStack={techStack} aiAnalysis={aiAnalysis} aiLoading={aiLoading} />}
           {activeView === 'master_plan_roadmap' && <NeuralRoadmap activePathId={user?.chosenPathId || 'generalist'} completedNodeIds={[]} />}
           {activeView === 'certificate_vault' && <VaultModule certs={certifications} />}
@@ -138,7 +140,7 @@ export default function StudentDashboard({
 }
 
 // 📡 DASHBOARD OVERVIEW: LEARNING NEXUS
-function OverviewModule({ stats, techStack, pipelines, certs }: any) {
+function OverviewModule({ stats, enrollments, techStack, pipelines, certs }: any) {
   const mainStats = [
     { label: 'Neural Sync', value: '98.4%', icon: Activity, color: 'primary', trend: '+0.2%' },
     { label: 'Skill XP', value: stats?.xp || '250', icon: Zap, color: 'amber-400', trend: '+50 today' },
@@ -153,6 +155,32 @@ function OverviewModule({ stats, techStack, pipelines, certs }: any) {
           <StatCard key={card.label} {...card} color={card.color.split('-')[0]} trend={card.trend as any} />
         ))}
       </div>
+
+      {enrollments.length > 0 && (
+        <div className="space-y-6">
+          <SectionHeader title="My Courses" subtitle="Active learning trajectories and progress" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {enrollments.slice(0, 6).map((enrollment: any, idx: number) => {
+              const progress = enrollment.progress || 0;
+              const status = enrollment.status === 'completed' ? 'completed' : 
+                           enrollment.progress > 0 ? 'in-progress' : 'not-started';
+              
+              return (
+                <CourseProgressCard
+                  key={idx}
+                  course={{
+                    title: enrollment.courseTitle || enrollment.title || 'Untitled Course',
+                    thumbnail: enrollment.thumbnail || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=225&fit=crop',
+                    progress,
+                    status: status as any,
+                    slug: enrollment.courseSlug || enrollment.slug
+                  }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-12">

@@ -1,0 +1,57 @@
+{
+  "title": "3D Artist Education Roadmap - Ultimate Edition",
+  "version": "5.4.1",
+  "description": "The definitive trajectory from artistic foundations to industry-grade technical mastery.",
+  "phases": [
+    {
+      "id": "phase_1",
+      "title": "Phase 1: Artistic Foundations",
+      "description": "Mastering the universal laws of aesthetics and anatomy.",
+      "nodes": [
+        { "id": "anatomy_basics", "label": "Human Anatomy & Skeletal Structure", "status": "locked", "difficulty": "intermediate" },
+        { "id": "color_theory", "label": "Color Theory & Industrial Lighting Basics", "status": "locked", "difficulty": "beginner" },
+        { "id": "composition", "label": "Composition & Cinematic Framing", "status": "locked", "difficulty": "beginner" }
+      ]
+    },
+    {
+      "id": "phase_2",
+      "title": "Phase 2: Technical Modeling Matrix",
+      "description": "Constructing complex geometry with mathematical precision.",
+      "nodes": [
+        { "id": "hardsurface_modeling", "label": "Hard Surface Modeling Protocols", "status": "locked", "difficulty": "intermediate" },
+        { "id": "retopology_pipeline", "label": "Advanced Retopology & UV Mapping", "status": "locked", "difficulty": "expert" },
+        { "id": "zbrush_sculpting", "label": "Organic Sculpting & Digital Anatomy", "status": "locked", "difficulty": "intermediate" }
+      ]
+    },
+    {
+      "id": "phase_3",
+      "title": "Phase 3: Material Science & Texturing",
+      "description": "Simulating physical surfaces and chemical weathering.",
+      "nodes": [
+        { "id": "pbr_workflows", "label": "Physical Based Rendering (PBR) Workflows", "status": "locked", "difficulty": "intermediate" },
+        { "id": "substance_mastery", "label": "Procedural Texturing in Substance Designer", "status": "locked", "difficulty": "expert" },
+        { "id": "handpainted_textures", "label": "Stylized Hand-Painted Techniques", "status": "locked", "difficulty": "intermediate" }
+      ]
+    },
+    {
+      "id": "phase_4",
+      "title": "Phase 4: Optimization & Engine Sync",
+      "description": "Integrating assets into real-time environments (UE5.4).",
+      "nodes": [
+        { "id": "ue5_integration", "label": "Unreal Engine 5.4 Technical Pipeline", "status": "locked", "difficulty": "intermediate" },
+        { "id": "level_design", "label": "Environmental Level Design & Foliage Sync", "status": "locked", "difficulty": "intermediate" },
+        { "id": "lod_optimization", "label": "Performance Optimization & LODs", "status": "locked", "difficulty": "expert" }
+      ]
+    },
+    {
+      "id": "phase_5",
+      "title": "Phase 5: Professional Presentation",
+      "description": "Finalizing the portfolio and entering the global talent network.",
+      "nodes": [
+        { "id": "rendering_presentation", "label": "Cinematic Rendering & Lighting", "status": "locked", "difficulty": "intermediate" },
+        { "id": "portfolio_forge", "label": "Industrial Portfolio Construction", "status": "locked", "difficulty": "beginner" },
+        { "id": "career_uplink", "label": "Industry Placement & Job Interview Protocol", "status": "locked", "difficulty": "intermediate" }
+      ]
+    }
+  ]
+}

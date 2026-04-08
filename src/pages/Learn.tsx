@@ -19,6 +19,7 @@ import {
   HelpCircle,
   Layout,
   Zap,
+  TrendingUp,
   ChevronDown,
   ChevronRight,
   MonitorPlay,
@@ -58,6 +59,8 @@ export default function Learn() {
   const [videoQuality, setVideoQuality] = useState<string>('auto');
   const [availableQualities, setAvailableQualities] = useState<any[]>([]);
   const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({});
+  const [sessionYield, setSessionYield] = useState(0);
+  const [neuralTokens, setNeuralTokens] = useState(0);
 
   // 1. Initial Data Loading
   useEffect(() => {
@@ -174,6 +177,11 @@ export default function Learn() {
         // Auto-complete logic (95% rule)
         const progress = (currentTime / (video.duration || 1)) * 100;
         const completedList = Array.isArray(enrollment.completedLessons) ? enrollment.completedLessons : (typeof enrollment.completedLessons === 'string' ? JSON.parse(enrollment.completedLessons) : []);
+        
+        // Increment Session Yield & Tokens (Mock Logic)
+        setSessionYield(prev => prev + 0.1);
+        setNeuralTokens(prev => prev + 1);
+
         if (progress > 95 && !completedList.includes(currentLesson.id)) {
           handleLessonComplete(currentLesson.id, true);
         }
@@ -316,13 +324,19 @@ export default function Learn() {
             <div className="absolute bottom-12 right-12 z-20 pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity">
                  <div className="px-5 py-3 bg-black/60 border border-white/10 rounded-2xl backdrop-blur-3xl flex items-center gap-6">
                     <div className="flex flex-col">
-                        <span className="text-[7px] font-black text-white/20 uppercase tracking-[0.3em]">Module_ID</span>
-                        <span className="text-[10px] font-mono text-white/60">RG_UNIT_0482</span>
+                        <span className="text-[7px] font-black text-white/20 uppercase tracking-[0.3em]">Session_Yield</span>
+                        <div className="flex items-center gap-2">
+                           <TrendingUp size={10} className="text-primary" />
+                           <span className="text-[10px] font-mono text-white/60">+{sessionYield.toFixed(1)}%</span>
+                        </div>
                     </div>
                     <div className="h-6 w-px bg-white/5" />
                     <div className="flex flex-col">
-                        <span className="text-[7px] font-black text-white/20 uppercase tracking-[0.3em]">Auth_Level</span>
-                        <span className="text-[10px] font-mono text-primary uppercase">Specialist</span>
+                        <span className="text-[7px] font-black text-white/20 uppercase tracking-[0.3em]">Neural_Bits</span>
+                        <div className="flex items-center gap-2">
+                           <Zap size={10} className="text-primary" fill="currentColor" />
+                           <span className="text-[10px] font-mono text-primary uppercase">{neuralTokens} NC</span>
+                        </div>
                     </div>
                  </div>
             </div>
@@ -456,26 +470,58 @@ export default function Learn() {
               <div className="max-w-6xl mx-auto">
                 {activeTab === 'overview' && (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                        <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-white/60 italic">Node_Synopsis</h4>
                        <p className="text-lg text-white/30 leading-relaxed font-medium italic">
-                         Synchronizing high-stakes visual data with architectural precision. This node focuses on procedural optimization of {course?.title} utilizing the latest synapse protocols.
+                         {course?.description}
                        </p>
+                       
+                       {course?.whatYouWillLearn && (typeof course.whatYouWillLearn === 'string' ? JSON.parse(course.whatYouWillLearn) : course.whatYouWillLearn).length > 0 && (
+                         <div className="space-y-4 pt-4">
+                            <h5 className="text-[9px] font-black uppercase tracking-[0.3em] text-primary/60 italic">Operational_Outcomes:</h5>
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                               {(typeof course.whatYouWillLearn === 'string' ? JSON.parse(course.whatYouWillLearn) : course.whatYouWillLearn).map((item: string, i: number) => (
+                                 <li key={i} className="flex items-start gap-3 text-[10px] font-black uppercase tracking-widest text-white/40 italic">
+                                    <CheckCircle size={14} className="text-primary mt-0.5 shrink-0" />
+                                    {item}
+                                 </li>
+                               ))}
+                            </ul>
+                         </div>
+                       )}
                     </div>
-                    <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 flex items-center gap-10">
-                        <div className="space-y-2">
-                           <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Sync_Efficiency</span>
-                           <div className="text-3xl font-black text-primary tracking-tighter">98.4%</div>
+                    <div className="space-y-6">
+                        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 flex items-center gap-10">
+                            <div className="space-y-2">
+                               <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Sync_Efficiency</span>
+                               <div className="text-3xl font-black text-primary tracking-tighter tabular-nums">{enrollment?.progress || 0}%</div>
+                            </div>
+                            <div className="h-10 w-px bg-white/5" />
+                            <div className="space-y-2">
+                               <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Operational_Status</span>
+                               <div className="text-sm font-black text-white uppercase tracking-widest">
+                                 {enrollment?.status === 'completed' ? 'Mastery_Locked' : 'Sync_In_Progress'}
+                               </div>
+                            </div>
                         </div>
-                        <div className="h-10 w-px bg-white/5" />
-                        <div className="space-y-2">
-                           <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Operational_Status</span>
-                           <div className="text-sm font-black text-white uppercase tracking-widest">Mastery_Locked</div>
-                        </div>
+
+                        {course?.requirements && (typeof course.requirements === 'string' ? JSON.parse(course.requirements) : course.requirements).length > 0 && (
+                          <div className="bg-white/[0.01] border border-white/5 rounded-3xl p-8 space-y-4">
+                              <h5 className="text-[9px] font-black uppercase tracking-[0.3em] text-white/20 italic">Node_Requirements:</h5>
+                              <ul className="space-y-2">
+                                  {(typeof course.requirements === 'string' ? JSON.parse(course.requirements) : course.requirements).map((req: string, i: number) => (
+                                    <li key={i} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-white/30 italic">
+                                        <Zap size={12} className="text-white/20" />
+                                        {req}
+                                    </li>
+                                  ))}
+                              </ul>
+                          </div>
+                        )}
                     </div>
                   </div>
                 )}
-                {/* ... Other tabs follow similar premium styling ... */}
+                {/* ... Other tabs ... */}
               </div>
             </div>
           </div>

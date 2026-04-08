@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../api/generated/prisma"
 }
 
@@ -23,6 +23,11 @@ enum SectorPath {
   STUDIO
   COMMUNITY
   NONE
+}
+
+enum LearningMode {
+  SOLO
+  STALKER
 }
 
 model User {
@@ -60,6 +65,16 @@ model User {
   // v2.60 Ecosystem Integration
   registrationStatus RegistrationStatus @default(VISITOR)
   selectedPath       SectorPath         @default(NONE)
+  
+  // v1.2 Learning Modes & Stalker Protocol
+  learningMode      LearningMode @default(SOLO)
+  isVerified        Boolean      @default(false)
+  subscriptionActive Boolean     @default(false)
+  trialStartedAt    DateTime?
+  subscriptionExpiresAt DateTime?
+  currentSemester   Int          @default(1)
+  facultyId         String?      // Path assigned after branching
+  
   metadata           Json?               // Store geolocation & consent telemetry
   
   createdAt    DateTime     @default(now())
@@ -106,6 +121,7 @@ model User {
   certificates  Certificate[]
   documents     UserDocument[]
   socialLinks   SocialConnection[]
+  quizAttempts  QuizAttempt[] @relation("UserQuizAttempts")
 }
 
 model Achievement {
@@ -184,7 +200,6 @@ model Profile {
   specialization  String?
   artStationUrl   String?
   availability    String?
-  hourlyRate      Float?
   aiReadiness     Float           @default(0.0) // Matrix Verified readiness (0-100)
 
   // --- Client Fields ---
@@ -431,6 +446,9 @@ model Course {
   slug           String       @unique
   title          String
   description    String
+  whatYouWillLearn String    @default("[]") // JSON array of strings
+  requirements     String    @default("[]") // JSON array of strings
+  targetAudience   String    @default("[]") // JSON array of strings
   lecturerId     String
   lecturerName   String
   lecturerAvatar String?      @default("https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png")
@@ -457,6 +475,7 @@ model Course {
   assignments    Assignment[]
   schedules      Schedule[]
   certificates   Certificate[]
+  quizzes        Quiz[]
 }
 
 model Module {
@@ -483,6 +502,62 @@ model Lesson {
   course       Course    @relation(fields: [courseId], references: [id])
   moduleId     String?
   module       Module?   @relation(fields: [moduleId], references: [id])
+  quizzes      Quiz[]
+}
+
+model Quiz {
+  id           String         @id @default(cuid())
+  courseId     String
+  course       Course         @relation(fields: [courseId], references: [id])
+  lessonId     String?
+  lesson       Lesson?        @relation(fields: [lessonId], references: [id])
+  title        String
+  description  String?
+  passingScore Float          @default(70)
+  maxAttempts  Int            @default(3)
+  cooldown     Int            @default(24) // Hours
+  questions    QuizQuestion[]
+  attempts     QuizAttempt[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+enum QuizQuestionType {
+  MCQ
+  TRUE_FALSE
+  CODE
+  ESSAY
+}
+
+model QuizQuestion {
+  id            String           @id @default(cuid())
+  quizId        String
+  quiz          Quiz             @relation(fields: [quizId], references: [id])
+  type          QuizQuestionType
+  content       String           @db.Text
+  options       String?          @default("[]") // JSON array for MCQ
+  correctAnswer String?          @db.Text       // JSON for validation
+  explanation   String?          @db.Text
+  order         Int
+  points        Float            @default(1.0)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+model QuizAttempt {
+  id        String   @id @default(cuid())
+  quizId    String
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  userId    String
+  user      User     @relation("UserQuizAttempts", fields: [userId], references: [id])
+  score     Float
+  passed    Boolean
+  answers   String   @db.Text // JSON of user answers
+  feedback  String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([quizId])
+  @@index([userId])
 }
 
 model Enrollment {

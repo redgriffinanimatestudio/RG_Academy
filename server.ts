@@ -1,4 +1,5 @@
 import express from "express";
+import * as Sentry from "@sentry/node";
 import fs from "fs";
 import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
@@ -55,9 +56,17 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 async function startServer() {
+  // --- SENTRY INIT ---
+  if (process.env.SENTRY_DSN) {
+    Sentry.init({
+      dsn: process.env.SENTRY_DSN,
+      tracesSampleRate: 1.0,
+      environment: process.env.NODE_ENV || 'development',
+    });
+    console.log("Sentry initialized");
+  }
   console.log("🛠️ Starting RG Academy Server (Step 1: INIT)...");
   const app = express();
-  
   // LOGGING: Critical for Hostinger diagnostics
   app.use((req, res, next) => {
     if (req.url.startsWith('/assets')) {
@@ -73,7 +82,7 @@ async function startServer() {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
         "script-src": ["'self'", "'unsafe-inline'", "https://locize.com"],
         "img-src": ["'self'", "data:", "https:", "https://cdn.flyonui.com"],
-        "connect-src": ["'self'", "https://locize.com", "https://api.locize.com", "ws://localhost:24678", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
+        "connect-src": ["'self'", "https://locize.com", "https://api.locize.com", "ws://localhost:24678", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://ipapi.co"],
         "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
         "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       },
@@ -154,6 +163,11 @@ async function startServer() {
   console.log("🛠️ Registering routes...");
   // --- API ROUTES ---
   app.use('/api', routes);
+
+  // Sentry error handler (after all routes)
+  if (process.env.SENTRY_DSN) {
+    Sentry.setupExpressErrorHandler(app);
+  }
 
   // Phase 31: API Discovery Guard
   app.all('/api/*', (req, res) => {

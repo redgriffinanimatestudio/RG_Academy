@@ -223,7 +223,7 @@ const Login: React.FC = () => {
         variants={shakeVariants}
         animate={isShaking ? "shake" : { opacity: 1, scale: 1 }}
         initial={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-7xl bg-bg-card backdrop-blur-3xl border border-border-main rounded-[2rem] sm:rounded-[4.5rem] overflow-hidden shadow-2xl flex flex-col lg:flex-row relative group z-10"
+        className="w-full max-w-[1550px] bg-bg-card backdrop-blur-3xl border border-border-main rounded-[2rem] sm:rounded-[4.5rem] overflow-hidden shadow-2xl flex flex-col lg:flex-row relative group z-10"
       >
         <div className="absolute inset-0 bg-gradient-to-tr from-emerald-600/5 via-transparent to-primary/5 pointer-events-none" />
         
@@ -359,22 +359,6 @@ const Login: React.FC = () => {
                 </motion.div>
               )}
 
-              {(mode === 'login' || (mode === 'register' && regStep === 1)) && (
-                <div className="pt-12 mt-auto border-t border-border-main space-y-6">
-                  <div className="relative flex items-center justify-center">
-                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border-main"></div></div>
-                    <span className="relative bg-bg-card px-6 text-[10px] font-black uppercase tracking-[0.5em] text-text-muted opacity-30 italic">External Handshake</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-5">
-                    <button onClick={async () => { try { const res: any = await socialAuth({ provider: 'github' } as any); if (res?.user?.isOnboarded === false) { setMode('register'); setRegStep(1); } } catch(e) {} }} className="py-5 rounded-[1.5rem] bg-bg-card border border-border-main flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-text-muted hover:bg-border-main hover:text-ink transition-all">
-                      <Github size={20} /> GitHub
-                    </button>
-                    <button onClick={async () => { try { const res: any = await socialAuth({ provider: 'google' } as any); if (res?.user?.isOnboarded === false) { setMode('register'); setRegStep(1); } } catch(e) {} }} className="py-5 rounded-[1.5rem] bg-bg-card border border-border-main flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-text-muted hover:bg-border-main hover:text-ink transition-all">
-                      <Globe size={20} /> Google
-                    </button>
-                  </div>
-                </div>
-              )}
             </motion.div>
           </AnimatePresence>
         </div>

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { adminController } from '../controllers/adminController';
+import { omniController } from '../controllers/omniController';
 import { authMiddleware, requireAdmin, requireModerator, requireStaff } from '../middleware/auth.js';
 
 const router = Router();
@@ -26,5 +27,9 @@ router.patch('/reviews/:reviewId/approve', authMiddleware, requireModerator, adm
 // Course Management
 router.get('/courses', authMiddleware, requireStaff, adminController.getAllCourses);
 router.patch('/courses/:courseId/status', authMiddleware, requireModerator, adminController.updateCourseStatus);
+
+// AI Gateway (OmniRoute)
+router.get('/omni/stats', authMiddleware, requireAdmin, omniController.getStats);
+router.get('/omni/logs', authMiddleware, requireAdmin, omniController.getLogs);
 
 export default router;

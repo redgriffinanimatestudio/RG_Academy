@@ -1,10 +1,12 @@
-import { PrismaClient } from '../../generated/prisma/client.js';
+import { createRequire } from 'node:module';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
-import * as mariadb from 'mariadb';
+
+const require = createRequire(import.meta.url);
+const { PrismaClient } = require('../../generated/prisma');
 
 const adapter = new PrismaMariaDb(process.env.DATABASE_URL || '');
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+const globalForPrisma = global as unknown as { prisma: InstanceType<typeof PrismaClient> };
 
 export const prisma = globalForPrisma.prisma || new PrismaClient({
   adapter,
@@ -13,4 +15,5 @@ export const prisma = globalForPrisma.prisma || new PrismaClient({
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
+export { PrismaClient };
 export default prisma;

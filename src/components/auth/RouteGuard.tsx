@@ -60,10 +60,24 @@ export default function RouteGuard({ children }: RouteGuardProps) {
       return;
     }
 
-    // 4. ACTIVE (Fully Activated) -> Semantic Sector Routing
+    // 4. ACTIVE (Fully Activated) -> Verification Check
     if (user.registrationStatus === 'ACTIVE') {
-      // Prevent loop or redundant waitlist access
-      if (isWaitlistPath || isRootPath || isAuthPage) {
+      const isVerifyPath = path.includes('/verify');
+      
+      if (!user.isVerified) {
+        if (!isVerifyPath) {
+          const verifyPath = `/${lang}/verify`;
+          if (path !== verifyPath && lastNav.current !== verifyPath) {
+            lastNav.current = verifyPath;
+            navigate(verifyPath, { replace: true });
+          }
+        }
+        return;
+      }
+
+      // 5. Fully Verified -> Semantic Sector Routing
+      // Prevent loop or redundant waitlist/verify access
+      if (isWaitlistPath || isRootPath || isAuthPage || isVerifyPath) {
         const sector = user.selectedPath || 'ACADEMY';
         const prefix = sector === 'ACADEMY' ? 'aca' : sector.toLowerCase();
         const targetSectorPath = `/${prefix}/${lang}`;

@@ -1,21 +1,27 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { 
+  Box, Video, UserPlus, Cpu, MessageSquare, Users, GraduationCap, Shield, Target, LayoutDashboard, Zap, DollarSign, LifeBuoy, BarChart3, Binary, Briefcase, ClipboardList, TrendingUp, Landmark, ShieldCheck, HeartPulse, Terminal, Key, Activity, Settings, Database, Filter, Globe, Layers, Lock, Monitor, Share2, Smartphone, Map, Brain
+} from 'lucide-react';
 import Layout from './components/Layout';
 import Academy from './pages/Academy/AcademyPage';
 import CourseDetail from './pages/CourseDetail';
 import Learn from './pages/Learn';
 import CourseBuilder from './pages/Academy/CourseBuilder';
+import CourseEditor from './pages/Academy/CourseEditor';
 import Studio from './pages/Studio/StudioPage';
 import NeuralStudio from './pages/Studio/NeuralStudio';
 import Community from './pages/Community/CommunityPage';
+import RoadmapPage from './pages/Academy/RoadmapPage';
+import NeuralForge from './pages/Dashboard/NeuralForge';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Messages from './pages/Messages';
 import Dashboard from './pages/Dashboard/DashboardController';
+import SpecialistProfile from './pages/SpecialistProfile';
 import TopicPage from './pages/TopicPage';
 import ServicePage from './pages/ServicePage';
 import CommunityTopic from './pages/CommunityTopic';
-import SpecialistProfile from './pages/SpecialistProfile';
 import Contracts from './pages/Contracts';
 import InfoPage from './pages/InfoPage';
 import DevDashboard from './pages/DevDashboard';
@@ -23,6 +29,7 @@ import TrajectoryPage from './pages/Trajectory';
 import AssetReview from './pages/AssetReview';
 import Finance from './pages/Finance';
 import WelcomeWaitlist from './pages/Dashboard/WelcomeWaitlist';
+import VerificationFlow from './components/auth/VerificationFlow';
 import RouteGuard from './components/auth/RouteGuard';
 import { AlertProvider } from './components/Alert';
 import GlobalSearchOverlay from './components/search/GlobalSearchOverlay';
@@ -88,11 +95,14 @@ export default function App() {
                   {/* Main Routes */}
                   <Route path="/:lang" element={<LanguageWrapper><Layout><RouteGuard><Home /></RouteGuard></Layout></LanguageWrapper>} />
                   <Route path="/:lang/dev" element={<LanguageWrapper><Layout><DevDashboard /></Layout></LanguageWrapper>} />
-                  <Route path="/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />
+                  <Route path="/:lang/dashboard" element={<LanguageWrapper><RouteGuard><Dashboard /></RouteGuard></LanguageWrapper>} />
+                  <Route path="/:lang/dashboard/neural-forge" element={<LanguageWrapper><RouteGuard><Layout><NeuralForge /></Layout></RouteGuard></LanguageWrapper>} />
+                  <Route path="/:lang/profile" element={<LanguageWrapper><RouteGuard><SpecialistProfile /></RouteGuard></LanguageWrapper>} />
                   <Route path="/:lang/dashboard/welcome-waitlist" element={<LanguageWrapper><WelcomeWaitlist /></LanguageWrapper>} />
                   <Route path="/:lang/finance" element={<LanguageWrapper><Layout><Finance /></Layout></LanguageWrapper>} />
                   <Route path="/:lang/login" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
                   <Route path="/:lang/register" element={<LanguageWrapper><Layout><Login /></Layout></LanguageWrapper>} />
+                  <Route path="/:lang/verify" element={<LanguageWrapper><VerificationFlow /></LanguageWrapper>} />
                   
                   {/* Redirect legacy specific routes to unified dashboard */}
                   <Route path="/:lang/admin" element={<RedirectWithLang to="/dashboard" />} />
@@ -106,9 +116,11 @@ export default function App() {
 
               {/* Academy Routes */}
               <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />
+              <Route path="/aca/:lang/roadmap" element={<LanguageWrapper><Layout><RoadmapPage /></Layout></LanguageWrapper>} />
               <Route path="/aca/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><TopicPage /></Layout></LanguageWrapper>} />
               <Route path="/aca/:lang/course/:slug" element={<LanguageWrapper><Layout><CourseDetail /></Layout></LanguageWrapper>} />
               <Route path="/aca/:lang/workshop" element={<LanguageWrapper><Layout><CourseBuilder /></Layout></LanguageWrapper>} />
+              <Route path="/aca/:lang/workshop/:courseId" element={<LanguageWrapper><Layout><CourseEditor /></Layout></LanguageWrapper>} />
               <Route path="/aca/:lang/community" element={<LanguageWrapper><Layout><Community /></Layout></LanguageWrapper>} />
               <Route path="/aca/:lang/messages" element={<LanguageWrapper><Layout><Messages /></Layout></LanguageWrapper>} />
               <Route path="/aca/:lang/dashboard" element={<LanguageWrapper><Layout><Dashboard /></Layout></LanguageWrapper>} />

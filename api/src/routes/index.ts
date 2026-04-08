@@ -22,6 +22,8 @@ import { authMiddleware } from '../middleware/auth';
 
 import dashboardRoutes from './dashboard';
 
+import { systemController } from '../controllers/systemController';
+
 const router = Router();
 
 // Logging middleware
@@ -34,6 +36,12 @@ router.use((req, res, next) => {
 router.get('/health', (req, res) => {
   res.json({ status: 'active', timestamp: new Date().toISOString(), version: '2.6.0' });
 });
+
+// Monitoring endpoints (Frontend Compatibility)
+router.get('/monitoring/health', (req, res) => systemController.getMonitoringHealth(req, res));
+router.get('/sync/cloud', (req, res) => systemController.getCloudSyncStatus(req, res));
+router.get('/health/degradation', (req, res) => systemController.getHealthDegradation(req, res));
+router.get('/token-health', (req, res) => systemController.getTokenHealth(req, res));
 
 // Explicit Role Switch Route (Fixing 404)
 router.post('/switch-role', authMiddleware, authController.switchRole);

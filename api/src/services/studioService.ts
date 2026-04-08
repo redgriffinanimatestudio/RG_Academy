@@ -46,11 +46,12 @@ export interface Contract {
   clientId: string;
   executorId: string;
   amount: number;
-  status: 'active' | 'completed' | 'disputed' | 'cancelled';
+  status: 'pending' | 'active' | 'completed' | 'disputed' | 'cancelled';
   milestones: {
     title: string;
     amount: number;
-    status: 'pending' | 'released' | 'disputed';
+    status: 'pending' | 'released' | 'disputed' | 'paid';
+    description?: string;
   }[];
   createdAt: any;
 }
@@ -127,6 +128,11 @@ export const studioService = {
     }
 
     return await createInLegacy();
+  },
+
+  async updateProjectStatus(projectId: string, status: string): Promise<any> {
+    const { data } = await apiClient.patch(`${API_V1}/projects/${projectId}/status`, { status });
+    return data;
   },
 
   // --- Contracts Module ---

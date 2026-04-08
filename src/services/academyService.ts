@@ -25,6 +25,8 @@ export interface Course {
   lod?: number;
   softwareStack?: { name: string; version?: string }[];
   tags: string[];
+  whatYouWillLearn?: string | string[];
+  requirements?: string | string[];
   status: 'draft' | 'published' | 'archived';
   createdAt: string;
 }
@@ -182,7 +184,8 @@ export const academyService = {
   },
 
   async savePlaybackPosition(enrollmentId: string, lessonId: string, seconds: number): Promise<void> {
-    await apiClient.post(`/enrollments/${enrollmentId}/analytics/sync`, {
+    await apiClient.post(`/v1/analytics/sync`, {
+      enrollmentId,
       lessonId,
       seconds: Math.floor(seconds)
     });
