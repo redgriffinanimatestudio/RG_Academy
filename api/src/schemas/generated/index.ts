@@ -1,5 +1,7 @@
 import { z } from 'zod';
-import { Prisma } from '../../../generated/prisma/client';
+import * as PrismaClient from '../../../generated/prisma/client.ts';
+
+const Prisma = PrismaClient.Prisma;
 
 /////////////////////////////////////////
 // HELPER FUNCTIONS
