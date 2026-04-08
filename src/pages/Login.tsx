@@ -253,7 +253,7 @@ const Login: React.FC = () => {
       navigate(`/${lang}/dashboard`);
     } catch (err: any) {
       console.error('❌ [REGISTRATION] Failure during final submission:', err);
-      setError(err.response?.data?.error || 'Registration failed: Internal Server Error or Connection Issue');
+      setError(err?.message || err.response?.data?.error || 'Registration failed: Internal Server Error or Connection Issue');
     } finally {
       setIsLoading(false);
     }

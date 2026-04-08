@@ -79,7 +79,12 @@ export const authService = {
       this.saveSession(result.token, result.user);
       return result;
     } catch (e: any) {
-      throw new Error(e.response?.data?.error || 'Registration failed');
+      const serverError = e.response?.data?.error;
+      const serverDetails = e.response?.data?.details;
+      const validationDetails = Array.isArray(serverDetails?.details)
+        ? serverDetails.details.map((item: any) => `${item.path}: ${item.message}`).join('; ')
+        : '';
+      throw new Error(serverError || validationDetails || 'Registration failed');
     }
   },
 

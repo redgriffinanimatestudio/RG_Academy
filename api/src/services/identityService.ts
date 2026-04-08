@@ -28,8 +28,9 @@ export const identityService = {
     const roles = role === 'admin' ? ['admin', 'student', 'lecturer'] : [role || 'student'];
     const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
     const normalizedSelectedPath = normalizeSectorPath(selectedPath, role);
+    const consentSignature = signature || Buffer.from(`SIGNED_BY_${email}_AT_${Date.now()}`).toString('base64');
 
-    return await prisma.$transaction(async (tx) => {
+    const newUser = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
         data: {
           email,
@@ -77,20 +78,23 @@ export const identityService = {
         },
         include: { profile: true }
       });
-
-      await tx.userDocument.create({
-        data: {
-          userId: newUser.id,
-          type: 'CONSENT',
-          title: 'Grid Membership Protocol & Privacy Policy',
-          status: 'SIGNED',
-          signature: signature || Buffer.from(`SIGNED_BY_${newUser.email}_AT_${Date.now()}`).toString('base64'),
-          content: `User ${newUser.email} signed the RG Academy Terms and Privacy Policy version 1.0.0 via manual registration.`
-        }
-      });
-
-      return { user: newUser, roles };
+      return newUser;
     });
+
+    await prisma.userDocument.create({
+      data: {
+        userId: newUser.id,
+        type: 'CONSENT',
+        title: 'Grid Membership Protocol & Privacy Policy',
+        status: 'SIGNED',
+        signature: consentSignature,
+        content: `User ${newUser.email} signed the RG Academy Terms and Privacy Policy version 1.0.0 via manual registration.`
+      }
+    }).catch((err: any) => {
+      console.warn('[AUTH] UserDocument creation skipped during registration:', err?.message || err);
+    });
+
+    return { user: newUser, roles };
   },
 
   async synchronizeSocialIdentity({ provider, payload }: any) {
@@ -129,17 +133,18 @@ export const identityService = {
           },
           include: { profile: true }
         });
-
-        await tx.socialConnection.create({
-          data: {
-            userId: newUser.id,
-            provider: provider.toUpperCase(),
-            remoteId: remoteId.toString(),
-            profileData: JSON.stringify(socialData)
-          }
-        });
-
         return newUser;
+      });
+
+      await prisma.socialConnection.create({
+        data: {
+          userId: user.id,
+          provider: provider.toUpperCase(),
+          remoteId: remoteId.toString(),
+          profileData: JSON.stringify(socialData)
+        }
+      }).catch((err: any) => {
+        console.warn('[AUTH] SocialConnection creation skipped:', err?.message || err);
       });
     } else {
       await prisma.user.update({
@@ -164,7 +169,7 @@ export const identityService = {
   },
 
   async finalizeOnboarding(userId: string, userEmail: string, { role, chosenPathId, profileData, signature }: any) {
-    return await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const updateData: any = {
         role,
         primaryRole: role,
@@ -215,17 +220,6 @@ export const identityService = {
         });
       }
 
-      await tx.userDocument.create({
-        data: {
-          userId: userId,
-          type: 'CONSENT',
-          title: 'Neural Identity Agreement & Grid Compliance',
-          status: 'SIGNED',
-          signature: signature || Buffer.from(`SIGNED_BY_${userEmail}_AT_${Date.now()}`).toString('base64'),
-          content: `User ${userEmail} successfully completed the professional onboarding protocol and accepted all legal terms.`
-        }
-      });
-
       const updatedUser = await tx.user.findUnique({
         where: { id: userId },
         include: { profile: true }
@@ -233,5 +227,20 @@ export const identityService = {
 
       return { user: updatedUser, roles: JSON.parse(updatedUser?.roles || '[]') };
     });
+
+    await prisma.userDocument.create({
+      data: {
+        userId: userId,
+        type: 'CONSENT',
+        title: 'Neural Identity Agreement & Grid Compliance',
+        status: 'SIGNED',
+        signature: signature || Buffer.from(`SIGNED_BY_${userEmail}_AT_${Date.now()}`).toString('base64'),
+        content: `User ${userEmail} successfully completed the professional onboarding protocol and accepted all legal terms.`
+      }
+    }).catch((err: any) => {
+      console.warn('[AUTH] Onboarding UserDocument creation skipped:', err?.message || err);
+    });
+
+    return result;
   }
 };
