@@ -21,13 +21,17 @@
 
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', async () => {
-          if (isLocalDev) {
-            const registrations = await navigator.serviceWorker.getRegistrations();
-            await Promise.all(registrations.map((registration) => registration.unregister()));
-            return;
-          }
+          try {
+            if (isLocalDev) {
+              const registrations = await navigator.serviceWorker.getRegistrations();
+              await Promise.allSettled(registrations.map((registration) => registration.unregister()));
+              return;
+            }
 
-          navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+            await navigator.serviceWorker.register('/sw.js');
+          } catch (err) {
+            console.log('SW setup skipped:', err);
+          }
         });
       }
     </script>
