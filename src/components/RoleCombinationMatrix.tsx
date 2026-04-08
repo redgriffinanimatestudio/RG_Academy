@@ -18,6 +18,19 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useAlert } from './Alert';
 
+const normalizeRoles = (roles: unknown): string[] => {
+  if (Array.isArray(roles)) return roles;
+  if (typeof roles === 'string' && roles.trim()) {
+    try {
+      const parsed = JSON.parse(roles);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      return roles.split(',').map(role => role.trim()).filter(Boolean);
+    }
+  }
+  return [];
+};
+
 const PERMS: Record<string, any> = {
   s: {
     id: 'student',
@@ -197,10 +210,11 @@ export const RoleCombinationMatrix = () => {
 
   // Initialize from user profile if available
   React.useEffect(() => {
-    if (profile?.roles && profile.roles.length > 0) {
+    const profileRoles = normalizeRoles(profile?.roles);
+    if (profileRoles.length > 0) {
       // Map full role names back to short keys (s, l, c, e)
       const mapped = new Set<string>();
-      profile.roles.forEach(r => {
+      profileRoles.forEach(r => {
         if (r === 'student') mapped.add('s');
         if (r === 'lecturer') mapped.add('l');
         if (r === 'client') mapped.add('c');

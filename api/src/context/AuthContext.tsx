@@ -17,6 +17,19 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const normalizeRoles = (roles: unknown): string[] => {
+  if (Array.isArray(roles)) return roles;
+  if (typeof roles === 'string' && roles.trim()) {
+    try {
+      const parsed = JSON.parse(roles);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      return roles.split(',').map(role => role.trim()).filter(Boolean);
+    }
+  }
+  return ['student'];
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeRole, setActiveRoleState] = useState<UserRole | null>(null);
@@ -31,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       photoURL: dbUser.photoURL,
       role: dbUser.role,
       primaryRole: dbUser.primaryRole,
-      roles: dbUser.roles || ['student'],
+      roles: normalizeRoles(dbUser.roles || dbUser.role),
       isAdmin: dbUser.isAdmin,
       isStudent: dbUser.isStudent,
       isLecturer: dbUser.isLecturer,

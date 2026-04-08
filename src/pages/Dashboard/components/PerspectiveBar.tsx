@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 
 interface PerspectiveBarProps {
-  roles: string[];
+  roles: string[] | string;
   activeRole: string | null;
   onSwitch: (role: string) => void;
 }
@@ -25,6 +25,18 @@ const ROLE_CONFIG: Record<string, { icon: any; label: string; color: string }> =
 };
 
 export default function PerspectiveBar({ roles, activeRole, onSwitch }: PerspectiveBarProps) {
+  const normalizedRoles = Array.isArray(roles)
+    ? roles
+    : (() => {
+        if (typeof roles !== 'string' || !roles.trim()) return ['student'];
+        try {
+          const parsed = JSON.parse(roles);
+          return Array.isArray(parsed) ? parsed : roles.split(',').map(role => role.trim()).filter(Boolean);
+        } catch {
+          return roles.split(',').map(role => role.trim()).filter(Boolean);
+        }
+      })();
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -39,7 +51,7 @@ export default function PerspectiveBar({ roles, activeRole, onSwitch }: Perspect
         </span>
 
         <div className="flex items-center gap-4 relative z-10">
-          {roles.map((role) => {
+          {normalizedRoles.map((role) => {
             const config = ROLE_CONFIG[role] || { icon: Shield, label: role, color: '#fff' };
             const isActive = activeRole === role;
             const Icon = config.icon;

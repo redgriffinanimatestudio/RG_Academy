@@ -3,6 +3,19 @@ import prisma from '../utils/prisma.js';
 import { success, error, paginate } from '../utils/response';
 import { AuthRequest } from '../middleware/auth';
 
+const normalizeRoles = (roles: unknown): string[] => {
+  if (Array.isArray(roles)) return roles;
+  if (typeof roles === 'string' && roles.trim()) {
+    try {
+      const parsed = JSON.parse(roles);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      return roles.split(',').map(role => role.trim()).filter(Boolean);
+    }
+  }
+  return ['student'];
+};
+
 export const adminController = {
   // --- DASHBOARD STATS ---
   async getStats(req: Request, res: Response) {
@@ -143,7 +156,12 @@ export const adminController = {
         prisma.user.count({ where })
       ]);
 
-      return paginate(res, users, total, pageNum, limitNum);
+      const normalizedUsers = users.map(user => ({
+        ...user,
+        roles: normalizeRoles((user as any).roles)
+      }));
+
+      return paginate(res, normalizedUsers, total, pageNum, limitNum);
     } catch (e) {
       return error(res, 'Failed to fetch users');
     }
@@ -174,7 +192,7 @@ export const adminController = {
         data: dataToUpdate
       });
 
-      return success(res, user);
+      return success(res, { ...user, roles: normalizeRoles(user.roles) });
     } catch (e) {
       return error(res, 'Failed to update user role');
     }
@@ -205,7 +223,7 @@ export const adminController = {
         }
       });
       
-      return success(res, user, 201);
+      return success(res, { ...user, roles: normalizeRoles(user.roles) }, 201);
     } catch (e) {
       if (e.code === 'P2002') return error(res, 'Email already exists', 409);
       return error(res, 'Failed to create user');
@@ -222,7 +240,7 @@ export const adminController = {
         data: { displayName, email }
       });
       
-      return success(res, user);
+      return success(res, { ...user, roles: normalizeRoles(user.roles) });
     } catch (e) {
       return error(res, 'Failed to update user profile');
     }

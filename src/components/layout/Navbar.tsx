@@ -25,6 +25,19 @@ interface NavbarProps {
 
 import { LANGUAGES } from './Layout.constants';
 
+const normalizeRoles = (roles: unknown): string[] => {
+  if (Array.isArray(roles)) return roles;
+  if (typeof roles === 'string' && roles.trim()) {
+    try {
+      const parsed = JSON.parse(roles);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      return roles.split(',').map(role => role.trim()).filter(Boolean);
+    }
+  }
+  return [];
+};
+
 export default function Navbar({ 
   isStudio, isAcademy, isCommunity, isDashboardPage, 
   modePrefix, modeColor, modeBg, unreadCount, onOpenMobileMenu 
@@ -42,6 +55,7 @@ export default function Navbar({
   const currentLang = LANGUAGES.find(l => l.code === currentLangCode) || LANGUAGES[0];
 
   const cartCount = platformData?.cart?.length || 0;
+  const profileRoles = normalizeRoles(profile?.roles);
 
   const changeLanguage = (newLang: string) => {
     const pathParts = window.location.pathname.split('/').filter(Boolean);
@@ -161,7 +175,7 @@ export default function Navbar({
 
                           <div className="px-8 py-3">
                             <p className="text-[8px] font-black text-text-muted opacity-40 uppercase mb-3 leading-none">Switch identity</p>
-                            {profile.roles.map(r => (
+                            {profileRoles.map(r => (
                               <button key={r} onClick={() => { setActiveRole(r as any); setIsUserMenuOpen(false); navigate(getDashboardLinkForRole(r)); }} className={`w-full text-left px-3 py-2.5 rounded-xl text-[9px] font-black uppercase flex items-center gap-3 transition-all ${activeRole === r ? 'text-emerald-600 bg-emerald-500/10 shadow-sm' : 'text-text-muted opacity-40 hover:bg-bg-dark/5'}`}>
                                 <div className={`size-1.5 rounded-full ${activeRole === r ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]' : 'bg-border-main'}`} /> {r.replace('_', ' ')}
                               </button>

@@ -17,6 +17,19 @@ import { useAuth } from '../../../context/AuthContext';
 import { adminService } from '../../../services/adminService';
 import Preloader from '../../../components/Preloader';
 
+const normalizeRoles = (roles: unknown): string[] => {
+  if (Array.isArray(roles)) return roles;
+  if (typeof roles === 'string' && roles.trim()) {
+    try {
+      const parsed = JSON.parse(roles);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      return roles.split(',').map(role => role.trim()).filter(Boolean);
+    }
+  }
+  return [];
+};
+
 interface AdminDashboardProps {
   stats?: any;
   activeRole: string;
@@ -148,7 +161,7 @@ export default function AdminDashboard({ stats, activeRole, setActiveRole }: Adm
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex flex-wrap gap-2">
-                                                {(user.roles || []).map((r: string) => (
+                                                {normalizeRoles(user.roles).map((r: string) => (
                                                     <span key={r} className="text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-white/40">{r}</span>
                                                 ))}
                                             </div>

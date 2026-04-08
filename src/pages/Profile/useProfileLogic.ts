@@ -8,6 +8,19 @@ import { useAlert } from '../../components/Alert';
 
 export type ProfileTab = 'about' | 'portfolio' | 'experience' | 'education' | 'reviews';
 
+const normalizeRoles = (roles: unknown): string[] => {
+  if (Array.isArray(roles)) return roles;
+  if (typeof roles === 'string' && roles.trim()) {
+    try {
+      const parsed = JSON.parse(roles);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      return roles.split(',').map(role => role.trim()).filter(Boolean);
+    }
+  }
+  return ['student'];
+};
+
 export function useProfileLogic() {
   const { id, lang } = useParams();
   const { t } = useTranslation();
@@ -49,7 +62,7 @@ export function useProfileLogic() {
 
   const synergyBadges = useMemo(() => {
     if (!profile) return [];
-    const roles = profile.roles || [];
+    const roles = normalizeRoles(profile.roles);
     const badges = [];
 
     const isL = roles.includes('lecturer') || roles.includes('admin');
@@ -82,7 +95,7 @@ export function useProfileLogic() {
           location: currentUserProfile.country || 'Remote',
           skills: [],
           portfolio: [],
-          roles: currentUserProfile.roles || [],
+          roles: normalizeRoles(currentUserProfile.roles),
           user: {
             displayName: currentUserProfile.displayName || 'User',
             photoURL: currentUserProfile.photoURL || undefined
@@ -111,9 +124,7 @@ export function useProfileLogic() {
             const resData = await response.json();
             const userData = resData.data || resData;
             let userRoles = ['student'];
-            if (userData.roles) {
-              userRoles = Array.isArray(userData.roles) ? userData.roles : JSON.parse(userData.roles);
-            }
+            userRoles = normalizeRoles(userData.roles);
             setProfile({
               id: userData.id,
               userId: userData.id,

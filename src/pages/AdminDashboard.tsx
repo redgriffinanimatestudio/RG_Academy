@@ -9,6 +9,19 @@ import {
 } from 'lucide-react';
 import { adminService } from '../services/adminService';
 
+const normalizeRoles = (roles: unknown): string[] => {
+  if (Array.isArray(roles)) return roles;
+  if (typeof roles === 'string' && roles.trim()) {
+    try {
+      const parsed = JSON.parse(roles);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      return roles.split(',').map(role => role.trim()).filter(Boolean);
+    }
+  }
+  return [];
+};
+
 // --- ADMIN DASHBOARD CONTENT ---
 
 export function AdminDashboardContentInternal({ activeModule, theme, user }: any) {
@@ -220,9 +233,8 @@ function AdminUsers({ theme }: any) {
               <tr><td colSpan={4} className="py-20 text-center text-white/10 uppercase font-black tracking-widest">No entities found</td></tr>
             ) : users.map((u) => {
               let userRoles = [];
-              try {
-                userRoles = JSON.parse(u.roles || '[]');
-              } catch (e) {
+              userRoles = normalizeRoles(u.roles);
+              if (userRoles.length === 0 && u.role) {
                 userRoles = [u.role];
               }
 

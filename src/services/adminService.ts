@@ -58,6 +58,19 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
 };
 
 export const adminService = {
+  normalizeRoles(roles: unknown): UserRole[] {
+    if (Array.isArray(roles)) return roles as UserRole[];
+    if (typeof roles === 'string' && roles.trim()) {
+      try {
+        const parsed = JSON.parse(roles);
+        if (Array.isArray(parsed)) return parsed as UserRole[];
+      } catch {
+        return roles.split(',').map(role => role.trim()).filter(Boolean) as UserRole[];
+      }
+    }
+    return [];
+  },
+
   hasPermission(roles: UserRole[], permission: Permission): boolean {
     return roles.some(role => ROLE_PERMISSIONS[role]?.includes(permission));
   },
@@ -90,7 +103,10 @@ export const adminService = {
     const { data } = await apiClient.get(`/v1/admin/users`, {
       params: { page, search, role }
     });
-    return data.success ? { users: data.data, total: data.meta?.total } : data;
+    const users = Array.isArray(data?.data)
+      ? data.data.map((user: any) => ({ ...user, roles: adminService.normalizeRoles(user.roles) }))
+      : [];
+    return data.success ? { users, total: data.meta?.total } : data;
   },
 
   async updateUserRole(userId: string, role: string, roles: string[]): Promise<any> {

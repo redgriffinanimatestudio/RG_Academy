@@ -19,6 +19,19 @@ import LecturerDashboard from './roles/LecturerDashboard';
 import RoleGuard from './components/RoleGuard';
 import PerspectiveBar from './components/PerspectiveBar';
 
+const normalizeRoles = (roles: unknown): string[] => {
+  if (Array.isArray(roles)) return roles;
+  if (typeof roles === 'string' && roles.trim()) {
+    try {
+      const parsed = JSON.parse(roles);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      return roles.split(',').map(role => role.trim()).filter(Boolean);
+    }
+  }
+  return ['student'];
+};
+
 export default function DashboardController() {
   const { profile, activeRole, setActiveRole, loading } = useAuth();
   const { lang } = useParams();
@@ -34,9 +47,10 @@ export default function DashboardController() {
     if (!profile || !perspective) return;
     
     // Industrial Oversight: Admins can force any perspective
+    const profileRoles = normalizeRoles(profile.roles);
     const effectiveRoles = profile.isAdmin 
-      ? [...new Set([...profile.roles, 'agency', 'hr', 'finance', 'support', 'manager', 'moderator', 'chief_manager'])]
-      : profile.roles;
+      ? [...new Set([...profileRoles, 'agency', 'hr', 'finance', 'support', 'manager', 'moderator', 'chief_manager'])]
+      : profileRoles;
 
     if (perspective !== activeRole && effectiveRoles.includes(perspective)) {
       console.log(`[Dashboard] Syncing state to URL perspective: ${perspective}`);
@@ -136,10 +150,10 @@ export default function DashboardController() {
         
         {/* Identity Switcher - Horizontal Scroll on Mobile */}
         <div className="mb-6 sm:mb-10 overflow-x-auto no-scrollbar pb-2 sm:pb-0 neural-panel p-2 backdrop-blur-2xl">
-          <PerspectiveBar 
+          <PerspectiveBar
             roles={profile.isAdmin 
               ? ['admin', 'student', 'executor', 'hr', 'finance', 'support', 'agency', 'manager', 'chief_manager', 'moderator']
-              : profile.roles
+              : normalizeRoles(profile.roles)
             } 
             activeRole={activeRole} 
             onSwitch={(role) => {
