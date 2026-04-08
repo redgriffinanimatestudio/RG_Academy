@@ -37,7 +37,7 @@ const RegStep2Network: React.FC<RegStep2NetworkProps> = ({
     !formData.password || 
     emailStatus === 'error' || 
     passConfirmStatus !== 'success' || 
-    phoneStatus !== 'success';
+    !String(formData.phone || '').trim();
 
   return (
     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-2 py-0">

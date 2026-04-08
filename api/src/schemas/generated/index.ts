@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Prisma } from './prisma-runtime.js';
+import { Prisma } from '../../../generated/prisma/client';
 
 /////////////////////////////////////////
 // HELPER FUNCTIONS

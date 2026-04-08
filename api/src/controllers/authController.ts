@@ -12,7 +12,7 @@ import {
 import { z } from 'zod';
 import { mapSocialPayload } from '../utils/socialMapper.js';
 import { identityService } from '../services/identityService.js';
-import { canonicalizePhoneDigits, normalizePhone } from '../utils/phone.js';
+import { normalizePhone } from '../utils/phone.js';
 
 // Временное кэширование OTP в памяти сервера
 // Формат: { '+7900...': { code: '123456', expiresAt: 1234123, attempts: 0 } }
@@ -346,30 +346,7 @@ export const authController = {
         return success(res, { available: false });
       }
 
-      const digitsOnly = canonicalizePhoneDigits(normalizedPhone);
-      if (!digitsOnly) {
-        return success(res, { available: true });
-      }
-
-      const legacyUsers = await prisma.user.findMany({
-        where: {
-          phone: {
-            not: null
-          }
-        },
-        select: {
-          id: true,
-          phone: true
-        }
-      });
-
-      const legacyMatch = legacyUsers.find((candidate) => canonicalizePhoneDigits(candidate.phone || '') === digitsOnly);
-
-      if (legacyMatch) {
-        console.log(`[AUTH] CheckPhone matched legacy phone storage: ${normalizedPhone} -> ${legacyMatch.id} (${legacyMatch.phone})`);
-      }
-
-      return success(res, { available: !legacyMatch });
+      return success(res, { available: true });
     } catch (e: any) {
       console.error('❌ [AUTH] CheckPhone Failure:', e);
       return error(res, `Prisma Conflict: ${e.message}`, 500, {

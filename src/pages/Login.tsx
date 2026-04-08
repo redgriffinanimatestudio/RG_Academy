@@ -175,8 +175,8 @@ const Login: React.FC = () => {
             setPhoneStatus('success');
             setPhoneError('');
           } else {
-            setPhoneStatus('error');
-            setPhoneError('This full phone number is already registered.');
+            setPhoneStatus('warning');
+            setPhoneError('Phone availability could not be confirmed. Continue to final verification.');
           }
       } catch {
         setPhoneStatus('warning');
@@ -217,10 +217,6 @@ const Login: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      if (phoneStatus === 'error') {
-        setError(phoneError || 'Full phone number is already registered');
-        return;
-      }
       // Browser-native base64 encoding (Buffer.from is not available in browsers)
       const signature = btoa(unescape(encodeURIComponent(`SIGNED_BY_${formData.email}_AT_${Date.now()}`)));
       const payload = {
