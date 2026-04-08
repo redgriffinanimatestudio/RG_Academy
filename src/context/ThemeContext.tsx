@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'light' | 'dark';
+type Theme = 'dark'; // Forced dark mode
 
 interface ThemeContextType {
   theme: Theme;
@@ -11,15 +11,12 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('rg-theme');
-    if (saved === 'light' || saved === 'dark') return saved;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  });
+  // Always initialize as dark
+  const [theme, setTheme] = useState<Theme>('dark');
 
   useEffect(() => {
-    localStorage.setItem('rg-theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('rg-theme', 'dark');
+    document.documentElement.setAttribute('data-theme', 'dark');
     
     // Add transition class to body to prevent flash on load
     document.body.classList.add('theme-transitioning');
@@ -31,9 +28,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [theme]);
 
   const toggleTheme = () => {
-    const nextTheme = theme === 'light' ? 'dark' : 'light';
-    console.log(`[Theme] Toggling to: ${nextTheme}`);
-    setTheme(nextTheme);
+    // No-op to prevent light mode switching
+    console.log(`[Theme] System is locked to Dark Mode for industrial consistency.`);
   };
 
   return (

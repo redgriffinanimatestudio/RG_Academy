@@ -146,8 +146,13 @@ export const authController = {
       if (!email) return error(res, 'Email is required for registration', 400);
 
       // Check for existing node (Prisma findUnique requires value)
-      let user = await prisma.user.findUnique({ where: { email } });
-      if (user) return res.status(400).json({ success: false, error: 'Node already active in grid' });
+      const existingByEmail = await prisma.user.findUnique({ where: { email } });
+      if (existingByEmail) return error(res, 'Email already exists', 409);
+
+      if (phone) {
+        const existingByPhone = await prisma.user.findUnique({ where: { phone } });
+        if (existingByPhone) return error(res, 'Phone already exists', 409);
+      }
 
       console.log(`[AUTH] Industrializing request for: ${email} | Role: ${role} | Path: ${selectedPath}`);
 
@@ -161,6 +166,12 @@ export const authController = {
       });
     } catch (e: any) {
       console.error('❌ [AUTH] Registration Critical Failure:', e);
+      if (e?.code === 'P2002') {
+        const target = Array.isArray(e?.meta?.target) ? e.meta.target.join(', ') : e?.meta?.target;
+        if (String(target).includes('phone')) return error(res, 'Phone already exists', 409);
+        if (String(target).includes('email')) return error(res, 'Email already exists', 409);
+        return error(res, 'Duplicate record already exists', 409);
+      }
       return error(res, `Registration failed: ${e.message || 'Internal Error'}`, 500, { message: e.message, stack: e.stack });
     }
   },
@@ -293,6 +304,23 @@ export const authController = {
         code: e.code, 
         meta: e.meta,
         stack: e.stack 
+      });
+    }
+  },
+
+  async checkPhone(req: Request, res: Response) {
+    try {
+      const { phone } = req.body;
+      if (!phone) return success(res, { available: true });
+
+      const user = await prisma.user.findUnique({ where: { phone } });
+      return success(res, { available: !user });
+    } catch (e: any) {
+      console.error('❌ [AUTH] CheckPhone Failure:', e);
+      return error(res, `Prisma Conflict: ${e.message}`, 500, {
+        code: e.code,
+        meta: e.meta,
+        stack: e.stack
       });
     }
   },

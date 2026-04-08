@@ -14,7 +14,8 @@ interface RegStep2NetworkProps {
   emailError: string;
   passStrength: 0 | 1 | 2 | 3;
   passConfirmStatus: 'none' | 'success' | 'error';
-  phoneStatus: 'none' | 'success' | 'warning' | 'error';
+  phoneStatus: 'none' | 'loading' | 'success' | 'warning' | 'error';
+  phoneError: string;
   onNext: () => void;
 }
 
@@ -26,6 +27,7 @@ const RegStep2Network: React.FC<RegStep2NetworkProps> = ({
   passStrength,
   passConfirmStatus,
   phoneStatus,
+  phoneError,
   onNext
 }) => {
   const { t } = useTranslation();
@@ -35,7 +37,7 @@ const RegStep2Network: React.FC<RegStep2NetworkProps> = ({
     !formData.password || 
     emailStatus === 'error' || 
     passConfirmStatus !== 'success' || 
-    phoneStatus === 'error';
+    phoneStatus !== 'success';
 
   return (
     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-2 py-0">
@@ -114,12 +116,14 @@ const RegStep2Network: React.FC<RegStep2NetworkProps> = ({
               <div className="flex-1 relative group">
                 <input 
                   type="tel"
+                  autoComplete="tel"
                   className={`w-full bg-black/60 border rounded-2xl py-3.5 px-6 text-white text-sm font-medium outline-none transition-all ${phoneStatus === 'error' ? 'border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : phoneStatus === 'success' ? 'border-emerald-500/30' : 'border-white/5 focus:border-primary/40 focus:ring-1 focus:ring-primary/20'}`}
                   placeholder="000 000 00 00"
                   value={formData.phone}
                   onChange={(e) => onChange('phone', e.target.value)}
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
+                   {phoneStatus === 'loading' && <div className="size-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_#3b82f6]" />}
                    {phoneStatus === 'success' && <div className="size-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]" />}
                    {phoneStatus === 'error' && <X size={14} className="text-red-500" />}
                    {phoneStatus === 'warning' && <Info size={14} className="text-yellow-500" />}
@@ -131,6 +135,11 @@ const RegStep2Network: React.FC<RegStep2NetworkProps> = ({
             <Info size={10} className="text-primary" />
             <p className="text-[8px] font-bold uppercase tracking-widest text-white/60 italic leading-none">Vessel requires SMS confirmation for neural activation.</p>
          </div>
+         {phoneError && (
+           <p className={`px-2 text-[9px] font-black uppercase tracking-widest ${phoneStatus === 'error' ? 'text-red-400' : phoneStatus === 'success' ? 'text-emerald-400' : 'text-yellow-400'}`}>
+             {phoneError}
+           </p>
+         )}
       </div>
       
       <div className="pt-4 space-y-6">

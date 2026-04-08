@@ -2,10 +2,32 @@ import prisma from '../utils/prisma.js';
 import bcrypt from 'bcryptjs';
 import { mapSocialPayload } from '../utils/socialMapper.js';
 
+type SectorPath = 'ACADEMY' | 'STUDIO' | 'COMMUNITY' | 'NONE';
+
+const normalizeSectorPath = (value: any, role?: string): SectorPath => {
+  const raw = String(value || '').trim();
+  const upper = raw.toUpperCase();
+
+  if (upper === 'ACADEMY' || upper === 'STUDIO' || upper === 'COMMUNITY' || upper === 'NONE') {
+    return upper as SectorPath;
+  }
+
+  if (raw === 'archviz' || raw === 'animator' || raw === 'game_artist') {
+    return 'ACADEMY';
+  }
+
+  if (role === 'student') return 'ACADEMY';
+  if (role === 'client' || role === 'executor') return 'STUDIO';
+  if (role === 'community' || role === 'moderator') return 'COMMUNITY';
+
+  return 'NONE';
+};
+
 export const identityService = {
   async registerUser({ email, displayName, phone, password, role, provider, profileData, signature, selectedPath, metadata }: any) {
     const roles = role === 'admin' ? ['admin', 'student', 'lecturer'] : [role || 'student'];
     const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
+    const normalizedSelectedPath = normalizeSectorPath(selectedPath, role);
 
     return await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
@@ -23,7 +45,7 @@ export const identityService = {
           isExecutor: role === 'executor',
           isOnboarded: false, // Wait for finalization
           registrationStatus: 'PENDING',
-          selectedPath: selectedPath || 'NONE',
+          selectedPath: normalizedSelectedPath,
           metadata: metadata || {},
           profile: {
             create: {
@@ -34,6 +56,7 @@ export const identityService = {
               telegramHandle: profileData?.telegramHandle,
               portfolioUrl: profileData?.portfolioUrl,
               gender: profileData?.gender,
+              chosenPathId: profileData?.chosenPathId,
               dateOfBirth: profileData?.dateOfBirth && !isNaN(Date.parse(profileData.dateOfBirth)) 
                 ? new Date(profileData.dateOfBirth) 
                 : undefined,
@@ -169,6 +192,7 @@ export const identityService = {
            telegramHandle: profileData.telegramHandle,
            portfolioUrl: profileData.portfolioUrl,
            gender: profileData.gender,
+           chosenPathId: profileData.chosenPathId || chosenPathId,
            dateOfBirth: profileData.dateOfBirth && !isNaN(Date.parse(profileData.dateOfBirth)) 
              ? new Date(profileData.dateOfBirth) 
              : undefined,
@@ -181,8 +205,7 @@ export const identityService = {
                 if (age < 13) return 'child';
                 if (age < 18) return 'teen';
                 return 'adult';
-              })() : 'adult',
-            chosenPathId: chosenPathId
+              })() : 'adult'
         };
 
         await tx.profile.upsert({

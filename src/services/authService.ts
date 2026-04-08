@@ -41,6 +41,7 @@ export const authService = {
   // 2. ProductionDB Read (Primary)
   async getCurrentUser(): Promise<any | null> {
     try {
+      if (!this.getToken()) return null;
       const response = await apiClient.get('/auth/me');
       // Handle standard response wrapper { success: true, data: user }
       if (response.data && response.data.success) {
@@ -48,9 +49,16 @@ export const authService = {
       }
       return response.data; // Return top-level if no wrapper
     } catch (e: any) {
-      console.error('[AUTH] User verification failed:', e.message);
+      if (e?.response?.status !== 401) {
+        console.error('[AUTH] User verification failed:', e.message);
+      }
       return null;
     }
+  },
+
+  async checkPhone(phone: string): Promise<boolean> {
+    const { data } = await apiClient.post('/auth/check-phone', { phone });
+    return !!data?.data?.available;
   },
 
   // 3. Синхронизация: Для наполнения новой БД из внешних источников (OAuth/Firebase)

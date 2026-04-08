@@ -77,11 +77,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const initAuth = async () => {
     try {
       console.log("[AUTH] Initializing Auth...");
-      const response = await authService.getCurrentUser();
-      console.log("[AUTH] Get Current User Response:", response);
-      // Handle response wrapper { success: true, data: user }
-      const user = response?.success ? response.data : response;
-      
+      const cachedUser = localStorage.getItem('rg_user');
+      if (!authService.getToken() || !cachedUser) {
+        console.log("[AUTH] No token found, skipping session check");
+        setProfile(null);
+        setActiveRoleState(null);
+        return;
+      }
+      const user = JSON.parse(cachedUser);
+      console.log("[AUTH] Loaded user from cache:", user);
+
       if (user && (user.id || user.uid)) {
         console.log("[AUTH] Valid User Found:", user);
         const mappedProfile = mapProfile(user);

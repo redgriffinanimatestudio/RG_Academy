@@ -17,6 +17,7 @@ import { CyberCalendar } from '../components/auth/CyberCalendar';
 import { ALL_COUNTRIES } from '../utils/countries';
 import { useTranslation } from 'react-i18next';
 import apiClient from '../services/apiClient';
+import { authService } from '../services/authService';
 import Preloader from '../components/Preloader';
 import { SocialAuthButtons } from '../components/auth/SocialAuthButtons';
 import { useUserJourney } from '../hooks/useUserJourney';
@@ -82,7 +83,8 @@ const Login: React.FC = () => {
   const [emailError, setEmailError] = useState('');
   const [passStrength, setPassStrength] = useState<0 | 1 | 2 | 3>(0);
   const [passConfirmStatus, setPassConfirmStatus] = useState<'none' | 'success' | 'error'>('none');
-  const [phoneStatus, setPhoneStatus] = useState<'none' | 'success' | 'warning' | 'error'>('none');
+  const [phoneStatus, setPhoneStatus] = useState<'none' | 'loading' | 'success' | 'warning' | 'error'>('none');
+  const [phoneError, setPhoneError] = useState('');
   
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -136,9 +138,41 @@ const Login: React.FC = () => {
 
   // Phone validation
   useEffect(() => {
-    if (!formData.phone) { setPhoneStatus('none'); return; }
-    if (formData.phone.length >= 7) setPhoneStatus('success');
-    else setPhoneStatus('warning');
+    const rawPhone = String(formData.phone || '').trim();
+    const digits = rawPhone.replace(/\D/g, '');
+
+    if (!rawPhone) {
+      setPhoneStatus('none');
+      setPhoneError('');
+      return;
+    }
+
+    if (digits.length < 7 || digits.length > 15) {
+      setPhoneStatus('warning');
+      setPhoneError('Use 7-15 digits. Include only numbers and separators.');
+      return;
+    }
+
+    setPhoneStatus('loading');
+    setPhoneError('Checking phone availability...');
+
+    const timer = setTimeout(async () => {
+      try {
+        const available = await authService.checkPhone(rawPhone);
+        if (available) {
+          setPhoneStatus('success');
+          setPhoneError('');
+        } else {
+          setPhoneStatus('error');
+          setPhoneError('This phone number is already registered.');
+        }
+      } catch {
+        setPhoneStatus('warning');
+        setPhoneError('Phone format looks valid. Availability check unavailable.');
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
   }, [formData.phone]);
 
   const handleInputChange = (field: string, value: any) => {
@@ -171,6 +205,10 @@ const Login: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
+      if (phoneStatus === 'error') {
+        setError(phoneError || 'Phone number is already registered');
+        return;
+      }
       // Browser-native base64 encoding (Buffer.from is not available in browsers)
       const signature = btoa(unescape(encodeURIComponent(`SIGNED_BY_${formData.email}_AT_${Date.now()}`)));
       const payload = {
@@ -184,9 +222,10 @@ const Login: React.FC = () => {
           telegramHandle: formData.telegramHandle,
           portfolioUrl: formData.portfolioUrl,
           gender: formData.gender,
-          dateOfBirth: formData.dateOfBirth
+          dateOfBirth: formData.dateOfBirth,
+          chosenPathId: formData.selectedRole === 'student' ? formData.selectedSoul : undefined
         },
-        selectedPath: formData.selectedRole === 'student' ? formData.selectedSoul : journey.selectedPath,
+        selectedPath: formData.selectedRole === 'student' ? 'ACADEMY' : journey.selectedPath,
         metadata: {
           ...journey,
           registrationSource: 'industrial_forge'
@@ -293,8 +332,8 @@ const Login: React.FC = () => {
                     ) : (
                       <form onSubmit={handleLogin} className="space-y-8">
                         <div className="space-y-6">
-                          <InputWithStatus id="login-email" label="Account Identity" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} placeholder="name@domain.com" hint="Professional identity signature" status={emailStatus} icon={<User size={18} />} required />
-                          <InputWithStatus id="login-password" label="Security Password" type="password" value={formData.password} onChange={(e) => handleInputChange('password', e.target.value)} placeholder="••••••••" hint="Encrypted secure passkey" icon={<Lock size={18} />} required />
+                          <InputWithStatus id="login-email" label="Account Identity" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} placeholder="name@domain.com" hint="Professional identity signature" status={emailStatus} icon={<User size={18} />} autoComplete="email" required />
+                          <InputWithStatus id="login-password" label="Security Password" type="password" value={formData.password} onChange={(e) => handleInputChange('password', e.target.value)} placeholder="••••••••" hint="Encrypted secure passkey" icon={<Lock size={18} />} autoComplete="current-password" required />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                           <button type="submit" disabled={isLoading} className="bg-primary text-white py-5 rounded-[1.5rem] font-black uppercase tracking-[0.2em] text-[11px] hover:bg-emerald-600 transition-all hover:scale-[1.02] shadow-2xl shadow-primary/20 flex items-center justify-center gap-3 group relative overflow-hidden">
@@ -338,7 +377,7 @@ const Login: React.FC = () => {
                             
                             const offset = isStudent ? 1 : 0;
                             
-                            if (regStep === 2 + offset) return <RegStep2Network formData={formData} onChange={handleInputChange} emailStatus={emailStatus} emailError={emailError} passStrength={passStrength} passConfirmStatus={passConfirmStatus} phoneStatus={phoneStatus} onNext={() => setRegStep(3 + offset)} />;
+                            if (regStep === 2 + offset) return <RegStep2Network formData={formData} onChange={handleInputChange} emailStatus={emailStatus} emailError={emailError} passStrength={passStrength} passConfirmStatus={passConfirmStatus} phoneStatus={phoneStatus} phoneError={phoneError} onNext={() => setRegStep(3 + offset)} />;
                             if (regStep === 3 + offset) return <RegStep3Identity formData={formData} onChange={handleInputChange} onNext={() => setRegStep(4 + offset)} lang={lang} />;
                             if (regStep === 4 + offset) return <RegStep4Specs formData={formData} onChange={handleInputChange} onNext={() => setRegStep(5 + offset)} onSkip={() => setRegStep(5 + offset)} />;
                             if (regStep === 5 + offset) return <RegStep5Legal formData={formData} lang={lang} termsAccepted={termsAccepted} onToggleTerms={() => setTermsAccepted(!termsAccepted)} onFinalize={handleRegisterFinal} isLoading={isLoading} />;

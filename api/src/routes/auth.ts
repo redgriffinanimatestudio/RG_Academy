@@ -19,6 +19,7 @@ router.post('/login', validate(LoginSchema), authController.login);
 // Registration
 router.post('/register', validate(RegisterSchema), authController.register);
 router.post('/check-email', authController.checkEmail);
+router.post('/check-phone', authController.checkPhone);
 router.post('/social-auth', authController.socialAuth);
 
 // Fast OTP

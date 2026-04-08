@@ -1,12 +1,5 @@
-import { createRequire } from 'node:module';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
-
-// Polyfill for CJS/ESM compatibility
-const _require = typeof require !== 'undefined' 
-  ? require 
-  : createRequire(import.meta.url);
-
-const { PrismaClient } = _require('../../generated/prisma');
+import { PrismaClient } from '../../generated/prisma';
 
 const adapter = new PrismaMariaDb(process.env.DATABASE_URL || '');
 

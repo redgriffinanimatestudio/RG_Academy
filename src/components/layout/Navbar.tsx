@@ -94,25 +94,6 @@ export default function Navbar({
           </div>
 
           <div className="flex items-center gap-1 sm:gap-3">
-            {/* Theme Toggle */}
-            <button 
-              onClick={toggleTheme} 
-              className="p-2.5 rounded-xl bg-[var(--switcher-bg)] text-ink hover:text-emerald-500 transition-all active:scale-95 group shadow-sm border border-border-main"
-              title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={theme}
-                  initial={{ y: -10, opacity: 0, rotate: -45 }}
-                  animate={{ y: 0, opacity: 1, rotate: 0 }}
-                  exit={{ y: 10, opacity: 0, rotate: 45 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-                </motion.div>
-              </AnimatePresence>
-            </button>
-
             <div className="relative hidden sm:block">
               <button onClick={() => setIsLangMenuOpen(!isLangMenuOpen)} className={`p-2 transition-colors flex items-center gap-2 font-black text-[9px] sm:text-[10px] uppercase ${modeColor}`}>
                 <Globe size={18} className="w-4 h-4 sm:w-[18px] sm:h-[18px]" /><span className="hidden md:inline">{currentLang.code}</span>
