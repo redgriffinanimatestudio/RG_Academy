@@ -82,7 +82,7 @@ async function startServer() {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
         "script-src": ["'self'", "'unsafe-inline'", "https://locize.com"],
         "img-src": ["'self'", "data:", "https:", "https://cdn.flyonui.com"],
-        "connect-src": ["'self'", "https://locize.com", "https://api.locize.com", "ws://localhost:24678", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://ipapi.co"],
+        "connect-src": ["'self'", "https://locize.com", "https://api.locize.com", "ws://localhost:24678", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://ipapi.co", "https://cdn.flyonui.com"],
         "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
         "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       },

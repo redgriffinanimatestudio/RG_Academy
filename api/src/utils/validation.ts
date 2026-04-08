@@ -9,6 +9,7 @@ export const RegisterSchema = z.object({
     role: z.enum(['student', 'lecturer', 'client', 'executor', 'admin', 'hr', 'finance', 'support', 'chief_manager', 'manager', 'moderator', 'artist', 'engineer', 'client_ceo', 'partner', 'community', 'user']).default('student'),
     password: z.string().min(6).optional(),
     phone: z.string().optional(),
+    phoneCode: z.string().optional(),
     provider: z.string().optional(),
     profileData: z.object({
       country: z.string().optional(),

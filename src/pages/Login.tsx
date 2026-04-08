@@ -31,6 +31,17 @@ import RegStep4Specs from '../components/auth/registration/RegStep4Specs';
 import RegStep5Legal from '../components/auth/registration/RegStep5Legal';
 import RegStep2Soul from '../components/auth/registration/RegStep2Soul';
 
+const normalizePhone = (phoneCode: string, phone: string) => {
+  const trimmed = String(phone || '').trim();
+  const digits = trimmed.replace(/\D/g, '');
+  const codeDigits = String(phoneCode || '').replace(/\D/g, '');
+
+  if (!digits) return '';
+  if (trimmed.startsWith('+')) return `+${digits}`;
+  if (trimmed.startsWith('00')) return `+${digits.replace(/^00/, '')}`;
+  return codeDigits ? `+${codeDigits}${digits}` : digits;
+};
+
 const Login: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [regStep, setRegStep] = useState(() => {
@@ -139,7 +150,8 @@ const Login: React.FC = () => {
   // Phone validation
   useEffect(() => {
     const rawPhone = String(formData.phone || '').trim();
-    const digits = rawPhone.replace(/\D/g, '');
+    const normalizedPhone = normalizePhone(String(formData.phoneCode || ''), rawPhone);
+    const digits = normalizedPhone.replace(/\D/g, '');
 
     if (!rawPhone) {
       setPhoneStatus('none');
@@ -149,23 +161,23 @@ const Login: React.FC = () => {
 
     if (digits.length < 7 || digits.length > 15) {
       setPhoneStatus('warning');
-      setPhoneError('Use 7-15 digits. Include only numbers and separators.');
+      setPhoneError('Use 7-15 digits. Include country code and local number.');
       return;
     }
 
     setPhoneStatus('loading');
     setPhoneError('Checking phone availability...');
 
-    const timer = setTimeout(async () => {
-      try {
-        const available = await authService.checkPhone(rawPhone);
-        if (available) {
-          setPhoneStatus('success');
-          setPhoneError('');
-        } else {
-          setPhoneStatus('error');
-          setPhoneError('This phone number is already registered.');
-        }
+      const timer = setTimeout(async () => {
+        try {
+          const available = await authService.checkPhone(normalizedPhone, String(formData.phoneCode || ''));
+          if (available) {
+            setPhoneStatus('success');
+            setPhoneError('');
+          } else {
+            setPhoneStatus('error');
+            setPhoneError('This full phone number is already registered.');
+          }
       } catch {
         setPhoneStatus('warning');
         setPhoneError('Phone format looks valid. Availability check unavailable.');
@@ -173,7 +185,7 @@ const Login: React.FC = () => {
     }, 350);
 
     return () => clearTimeout(timer);
-  }, [formData.phone]);
+  }, [formData.phone, formData.phoneCode]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -206,13 +218,15 @@ const Login: React.FC = () => {
     setError('');
     try {
       if (phoneStatus === 'error') {
-        setError(phoneError || 'Phone number is already registered');
+        setError(phoneError || 'Full phone number is already registered');
         return;
       }
       // Browser-native base64 encoding (Buffer.from is not available in browsers)
       const signature = btoa(unescape(encodeURIComponent(`SIGNED_BY_${formData.email}_AT_${Date.now()}`)));
+      const normalizedPhone = normalizePhone(String(formData.phoneCode || ''), String(formData.phone || ''));
       const payload = {
         ...formData,
+        phone: normalizedPhone,
         role: formData.selectedRole,
         profileData: {
           bio: formData.bio || `Synchronized via ${formData.selectedRole.toUpperCase()} PROTOCOL`,

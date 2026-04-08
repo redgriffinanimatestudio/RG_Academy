@@ -4,10 +4,12 @@
 function Start-RGStack {
     Write-Host "🚀 Launching Unified Infrastructure (v3.8)..." -ForegroundColor Cyan
     $root = $PSScriptRoot
+    $rgPort = 3001
+    $omniPort = 4000
 
     # --- 1. PRE-FLIGHT: CLEAR PORTS ---
-    Write-Host "[1/5] Clearing existing ports (3000, 4000, 24678, 5556)..." -ForegroundColor Gray
-    $ports = @(3000, 4000, 24678, 5556)
+    Write-Host "[1/5] Clearing existing ports (3001, 4000, 24678, 5556)..." -ForegroundColor Gray
+    $ports = @($rgPort, $omniPort, 24678, 5556)
     foreach ($port in $ports) {
         $proc = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
         if ($proc) {
@@ -49,16 +51,18 @@ function Start-RGStack {
     Start-Sleep -Seconds 2
 
     # --- 5. AI SERVICES ---
-    Write-Host "[4/5] Starting AI Core (Port 4000 & Kilo)..." -ForegroundColor Gray
+    Write-Host "[4/5] Starting AI Core (Port $omniPort & Kilo)..." -ForegroundColor Gray
     $kiloPath = Join-Path $root "kilo.ps1"
     
-    Start-Process powershell -ArgumentList "-NoExit", "-Command", "`$env:PORT=4000; omniroute" -WindowStyle Normal
+    Start-Process powershell -ArgumentList "-NoExit", "-Command", "`$env:PORT=$omniPort; omniroute" -WindowStyle Normal
     Start-Process powershell -ArgumentList "-NoExit", "-Command", ". '$kiloPath'; kilo" -WindowStyle Normal
 
     # --- 6. CORE ENGINE ---
-    Write-Host "[5/5] Launching RG Academy Engine (Port 3000)..." -ForegroundColor Cyan
-    # Set PORT to 3000 to match server.ts logic
-    $env:PORT = 3000
+    Write-Host "[5/5] Launching RG Academy Engine (Port $rgPort)..." -ForegroundColor Cyan
+    # Explicit dev mode so Vite middleware stays active and does not fall back to static production mode
+    $env:NODE_ENV = 'development'
+    $env:SKIP_VITE = 'false'
+    $env:PORT = $rgPort
     npm run dev
 }
 

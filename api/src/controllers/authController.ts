@@ -17,6 +17,32 @@ import { identityService } from '../services/identityService.js';
 // Формат: { '+7900...': { code: '123456', expiresAt: 1234123, attempts: 0 } }
 const otpCache = new Map<string, { code: string; expiresAt: number; attempts: number }>();
 
+const normalizePhone = (phone?: string, phoneCode?: string) => {
+  const rawPhone = String(phone || '').trim();
+  const rawCode = String(phoneCode || '').trim();
+
+  if (!rawPhone && !rawCode) return '';
+
+  const phoneDigits = rawPhone.replace(/\D/g, '');
+  const codeDigits = rawCode.replace(/\D/g, '');
+
+  if (!phoneDigits) return '';
+
+  if (rawPhone.startsWith('+')) {
+    return `+${phoneDigits}`;
+  }
+
+  if (rawPhone.startsWith('00')) {
+    return `+${phoneDigits.replace(/^00/, '')}`;
+  }
+
+  if (codeDigits) {
+    return `+${codeDigits}${phoneDigits}`;
+  }
+
+  return phoneDigits;
+};
+
 /**
  * @swagger
  * tags:
@@ -141,23 +167,24 @@ export const authController = {
    */
   async register(req: Request, res: Response) {
     try {
-      const { email, displayName, phone, password, role, provider, profileData, signature, selectedPath, metadata } = req.body;
+      const { email, displayName, phone, phoneCode, password, role, provider, profileData, signature, selectedPath, metadata } = req.body;
 
       if (!email) return error(res, 'Email is required for registration', 400);
+      const normalizedPhone = normalizePhone(phone, phoneCode);
 
       // Check for existing node (Prisma findUnique requires value)
       const existingByEmail = await prisma.user.findUnique({ where: { email } });
       if (existingByEmail) return error(res, 'Email already exists', 409);
 
-      if (phone) {
-        const existingByPhone = await prisma.user.findUnique({ where: { phone } });
+      if (normalizedPhone) {
+        const existingByPhone = await prisma.user.findUnique({ where: { phone: normalizedPhone } });
         if (existingByPhone) return error(res, 'Phone already exists', 409);
       }
 
-      console.log(`[AUTH] Industrializing request for: ${email} | Role: ${role} | Path: ${selectedPath}`);
+      console.log(`[AUTH] Industrializing request for: ${email} | Role: ${role} | Path: ${selectedPath} | Phone: ${normalizedPhone || phone || 'N/A'}`);
 
       const result = await identityService.registerUser({ 
-        email, displayName, phone, password, role, provider, profileData, signature, selectedPath, metadata 
+        email, displayName, phone: normalizedPhone || phone, password, role, provider, profileData, signature, selectedPath, metadata 
       });
 
       return success(res, { 
@@ -184,14 +211,15 @@ export const authController = {
    */
   async sendOtp(req: Request, res: Response) {
     try {
-      const { phone } = req.body;
-      if (!phone) return error(res, 'Phone is required', 400);
+      const { phone, phoneCode } = req.body;
+      const normalizedPhone = normalizePhone(phone, phoneCode);
+      if (!normalizedPhone) return error(res, 'Phone is required', 400);
 
       // Генерация 6-значного кода
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       
       // Храним в памяти 2 минуты (120000 мс) и даем 3 попытки
-      otpCache.set(phone, {
+      otpCache.set(normalizedPhone, {
         code,
         expiresAt: Date.now() + 2 * 60 * 1000,
         attempts: 0
@@ -200,7 +228,7 @@ export const authController = {
       // ЯРКИЙ ЛОГ В КОНСОЛЬ СЕРВЕРА (терминал npm run dev)
       console.log('\n======================================================');
       console.log('⚡ [FAST ACCESS] КОД АВТОРИЗАЦИИ ЗАПРОШЕН');
-      console.log(`📱 Телефон: ${phone}`);
+      console.log(`📱 Телефон: ${normalizedPhone}`);
       console.log(`🔑 КОД ДЛЯ ВХОДА:  \x1b[32m\x1b[1m${code}\x1b[0m   <--- (Введите его на сайте)`);
       console.log('⏳ Срок действия: 2 минуты (осталось 3 попытки)');
       console.log('======================================================\n');
@@ -220,49 +248,50 @@ export const authController = {
    */
   async verifyOtp(req: Request, res: Response) {
     try {
-      const { phone, code, role } = req.body;
-      const cached = otpCache.get(phone);
+      const { phone, phoneCode, code, role } = req.body;
+      const normalizedPhone = normalizePhone(phone, phoneCode);
+      const cached = otpCache.get(normalizedPhone);
 
-      console.log(`[AUTH] Попытка входа пользователя ${phone}. Введен код: ${code}`);
+      console.log(`[AUTH] Попытка входа пользователя ${normalizedPhone}. Введен код: ${code}`);
 
       if (!cached) {
-        console.log(`[AUTH] ❌ Отказ для ${phone}: код не запрошен или уже сгорел.`);
+        console.log(`[AUTH] ❌ Отказ для ${normalizedPhone}: код не запрошен или уже сгорел.`);
         return error(res, 'The code expired or was not requested', 400);
       }
 
       if (Date.now() > cached.expiresAt) {
-        otpCache.delete(phone);
-        console.log(`[AUTH] ❌ Отказ для ${phone}: Время вышло (2 минуты).`);
+        otpCache.delete(normalizedPhone);
+        console.log(`[AUTH] ❌ Отказ для ${normalizedPhone}: Время вышло (2 минуты).`);
         return error(res, 'Code expired (2 minutes limit)', 400);
       }
       
       if (cached.attempts >= 3) {
-        otpCache.delete(phone);
-        console.log(`[AUTH] ❌ Отказ для ${phone}: Превышено количество попыток.`);
+        otpCache.delete(normalizedPhone);
+        console.log(`[AUTH] ❌ Отказ для ${normalizedPhone}: Превышено количество попыток.`);
         return error(res, 'Too many failed attempts. Request a new code.', 429);
       }
 
       if (cached.code !== code) {
         cached.attempts += 1;
         const left = 3 - cached.attempts;
-        console.log(`[AUTH] ❌ Неверный код для ${phone}. Осталось попыток: ${left}`);
-        if (left <= 0) otpCache.delete(phone);
+        console.log(`[AUTH] ❌ Неверный код для ${normalizedPhone}. Осталось попыток: ${left}`);
+        if (left <= 0) otpCache.delete(normalizedPhone);
         return error(res, `Invalid code. ${left} attempts left.`, 400);
       }
 
       // УСПЕХ!
-      otpCache.delete(phone);
-      console.log(`✅ [AUTH] Пользователь ${phone} начал процесс онбординга.`);
+      otpCache.delete(normalizedPhone);
+      console.log(`✅ [AUTH] Пользователь ${normalizedPhone} начал процесс онбординга.`);
 
-      let user = await prisma.user.findFirst({ where: { phone } });
+      let user = await prisma.user.findFirst({ where: { phone: normalizedPhone } });
       const roles = ['user'];
 
       if (!user) {
         user = await prisma.user.create({
           data: {
-            email: `${phone.replace(/[^0-9]/g, '')}@phone.local`,
-            phone,
-            displayName: `User ${phone.slice(-4)}`,
+            email: `${normalizedPhone.replace(/[^0-9]/g, '')}@phone.local`,
+            phone: normalizedPhone,
+            displayName: `User ${normalizedPhone.slice(-4)}`,
             role: 'user',
             primaryRole: 'user',
             roles: JSON.stringify(roles),
@@ -276,7 +305,7 @@ export const authController = {
             profile: { create: { bio: `Registered via OTP (Initial Entry)` } }
           }
         });
-        console.log(`✨ [AUTH] Created new OTP node for ${phone} (Protocol: Pending)`);
+        console.log(`✨ [AUTH] Created new OTP node for ${normalizedPhone} (Protocol: Pending)`);
       }
 
       return success(res, { 
@@ -310,10 +339,11 @@ export const authController = {
 
   async checkPhone(req: Request, res: Response) {
     try {
-      const { phone } = req.body;
-      if (!phone) return success(res, { available: true });
+      const { phone, phoneCode } = req.body;
+      const normalizedPhone = normalizePhone(phone, phoneCode);
+      if (!normalizedPhone) return success(res, { available: true });
 
-      const user = await prisma.user.findUnique({ where: { phone } });
+      const user = await prisma.user.findUnique({ where: { phone: normalizedPhone } });
       return success(res, { available: !user });
     } catch (e: any) {
       console.error('❌ [AUTH] CheckPhone Failure:', e);

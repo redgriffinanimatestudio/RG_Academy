@@ -56,8 +56,8 @@ export const authService = {
     }
   },
 
-  async checkPhone(phone: string): Promise<boolean> {
-    const { data } = await apiClient.post('/auth/check-phone', { phone });
+  async checkPhone(phone: string, phoneCode?: string): Promise<boolean> {
+    const { data } = await apiClient.post('/auth/check-phone', { phone, phoneCode });
     return !!data?.data?.available;
   },
 
@@ -72,7 +72,7 @@ export const authService = {
     }
   },
 
-  async register(data: { email: string, displayName: string, role: string, phone?: string, provider?: string, password?: string }): Promise<AuthResponse> {
+  async register(data: { email: string, displayName: string, role: string, phone?: string, phoneCode?: string, provider?: string, password?: string }): Promise<AuthResponse> {
     try {
       const { data: apiResponse } = await apiClient.post('/auth/register', data);
       const { data: result } = apiResponse;
