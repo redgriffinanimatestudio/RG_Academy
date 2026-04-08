@@ -16,6 +16,18 @@ import { identityService } from '../services/identityService.js';
 // Временное кэширование OTP в памяти сервера
 // Формат: { '+7900...': { code: '123456', expiresAt: 1234123, attempts: 0 } }
 const otpCache = new Map<string, { code: string; expiresAt: number; attempts: number }>();
+const AUTH_COOKIE_NAME = 'rg_auth_token';
+const authCookieOptions = {
+  httpOnly: true,
+  sameSite: 'lax' as const,
+  secure: process.env.NODE_ENV === 'production',
+  path: '/',
+  maxAge: 7 * 24 * 60 * 60 * 1000
+};
+
+const attachAuthCookie = (res: Response, token: string) => {
+  res.cookie(AUTH_COOKIE_NAME, token, authCookieOptions);
+};
 
 const normalizePhone = (phone?: string, phoneCode?: string) => {
   const rawPhone = String(phone || '').trim();
@@ -86,8 +98,10 @@ export const authController = {
           }
         });
         const rolesArray = JSON.parse(user.roles || '["student"]');
+        const token = generateToken(user.id, user.email!);
+        attachAuthCookie(res, token);
         return success(res, {
-          token: generateToken(user.id, user.email!),
+          token,
           user: { ...user, roles: rolesArray }
         });
       }
@@ -130,8 +144,10 @@ export const authController = {
             isStudent: true
           }
         });
+        const token = generateToken(user.id, user.email!);
+        attachAuthCookie(res, token);
         return success(res, {
-          token: generateToken(user.id, user.email!),
+          token,
           user: { ...user, roles: JSON.parse(user.roles || '["admin"]') }
         });
       }
@@ -149,8 +165,10 @@ export const authController = {
       }
 
       const rolesArray = JSON.parse(user.roles || '["student"]');
+      const token = generateToken(user.id, user.email!);
+      attachAuthCookie(res, token);
       return success(res, {
-        token: generateToken(user.id, user.email!),
+        token,
         user: { ...user, roles: rolesArray }
       });
     } catch (e) {
@@ -187,8 +205,10 @@ export const authController = {
         email, displayName, phone: normalizedPhone || phone, password, role, provider, profileData, signature, selectedPath, metadata 
       });
 
+      const token = generateToken(result.user.id, result.user.email!);
+      attachAuthCookie(res, token);
       return success(res, { 
-        token: generateToken(result.user.id, result.user.email!), 
+        token, 
         user: { ...result.user, roles: result.roles } 
       });
     } catch (e: any) {
@@ -308,8 +328,10 @@ export const authController = {
         console.log(`✨ [AUTH] Created new OTP node for ${normalizedPhone} (Protocol: Pending)`);
       }
 
+      const token = generateToken(user.id, user.email!);
+      attachAuthCookie(res, token);
       return success(res, { 
-        token: generateToken(user.id, user.email!), 
+        token, 
         user: { ...user, roles } 
       });
 
@@ -392,8 +414,11 @@ export const authController = {
         registrationStatus: 'ACTIVE' // Activating account after onboarding complete
       });
 
+      const token = generateToken(result.user.id, result.user.email!);
+      attachAuthCookie(res, token);
       return success(res, { 
         message: 'Onboarding complete', 
+        token,
         user: { ...result.user, roles: result.roles } 
       });
     } catch (e: any) {
@@ -416,8 +441,10 @@ export const authController = {
 
       const result = await identityService.synchronizeSocialIdentity({ provider, payload });
 
+      const token = generateToken(result.user.id, result.user.email!);
+      attachAuthCookie(res, token);
       return success(res, { 
-        token: generateToken(result.user.id, result.user.email!), 
+        token, 
         user: { ...result.user, roles: result.roles } 
       });
     } catch (e: any) {

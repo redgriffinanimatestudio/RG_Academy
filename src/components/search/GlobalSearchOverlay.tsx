@@ -22,6 +22,11 @@ export default function GlobalSearchOverlay() {
   const [loading, setLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const searchResults = results && typeof results === 'object' ? results : null;
+  const courses = Array.isArray(searchResults?.courses) ? searchResults.courses : [];
+  const projects = Array.isArray(searchResults?.projects) ? searchResults.projects : [];
+  const profiles = Array.isArray(searchResults?.profiles) ? searchResults.profiles : [];
+  const services = Array.isArray(searchResults?.services) ? searchResults.services : [];
 
   // Keyboard Shortcuts (Cmd+K)
   useEffect(() => {
@@ -132,17 +137,17 @@ export default function GlobalSearchOverlay() {
               )}
 
               {/* Categorized Results */}
-              {results && (
+              {searchResults && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {/* Column 1: Academy & Studio */}
                   <div className="space-y-8">
-                    {results.courses.length > 0 && (
+                    {courses.length > 0 && (
                       <div className="space-y-4">
                         <h4 className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20 flex items-center gap-2">
                           <BookOpen size={12} /> Academy Courses
                         </h4>
                         <div className="grid gap-2">
-                          {results.courses.map((c: any) => (
+                          {courses.map((c: any) => (
                             <button 
                               key={c.id} 
                               onClick={() => handleNavigate(`/aca/eng/course/${c.slug}`)}
@@ -164,13 +169,13 @@ export default function GlobalSearchOverlay() {
                       </div>
                     )}
 
-                    {results.projects.length > 0 && (
+                    {projects.length > 0 && (
                       <div className="space-y-4">
                         <h4 className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20 flex items-center gap-2">
                           <Briefcase size={12} /> Studio Projects
                         </h4>
                         <div className="grid gap-2">
-                          {results.projects.map((p: any) => (
+                          {projects.map((p: any) => (
                             <button 
                               key={p.id}
                               onClick={() => handleNavigate(`/stu/eng/project/${p.slug}`)}
@@ -195,13 +200,13 @@ export default function GlobalSearchOverlay() {
 
                   {/* Column 2: Network & Services */}
                   <div className="space-y-8">
-                    {results.profiles.length > 0 && (
+                    {profiles.length > 0 && (
                       <div className="space-y-4">
                         <h4 className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20 flex items-center gap-2">
                           <User size={12} /> Experts & Talent
                         </h4>
                         <div className="grid gap-2">
-                          {results.profiles.map((pr: any) => (
+                          {profiles.map((pr: any) => (
                             <button 
                               key={pr.id}
                               onClick={() => handleNavigate(`/stu/eng/profiles/${pr.displayName}`)}
@@ -223,13 +228,13 @@ export default function GlobalSearchOverlay() {
                       </div>
                     )}
                     
-                    {results.services.length > 0 && (
+                    {services.length > 0 && (
                       <div className="space-y-4">
                         <h4 className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/20 flex items-center gap-2">
                           <Zap size={12} /> Studio Services
                         </h4>
                         <div className="grid gap-2">
-                          {results.services.map((s: any) => (
+                          {services.map((s: any) => (
                             <button 
                               key={s.id}
                               onClick={() => handleNavigate(`/stu/eng/services/${s.id}`)}

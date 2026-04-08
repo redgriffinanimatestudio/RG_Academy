@@ -16,6 +16,7 @@ export default function NeuralSearch({ isOpen, onClose }: NeuralSearchProps) {
   const { lang } = useParams();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
+  const safeResults = Array.isArray(results) ? results : [];
 
   useEffect(() => {
     if (isOpen) {
@@ -52,7 +53,8 @@ export default function NeuralSearch({ isOpen, onClose }: NeuralSearchProps) {
       setLoading(true);
       try {
         const allCourses = await academyService.getCourses();
-        const filtered = allCourses.filter(c => 
+        const safeCourses = Array.isArray(allCourses) ? allCourses : [];
+        const filtered = safeCourses.filter(c => 
           c.title.toLowerCase().includes(query.toLowerCase()) ||
           c.lecturerName.toLowerCase().includes(query.toLowerCase()) ||
           c.description.toLowerCase().includes(query.toLowerCase())
@@ -130,10 +132,10 @@ export default function NeuralSearch({ isOpen, onClose }: NeuralSearchProps) {
                       ))}
                    </div>
                 </div>
-              ) : results.length > 0 ? (
+              ) : safeResults.length > 0 ? (
                 <div className="space-y-2">
-                   <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mb-4 px-4">{results.length} Nodes Synchronized</p>
-                   {results.map((course, idx) => (
+                   <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20 mb-4 px-4">{safeResults.length} Nodes Synchronized</p>
+                   {safeResults.map((course, idx) => (
                      <motion.div 
                        key={course.id}
                        initial={{ opacity: 0, x: -10 }}

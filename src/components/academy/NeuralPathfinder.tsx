@@ -47,6 +47,9 @@ export default function NeuralPathfinder({ onComplete, isDashboard = false }: Ne
   const [vision, setVision] = useState<string | null>(null);
   const [selectedDiscipline, setSelectedDiscipline] = useState<Discipline | null>(null);
   const [completed, setCompleted] = useState(false);
+  const selectedLevels = Array.isArray(selectedDiscipline?.levels) ? selectedDiscipline.levels : [];
+  const adobeProducts = Array.isArray(SOFTWARE_MAP.adobe.products) ? SOFTWARE_MAP.adobe.products : [];
+  const autodeskProducts = Array.isArray(SOFTWARE_MAP.autodesk.products) ? SOFTWARE_MAP.autodesk.products : [];
 
   const steps = [
     { title: 'Soul_Inquiry', subtitle: 'What is your vision for the digital realm?' },
@@ -96,7 +99,14 @@ export default function NeuralPathfinder({ onComplete, isDashboard = false }: Ne
         </header>
 
         <div className={`p-6 md:p-20 ${isDashboard ? 'bg-transparent border-0 md:p-8' : 'bg-[#080808]/80 border border-white/5 rounded-[2.5rem] md:rounded-[4rem] backdrop-blur-3xl shadow-[0_0_100px_rgba(0,0,0,1)]'} relative overflow-hidden group`}>
-           <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('/scanlines.png')] bg-repeat" />
+           <div
+             className="absolute inset-0 pointer-events-none opacity-[0.03]"
+             style={{
+               backgroundImage:
+                 'linear-gradient(180deg, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 1px, transparent 1px, transparent 4px)',
+               backgroundSize: '100% 4px',
+             }}
+           />
            
            <div className="absolute top-0 right-0 p-6 md:p-12 text-primary/10 group-hover:scale-110 transition-transform duration-700">
               <Compass className="size-16 md:size-[180px]" />
@@ -216,7 +226,7 @@ export default function NeuralPathfinder({ onComplete, isDashboard = false }: Ne
                              </div>
                              <div className="flex flex-wrap gap-2">
                                 {selectedDiscipline?.software.includes('After Effects') || selectedDiscipline?.software.includes('Ps') ? (
-                                   SOFTWARE_MAP.adobe.products.slice(0, 3).map(p => (
+                                   adobeProducts.slice(0, 3).map(p => (
                                      <span key={p.id} className="px-3 py-1.5 bg-white/5 border border-white/5 rounded-lg text-[7px] md:text-[9px] font-black uppercase tracking-widest text-white/40">{p.name}</span>
                                    ))
                                 ) : (
@@ -230,7 +240,7 @@ export default function NeuralPathfinder({ onComplete, isDashboard = false }: Ne
                                 <h4 className="text-sm md:text-2xl font-black uppercase tracking-tighter text-white italic">Autodesk Industrial</h4>
                              </div>
                              <div className="flex flex-wrap gap-2">
-                                {SOFTWARE_MAP.autodesk.products.slice(0, 3).map(p => (
+                                {autodeskProducts.slice(0, 3).map(p => (
                                    <span key={p.id} className="px-3 py-1.5 bg-white/5 border border-white/5 rounded-lg text-[7px] md:text-[9px] font-black uppercase tracking-widest text-white/40">{p.name}</span>
                                 ))}
                              </div>
@@ -278,8 +288,8 @@ export default function NeuralPathfinder({ onComplete, isDashboard = false }: Ne
                      </div>
 
                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 relative z-10">
-                        {selectedDiscipline?.levels.map((level, i) => (
-                          <div key={level} className="p-6 md:p-10 rounded-2xl md:rounded-[3rem] bg-white/[0.03] border border-white/5 space-y-4 md:space-y-6 hover:border-primary/20 transition-all group backdrop-blur-xl">
+                        {selectedLevels.map((level, i) => (
+                             <div key={level} className="p-6 md:p-10 rounded-2xl md:rounded-[3rem] bg-white/[0.03] border border-white/5 space-y-4 md:space-y-6 hover:border-primary/20 transition-all group backdrop-blur-xl">
                              <span className="text-[9px] md:text-[10px] font-black text-primary/40 uppercase tracking-[0.4em]">Node_0{i + 1}</span>
                              <h4 className="text-sm md:text-2xl font-black uppercase tracking-tighter text-white italic group-hover:text-primary transition-colors">{level}</h4>
                              <div className="h-1 md:h-1.5 w-full bg-white/5 rounded-full overflow-hidden">

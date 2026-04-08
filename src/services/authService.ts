@@ -113,6 +113,11 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
+    try {
+      await apiClient.post('/auth/logout');
+    } catch {
+      // Ignore server logout failures; local session will still be cleared below.
+    }
     localStorage.removeItem('auth_token');
     localStorage.removeItem('rg_user');
     localStorage.removeItem('rg_auth_active');

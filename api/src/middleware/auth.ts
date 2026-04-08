@@ -3,6 +3,16 @@ import { verifyToken } from '../utils/auth.js';
 import prisma from '../utils/prisma.js';
 import { error } from '../utils/response.js';
 
+const AUTH_COOKIE_NAME = 'rg_auth_token';
+
+const getCookieToken = (cookieHeader?: string) => {
+  if (!cookieHeader) return null;
+  const parts = cookieHeader.split(';').map(part => part.trim());
+  const match = parts.find(part => part.startsWith(`${AUTH_COOKIE_NAME}=`));
+  if (!match) return null;
+  return decodeURIComponent(match.slice(AUTH_COOKIE_NAME.length + 1));
+};
+
 export interface AuthRequest extends Request {
   user?: {
     id: string;
@@ -24,12 +34,16 @@ export interface AuthRequest extends Request {
 
 export const authMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
+  const cookieToken = getCookieToken(req.headers.cookie);
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return error(res, 'Authorization header missing or malformed', 401);
+  const token = authHeader && authHeader.startsWith('Bearer ')
+    ? authHeader.split(' ')[1]
+    : cookieToken;
+
+  if (!token) {
+    return error(res, 'Authorization header or auth cookie missing', 401);
   }
 
-  const token = authHeader.split(' ')[1];
   const decoded: any = verifyToken(token);
 
   if (!decoded) {
