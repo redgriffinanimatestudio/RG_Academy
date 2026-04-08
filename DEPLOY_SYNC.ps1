@@ -67,7 +67,7 @@ npx esbuild server.ts --bundle --platform=node --format=cjs --outfile=server-dis
 # [3/6] Export DB
 if (docker ps -q -f name=$DB_CONTAINER) {
     Write-Host "Exporting Database from $DB_CONTAINER..." -ForegroundColor Yellow
-    docker exec $DB_CONTAINER mysqldump --no-tablespaces -u$LOCAL_DB_USER -p$LOCAL_DB_PASS $LOCAL_DB > $SQL_DUMP
+    docker exec $DB_CONTAINER mysqldump --no-tablespaces "--user=$LOCAL_DB_USER" "--password=$LOCAL_DB_PASS" $LOCAL_DB | Out-File -FilePath $SQL_DUMP -Encoding utf8
 }
 else {
     Write-Host 'Skipping Database Export (Local DB Container Not Found)...' -ForegroundColor Red
@@ -141,7 +141,7 @@ $C += 'echo "--- APPLYING SCHEMA PATCH __DEPLOYTAG__ ---"' + "`n"
 $C += 'mysql -u __DBU__ -p"__DBP__" __DBN__ < nodejs/__SQLPATCH__ ' + $OR + ' echo "SQL Patch Warning: Partial failure or columns already exist."' + "`n"
 $C += 'mkdir -p tmp ' + $AND + ' touch tmp/restart.txt' + "`n"
 $C += 'rm "__ZIP__"' + "`n"
-$C += 'echo "DEPLOY SUCCESSFUL (__DEPLOYTAG__-Mythology-Synchronized)"'
+$C += 'printf "%s\n" "DEPLOY SUCCESSFUL (__DEPLOYTAG__-Mythology-Synchronized)"'
 
 $REMOTE_COMMANDS = $C `
     -replace '__BASE__', $REMOTE_BASE `

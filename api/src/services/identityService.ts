@@ -31,7 +31,7 @@ export const identityService = {
     const consentSignature = signature || Buffer.from(`SIGNED_BY_${email}_AT_${Date.now()}`).toString('base64');
 
     const newUser = await prisma.$transaction(async (tx) => {
-      const newUser = await tx.user.create({
+      return await tx.user.create({
         data: {
           email,
           displayName,
@@ -48,38 +48,69 @@ export const identityService = {
           registrationStatus: 'PENDING',
           selectedPath: normalizedSelectedPath,
           metadata: metadata || {},
-          profile: {
-            create: {
-              bio: profileData?.bio || `Registered via ${provider || 'Auth System'}`,
-              country: profileData?.country,
-              citizenship: profileData?.citizenship,
-              linkedInUrl: profileData?.linkedInUrl,
-              telegramHandle: profileData?.telegramHandle,
-              portfolioUrl: profileData?.portfolioUrl,
-              gender: profileData?.gender,
-              chosenPathId: profileData?.chosenPathId,
-              dateOfBirth: profileData?.dateOfBirth && !isNaN(Date.parse(profileData.dateOfBirth)) 
-                ? new Date(profileData.dateOfBirth) 
-                : undefined,
-              ageCategory: profileData?.dateOfBirth && !isNaN(Date.parse(profileData.dateOfBirth)) ? (() => {
-                const birthDate = new Date(profileData.dateOfBirth);
-                const today = new Date();
-                let age = today.getFullYear() - birthDate.getFullYear();
-                const m = today.getMonth() - birthDate.getMonth();
-                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                  age--;
-                }
-                if (age < 13) return 'child';
-                if (age < 18) return 'teen';
-                return 'adult';
-              })() : 'adult' // Default to adult if birthDate is missing or invalid
-            }
-          }
         },
         include: { profile: true }
       });
-      return newUser;
     });
+
+    if (profileData) {
+      await prisma.profile.upsert({
+        where: { userId: newUser.id },
+        create: {
+          userId: newUser.id,
+          bio: profileData?.bio || `Registered via ${provider || 'Auth System'}`,
+          country: profileData?.country,
+          citizenship: profileData?.citizenship,
+          linkedInUrl: profileData?.linkedInUrl,
+          telegramHandle: profileData?.telegramHandle,
+          portfolioUrl: profileData?.portfolioUrl,
+          gender: profileData?.gender,
+          chosenPathId: profileData?.chosenPathId,
+          dateOfBirth: profileData?.dateOfBirth && !isNaN(Date.parse(profileData.dateOfBirth))
+            ? new Date(profileData.dateOfBirth)
+            : undefined,
+          ageCategory: profileData?.dateOfBirth && !isNaN(Date.parse(profileData.dateOfBirth)) ? (() => {
+            const birthDate = new Date(profileData.dateOfBirth);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+              age--;
+            }
+            if (age < 13) return 'child';
+            if (age < 18) return 'teen';
+            return 'adult';
+          })() : 'adult'
+        },
+        update: {
+          bio: profileData?.bio || `Registered via ${provider || 'Auth System'}`,
+          country: profileData?.country,
+          citizenship: profileData?.citizenship,
+          linkedInUrl: profileData?.linkedInUrl,
+          telegramHandle: profileData?.telegramHandle,
+          portfolioUrl: profileData?.portfolioUrl,
+          gender: profileData?.gender,
+          chosenPathId: profileData?.chosenPathId,
+          dateOfBirth: profileData?.dateOfBirth && !isNaN(Date.parse(profileData.dateOfBirth))
+            ? new Date(profileData.dateOfBirth)
+            : undefined,
+          ageCategory: profileData?.dateOfBirth && !isNaN(Date.parse(profileData.dateOfBirth)) ? (() => {
+            const birthDate = new Date(profileData.dateOfBirth);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+              age--;
+            }
+            if (age < 13) return 'child';
+            if (age < 18) return 'teen';
+            return 'adult';
+          })() : 'adult'
+        }
+      }).catch((err: any) => {
+        console.warn('[AUTH] Profile creation skipped during registration:', err?.message || err);
+      });
+    }
 
     await prisma.userDocument.create({
       data: {
