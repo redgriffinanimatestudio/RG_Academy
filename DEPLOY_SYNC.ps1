@@ -1,5 +1,5 @@
 # RED GRIFFIN ACADEMY - INTEGRATED DEPLOY & SYNC SCRIPT (DOCKER)
-# Version: 2.32 (Neural Industrialization - Sharded Registry)
+# Version: 2.35 (Neural Industrialization - Sharded Registry)
 # ==========================================================
 
 $ErrorActionPreference = 'Stop'
@@ -20,7 +20,7 @@ $DB_CONTAINER = 'rg-academy-db'
 $REMOTE_DB = 'u315573487_db'
 $REMOTE_DB_USER = 'u315573487_admin'
 $REMOTE_DB_PASS = 'RG_Academy_2026'
-$DEPLOY_TAG = 'v2.32'
+$DEPLOY_TAG = 'v2.35'
 $SCHEMA_PATCH = 'update_v2.35.sql'
 $PRISMA_GENERATED_SRC = 'api/generated/prisma'
 $DEPLOY_ZIP = 'RG_Academy_HOSTINGER_DEPLOY.zip'

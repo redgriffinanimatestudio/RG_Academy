@@ -1,7 +1,5 @@
 import { z } from 'zod';
-import * as PrismaClient from '../../../generated/prisma/client.ts';
-
-const Prisma = PrismaClient.Prisma;
+import { Prisma } from './prisma-runtime.js';
 
 /////////////////////////////////////////
 // HELPER FUNCTIONS
