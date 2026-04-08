@@ -4,6 +4,22 @@
 
 USE u315573487_db;
 
+-- 0. Normalize phone numbers to a canonical format before availability checks.
+-- This keeps legacy values like "+7 (999) 123-45-67" comparable with new records.
+UPDATE `User`
+SET `phone` = CONCAT('+', REGEXP_REPLACE(`phone`, '[^0-9]', ''))
+WHERE `phone` IS NOT NULL
+  AND `phone` <> '';
+
+-- 0.1. Audit duplicate phone values after normalization.
+-- If rows are returned here, resolve them manually before enforcing or relying on uniqueness.
+SELECT `phone`, COUNT(*) AS `count`
+FROM `User`
+WHERE `phone` IS NOT NULL
+  AND `phone` <> ''
+GROUP BY `phone`
+HAVING COUNT(*) > 1;
+
 -- 1. Update User Table with new role flags and onboarding status
 ALTER TABLE `User` 
 ADD COLUMN IF NOT EXISTS `isStudent` BOOLEAN DEFAULT FALSE,

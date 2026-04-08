@@ -1,4 +1,4 @@
-# 🚀 RED GRIFFIN ACADEMY - INTEGRATED DEPLOY & SYNC SCRIPT (DOCKER)
+# RED GRIFFIN ACADEMY - INTEGRATED DEPLOY & SYNC SCRIPT (DOCKER)
 # Version: 2.32 (Neural Industrialization - Sharded Registry)
 # ==========================================================
 
@@ -28,11 +28,11 @@ $SQL_DUMP = 'local_sync.sql'
 $BUILD_TEMP = 'BUILD_TEMP'
 
 Write-Host '===============================================' -ForegroundColor Cyan
-Write-Host "🦾 STARTING NEURAL DEPLOYMENT PIPELINE $DEPLOY_TAG" -ForegroundColor Cyan
+Write-Host "STARTING NEURAL DEPLOYMENT PIPELINE $DEPLOY_TAG" -ForegroundColor Cyan
 Write-Host '===============================================' -ForegroundColor Cyan
 
 # [1/6] Syncing Git
-Write-Host '💾 Syncing Git...' -ForegroundColor Yellow
+Write-Host 'Syncing Git...' -ForegroundColor Yellow
 $CommitDate = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 $CommitMsg = 'Neural Industrialization (' + $DEPLOY_TAG + '): ' + $CommitDate
 git add .
@@ -41,11 +41,11 @@ try {
     git push origin main 2>$null
 }
 catch {
-    Write-Host '⚠️ Git sync skipped, continuing...' -ForegroundColor Gray
+    Write-Host 'Git sync skipped, continuing...' -ForegroundColor Gray
 }
 
 # [2/6] Rebuild Assets
-Write-Host '🏗️ Rebuilding Assets...' -ForegroundColor Yellow
+Write-Host 'Rebuilding Assets...' -ForegroundColor Yellow
 if (Test-Path $BUILD_TEMP) { Remove-Item -Recurse -Force $BUILD_TEMP }
 New-Item -ItemType Directory -Path $BUILD_TEMP | Out-Null
 
@@ -62,46 +62,22 @@ if (-not (Test-Path $PRISMA_GENERATED_SRC)) {
 npx prisma generate
 npm run build
 
-# Injecting ServiceWorker kill-switch
-if (Test-Path 'dist') {
-    $SW = [string]::Join([Environment]::NewLine, @(
-        'self.addEventListener("install", function (e) {',
-        '  self.skipWaiting();',
-        '});',
-        'self.addEventListener("activate", function (e) {',
-        '  caches.keys().then(function (names) {',
-        '    for (var i = 0; i < names.length; i++) {',
-        '      caches.delete(names[i]);',
-        '    }',
-        '  });',
-        '  self.registration.unregister().then(function () {',
-        '    return self.clients.matchAll();',
-        '  }).then(function (clients) {',
-        '    clients.forEach(function (client) {',
-        '      client.navigate(client.url);',
-        '    });',
-        '  });',
-        '});'
-    ))
-    $SW | Out-File -FilePath 'dist/sw.js' -Encoding utf8
-}
-
 npx esbuild server.ts --bundle --platform=node --format=cjs --outfile=server-dist.cjs --external:fsevents --external:canvas --external:sharp --external:prisma --external:@prisma/client
 
 # [3/6] Export DB
 if (docker ps -q -f name=$DB_CONTAINER) {
-    Write-Host "🛢️ Exporting Database from $DB_CONTAINER..." -ForegroundColor Yellow
+    Write-Host "Exporting Database from $DB_CONTAINER..." -ForegroundColor Yellow
     docker exec $DB_CONTAINER mysqldump --no-tablespaces -u$LOCAL_DB_USER -p$LOCAL_DB_PASS $LOCAL_DB > $SQL_DUMP
 }
 else {
-    Write-Host '⚠️ Skipping Database Export (Local DB Container Not Found)...' -ForegroundColor Red
+    Write-Host 'Skipping Database Export (Local DB Container Not Found)...' -ForegroundColor Red
     if (-Not (Test-Path $SQL_DUMP)) { 
         "-- Empty dump (Container Down)" | Out-File -FilePath $SQL_DUMP -Encoding utf8 
     }
 }
 
 # [4/6] Creating Archive
-Write-Host '📦 Creating Archive...' -ForegroundColor Yellow
+Write-Host 'Creating Archive...' -ForegroundColor Yellow
 Copy-Item -Recurse 'dist' ($BUILD_TEMP + '/dist')
 Copy-Item 'server-dist.cjs' ($BUILD_TEMP + '/server-dist.cjs')
 Copy-Item 'index.js' ($BUILD_TEMP + '/index.js')
@@ -121,7 +97,7 @@ $REMOTE_ENV | Out-File -FilePath ($BUILD_TEMP + '/.env') -Encoding utf8
 if (Test-Path 'prisma') { Copy-Item -Recurse 'prisma' ($BUILD_TEMP + '/prisma') }
 
 New-Item -ItemType Directory -Force ($BUILD_TEMP + '/node_modules') | Out-Null
-Write-Host '🧹 Optimizing Prisma for Linux...' -ForegroundColor Cyan
+Write-Host 'Optimizing Prisma for Linux...' -ForegroundColor Cyan
 if (Test-Path 'node_modules/@prisma') { 
     Copy-Item -Recurse 'node_modules/@prisma' ($BUILD_TEMP + '/node_modules/') 
     # Remove Windows/Node-native binaries to save space (leaving only .so or generic)
@@ -136,18 +112,18 @@ if (Test-Path $DEPLOY_ZIP) { Remove-Item $DEPLOY_ZIP }
 Compress-Archive -Path ($BUILD_TEMP + '/*') -DestinationPath $DEPLOY_ZIP
 
 # [5/6] Upload
-Write-Host "🚀 Uploading to Hostinger (Optimized $DEPLOY_TAG)..." -ForegroundColor Yellow
+Write-Host "Uploading to Hostinger (Optimized $DEPLOY_TAG)..." -ForegroundColor Yellow
 $RemotePath = $SSH_USER + '@' + $SSH_HOST + ':' + $REMOTE_BASE + '/'
 # Note: scp will ask for password if keys are not set
 scp -P $SSH_PORT $DEPLOY_ZIP $RemotePath
 
 # [6/6] Finalize Remote
-Write-Host "⚡ Finalizing $DEPLOY_TAG (Neural Sync + Schema Patch)..." -ForegroundColor Yellow
+Write-Host "Finalizing $DEPLOY_TAG (Neural Sync + Schema Patch)..." -ForegroundColor Yellow
 
-$C = 'cd __BASE__ ' + $OR + ' (echo "❌ FAILED TO ENTER __BASE__" ' + $AND + ' exit 1)' + "`n"
+$C = 'cd __BASE__ ' + $OR + ' (echo "FAILED TO ENTER __BASE__" ' + $AND + ' exit 1)' + "`n"
 $C += 'echo "--- REMOTE DIAGNOSTICS ---"' + "`n"
 $C += 'pwd' + "`n"
-$C += 'ls -la __ZIP__ ' + $OR + ' echo "⚠️ __ZIP__ MISSING"' + "`n"
+$C += 'ls -la __ZIP__ ' + $OR + ' echo "__ZIP__ MISSING"' + "`n"
 $C += 'echo "--- RESOURCE CLEANUP ---"' + "`n"
 $C += 'pkill -u __USER__ node ' + $OR + ' true' + "`n"
 $C += 'sleep 2' + "`n"
@@ -162,10 +138,10 @@ $C += 'cp -R public_html/dist/. public_html/ 2>/dev/null ' + $OR + ' true' + "`n
 $C += 'rm -rf public_html/dist 2>/dev/null' + "`n"
 $C += 'test -f public_html/Favicon.png ' + $OR + ' test -f public_html/favicon.ico ' + $OR + ' cp public_html/Favicon.png public_html/favicon.ico 2>/dev/null ' + $OR + ' true' + "`n"
 $C += 'echo "--- APPLYING SCHEMA PATCH __DEPLOYTAG__ ---"' + "`n"
-$C += 'mysql -u __DBU__ -p"__DBP__" __DBN__ < nodejs/__SQLPATCH__ ' + $OR + ' echo "⚠️ SQL Patch Warning: Partial failure or columns already exist."' + "`n"
+$C += 'mysql -u __DBU__ -p"__DBP__" __DBN__ < nodejs/__SQLPATCH__ ' + $OR + ' echo "SQL Patch Warning: Partial failure or columns already exist."' + "`n"
 $C += 'mkdir -p tmp ' + $AND + ' touch tmp/restart.txt' + "`n"
 $C += 'rm "__ZIP__"' + "`n"
-$C += 'echo "✅ DEPLOY SUCCESSFUL (__DEPLOYTAG__-Mythology-Synchronized)"'
+$C += 'echo "DEPLOY SUCCESSFUL (__DEPLOYTAG__-Mythology-Synchronized)"'
 
 $REMOTE_COMMANDS = $C `
     -replace '__BASE__', $REMOTE_BASE `
@@ -182,7 +158,7 @@ $SshTarget = $SSH_USER + '@' + $SSH_HOST
 ssh -p $SSH_PORT $SshTarget $REMOTE_COMMANDS
 
 Write-Host '===============================================' -ForegroundColor Green
-Write-Host "✅ NEURAL DEPLOY $DEPLOY_TAG COMPLETED!" -ForegroundColor Green
-Write-Host '🌐 Health Check: https://rgacademy.space/api/health' -ForegroundColor Cyan
+Write-Host "NEURAL DEPLOY $DEPLOY_TAG COMPLETED!" -ForegroundColor Green
+Write-Host 'Health Check: https://rgacademy.space/api/health' -ForegroundColor Cyan
 Write-Host '===============================================' -ForegroundColor Green
 Start-Sleep -Seconds 2

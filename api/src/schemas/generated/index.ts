@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import pkg from '../../../generated/prisma/client';
-const { Prisma } = pkg;
+import { Prisma } from '../../../generated/prisma/client';
 
 /////////////////////////////////////////
 // HELPER FUNCTIONS

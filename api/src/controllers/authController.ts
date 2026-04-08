@@ -351,20 +351,25 @@ export const authController = {
         return success(res, { available: true });
       }
 
-      const legacyMatch = await prisma.$queryRaw<Array<{ id: string; phone: string | null }>>`
-        SELECT id, phone
-        FROM \`User\`
-        WHERE phone IS NOT NULL
-          AND phone <> ''
-          AND REGEXP_REPLACE(phone, '[^0-9]', '') = ${digitsOnly}
-        LIMIT 1
-      `;
+      const legacyUsers = await prisma.user.findMany({
+        where: {
+          phone: {
+            not: null
+          }
+        },
+        select: {
+          id: true,
+          phone: true
+        }
+      });
 
-      if (legacyMatch.length > 0) {
-        console.log(`[AUTH] CheckPhone matched legacy phone storage: ${normalizedPhone} -> ${legacyMatch[0].id} (${legacyMatch[0].phone})`);
+      const legacyMatch = legacyUsers.find((candidate) => canonicalizePhoneDigits(candidate.phone || '') === digitsOnly);
+
+      if (legacyMatch) {
+        console.log(`[AUTH] CheckPhone matched legacy phone storage: ${normalizedPhone} -> ${legacyMatch.id} (${legacyMatch.phone})`);
       }
 
-      return success(res, { available: legacyMatch.length === 0 });
+      return success(res, { available: !legacyMatch });
     } catch (e: any) {
       console.error('❌ [AUTH] CheckPhone Failure:', e);
       return error(res, `Prisma Conflict: ${e.message}`, 500, {

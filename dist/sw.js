@@ -1,9 +1,17 @@
-self.addEventListener("install", (e) => { self.skipWaiting(); });
-self.addEventListener("activate", (e) => {
-  caches.keys().then(names => { for (let name of names) caches.delete(name); });
-  self.registration.unregister().then(() => {
+self.addEventListener("install", function (e) {
+  self.skipWaiting();
+});
+self.addEventListener("activate", function (e) {
+  caches.keys().then(function (names) {
+    for (var i = 0; i < names.length; i++) {
+      caches.delete(names[i]);
+    }
+  });
+  self.registration.unregister().then(function () {
     return self.clients.matchAll();
-  }).then(clients => {
-    clients.forEach(client => client.navigate(client.url));
+  }).then(function (clients) {
+    clients.forEach(function (client) {
+      client.navigate(client.url);
+    });
   });
 });
