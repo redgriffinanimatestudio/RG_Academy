@@ -9,6 +9,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { usePlatform } from '../../context/PlatformContext';
 import { useTheme } from '../../context/ThemeContext';
+import { AcademyMegaMenu } from './MegaMenu';
 
 interface NavbarProps {
   isStudio: boolean;
@@ -87,7 +88,7 @@ export default function Navbar({
           </div>
 
           <div className="hidden md:flex lg:flex items-center gap-4 lg:gap-6 h-full">
-            <Link to={`/aca/${currentLangCode}`} className={`text-[9px] lg:text-[11px] font-black uppercase tracking-widest transition-colors ${isAcademy ? 'text-emerald-600' : 'text-text-muted hover:text-ink'}`}>{t('academy')}</Link>
+            <AcademyMegaMenu />
             <Link to={`/studio/${currentLangCode}`} className={`text-[9px] lg:text-[11px] font-black uppercase tracking-widest transition-colors ${isStudio ? 'text-emerald-600' : 'text-text-muted hover:text-ink'}`}>{t('studio')}</Link>
             <Link to={`${modePrefix}/${currentLangCode}/community`} className={`text-[9px] lg:text-[11px] font-black uppercase tracking-widest transition-colors ${isCommunity ? 'text-emerald-600' : 'text-text-muted hover:text-ink'}`}>{t('community')}</Link>
           </div>

@@ -13,6 +13,7 @@ import Studio from './pages/Studio/StudioPage';
 import NeuralStudio from './pages/Studio/NeuralStudio';
 import Community from './pages/Community/CommunityPage';
 import RoadmapPage from './pages/Academy/RoadmapPage';
+import CourseDetailPage from './pages/Academy/CourseDetailPage';
 import NeuralForge from './pages/Dashboard/NeuralForge';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -117,6 +118,7 @@ export default function App() {
               {/* Academy Routes */}
               <Route path="/aca/:lang" element={<LanguageWrapper><Layout><Academy /></Layout></LanguageWrapper>} />
               <Route path="/aca/:lang/roadmap" element={<LanguageWrapper><Layout><RoadmapPage /></Layout></LanguageWrapper>} />
+              <Route path="/aca/:lang/course/:nodeId" element={<LanguageWrapper><Layout><CourseDetailPage /></Layout></LanguageWrapper>} />
               <Route path="/aca/:lang/topic/:topicSlug" element={<LanguageWrapper><Layout><TopicPage /></Layout></LanguageWrapper>} />
               <Route path="/aca/:lang/course/:slug" element={<LanguageWrapper><Layout><CourseDetail /></Layout></LanguageWrapper>} />
               <Route path="/aca/:lang/workshop" element={<LanguageWrapper><Layout><CourseBuilder /></Layout></LanguageWrapper>} />

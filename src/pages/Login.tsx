@@ -28,6 +28,7 @@ import RegStep2Network from '../components/auth/registration/RegStep2Network';
 import RegStep3Identity from '../components/auth/registration/RegStep3Identity';
 import RegStep4Specs from '../components/auth/registration/RegStep4Specs';
 import RegStep5Legal from '../components/auth/registration/RegStep5Legal';
+import RegStep2Soul from '../components/auth/registration/RegStep2Soul';
 
 const Login: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -60,6 +61,7 @@ const Login: React.FC = () => {
       country: '',
       citizenship: '',
       selectedRole: 'user',
+      selectedSoul: '',
       bio: '',
       portfolioUrl: '',
       linkedInUrl: '',
@@ -184,7 +186,7 @@ const Login: React.FC = () => {
           gender: formData.gender,
           dateOfBirth: formData.dateOfBirth
         },
-        selectedPath: journey.selectedPath,
+        selectedPath: formData.selectedRole === 'student' ? formData.selectedSoul : journey.selectedPath,
         metadata: {
           ...journey,
           registrationSource: 'industrial_forge'
@@ -311,30 +313,38 @@ const Login: React.FC = () => {
                 ) : (
                   <motion.div key="register-shard" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-10 flex-1 flex flex-col">
                     <div className="flex items-center justify-between px-2">
-                      {[1, 2, 3, 4, 5].map(s => (
+                      {Array.from({ length: formData.selectedRole === 'student' ? 6 : 5 }, (_, i) => i + 1).map(s => (
                         <div key={s} className="flex items-center gap-2">
                           <div className={`size-7 sm:size-8 rounded-full flex items-center justify-center text-[10px] font-black border-2 transition-all duration-700 ${regStep >= s ? 'bg-primary border-primary shadow-lg shadow-primary/20 text-white' : 'border-border-main text-text-muted opacity-30'}`}>
                             {s}
                           </div>
-                          {s < 5 && <div className={`h-[2px] w-4 lg:w-10 transition-all duration-700 ${regStep > s ? 'bg-primary' : 'bg-border-main'}`} />}
+                          {s < (formData.selectedRole === 'student' ? 6 : 5) && <div className={`h-[2px] w-4 lg:w-10 transition-all duration-700 ${regStep > s ? 'bg-primary' : 'bg-border-main'}`} />}
                         </div>
                       ))}
                     </div>
                     <div className={`flex flex-col lg:flex-row gap-6 sm:gap-12 flex-1 ${regStep > 1 ? 'items-stretch' : 'items-center'}`}>
                       {regStep > 1 && <IdentitySidebar role={formData.selectedRole} step={regStep} />}
-                      <form onSubmit={(e) => { e.preventDefault(); if (regStep < 5) setRegStep(regStep + 1); else handleRegisterFinal(); }} className="flex-1 flex flex-col">
+                      <form onSubmit={(e) => { e.preventDefault(); if (regStep < (formData.selectedRole === 'student' ? 6 : 5)) setRegStep(regStep + 1); else handleRegisterFinal(); }} className="flex-1 flex flex-col">
                         <div className="flex-1">
-                          {regStep === 1 ? (
-                            <RegStep1Role onSelect={(id) => { handleInputChange('selectedRole', id); setRegStep(2); }} selectedId={formData.selectedRole} />
-                          ) : regStep === 2 ? (
-                            <RegStep2Network formData={formData} onChange={handleInputChange} emailStatus={emailStatus} emailError={emailError} passStrength={passStrength} passConfirmStatus={passConfirmStatus} phoneStatus={phoneStatus} onNext={() => setRegStep(3)} />
-                          ) : regStep === 3 ? (
-                            <RegStep3Identity formData={formData} onChange={handleInputChange} onNext={() => setRegStep(4)} lang={lang} />
-                          ) : regStep === 4 ? (
-                            <RegStep4Specs formData={formData} onChange={handleInputChange} onNext={() => setRegStep(5)} onSkip={() => setRegStep(5)} />
-                          ) : regStep === 5 ? (
-                            <RegStep5Legal formData={formData} lang={lang} termsAccepted={termsAccepted} onToggleTerms={() => setTermsAccepted(!termsAccepted)} onFinalize={handleRegisterFinal} isLoading={isLoading} />
-                          ) : null}
+                          {(() => {
+                            const isStudent = formData.selectedRole === 'student';
+                            const totalSteps = isStudent ? 6 : 5;
+                            
+                            if (regStep === 1) return <RegStep1Role onSelect={(id) => { handleInputChange('selectedRole', id); setRegStep(2); }} selectedId={formData.selectedRole} />;
+                            
+                            if (isStudent && regStep === 2) {
+                              return <RegStep2Soul onSelect={(id) => { handleInputChange('selectedSoul', id); setRegStep(3); }} selectedId={formData.selectedSoul} />;
+                            }
+                            
+                            const offset = isStudent ? 1 : 0;
+                            
+                            if (regStep === 2 + offset) return <RegStep2Network formData={formData} onChange={handleInputChange} emailStatus={emailStatus} emailError={emailError} passStrength={passStrength} passConfirmStatus={passConfirmStatus} phoneStatus={phoneStatus} onNext={() => setRegStep(3 + offset)} />;
+                            if (regStep === 3 + offset) return <RegStep3Identity formData={formData} onChange={handleInputChange} onNext={() => setRegStep(4 + offset)} lang={lang} />;
+                            if (regStep === 4 + offset) return <RegStep4Specs formData={formData} onChange={handleInputChange} onNext={() => setRegStep(5 + offset)} onSkip={() => setRegStep(5 + offset)} />;
+                            if (regStep === 5 + offset) return <RegStep5Legal formData={formData} lang={lang} termsAccepted={termsAccepted} onToggleTerms={() => setTermsAccepted(!termsAccepted)} onFinalize={handleRegisterFinal} isLoading={isLoading} />;
+                            
+                            return null;
+                          })()}
                         </div>
                       </form>
                     </div>

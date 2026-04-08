@@ -1,57 +1,136 @@
 {
   "title": "3D Artist Education Roadmap - Ultimate Edition",
-  "version": "5.4.1",
+  "version": "6.0",
   "description": "The definitive trajectory from artistic foundations to industry-grade technical mastery.",
-  "phases": [
-    {
-      "id": "phase_1",
-      "title": "Phase 1: Artistic Foundations",
-      "description": "Mastering the universal laws of aesthetics and anatomy.",
-      "nodes": [
-        { "id": "anatomy_basics", "label": "Human Anatomy & Skeletal Structure", "status": "locked", "difficulty": "intermediate" },
-        { "id": "color_theory", "label": "Color Theory & Industrial Lighting Basics", "status": "locked", "difficulty": "beginner" },
-        { "id": "composition", "label": "Composition & Cinematic Framing", "status": "locked", "difficulty": "beginner" }
-      ]
-    },
-    {
-      "id": "phase_2",
-      "title": "Phase 2: Technical Modeling Matrix",
-      "description": "Constructing complex geometry with mathematical precision.",
-      "nodes": [
-        { "id": "hardsurface_modeling", "label": "Hard Surface Modeling Protocols", "status": "locked", "difficulty": "intermediate" },
-        { "id": "retopology_pipeline", "label": "Advanced Retopology & UV Mapping", "status": "locked", "difficulty": "expert" },
-        { "id": "zbrush_sculpting", "label": "Organic Sculpting & Digital Anatomy", "status": "locked", "difficulty": "intermediate" }
-      ]
-    },
-    {
-      "id": "phase_3",
-      "title": "Phase 3: Material Science & Texturing",
-      "description": "Simulating physical surfaces and chemical weathering.",
-      "nodes": [
-        { "id": "pbr_workflows", "label": "Physical Based Rendering (PBR) Workflows", "status": "locked", "difficulty": "intermediate" },
-        { "id": "substance_mastery", "label": "Procedural Texturing in Substance Designer", "status": "locked", "difficulty": "expert" },
-        { "id": "handpainted_textures", "label": "Stylized Hand-Painted Techniques", "status": "locked", "difficulty": "intermediate" }
-      ]
-    },
-    {
-      "id": "phase_4",
-      "title": "Phase 4: Optimization & Engine Sync",
-      "description": "Integrating assets into real-time environments (UE5.4).",
-      "nodes": [
-        { "id": "ue5_integration", "label": "Unreal Engine 5.4 Technical Pipeline", "status": "locked", "difficulty": "intermediate" },
-        { "id": "level_design", "label": "Environmental Level Design & Foliage Sync", "status": "locked", "difficulty": "intermediate" },
-        { "id": "lod_optimization", "label": "Performance Optimization & LODs", "status": "locked", "difficulty": "expert" }
-      ]
-    },
-    {
-      "id": "phase_5",
-      "title": "Phase 5: Professional Presentation",
-      "description": "Finalizing the portfolio and entering the global talent network.",
-      "nodes": [
-        { "id": "rendering_presentation", "label": "Cinematic Rendering & Lighting", "status": "locked", "difficulty": "intermediate" },
-        { "id": "portfolio_forge", "label": "Industrial Portfolio Construction", "status": "locked", "difficulty": "beginner" },
-        { "id": "career_uplink", "label": "Industry Placement & Job Interview Protocol", "status": "locked", "difficulty": "intermediate" }
+  "coreFoundation": {
+    "id": "sem_1",
+    "title": "SEMESTER 1: Core Foundation",
+    "duration": "3 months",
+    "description": "Общий фундамент",
+    "nodes": [
+      { "id": "prep", "label": "Prep Course: PC Basics & Software Install", "status": "completed", "difficulty": "beginner", "hours": 0 },
+      { "id": "art_basics", "label": "Art Basics (Композиция, Цвет, Перспектива)", "status": "unlocked", "difficulty": "beginner", "hours": 40 },
+      { "id": "digital_hygiene", "label": "Digital Hygiene (Пайплайн, Версионность)", "status": "locked", "difficulty": "beginner", "hours": 20 },
+      { "id": "form_volume", "label": "Form & Volume (Анатомия форм, Светотень)", "status": "locked", "difficulty": "intermediate", "hours": 60 }
+    ],
+    "exam": {
+      "id": "exam_1",
+      "label": "📝 Exam 1: Portfolio Review",
+      "status": "locked"
+    }
+  },
+  "branchingPoint": {
+    "title": "🔀 BRANCHING POINT",
+    "subtitle": "Выбор специализации / Career Counseling",
+    "faculties": [
+      {
+        "id": "archviz",
+        "title": "🏗️ FACULTY: ArchViz Specialist",
+        "duration": "4 months",
+        "semesters": [
+          {
+            "id": "s2_a",
+            "title": "SEMESTER 2A: Technical Pipeline",
+            "subtitle": "3ds Max + Corona",
+            "nodes": [
+              { "id": "cad_bim", "label": "CAD & BIM Integration", "status": "locked", "difficulty": "intermediate", "hours": 40 },
+              { "id": "photo_lighting", "label": "Photorealistic Lighting", "status": "locked", "difficulty": "expert", "hours": 60 },
+              { "id": "materials_pbr", "label": "Materials & Textures (PBR)", "status": "locked", "difficulty": "intermediate", "hours": 40 },
+              { "id": "sq_photo", "label": "Side Quest: Photogrammetry", "status": "side_quest", "difficulty": "expert", "hours": 15 }
+            ],
+            "exam": { "id": "exam_2a", "label": "📝 Exam 2A: Interior Scene", "status": "locked" }
+          },
+          {
+            "id": "s3_a",
+            "title": "SEMESTER 3A: Production",
+            "subtitle": "UE5 & Interactivity",
+            "nodes": [
+              { "id": "ue5", "label": "Unreal Engine 5", "status": "locked", "difficulty": "expert", "hours": 50 },
+              { "id": "virtual_tours", "label": "Virtual Tours (VR/AR)", "status": "locked", "difficulty": "intermediate", "hours": 30 },
+              { "id": "cinematics", "label": "Cinematics (Sequencer)", "status": "locked", "difficulty": "expert", "hours": 40 }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "animator",
+        "title": "🎭 FACULTY: Character Animator",
+        "duration": "4 months",
+        "semesters": [
+          {
+            "id": "s2_c",
+            "title": "SEMESTER 2C: Technical Pipeline",
+            "subtitle": "Maya + ZBrush",
+            "nodes": [
+              { "id": "adv_anatomy", "label": "Advanced Anatomy", "status": "locked", "difficulty": "expert", "hours": 50 },
+              { "id": "rigging", "label": "Character Rigging", "status": "locked", "difficulty": "expert", "hours": 50 },
+              { "id": "anim_principles", "label": "Animation Principles", "status": "locked", "difficulty": "intermediate", "hours": 40 },
+              { "id": "sq_mocap", "label": "Side Quest: Performance Capture", "status": "side_quest", "difficulty": "expert", "hours": 15 }
+            ],
+            "exam": { "id": "exam_2c", "label": "📝 Exam 2C: Character Walk Cycle", "status": "locked" }
+          },
+          {
+            "id": "s3_c",
+            "title": "SEMESTER 3C: Production",
+            "subtitle": "Physics & Simulation",
+            "nodes": [
+              { "id": "fx_dyn", "label": "FX & Dynamics", "status": "locked", "difficulty": "expert", "hours": 50 },
+              { "id": "mocap_cleanup", "label": "Motion Capture Cleanup", "status": "locked", "difficulty": "intermediate", "hours": 30 },
+              { "id": "facial_anim", "label": "Facial Animation", "status": "locked", "difficulty": "expert", "hours": 40 }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "game_artist",
+        "title": "🎮 FACULTY: Game Artist",
+        "duration": "4 months",
+        "semesters": [
+          {
+            "id": "s2_g",
+            "title": "SEMESTER 2G: Game Pipeline",
+            "subtitle": "Blender + Unity/Unreal",
+            "nodes": [
+              { "id": "env_design", "label": "Environment Design", "status": "locked", "difficulty": "intermediate", "hours": 50 },
+              { "id": "rt_opt", "label": "Real-time Optimization (LODs)", "status": "locked", "difficulty": "expert", "hours": 40 },
+              { "id": "stylized_art", "label": "Stylized Art", "status": "locked", "difficulty": "intermediate", "hours": 30 },
+              { "id": "sq_audio", "label": "Side Quest: Audio Integration", "status": "side_quest", "difficulty": "intermediate", "hours": 15 }
+            ],
+            "exam": { "id": "exam_2g", "label": "📝 Exam 2G: Game Environment", "status": "locked" }
+          },
+          {
+            "id": "s3_g",
+            "title": "SEMESTER 3G: Production",
+            "subtitle": "Game Systems",
+            "nodes": [
+              { "id": "weapons_props", "label": "Weapon & Props", "status": "locked", "difficulty": "intermediate", "hours": 40 },
+              { "id": "shader_dev", "label": "Shader Development", "status": "locked", "difficulty": "expert", "hours": 40 },
+              { "id": "asset_mgm", "label": "Asset Management", "status": "locked", "difficulty": "beginner", "hours": 30 }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "careerLaunch": {
+    "id": "sem_4",
+    "title": "🎓 SEMESTER 4: Career Launch",
+    "duration": "2 months",
+    "description": "Портфолио и Рынок",
+    "nodes": [
+      { "id": "showreel", "label": "Showreel Production", "status": "locked", "difficulty": "intermediate", "hours": 40 },
+      { "id": "freelance_legal", "label": "Freelance & Legal", "status": "locked", "difficulty": "intermediate", "hours": 20 },
+      { "id": "job_placement", "label": "Job Placement", "status": "locked", "difficulty": "intermediate", "hours": 20 },
+      { "id": "thesis", "label": "🚀 Thesis Project", "status": "locked", "difficulty": "expert", "hours": 60 }
+    ],
+    "graduation": {
+      "title": "🏆 GRADUATION",
+      "subtitle": "Junior 3D Artist",
+      "paths": [
+        "💰 Freelance Career",
+        "🏢 Studio Employment",
+        "📚 Master's Program"
       ]
     }
-  ]
+  }
 }
