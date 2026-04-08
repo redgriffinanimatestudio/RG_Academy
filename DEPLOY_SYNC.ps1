@@ -62,17 +62,27 @@ if (-not (Test-Path $PRISMA_GENERATED_SRC)) {
 npx prisma generate
 npm run build
 
-# Injecting ServiceWorker Kill-Switch (Zero sub-expressions)
+# Injecting ServiceWorker kill-switch
 if (Test-Path 'dist') {
-    $SW = 'self.addEventListener("install", (e) => { self.skipWaiting(); });' + "`n"
-    $SW += 'self.addEventListener("activate", (e) => {' + "`n"
-    $SW += '  caches.keys().then(names => { for (let name of names) caches.delete(name); });' + "`n"
-    $SW += '  self.registration.unregister().then(() => {' + "`n"
-    $SW += '    return self.clients.matchAll();' + "`n"
-    $SW += '  }).then(clients => {' + "`n"
-    $SW += '    clients.forEach(client => client.navigate(client.url));' + "`n"
-    $SW += '  });' + "`n"
-    $SW += '});'
+    $SW = [string]::Join([Environment]::NewLine, @(
+        'self.addEventListener("install", function (e) {',
+        '  self.skipWaiting();',
+        '});',
+        'self.addEventListener("activate", function (e) {',
+        '  caches.keys().then(function (names) {',
+        '    for (var i = 0; i < names.length; i++) {',
+        '      caches.delete(names[i]);',
+        '    }',
+        '  });',
+        '  self.registration.unregister().then(function () {',
+        '    return self.clients.matchAll();',
+        '  }).then(function (clients) {',
+        '    clients.forEach(function (client) {',
+        '      client.navigate(client.url);',
+        '    });',
+        '  });',
+        '});'
+    ))
     $SW | Out-File -FilePath 'dist/sw.js' -Encoding utf8
 }
 

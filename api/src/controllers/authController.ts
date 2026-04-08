@@ -12,6 +12,7 @@ import {
 import { z } from 'zod';
 import { mapSocialPayload } from '../utils/socialMapper.js';
 import { identityService } from '../services/identityService.js';
+import { canonicalizePhoneDigits, normalizePhone } from '../utils/phone.js';
 
 // Временное кэширование OTP в памяти сервера
 // Формат: { '+7900...': { code: '123456', expiresAt: 1234123, attempts: 0 } }
@@ -27,32 +28,6 @@ const authCookieOptions = {
 
 const attachAuthCookie = (res: Response, token: string) => {
   res.cookie(AUTH_COOKIE_NAME, token, authCookieOptions);
-};
-
-const normalizePhone = (phone?: string, phoneCode?: string) => {
-  const rawPhone = String(phone || '').trim();
-  const rawCode = String(phoneCode || '').trim();
-
-  if (!rawPhone && !rawCode) return '';
-
-  const phoneDigits = rawPhone.replace(/\D/g, '');
-  const codeDigits = rawCode.replace(/\D/g, '');
-
-  if (!phoneDigits) return '';
-
-  if (rawPhone.startsWith('+')) {
-    return `+${phoneDigits}`;
-  }
-
-  if (rawPhone.startsWith('00')) {
-    return `+${phoneDigits.replace(/^00/, '')}`;
-  }
-
-  if (codeDigits) {
-    return `+${codeDigits}${phoneDigits}`;
-  }
-
-  return phoneDigits;
 };
 
 /**
@@ -366,7 +341,30 @@ export const authController = {
       if (!normalizedPhone) return success(res, { available: true });
 
       const user = await prisma.user.findUnique({ where: { phone: normalizedPhone } });
-      return success(res, { available: !user });
+      if (user) {
+        console.log(`[AUTH] CheckPhone matched exact canonical value: ${normalizedPhone} -> ${user.id}`);
+        return success(res, { available: false });
+      }
+
+      const digitsOnly = canonicalizePhoneDigits(normalizedPhone);
+      if (!digitsOnly) {
+        return success(res, { available: true });
+      }
+
+      const legacyMatch = await prisma.$queryRaw<Array<{ id: string; phone: string | null }>>`
+        SELECT id, phone
+        FROM \`User\`
+        WHERE phone IS NOT NULL
+          AND phone <> ''
+          AND REGEXP_REPLACE(phone, '[^0-9]', '') = ${digitsOnly}
+        LIMIT 1
+      `;
+
+      if (legacyMatch.length > 0) {
+        console.log(`[AUTH] CheckPhone matched legacy phone storage: ${normalizedPhone} -> ${legacyMatch[0].id} (${legacyMatch[0].phone})`);
+      }
+
+      return success(res, { available: legacyMatch.length === 0 });
     } catch (e: any) {
       console.error('❌ [AUTH] CheckPhone Failure:', e);
       return error(res, `Prisma Conflict: ${e.message}`, 500, {

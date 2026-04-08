@@ -170,7 +170,7 @@ const Login: React.FC = () => {
 
       const timer = setTimeout(async () => {
         try {
-          const available = await authService.checkPhone(normalizedPhone, String(formData.phoneCode || ''));
+          const available = await authService.checkPhone(rawPhone, String(formData.phoneCode || ''));
           if (available) {
             setPhoneStatus('success');
             setPhoneError('');
@@ -223,10 +223,10 @@ const Login: React.FC = () => {
       }
       // Browser-native base64 encoding (Buffer.from is not available in browsers)
       const signature = btoa(unescape(encodeURIComponent(`SIGNED_BY_${formData.email}_AT_${Date.now()}`)));
-      const normalizedPhone = normalizePhone(String(formData.phoneCode || ''), String(formData.phone || ''));
       const payload = {
         ...formData,
-        phone: normalizedPhone,
+        phone: String(formData.phone || '').trim(),
+        phoneCode: String(formData.phoneCode || ''),
         role: formData.selectedRole,
         profileData: {
           bio: formData.bio || `Synchronized via ${formData.selectedRole.toUpperCase()} PROTOCOL`,
