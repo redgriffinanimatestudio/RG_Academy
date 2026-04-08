@@ -96,7 +96,8 @@ Copy-Item -Recurse 'dist' ($BUILD_TEMP + '/dist')
 Copy-Item 'server-dist.cjs' ($BUILD_TEMP + '/server-dist.cjs')
 Copy-Item 'index.js' ($BUILD_TEMP + '/index.js')
 Copy-Item $SCHEMA_PATCH ($BUILD_TEMP + '/' + $SCHEMA_PATCH)
-Copy-Item -Recurse $PRISMA_GENERATED_SRC ($BUILD_TEMP + '/generated')
+New-Item -ItemType Directory -Force ($BUILD_TEMP + '/generated') | Out-Null
+Copy-Item -Recurse $PRISMA_GENERATED_SRC ($BUILD_TEMP + '/generated/prisma')
 ("${DEPLOY_TAG}-Neural-Patch") | Out-File -FilePath ($BUILD_TEMP + '/VERSION') -Encoding utf8
 
 # Generate .env locally for security (avoid remote printf mangling)

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Prisma } from '../../../generated/prisma';
+import { Prisma } from '../../../generated/prisma/client';
 
 /////////////////////////////////////////
 // HELPER FUNCTIONS
